@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{7cc87c21-cda7-4752-bc2f-331f23313685}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{82eb8aad-ca3b-4329-bbc8-c6a7fa77497d}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{92032fab-478f-412b-8af0-fdc560fd8f99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\forms">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="source\commands">
+      <UniqueIdentifier>{226e0400-3039-4822-a038-c33d563b2d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\graph">
+      <UniqueIdentifier>{af5a77ad-73ed-42f4-b36e-c6600cae821f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\util">
+      <UniqueIdentifier>{ec71704a-3af4-488a-9f76-5d664f1a444a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\shaders">
+      <UniqueIdentifier>{83ac644f-364a-4e9d-b83a-b0bdfced8bcb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\zengarden.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="source\commands\command.cpp">
+      <Filter>source\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="source\commands\graphCommands.cpp">
+      <Filter>source\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="source\graph\operatorPanel.cpp">
+      <Filter>source\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="source\graph\operatorWidget.cpp">
+      <Filter>source\graph</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_operatorPanel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_operatorPanel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="source\util\textTexture.cpp">
+      <Filter>source\util</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_ui_shaders.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\document.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\util\glPainter.cpp">
+      <Filter>source\util</Filter>
+    </ClCompile>
+    <ClCompile Include="source\util\editorComponents.cpp">
+      <Filter>source\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="source\forms\zengarden.ui">
+      <Filter>source\forms</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\forms\zengarden.qrc">
+      <Filter>source\forms</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\zengarden.h">
+      <Filter>source</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\graph\operatorPanel.h">
+      <Filter>source\graph</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\shaders\ui_shaders.qrc">
+      <Filter>source\shaders</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_zengarden.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\commands\command.h">
+      <Filter>source\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="source\commands\graphCommands.h">
+      <Filter>source\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="source\graph\operatorWidget.h">
+      <Filter>source\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="source\util\textTexture.h">
+      <Filter>source\util</Filter>
+    </ClInclude>
+    <ClInclude Include="source\document.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\util\glPainter.h">
+      <Filter>source\util</Filter>
+    </ClInclude>
+    <ClInclude Include="source\util\editorComponents.h">
+      <Filter>source\util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\shaders\solidcolor.fs">
+      <Filter>source\shaders</Filter>
+    </None>
+    <None Include="source\shaders\solidTexture.fs">
+      <Filter>source\shaders</Filter>
+    </None>
+    <None Include="source\shaders\textTexture.fs">
+      <Filter>source\shaders</Filter>
+    </None>
+    <None Include="source\shaders\2dtransform.vs">
+      <Filter>source\shaders</Filter>
+    </None>
+    <None Include="source\shaders\transformPos.vs">
+      <Filter>source\shaders</Filter>
+    </None>
+    <None Include="source\shaders\transformPosUV.vs">
+      <Filter>source\shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

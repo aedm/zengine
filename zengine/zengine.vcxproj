@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{31844F21-69DE-4C92-A7D5-C8DEFE994011}</ProjectGuid>
+    <RootNamespace>zengine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>D:\Develop\Haiku\Zengine\include;D:\3rdparty\glut-3.7.6-bin;d:\3rdparty\Box2D_v2.2.1;D:\3rdparty\boost_1_52_0;D:\3rdparty\Qt\4.8.3\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\3rdparty\glew-1.9.0\include;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)\lib\</OutDir>
+    <IntDir>$(ProjectDir)\.msbuild\$(Configuration)\</IntDir>
+    <TargetName>zengine-debug</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(ProjectDir)\lib\</OutDir>
+    <IntDir>$(ProjectDir)\.msbuild\$(Configuration)\</IntDir>
+    <TargetName>zengine-release</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalOptions>/MP /we4062 /wd4355 %(AdditionalOptions)</AdditionalOptions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\components\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <CompileAsManaged>false</CompileAsManaged>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\components\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>components\glew\glew32s.lib</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="doc\shader2.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\base\defines.h" />
+    <ClInclude Include="include\base\fastdelegate.h" />
+    <ClInclude Include="include\base\helpers.h" />
+    <ClInclude Include="include\base\system.h" />
+    <ClInclude Include="include\base\vectormath.h" />
+    <ClInclude Include="include\dom\node.h" />
+    <ClInclude Include="include\dom\types.h" />
+    <ClInclude Include="include\operators\meshoperator.h" />
+    <ClInclude Include="include\operators\model.h" />
+    <ClInclude Include="include\operators\shaderoperator.h" />
+    <ClInclude Include="include\operators\valueoperators.h" />
+    <ClInclude Include="include\render\drawingapi.h" />
+    <ClInclude Include="include\resources\resourcemanager.h" />
+    <ClInclude Include="include\shaders\shaderbuilder.h" />
+    <ClInclude Include="include\shaders\shadermetadata.h" />
+    <ClInclude Include="include\shaders\shaders.h" />
+    <ClInclude Include="include\zengine.h" />
+    <ClInclude Include="source\render\opengl\drawingopengl.h" />
+    <ClInclude Include="source\shaders\analyzer.h" />
+    <ClInclude Include="source\shaders\shaderTokenizer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\base\helpers.cpp" />
+    <ClCompile Include="source\base\system.cpp" />
+    <ClCompile Include="source\base\vectormath.cpp" />
+    <ClCompile Include="source\dom\node.cpp" />
+    <ClCompile Include="source\operators\meshoperator.cpp" />
+    <ClCompile Include="source\operators\model.cpp" />
+    <ClCompile Include="source\operators\shaderoperator.cpp" />
+    <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
+    <ClCompile Include="source\resources\mesh.cpp" />
+    <ClCompile Include="source\resources\resourcemanager.cpp" />
+    <ClCompile Include="source\resources\texture.cpp" />
+    <ClCompile Include="source\shaders\analyzer.cpp" />
+    <ClCompile Include="source\shaders\shaderBuilder.cpp" />
+    <ClCompile Include="source\shaders\shaderMetadata.cpp" />
+    <ClCompile Include="source\shaders\shaders.cpp" />
+    <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
+    <ClCompile Include="source\zengine.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

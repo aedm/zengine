@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="doc">
+      <UniqueIdentifier>{8f1b49aa-7e9b-4335-8463-052ad78a62e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{788fb7d9-2712-45b5-aa9f-c2f1ac156d38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{79dcf934-de57-4e4d-bb3b-defc7a1badc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\resources">
+      <UniqueIdentifier>{df1c26b3-77fb-4457-a7fd-c6a2a64db3ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\base">
+      <UniqueIdentifier>{8c2d18f5-a263-4556-b824-d78639740c34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\dom">
+      <UniqueIdentifier>{5e682bea-3e34-4a64-acc7-e6a3100869dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\operators">
+      <UniqueIdentifier>{572cf8d3-2a81-4710-89d1-baeb2bb2b097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\shaders">
+      <UniqueIdentifier>{4960c071-4981-432e-8c00-0f556fca3880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\base">
+      <UniqueIdentifier>{ae5d5113-4091-4b5d-be7f-1768cd2c7a1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\dom">
+      <UniqueIdentifier>{580ede8c-34bf-41af-93ab-7c96b7d5cb9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\operators">
+      <UniqueIdentifier>{2b9bcb46-5c32-4ea2-ae28-b3a9f933632f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\render">
+      <UniqueIdentifier>{984ecc4c-b78a-472e-ac3f-80a42f033ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\render\opengl">
+      <UniqueIdentifier>{2dddd788-3631-435b-9eee-c3597a70f4db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\resources">
+      <UniqueIdentifier>{b228b5fb-3cb5-4253-89e7-54c7802ed4a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\shaders">
+      <UniqueIdentifier>{ab4cad09-252d-4f8c-b03f-aa45a8f53383}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\render">
+      <UniqueIdentifier>{ee22b4d5-c892-4aa4-b356-a126766315f1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="doc\shader2.txt">
+      <Filter>doc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\zengine.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\resources\resourcemanager.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\helpers.h">
+      <Filter>include\base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\node.h">
+      <Filter>include\dom</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\types.h">
+      <Filter>include\dom</Filter>
+    </ClInclude>
+    <ClInclude Include="include\operators\meshoperator.h">
+      <Filter>include\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\operators\model.h">
+      <Filter>include\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\operators\shaderoperator.h">
+      <Filter>include\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\operators\valueoperators.h">
+      <Filter>include\operators</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\shaderbuilder.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\shadermetadata.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\shaders.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="source\render\opengl\drawingopengl.h">
+      <Filter>source\render\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="source\shaders\analyzer.h">
+      <Filter>source\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="source\shaders\shaderTokenizer.h">
+      <Filter>source\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\defines.h">
+      <Filter>include\base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\render\drawingapi.h">
+      <Filter>include\render</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\vectormath.h">
+      <Filter>include\base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\fastdelegate.h">
+      <Filter>include\base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\system.h">
+      <Filter>include\base</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\base\helpers.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="source\base\system.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="source\base\vectormath.cpp">
+      <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\node.cpp">
+      <Filter>source\dom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\operators\meshoperator.cpp">
+      <Filter>source\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="source\operators\model.cpp">
+      <Filter>source\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="source\operators\shaderoperator.cpp">
+      <Filter>source\operators</Filter>
+    </ClCompile>
+    <ClCompile Include="source\render\opengl\drawingopengl.cpp">
+      <Filter>source\render\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="source\resources\mesh.cpp">
+      <Filter>source\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="source\resources\texture.cpp">
+      <Filter>source\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\analyzer.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\shaderBuilder.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\shaderMetadata.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\shaders.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\shaderTokenizer.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\resources\resourcemanager.cpp">
+      <Filter>source\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="source\zengine.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
