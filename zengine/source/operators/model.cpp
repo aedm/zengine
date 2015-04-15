@@ -25,7 +25,7 @@ void Model::Render(PrimitiveTypeEnum Primitive)
 	Evaluate();
 	if (!Mapper) return;
 
-	static_cast<ShaderOperator*>(TheShader.GetAttachedOperator())->Set();
+	static_cast<ShaderOperator*>(TheShader.GetConnectedNode())->Set();
 	Mesh* mesh = TheMesh.Value();
 	if (mesh->IndexHandle)
 	{
@@ -47,7 +47,7 @@ void Model::Operate()
 	if (Mapper == NULL)
 	{
 		Mesh* mesh = TheMesh.Value();
-		ShaderOperator* shader = (ShaderOperator*)TheShader.GetAttachedOperator();
+		ShaderOperator* shader = (ShaderOperator*)TheShader.GetConnectedNode();
 		if (mesh && shader)
 		{
 			Mapper = TheDrawingAPI->CreateAttributeMapper(mesh->Format->Attributes, 

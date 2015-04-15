@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_operatorPanel.cpp">
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
@@ -29,7 +29,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_operatorPanel.cpp">
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
@@ -38,8 +38,8 @@
     <ClCompile Include="source\commands\command.cpp" />
     <ClCompile Include="source\commands\graphCommands.cpp" />
     <ClCompile Include="source\document.cpp" />
-    <ClCompile Include="source\graph\operatorPanel.cpp" />
-    <ClCompile Include="source\graph\operatorWidget.cpp" />
+    <ClCompile Include="source\graph\grapheditor.cpp" />
+    <ClCompile Include="source\graph\nodewidget.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\util\editorComponents.cpp" />
     <ClCompile Include="source\util\glPainter.cpp" />
@@ -75,17 +75,17 @@
     <ClInclude Include="source\commands\command.h" />
     <ClInclude Include="source\commands\graphCommands.h" />
     <ClInclude Include="source\document.h" />
-    <ClInclude Include="source\graph\operatorWidget.h" />
+    <ClInclude Include="source\graph\nodewidget.h" />
     <ClInclude Include="source\util\editorComponents.h" />
     <ClInclude Include="source\util\glPainter.h" />
     <ClInclude Include="source\util\textTexture.h" />
-    <CustomBuild Include="source\graph\operatorPanel.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing operatorPanel.h...</Message>
+    <CustomBuild Include="source\graph\grapheditor.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing grapheditor.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing operatorPanel.h...</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing grapheditor.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
     </CustomBuild>

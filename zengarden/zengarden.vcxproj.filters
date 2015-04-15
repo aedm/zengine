@@ -58,18 +58,6 @@
     <ClCompile Include="source\commands\graphCommands.cpp">
       <Filter>source\commands</Filter>
     </ClCompile>
-    <ClCompile Include="source\graph\operatorPanel.cpp">
-      <Filter>source\graph</Filter>
-    </ClCompile>
-    <ClCompile Include="source\graph\operatorWidget.cpp">
-      <Filter>source\graph</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_operatorPanel.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_operatorPanel.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="source\util\textTexture.cpp">
       <Filter>source\util</Filter>
     </ClCompile>
@@ -85,6 +73,18 @@
     <ClCompile Include="source\util\editorComponents.cpp">
       <Filter>source\util</Filter>
     </ClCompile>
+    <ClCompile Include="source\graph\grapheditor.cpp">
+      <Filter>source\graph</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="source\graph\nodewidget.cpp">
+      <Filter>source\graph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -96,11 +96,11 @@
     <CustomBuild Include="source\zengarden.h">
       <Filter>source</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\graph\operatorPanel.h">
-      <Filter>source\graph</Filter>
-    </CustomBuild>
     <CustomBuild Include="source\shaders\ui_shaders.qrc">
       <Filter>source\shaders</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\graph\grapheditor.h">
+      <Filter>source\graph</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -113,9 +113,6 @@
     <ClInclude Include="source\commands\graphCommands.h">
       <Filter>source\commands</Filter>
     </ClInclude>
-    <ClInclude Include="source\graph\operatorWidget.h">
-      <Filter>source\graph</Filter>
-    </ClInclude>
     <ClInclude Include="source\util\textTexture.h">
       <Filter>source\util</Filter>
     </ClInclude>
@@ -127,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="source\util\editorComponents.h">
       <Filter>source\util</Filter>
+    </ClInclude>
+    <ClInclude Include="source\graph\nodewidget.h">
+      <Filter>source\graph</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

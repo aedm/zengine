@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graph/operatorWidget.h"
+#include "graph/nodewidget.h"
 #include <vector>
 
 using namespace std;
@@ -22,5 +22,5 @@ class OperatorGraph
 public:
 	OperatorGraph();
 
-	vector<OperatorWidget*>		Widgets;
+	vector<NodeWidget*>		Widgets;
 };

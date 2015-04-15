@@ -12,7 +12,7 @@ zengarden::zengarden(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	OpPanel = new OperatorPanel(ui.tab);
+	OpPanel = new GraphEditor(ui.tab);
 	OpPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	ui.leftPanelFirstTabLayout->addWidget(OpPanel);
 
@@ -40,15 +40,15 @@ void zengarden::InitModules()
 	ShaderOperator* shaderOp = LoadShader("test.vs", "test.fs");
 	if (shaderOp)
 	{
-		TheCommandStack->Execute(new CreateOperatorCommand(shaderOp, OpPanel));
-		OperatorWidget* ow = OpPanel->GetOperatorWidget(shaderOp);
-		TheCommandStack->Execute(new MoveOperatorCommand(ow, Vec2(20, 50)));
+		TheCommandStack->Execute(new CreateNodeCommand(shaderOp, OpPanel));
+		NodeWidget* ow = OpPanel->GetOperatorWidget(shaderOp);
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 50)));
 	}
 
 	Model* model = new Model();
-	TheCommandStack->Execute(new CreateOperatorCommand(model, OpPanel));
-	OperatorWidget* ow = OpPanel->GetOperatorWidget(model);
-	TheCommandStack->Execute(new MoveOperatorCommand(ow, Vec2(ADJUST(250), 70)));
+	TheCommandStack->Execute(new CreateNodeCommand(model, OpPanel));
+	NodeWidget* ow = OpPanel->GetOperatorWidget(model);
+	TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(ADJUST(250), 70)));
 
 	//model->TheShader.Connect(shaderOp);
 	OpPanel->update();

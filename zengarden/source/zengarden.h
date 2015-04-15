@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_zengarden.h"
-#include "graph/operatorPanel.h"
+#include "graph/grapheditor.h"
 #include "document.h"
 #include <zengine.h>
 
@@ -19,7 +19,7 @@ private:
 	Ui::zengardenClass ui;
 	void Log(LogMessage Message);
 
-	OperatorPanel*				OpPanel;
+	GraphEditor*				OpPanel;
 	Document*					Doc;
 
 private slots:

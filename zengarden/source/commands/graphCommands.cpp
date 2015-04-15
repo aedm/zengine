@@ -1,92 +1,92 @@
 #include "graphCommands.h"
-#include "../graph/operatorWidget.h"
+#include "../graph/nodewidget.h"
 
-CreateOperatorCommand::CreateOperatorCommand( Node* _Nd, OperatorPanel* _Panel )
-	: Op(_Nd)
+CreateNodeCommand::CreateNodeCommand( Node* _Nd, GraphEditor* _Panel )
+	: Nd(_Nd)
 	, Panel(_Panel)
 {}
 
-CreateOperatorCommand::~CreateOperatorCommand()
+CreateNodeCommand::~CreateNodeCommand()
 {
 	if (!Active) {
-		SafeDelete(Op);
+		SafeDelete(Nd);
 	}
 }
 
-bool CreateOperatorCommand::Do()
+bool CreateNodeCommand::Do()
 {
-	Panel->AddOperator(Op);
+	Panel->AddNode(Nd);
 	return true;
 }
 
-bool CreateOperatorCommand::Undo()
+bool CreateNodeCommand::Undo()
 {
 	NOT_IMPLEMENTED;
 	return true;
 }
 
-MoveOperatorCommand::MoveOperatorCommand( OperatorWidget* _OpWidget, const Vec2& _Position )
-	: OpWidget(_OpWidget)
+MoveNodeCommand::MoveNodeCommand( NodeWidget* _NdWidget, const Vec2& _Position )
+	: NdWidget(_NdWidget)
 	, NewPosition(_Position)
 {
-	OldPosition = OpWidget->Position;
+	OldPosition = NdWidget->Position;
 }
 
-bool MoveOperatorCommand::Do()
+bool MoveNodeCommand::Do()
 {
-	OpWidget->SetPosition(NewPosition);
+	NdWidget->SetPosition(NewPosition);
 	return true;
 }
 
-bool MoveOperatorCommand::Undo()
+bool MoveNodeCommand::Undo()
 {
-	OpWidget->SetPosition(OldPosition);
+	NdWidget->SetPosition(OldPosition);
 	return true;
 }
 
 
-ConnectOperatorToSlotCommand::ConnectOperatorToSlotCommand( Node* _FromOperator, Slot* _ToSlot )
-	: NewOperator(_FromOperator)
+ConnectNodeToSlotCommand::ConnectNodeToSlotCommand( Node* _FromNode, Slot* _ToSlot )
+	: NewNode(_FromNode)
 	, ToSlot(_ToSlot)
 {
-	OldOperator = ToSlot->GetAttachedOperator();
+	OldNode = ToSlot->GetConnectedNode();
 }
 
-bool ConnectOperatorToSlotCommand::Do()
+bool ConnectNodeToSlotCommand::Do()
 {
-	return ToSlot->Connect(NewOperator);
+	return ToSlot->Connect(NewNode);
 }
 
-bool ConnectOperatorToSlotCommand::Undo()
+bool ConnectNodeToSlotCommand::Undo()
 {
-	return ToSlot->Connect(OldOperator);
+	return ToSlot->Connect(OldNode);
 }
 
-DeleteOperatorCommand::DeleteOperatorCommand( const set<OperatorWidget*>& _OpWidgets )
-	: OpWidgets(_OpWidgets)
+DeleteNodeCommand::DeleteNodeCommand( const set<NodeWidget*>& _NodeWidgets )
+	: NodeWidgets(_NodeWidgets)
 {}
 
-DeleteOperatorCommand::~DeleteOperatorCommand()
+DeleteNodeCommand::~DeleteNodeCommand()
 {
 	if (Active) {
-		foreach (OperatorWidget* ow, OpWidgets) {
-			delete ow;
+		foreach (NodeWidget* nw, NodeWidgets) {
+			delete nw;
 		}
 	}
 }
 
-bool DeleteOperatorCommand::Do()
+bool DeleteNodeCommand::Do()
 {
 	NOT_IMPLEMENTED
-	foreach(OperatorWidget* ow, OpWidgets) {
-		foreach (Slot* slot, ow->GetOperator()->Slots) {
+	foreach(NodeWidget* nw, NodeWidgets) {
+		foreach (Slot* slot, nw->GetOperator()->Slots) {
 			slot->Connect(NULL);
 		}
 	}
 	return true;
 }
 
-bool DeleteOperatorCommand::Undo()
+bool DeleteNodeCommand::Undo()
 {
 	NOT_IMPLEMENTED
 	return false;

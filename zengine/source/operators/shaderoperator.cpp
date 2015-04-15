@@ -85,7 +85,7 @@ void ShaderOperator::RegenerateCopyItems()
 	bool allConnected = true;
 	foreach(UniformMapping& item, Uniforms)
 	{
-		if (item.TargetUniform->IsLocal && item.SourceSlot->GetAttachedOperator() == NULL)
+		if (item.TargetUniform->IsLocal && item.SourceSlot->GetConnectedNode() == NULL)
 		{
 			allConnected = false;
 			break;

@@ -1,62 +1,62 @@
 #pragma once
 
 #include "command.h"
-#include "../graph/operatorPanel.h"
+#include "../graph/grapheditor.h"
 
-class CreateOperatorCommand: public Command
+class CreateNodeCommand: public Command
 {
 public:
-	CreateOperatorCommand(Node* Nd, OperatorPanel* Panel);
-	~CreateOperatorCommand();
+	CreateNodeCommand(Node* Nd, GraphEditor* Panel);
+	~CreateNodeCommand();
 
 	virtual bool			Do() override;
 	virtual bool			Undo() override;
 
 private:
-	Node*					Op;
-	OperatorPanel*			Panel;
+	Node*					Nd;
+	GraphEditor*			Panel;
 };
 
 
-class MoveOperatorCommand: public Command
+class MoveNodeCommand: public Command
 {
 public:
-	MoveOperatorCommand(OperatorWidget* OpWidget, const Vec2& Position);
+	MoveNodeCommand(NodeWidget* OpWidget, const Vec2& Position);
 
 	virtual bool			Do() override;
 	virtual bool			Undo() override;
 
 private:
-	OperatorWidget*			OpWidget;
+	NodeWidget*				NdWidget;
 	Vec2					NewPosition;
 	Vec2					OldPosition;
 };
 
 
-class ConnectOperatorToSlotCommand: public Command
+class ConnectNodeToSlotCommand: public Command
 {
 public:
-	ConnectOperatorToSlotCommand(Node* FromOperator, Slot* ToSlot);
+	ConnectNodeToSlotCommand(Node* FromNode, Slot* ToSlot);
 
 	virtual bool			Do() override;
 	virtual bool			Undo() override;
 
 private:
-	Node*					NewOperator;
-	Node*					OldOperator;
+	Node*					NewNode;
+	Node*					OldNode;
 	Slot*					ToSlot;
 };
 
 
-class DeleteOperatorCommand: public Command
+class DeleteNodeCommand: public Command
 {
 public:
-	DeleteOperatorCommand(const set<OperatorWidget*>& OpWidgets);
-	virtual ~DeleteOperatorCommand();
+	DeleteNodeCommand(const set<NodeWidget*>& NodeWidgets);
+	virtual ~DeleteNodeCommand();
 
 	virtual bool			Do() override;
 	virtual bool			Undo() override;
 
 private:
-	set<OperatorWidget*>	OpWidgets;
+	set<NodeWidget*>		NodeWidgets;
 };

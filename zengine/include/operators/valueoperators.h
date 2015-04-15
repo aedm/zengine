@@ -5,7 +5,7 @@
 
 /// Operators holding primitive values that can be directly set.
 template<NodeTypeEnum T>
-class ValueOperator: public TypedOperator<T>
+class ValueOperator: public TypedNode<T>
 {
 public:
 	ValueOperator();
@@ -43,7 +43,7 @@ template class ValueOperator<NODE_MATRIX44>;
 
 template<NodeTypeEnum T>
 ValueOperator<T>::ValueOperator()
-	: TypedOperator()
+	: TypedNode()
 {
 	Value = ValueType();
 }
@@ -51,7 +51,7 @@ ValueOperator<T>::ValueOperator()
 
 template<NodeTypeEnum T>
 ValueOperator<T>::ValueOperator( const ValueOperator<T>& Original )
-	: TypedOperator(Original)
+	: TypedNode(Original)
 {
 	Value = Original.Value;
 }

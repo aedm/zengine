@@ -12,7 +12,7 @@ using namespace std;
 using namespace fastdelegate;
 
 class Node;
-template<NodeTypeEnum T> class TypedOperator;
+template<NodeTypeEnum T> class TypedNode;
 
 /// Nodes can have multiple input slots. Each slot's value is set by an another node's output.
 class Slot
@@ -24,37 +24,37 @@ public:
 	/// The operator which this slot is a member of
 	Node* const				Owner;
 
-	/// Attach slot to ZenOperator. Slot value will be taken from operator value.
-	/// If @Operator is NULL, slot will be detached. 
+	/// Attach slot to node. Slot value will be taken from the node.
+	/// If node parameter is nullptr, slot will be detached. 
 	/// Returns false if connection is not possible due to type mismatch.
-	bool						Connect(Node* Op);
+	bool					Connect(Node* Nd);
 
-	/// Returns connected operator
-	Node*					GetAttachedOperator() const;
+	/// Returns connected node
+	Node*					GetConnectedNode() const;
 
 	/// Type of object this slot accepts
-	NodeTypeEnum					GetType() const;
+	NodeTypeEnum			GetType() const;
 	
 	/// Returns the name of the slot
-	SharedString				GetName();
+	SharedString			GetName();
 
 protected:
 	/// Slot is connected to this one
-	Node*					AttachedOperator;
+	Node*					ConnectedNode;
 
 	/// Name of the slot. Can't be changed.
-	SharedString				Name;
+	SharedString			Name;
 
 	/// Output type
-	const NodeTypeEnum			Type;
+	const NodeTypeEnum		Type;
 
 	/// Biolerplate
-	void						DisconnectFromOperator();
-	void						FinalizeAttach();
+	void					DisconnectFromNode();
+	void					FinalizeAttach();
 };
 
 
-/// Slot expecting a value operator.
+/// Slot expecting a value node.
 template <NodeTypeEnum T>
 class TypedSlot: public Slot
 {
@@ -63,10 +63,10 @@ class TypedSlot: public Slot
 public:
 	TypedSlot(Node* Owner, SharedString Name);
 
-	const ValueType&			Value();
+	const ValueType&		Value();
 
-	/// Returns connected typed operator
-	TypedOperator<T>*			GetOperator() const;
+	/// Returns connected typed node
+	TypedNode<T>*			GetNode() const;
 };
 
 
@@ -78,25 +78,26 @@ class Node
 public:
 	virtual ~Node();
 
-	/// Parameters of this operator.
+	/// Parameters of this node.
 	vector<Slot*>				Slots;
 
-	/// Name of the operator
+	/// Name of the node
 	string						Name;
 	
 	/// Returns object type.
-	NodeTypeEnum					GetType() const;			
+	NodeTypeEnum				GetType() const;			
 
-	/// List of slots this operator's output is connected to
+	/// List of slots this node's output is connected to
 	const vector<Slot*>&		GetDependants() const;	
 
 	/// Reruns Operate() if dirty (on dirty ancestors too)
 	void						Evaluate();
 
-	/// Clone operator
-	virtual Node*			Clone() const;
+	/// Clone node
+	virtual Node*				Clone() const;
 
 	/// If true, this is a primitive type, value can be set directly
+	/// TODO: kill this
 	virtual bool				CanSetValueDirectly();
 
 protected:
@@ -121,13 +122,13 @@ protected:
 	void						SetDependantsDirty();
 	
 	/// Output type
-	NodeTypeEnum					Type;
+	NodeTypeEnum				Type;
 
 private:
 	/// True if Operate() needs to be called
 	bool						IsDirty;
 
-	/// Slots this operator is connected to (as an input)
+	/// Slots that this node is connected to (as an input)
 	vector<Slot*>				Dependants;
 
 	/// Add or remove slot to/from notification list
@@ -139,24 +140,24 @@ private:
 };
 
 
-/// Operator with an output value.
+/// Node with an output value.
 template<NodeTypeEnum T>
-class TypedOperator: public Node
+class TypedNode: public Node
 {
 public:
 	typedef typename OpTypes<T>::Type ValueType;
 
-	TypedOperator();
+	TypedNode();
 
 	/// For cloning
-	TypedOperator(const TypedOperator<T>& Original);
+	TypedNode(const TypedNode<T>& Original);
 
-	/// Returns value of operator. Reevaluates if necessary
+	/// Returns value of node. Reevaluates if necessary
 	virtual const ValueType&	GetValue() = NULL;
 };
 
 
-/// Operator and slot types
+/// Node and slot types
 typedef TypedSlot<NODE_FLOAT>		FloatSlot;
 typedef TypedSlot<NODE_VEC4>		Vec4Slot;
 typedef TypedSlot<NODE_MATRIX44>	Matrix4Slot;
@@ -180,12 +181,12 @@ TypedSlot<T>::TypedSlot( Node* Owner, SharedString Name )
 template <NodeTypeEnum T>
 const typename TypedSlot<T>::ValueType& TypedSlot<T>::Value()
 {
-	return static_cast<TypedOperator<T>*>(GetAttachedOperator())->GetValue();
+	return static_cast<TypedNode<T>*>(GetConnectedNode())->GetValue();
 }
 
 
 template<NodeTypeEnum T>
-TypedOperator<T>::TypedOperator()
+TypedNode<T>::TypedNode()
 	: Node(VariableNames[(UINT)T])
 {
 	Type = T;
@@ -193,7 +194,7 @@ TypedOperator<T>::TypedOperator()
 
 
 template<NodeTypeEnum T>
-TypedOperator<T>::TypedOperator( const TypedOperator<T>& Original ) 
+TypedNode<T>::TypedNode( const TypedNode<T>& Original ) 
 	: Node(Original)
 {}
 

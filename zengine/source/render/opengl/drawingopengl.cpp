@@ -76,9 +76,6 @@ void DrawingOpenGL::OnContextSwitch()
 	BlendModeShadow = RenderState::BLEND_ADDITIVE;
 	BlendEnableShadow = true;
 	SetBlendMode(RenderState::BLEND_NORMAL);
-	
-	BlendEnableShadow = true;
-	SetBlendMode(RenderState::BLEND_NORMAL);
 
 	DepthTestEnabledShadow = true;
 	SetDepthTest(false);

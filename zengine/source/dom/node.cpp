@@ -6,7 +6,7 @@ Slot::Slot(NodeTypeEnum _Type, Node* _Owner, SharedString _Name )
 	: Owner(_Owner)
 	, Type(_Type)
 {
-	AttachedOperator = NULL;
+	ConnectedNode = NULL;
 	Name = _Name;
 }
 
@@ -17,7 +17,7 @@ Slot::~Slot()
 
 bool Slot::Connect( Node* Op )
 {
-	if (AttachedOperator != Op)
+	if (ConnectedNode != Op)
 	{
 		if (Op && Op->GetType() != GetType()) 
 		{
@@ -26,9 +26,9 @@ bool Slot::Connect( Node* Op )
 			return false;
 		}
 
-		if (AttachedOperator) AttachedOperator->DisconnectFromSlot(this);
-		AttachedOperator = Op;
-		if (AttachedOperator) AttachedOperator->ConnectToSlot(this);
+		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
+		ConnectedNode = Op;
+		if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
 		
 		FinalizeAttach();
 	}
@@ -37,11 +37,11 @@ bool Slot::Connect( Node* Op )
 }
 
 
-void Slot::DisconnectFromOperator()
+void Slot::DisconnectFromNode()
 {
-	ASSERT(AttachedOperator);
-	AttachedOperator->DisconnectFromSlot(this);
-	AttachedOperator = NULL;
+	ASSERT(ConnectedNode);
+	ConnectedNode->DisconnectFromSlot(this);
+	ConnectedNode = NULL;
 }
 
 
@@ -56,9 +56,9 @@ void Slot::FinalizeAttach()
 }
 
 
-Node* Slot::GetAttachedOperator() const 
+Node* Slot::GetConnectedNode() const 
 {
-	return AttachedOperator;
+	return ConnectedNode;
 }
 
 SharedString Slot::GetName()
@@ -118,7 +118,7 @@ void Node::SetDependantsDirty()
 {
 	foreach(Slot* dependant, Dependants)
 	{
-		dependant->GetAttachedOperator()->OnSlotValueChanged(dependant);
+		dependant->GetConnectedNode()->OnSlotValueChanged(dependant);
 	}
 }
 
@@ -126,7 +126,7 @@ void Node::CheckConnections()
 {
 	foreach (Slot* slot, Slots)
 	{
-		if (slot->GetAttachedOperator() == NULL)
+		if (slot->GetConnectedNode() == NULL)
 		{
 			IsProperlyConnected = false;
 			return;
@@ -141,7 +141,7 @@ void Node::Evaluate()
 	{
 		foreach(Slot* slot, Slots) 
 		{
-			slot->GetAttachedOperator()->Evaluate();
+			slot->GetConnectedNode()->Evaluate();
 		}
 		Operate();
 		IsDirty = false;
