@@ -3,11 +3,11 @@
 
 Model::Model()
 	: Node(string("Model"))
-	, TheShader(OP_SHADER, this, make_shared<string>("Shader"))
+	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
 	, Mapper(NULL)
 {
-	Type = OP_MODEL;
+	Type = NodeType::MODEL;
 	Slots.push_back(&TheShader);
 	Slots.push_back(&TheMesh);
 }
@@ -15,7 +15,7 @@ Model::Model()
 /// TODO: Use C++11 delegating constructors
 Model::Model( const Model& Original )
 	: Node(Original)
-	, TheShader(OP_SHADER, this, make_shared<string>("Shader"))
+	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
 	, Mapper(NULL)
 {}

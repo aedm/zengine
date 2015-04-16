@@ -1,25 +1,11 @@
 #include <include/base/helpers.h>
 #include <include/base/vectormath.h>
-#include <include/dom/types.h>
+#include <include/base/types.h>
 #include <stdarg.h>
-
-/// Array for variable sizes in bytes
-const int VariableByteSizes[] = {
-#undef ITEM
-#define ITEM(name, type, token) sizeof(type),
-	NODETYPE_LIST
-};
-
-/// Array for variable sizes in bytes
-const char* VariableNames[] = {
-#undef ITEM
-#define ITEM(name, type, token) token,
-	NODETYPE_LIST
-};
 
 
 /// Array for attribute types
-const NodeTypeEnum VertexAttributeType[] = {
+const NodeType VertexAttributeType[] = {
 #undef ITEM
 #define ITEM(name, type, token) type,
 	VERTEXATTRIBUTE_LIST

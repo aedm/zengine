@@ -3,9 +3,9 @@
 Globals TheGlobals;
 
 /// Array for global uniform types
-static const NodeTypeEnum GlobalUniformTypes[] = {
+static const NodeType GlobalUniformTypes[] = {
 #undef ITEM
-#define ITEM(name, type, token) type,
+#define ITEM(name, type, token) NodeType::type,
 	GLOBALUSAGE_LIST
 };
 
@@ -45,7 +45,7 @@ Sampler::Sampler( SamplerId _Handle, const LocalDesc* _Desc )
 {}
 
 
-Uniform::Uniform( NodeTypeEnum _Type, UniformId _Handle, int _ByteOffset, 
+Uniform::Uniform( NodeType _Type, UniformId _Handle, int _ByteOffset, 
 	bool _IsLocal )
 	: Type(_Type)
 	, Handle(_Handle)
@@ -54,7 +54,7 @@ Uniform::Uniform( NodeTypeEnum _Type, UniformId _Handle, int _ByteOffset,
 {}
 
 
-LocalUniform::LocalUniform( NodeTypeEnum _Type, UniformId _Handle, 
+LocalUniform::LocalUniform( NodeType _Type, UniformId _Handle, 
 	int _ByteOffset, const LocalDesc* _Desc )
 	: Uniform(_Type, _Handle, _ByteOffset, true)
 	, Desc(_Desc)

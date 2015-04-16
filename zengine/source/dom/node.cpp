@@ -2,7 +2,7 @@
 #include <include/base/helpers.h>
 #include <algorithm>
 
-Slot::Slot(NodeTypeEnum _Type, Node* _Owner, SharedString _Name )
+Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name )
 	: Owner(_Owner)
 	, Type(_Type)
 {
@@ -15,11 +15,11 @@ Slot::~Slot()
 	Connect(NULL);
 }
 
-bool Slot::Connect( Node* Op )
+bool Slot::Connect( Node* Nd )
 {
-	if (ConnectedNode != Op)
+	if (ConnectedNode != Nd)
 	{
-		if (Op && Op->GetType() != GetType()) 
+		if (Nd && Nd->GetType() != GetType()) 
 		{
 			ERR("Slot and operator type mismatch");
 			ASSERT(false);
@@ -27,7 +27,7 @@ bool Slot::Connect( Node* Op )
 		}
 
 		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
-		ConnectedNode = Op;
+		ConnectedNode = Nd;
 		if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
 		
 		FinalizeAttach();
@@ -66,14 +66,14 @@ SharedString Slot::GetName()
 	return Name;
 }
 
-NodeTypeEnum Slot::GetType() const
+NodeType Slot::GetType() const
 {
 	return Type;
 }
 
 Node::Node(const string& _Name)
 	: Name(_Name)
-	, Type(OP_UNDEFINED)
+	, Type(NodeType::UNDEFINED)
 {
 	IsDirty = true;
 	IsProperlyConnected = true;
@@ -100,7 +100,7 @@ const vector<Slot*>& Node::GetDependants() const
 	return Dependants;
 }
 
-NodeTypeEnum Node::GetType() const
+NodeType Node::GetType() const
 {
 	return Type;
 }

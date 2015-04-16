@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../dom/types.h"
+#include "../base/types.h"
 #include <vector>
 #include <map>
 
@@ -82,11 +82,11 @@ struct ShaderChoice
 class LocalDesc
 {
 public:
-	LocalDesc(NodeTypeEnum UniformType, SharedString UniformName, string* UISectionName,
+	LocalDesc(NodeType UniformType, SharedString UniformName, string* UISectionName,
 		OWNERSHIP const vector<LocalFloatDesc>* Elements);
 	~LocalDesc();
 
-	const NodeTypeEnum				UniformType;	/// Type (float, vec2...)
+	const NodeType					UniformType;	/// Type (float, vec2...)
 	SharedString					UniformName;	/// Uniform variable name in shader
 	const string*					UISectionName;	/// UI section name
 

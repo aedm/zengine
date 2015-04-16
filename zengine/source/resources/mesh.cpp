@@ -22,7 +22,7 @@ VertexFormat::VertexFormat(UINT BinaryFormat)
 		{
 			VertexAttribute attrib;
 			attrib.Usage = (VertexAttributeEnum)i;
-			attrib.Size = VariableByteSizes[VertexAttributeType[i]];
+			attrib.Size = VariableByteSizes[(UINT)VertexAttributeType[i]];
 			attrib.Offset = stride;
 			Attributes.push_back(attrib);
 			stride += attrib.Size;

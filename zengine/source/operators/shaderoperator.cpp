@@ -9,7 +9,7 @@ ShaderOperator::ShaderOperator( Shader* _Shader )
 	: Node(string("Shader"))
 	, ShaderProgram(_Shader)
 {
-	Type = OP_SHADER;
+	Type = NodeType::SHADER;
 	Init();
 }
 
@@ -112,17 +112,17 @@ void ShaderOperator::RegenerateCopyItems()
 			{
 				#undef ITEM
 				#define ITEM(name, type, token) \
-			case name: \
-				source = reinterpret_cast<const UINT*>(&ToValueSlot<name>(slot)->Value()); \
+			case NodeType::name: \
+				source = reinterpret_cast<const UINT*>(&ToValueSlot<NodeType::name>(slot)->Value()); \
 				break;
-				NODETYPE_LIST
+				VALUETYPE_LIST
 
 			default: NOT_IMPLEMENTED; break;
 			}
 			UINT* target = reinterpret_cast<UINT*>(
 				reinterpret_cast<char*>(item.Array->Values) + 
 				item.TargetUniform->ByteOffset + item.ByteOffset);
-			UINT floatCount = VariableByteSizes[slot->GetType()] / sizeof(float);
+			UINT floatCount = VariableByteSizes[(UINT)slot->GetType()] / sizeof(float);
 			for (UINT i=0; i<floatCount; i++)
 			{
 				item.Array->CopyItems.push_back(
@@ -133,7 +133,7 @@ void ShaderOperator::RegenerateCopyItems()
 			const UINT* source = reinterpret_cast<const UINT*>(GlobalUniformOffsets[global->Usage]);
 			UINT* target = reinterpret_cast<UINT*>(
 				reinterpret_cast<char*>(item.Array->Values) + global->ByteOffset);
-			UINT floatCount = VariableByteSizes[global->Type] / sizeof(float);
+			UINT floatCount = VariableByteSizes[(UINT)global->Type] / sizeof(float);
 			for (UINT i=0; i<floatCount; i++)
 			{
 				item.Array->CopyItems.push_back(
@@ -166,9 +166,9 @@ void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& 
 				switch(local->Type)
 				{
 				#undef ITEM
-				#define ITEM(name, type, token) \
-				case name: slot = new TypedSlot<name>(Owner, local->Desc->UniformName); break;
-				NODETYPE_LIST
+				#define ITEM(name, type) \
+				case NodeType::name: slot = new TypedSlot<NodeType::name>(Owner, local->Desc->UniformName); break;
+				VALUETYPE_LIST
 
 				default: SHOULDNT_HAPPEN; break;
 				}

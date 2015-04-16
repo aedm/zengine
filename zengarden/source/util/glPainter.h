@@ -30,8 +30,8 @@ public:
 	void					DrawTexture(Texture* Tex, float x, float y);
 	void					DrawTextTexture(TextTexture* Tex, const Vec2& Position);
 
-	Vec4Operator			Color;
-	TextureOperator			TexOp;
+	Vec4Node				Color;
+	TextureNode				TexOp;
 
 	QFont					TitleFont;
 

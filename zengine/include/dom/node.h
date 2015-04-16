@@ -1,6 +1,6 @@
 #pragma once
 
-#include "types.h"
+#include "../base/types.h"
 #include "../base/vectormath.h"
 #include "../base/fastdelegate.h"
 #include "../base/helpers.h"
@@ -12,13 +12,13 @@ using namespace std;
 using namespace fastdelegate;
 
 class Node;
-template<NodeTypeEnum T> class TypedNode;
+template<NodeType T> class TypedNode;
 
 /// Nodes can have multiple input slots. Each slot's value is set by an another node's output.
 class Slot
 {
 public:
-	Slot(NodeTypeEnum Type, Node* Owner, SharedString Name);
+	Slot(NodeType Type, Node* Owner, SharedString Name);
 	virtual ~Slot();
 
 	/// The operator which this slot is a member of
@@ -33,7 +33,8 @@ public:
 	Node*					GetConnectedNode() const;
 
 	/// Type of object this slot accepts
-	NodeTypeEnum			GetType() const;
+	/// TODO: get rid of this
+	NodeType				GetType() const;
 	
 	/// Returns the name of the slot
 	SharedString			GetName();
@@ -46,7 +47,7 @@ protected:
 	SharedString			Name;
 
 	/// Output type
-	const NodeTypeEnum		Type;
+	const NodeType			Type;
 
 	/// Biolerplate
 	void					DisconnectFromNode();
@@ -55,7 +56,7 @@ protected:
 
 
 /// Slot expecting a value node.
-template <NodeTypeEnum T>
+template <NodeType T>
 class TypedSlot: public Slot
 {
 	typedef typename OpTypes<T>::Type ValueType;
@@ -85,7 +86,7 @@ public:
 	string						Name;
 	
 	/// Returns object type.
-	NodeTypeEnum				GetType() const;			
+	NodeType					GetType() const;			
 
 	/// List of slots this node's output is connected to
 	const vector<Slot*>&		GetDependants() const;	
@@ -122,7 +123,7 @@ protected:
 	void						SetDependantsDirty();
 	
 	/// Output type
-	NodeTypeEnum				Type;
+	NodeType					Type;
 
 private:
 	/// True if Operate() needs to be called
@@ -141,7 +142,7 @@ private:
 
 
 /// Node with an output value.
-template<NodeTypeEnum T>
+template<NodeType T>
 class TypedNode: public Node
 {
 public:
@@ -158,34 +159,34 @@ public:
 
 
 /// Node and slot types
-typedef TypedSlot<NODE_FLOAT>		FloatSlot;
-typedef TypedSlot<NODE_VEC4>		Vec4Slot;
-typedef TypedSlot<NODE_MATRIX44>	Matrix4Slot;
-typedef TypedSlot<NODE_TEXURE>		TextureSlot;
+typedef TypedSlot<NodeType::FLOAT>		FloatSlot;
+typedef TypedSlot<NodeType::VEC4>		Vec4Slot;
+typedef TypedSlot<NodeType::MATRIX44>	Matrix4Slot;
+typedef TypedSlot<NodeType::TEXTURE>		TextureSlot;
 
 
 /// Helper cast
-template<NodeTypeEnum T> 
+template<NodeType T> 
 inline static TypedSlot<T>* ToValueSlot(Slot* slot) 
 { 
 	return static_cast<TypedSlot<T>*>(slot); 
 }
 
 
-template <NodeTypeEnum T>
+template <NodeType T>
 TypedSlot<T>::TypedSlot( Node* Owner, SharedString Name )
 	: Slot(T, Owner, Name)
 {}
 
 
-template <NodeTypeEnum T>
+template <NodeType T>
 const typename TypedSlot<T>::ValueType& TypedSlot<T>::Value()
 {
 	return static_cast<TypedNode<T>*>(GetConnectedNode())->GetValue();
 }
 
 
-template<NodeTypeEnum T>
+template<NodeType T>
 TypedNode<T>::TypedNode()
 	: Node(VariableNames[(UINT)T])
 {
@@ -193,7 +194,7 @@ TypedNode<T>::TypedNode()
 }
 
 
-template<NodeTypeEnum T>
+template<NodeType T>
 TypedNode<T>::TypedNode( const TypedNode<T>& Original ) 
 	: Node(Original)
 {}

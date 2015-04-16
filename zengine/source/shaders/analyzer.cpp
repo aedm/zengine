@@ -13,7 +13,7 @@ const EnumMapperA GlobalUniformMapper[] = {
 namespace Shaders
 {
 
-void Analysis::AnalyzedLocal::Reset( SharedString _UniformName, NodeTypeEnum _Type )
+void Analysis::AnalyzedLocal::Reset( SharedString _UniformName, NodeType _Type )
 {
 	UniformName =_UniformName;
 	Type = _Type;
@@ -80,7 +80,7 @@ void Analysis::AnalyzeUniformLine( SourceLine* line )
 {
 	if (line->SubStrings.size() == 4 && line->SubStrings[3].Token == TOKEN_SEMICOLON) 
 	{
-		NodeTypeEnum type = GetOpTypeFromToken(line->SubStrings[1].Token);
+		NodeType type = GetOpTypeFromToken(line->SubStrings[1].Token);
 		if (int(type) >= 0)
 		{
 			SubString& name = line->SubStrings[2];
@@ -107,17 +107,17 @@ void Analysis::AnalyzeUniformLine( SourceLine* line )
 		CurrentLineNumber);
 }
 
-NodeTypeEnum Analysis::GetOpTypeFromToken( ShaderTokenEnum Token )
+NodeType Analysis::GetOpTypeFromToken( ShaderTokenEnum Token )
 {
 	switch (Token)
 	{
-	case TOKEN_float:		return NODE_FLOAT;
-	case TOKEN_vec2:		return NODE_VEC2;
-	case TOKEN_vec3:		return NODE_VEC3;
-	case TOKEN_vec4:		return NODE_VEC4;
-	case TOKEN_mat4:		return NODE_MATRIX44;
-	case TOKEN_sampler2D:	return NODE_TEXURE;
-	default: return (NodeTypeEnum)-1;
+	case TOKEN_float:		return NodeType::FLOAT;
+	case TOKEN_vec2:		return NodeType::VEC2;
+	case TOKEN_vec3:		return NodeType::VEC3;
+	case TOKEN_vec4:		return NodeType::VEC4;
+	case TOKEN_mat4:		return NodeType::MATRIX44;
+	case TOKEN_sampler2D:	return NodeType::TEXTURE;
+	default: return (NodeType)-1;
 	}
 }
 

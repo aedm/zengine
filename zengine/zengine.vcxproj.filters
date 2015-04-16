@@ -68,9 +68,6 @@
     <ClInclude Include="include\dom\node.h">
       <Filter>include\dom</Filter>
     </ClInclude>
-    <ClInclude Include="include\dom\types.h">
-      <Filter>include\dom</Filter>
-    </ClInclude>
     <ClInclude Include="include\operators\meshoperator.h">
       <Filter>include\operators</Filter>
     </ClInclude>
@@ -114,6 +111,9 @@
       <Filter>include\base</Filter>
     </ClInclude>
     <ClInclude Include="include\base\system.h">
+      <Filter>include\base</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base\types.h">
       <Filter>include\base</Filter>
     </ClInclude>
   </ItemGroup>
@@ -168,6 +168,9 @@
     </ClCompile>
     <ClCompile Include="source\zengine.cpp">
       <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\base\types.cpp">
+      <Filter>source\base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

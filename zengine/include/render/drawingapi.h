@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../base/defines.h"
-#include "../dom/types.h"
+#include "../base/types.h"
 #include <vector>
 #include <string>
 
@@ -43,7 +43,7 @@ public:
 	/// Shader functions
 	virtual OWNERSHIP ShaderCompileDesc* CreateShaderFromSource(const char* VertexSource, const char* FragmentSource) = 0;
 	virtual void				SetShaderProgram(ShaderHandle Handle) = 0;
-	virtual void				SetUniform(UniformId Id, NodeTypeEnum Type, const void* Values) = 0;
+	virtual void				SetUniform(UniformId Id, NodeType Type, const void* Values) = 0;
 	virtual void				DestroyShaderProgram(ShaderHandle Handle) = 0;
 
 	/// Vertex buffer handling
@@ -166,7 +166,7 @@ struct VertexAttribute
 /// One attribute as shader input
 struct ShaderAttributeDesc
 {
-	NodeTypeEnum					Type;
+	NodeType					Type;
 	AttributeId					Handle;
 	VertexAttributeEnum			Usage;
 	string						Name;
@@ -175,7 +175,7 @@ struct ShaderAttributeDesc
 /// Uniform properties in a compiled shader
 struct ShaderUniformDesc
 {
-	NodeTypeEnum					UniformType;		/// Type (float, vec2...)
+	NodeType					UniformType;		/// Type (float, vec2...)
 	UniformId					Handle;				/// Uniform ID
 	string						Name;
 };

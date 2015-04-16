@@ -23,19 +23,19 @@ extern const int GlobalUniformOffsets[];
 
 /// Macrolist for global uniforms (name, type, variable/token)
 #define GLOBALUSAGE_LIST \
-	ITEM(USAGE_TIME,					NODE_FLOAT,		Time)					\
-	ITEM(USAGE_MATRIX_VIEW,				NODE_MATRIX44,	View)					\
-	ITEM(USAGE_MATRIX_PROJECTION,		NODE_MATRIX44,	Projection)				\
-	ITEM(USAGE_MATRIX_TRANSFORMATION,	NODE_MATRIX44,	Transformation)			\
-	ITEM(USAGE_NOISEMAP_SIZE,			NODE_VEC2,		NoiseMapSize)			\
-	ITEM(USAGE_NOISEMAP_SIZE_RECIP,		NODE_VEC2,		NoiseMapSizeRecip)		\
-	ITEM(USAGE_RENDERTARGET_SIZE,		NODE_VEC2,		RenderTargetSize)		\
-	ITEM(USAGE_RENDERTARGET_SIZE_RECIP,	NODE_VEC2,		RenderTargetSizeRecip)	\
-	ITEM(USAGE_VIEWPORT_SIZE,			NODE_VEC2,		ViewportSize)			\
-	ITEM(USAGE_PIXEL_SIZE,				NODE_VEC2,		PixelSize)				\
-	ITEM(USAGE_DIFFUSE_COLOR,			NODE_VEC4,		DiffuseColor)			\
-	ITEM(USAGE_AMBIENT_COLOR,			NODE_VEC4,		AmbientColor)			\
-	ITEM(USAGE_DEPTH_BIAS,				NODE_FLOAT,		DepthBias)				\
+	ITEM(USAGE_TIME,					FLOAT,			Time)					\
+	ITEM(USAGE_MATRIX_VIEW,				MATRIX44,		View)					\
+	ITEM(USAGE_MATRIX_PROJECTION,		MATRIX44,		Projection)				\
+	ITEM(USAGE_MATRIX_TRANSFORMATION,	MATRIX44,		Transformation)			\
+	ITEM(USAGE_NOISEMAP_SIZE,			VEC2,			NoiseMapSize)			\
+	ITEM(USAGE_NOISEMAP_SIZE_RECIP,		VEC2,			NoiseMapSizeRecip)		\
+	ITEM(USAGE_RENDERTARGET_SIZE,		VEC2,			RenderTargetSize)		\
+	ITEM(USAGE_RENDERTARGET_SIZE_RECIP,	VEC2,			RenderTargetSizeRecip)	\
+	ITEM(USAGE_VIEWPORT_SIZE,			VEC2,			ViewportSize)			\
+	ITEM(USAGE_PIXEL_SIZE,				VEC2,			PixelSize)				\
+	ITEM(USAGE_DIFFUSE_COLOR,			VEC4,			DiffuseColor)			\
+	ITEM(USAGE_AMBIENT_COLOR,			VEC4,			AmbientColor)			\
+	ITEM(USAGE_DEPTH_BIAS,				FLOAT,			DepthBias)				\
 
 
 /// Shader program. All shader stages together, compiled, linked.
@@ -88,10 +88,10 @@ public:
 struct Uniform
 {
 public:
-	Uniform(NodeTypeEnum Type, UniformId Handle, int ByteOffset, bool IsLocal);
+	Uniform(NodeType Type, UniformId Handle, int ByteOffset, bool IsLocal);
 
 	/// Type of the uniform variable. (float, vec2...)
-	const NodeTypeEnum			Type;				
+	const NodeType				Type;				
 	
 	/// Graphics API uniform handle. Only valid for uniforms in global space.
 	/// For uniforms in a real uniform buffer (future feature) this should be -1.
@@ -108,7 +108,7 @@ public:
 /// Local uniform with manually controlled value (like a slot)
 struct LocalUniform: public Uniform
 {
-	LocalUniform(NodeTypeEnum Type, UniformId Handle, int ByteOffset, const LocalDesc* Desc);
+	LocalUniform(NodeType Type, UniformId Handle, int ByteOffset, const LocalDesc* Desc);
 
 	/// Metadata for this uniform, like UI name, etc.
 	const LocalDesc*			Desc;

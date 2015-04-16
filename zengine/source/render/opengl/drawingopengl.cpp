@@ -196,12 +196,12 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource( const char* 
 			uniform.Name = name;
 			switch(type)
 			{
-			case GL_FLOAT:		uniform.UniformType = NODE_FLOAT;		break;
-			case GL_FLOAT_VEC2:	uniform.UniformType = NODE_VEC2;		break;
-			case GL_FLOAT_VEC3:	uniform.UniformType = NODE_VEC3;		break;
-			case GL_FLOAT_VEC4:	uniform.UniformType = NODE_VEC4;		break;
-			case GL_FLOAT_MAT4:	uniform.UniformType = NODE_MATRIX44;	break;
-			default: NOT_IMPLEMENTED; uniform.UniformType = (NodeTypeEnum)-1; break;
+			case GL_FLOAT:		uniform.UniformType = NodeType::FLOAT;		break;
+			case GL_FLOAT_VEC2:	uniform.UniformType = NodeType::VEC2;		break;
+			case GL_FLOAT_VEC3:	uniform.UniformType = NodeType::VEC3;		break;
+			case GL_FLOAT_VEC4:	uniform.UniformType = NodeType::VEC4;		break;
+			case GL_FLOAT_MAT4:	uniform.UniformType = NodeType::MATRIX44;	break;
+			default: NOT_IMPLEMENTED; uniform.UniformType = (NodeType)-1; break;
 			}
 			builder->Uniforms.push_back(uniform);
 		}
@@ -232,11 +232,11 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource( const char* 
 		attribute.Name = name;
 		switch(type)
 		{
-		case GL_FLOAT:		attribute.Type = NODE_FLOAT;		break;
-		case GL_FLOAT_VEC2:	attribute.Type = NODE_VEC2;		break;
-		case GL_FLOAT_VEC3:	attribute.Type = NODE_VEC3;		break;
-		case GL_FLOAT_VEC4:	attribute.Type = NODE_VEC4;		break;
-		default: NOT_IMPLEMENTED; attribute.Type = (NodeTypeEnum)-1; break;
+		case GL_FLOAT:		attribute.Type = NodeType::FLOAT;		break;
+		case GL_FLOAT_VEC2:	attribute.Type = NodeType::VEC2;		break;
+		case GL_FLOAT_VEC3:	attribute.Type = NodeType::VEC3;		break;
+		case GL_FLOAT_VEC4:	attribute.Type = NodeType::VEC4;		break;
+		default: NOT_IMPLEMENTED; attribute.Type = (NodeType)-1;	break;
 		}
 
 		/// Map attribute name to usage
@@ -268,17 +268,17 @@ void DrawingOpenGL::SetShaderProgram( ShaderHandle Handle )
 	CheckGLError();
 }
 
-void DrawingOpenGL::SetUniform( UniformId Id, NodeTypeEnum Type, const void* Values )
+void DrawingOpenGL::SetUniform( UniformId Id, NodeType Type, const void* Values )
 {
 	CheckGLError();
 
 	switch(Type)
 	{
-	case NODE_FLOAT:	glUniform1f(Id, *(const GLfloat*)Values);					break;
-	case NODE_VEC2:		glUniform2fv(Id, 1, (const GLfloat*)Values);				break;
-	case NODE_VEC3:		glUniform3fv(Id, 1, (const GLfloat*)Values);				break;
-	case NODE_VEC4:		glUniform4fv(Id, 1, (const GLfloat*)Values);				break;
-	case NODE_MATRIX44:	glUniformMatrix4fv(Id, 1, false, (const GLfloat*)Values);	break;
+	case NodeType::FLOAT:		glUniform1f(Id, *(const GLfloat*)Values);					break;
+	case NodeType::VEC2:		glUniform2fv(Id, 1, (const GLfloat*)Values);				break;
+	case NodeType::VEC3:		glUniform3fv(Id, 1, (const GLfloat*)Values);				break;
+	case NodeType::VEC4:		glUniform4fv(Id, 1, (const GLfloat*)Values);				break;
+	case NodeType::MATRIX44:	glUniformMatrix4fv(Id, 1, false, (const GLfloat*)Values);	break;
 	
 	default: NOT_IMPLEMENTED; break;
 	}
@@ -394,10 +394,10 @@ AttributeMapper* DrawingOpenGL::CreateAttributeMapper( const vector<VertexAttrib
 				attr.Index = shaderAttr.Handle;
 				switch(VertexAttributeType[bufferAttr.Usage])
 				{
-				case NODE_FLOAT:	attr.Size = 1;	attr.Type = GL_FLOAT;	break;
-				case NODE_VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
-				case NODE_VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
-				case NODE_VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
+				case NodeType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
+				case NodeType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
+				case NodeType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
+				case NodeType::VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
 				default:
 					ERR(L"Unhandled vertex attribute type");
 					break;

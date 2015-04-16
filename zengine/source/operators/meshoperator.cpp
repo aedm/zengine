@@ -11,7 +11,7 @@ MeshOperator::~MeshOperator()
 void MeshOperator::SetValue( Mesh* const & NewValue )
 {
 	if (Value) TheResourceManager->DiscardMesh(Value);
-	ValueOperator::SetValue(NewValue);
+	ValueNode::SetValue(NewValue);
 }
 
 MeshOperator* MeshOperator::Create( OWNERSHIP Mesh* _Value )

@@ -96,9 +96,9 @@
     <ClInclude Include="include\base\fastdelegate.h" />
     <ClInclude Include="include\base\helpers.h" />
     <ClInclude Include="include\base\system.h" />
+    <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\node.h" />
-    <ClInclude Include="include\dom\types.h" />
     <ClInclude Include="include\operators\meshoperator.h" />
     <ClInclude Include="include\operators\model.h" />
     <ClInclude Include="include\operators\shaderoperator.h" />
@@ -116,6 +116,7 @@
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp" />
     <ClCompile Include="source\base\system.cpp" />
+    <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
     <ClCompile Include="source\operators\meshoperator.cpp" />

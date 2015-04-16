@@ -47,7 +47,7 @@ public:
 	/// Shader functions
 	virtual OWNERSHIP ShaderCompileDesc* CreateShaderFromSource(const char* VertexSource, const char* FragmentSource) override;
 	virtual void				SetShaderProgram(ShaderHandle Handle) override;
-	virtual void				SetUniform(UniformId Id, NodeTypeEnum Type, const void* Values) override;
+	virtual void				SetUniform(UniformId Id, NodeType Type, const void* Values) override;
 	virtual void				DestroyShaderProgram(ShaderHandle Handle) override;
 
 	/// Vertex buffer handling

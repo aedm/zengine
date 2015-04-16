@@ -37,7 +37,7 @@ CompileSettings::CompileSettings(const ShaderMetadata* _Desc,
 {}
 
 
-LocalDesc::LocalDesc( NodeTypeEnum _UniformType, SharedString _UniformName, 
+LocalDesc::LocalDesc( NodeType _UniformType, SharedString _UniformName, 
 	string* _UISectionName, const vector<LocalFloatDesc>* _Elements )
 	: UniformType(_UniformType)
 	, UniformName(_UniformName)

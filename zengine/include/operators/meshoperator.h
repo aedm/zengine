@@ -5,9 +5,9 @@
 #include "valueOperators.h"
 
 class MeshOperator;
-typedef TypedSlot<NODE_MESH> MeshSlot;
+typedef TypedSlot<NodeType::MESH> MeshSlot;
 
-class MeshOperator: public ValueOperator<NODE_MESH>
+class MeshOperator : public ValueNode<NodeType::MESH>
 {
 public:
 	MeshOperator();

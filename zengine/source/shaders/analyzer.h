@@ -36,9 +36,9 @@ private:
 	/// See LocalDesc
 	struct AnalyzedLocal 
 	{
-		void					Reset(SharedString UniformName, NodeTypeEnum Type);
+		void					Reset(SharedString UniformName, NodeType Type);
 		LocalDesc*				ToLocalDesc();
-		NodeTypeEnum				Type;
+		NodeType				Type;
 		SharedString			UniformName;
 		string*					UISectionName;
 		vector<LocalFloatDesc>*	Floats;
@@ -50,7 +50,7 @@ private:
 	void						AnalyzeMetadataLine(SourceLine* line);
 	void						AnalyzeMetadataLine_Local(SourceLine* line);
 
-	static NodeTypeEnum			GetOpTypeFromToken(ShaderTokenEnum Token);
+	static NodeType				GetOpTypeFromToken(ShaderTokenEnum Token);
 	bool						IsCurrentLocalFloatActive();
 	void						SubStringToFloat(SubString& Value, float* oTarget);
 

@@ -1,71 +1,74 @@
 #pragma once
 
 #include "../dom/node.h"
-#include "../dom/types.h"
+#include "../base/types.h"
 
-/// Operators holding primitive values that can be directly set.
-template<NodeTypeEnum T>
-class ValueOperator: public TypedNode<T>
+/// Nodes holding primitive values that can be directly set.
+template<NodeType T>
+class ValueNode: public TypedNode<T>
 {
 public:
-	ValueOperator();
+	ValueNode();
 
 	/// For cloning
-	ValueOperator(const ValueOperator<T>& Original);
+	ValueNode(const ValueNode<T>& Original);
 
-	/// Returns value of operator. Reevaluates if necessary
+	/// Returns value of node. Reevaluates if necessary
 	virtual const ValueType&	GetValue() override;
 
-	/// Sets value of operator. Operate() should call this, too.
+	/// Sets value of node. Operate() should call this, too.
 	virtual void				SetValue(const ValueType& NewValue);
 
-	/// Clone operator
+	/// Clone node
 	virtual Node*				Clone() const override;
 
 	/// This is a primitive type, value can be set directly
 	virtual bool				CanSetValueDirectly();
 
 protected:
-	/// Output value of the operator
+	/// Output value of the node
 	ValueType					Value;
 };
 
-typedef ValueOperator<NODE_FLOAT>		FloatOperator;
-typedef ValueOperator<NODE_VEC4>		Vec4Operator;
-typedef ValueOperator<NODE_MATRIX44>	Matrix4Operator;
-typedef ValueOperator<NODE_TEXURE>		TextureOperator;
+typedef ValueNode<NodeType::FLOAT>		FloatNode;
+typedef ValueNode<NodeType::VEC4>		Vec4Node;
+typedef ValueNode<NodeType::MATRIX44>	Matrix4Node;
+
+// TODO: kill this
+typedef ValueNode<NodeType::TEXTURE>	TextureNode;
+
 
 /// Explicit template type instantiations
-template class ValueOperator<NODE_FLOAT>;
-template class ValueOperator<NODE_VEC4>;
-template class ValueOperator<NODE_MATRIX44>;
+template class ValueNode<NodeType::FLOAT>;
+template class ValueNode<NodeType::VEC4>;
+template class ValueNode<NodeType::MATRIX44>;
 
 
-template<NodeTypeEnum T>
-ValueOperator<T>::ValueOperator()
+template<NodeType T>
+ValueNode<T>::ValueNode()
 	: TypedNode()
 {
 	Value = ValueType();
 }
 
 
-template<NodeTypeEnum T>
-ValueOperator<T>::ValueOperator( const ValueOperator<T>& Original )
+template<NodeType T>
+ValueNode<T>::ValueNode( const ValueNode<T>& Original )
 	: TypedNode(Original)
 {
 	Value = Original.Value;
 }
 
 
-template<NodeTypeEnum T>
-bool ValueOperator<T>::CanSetValueDirectly()
+template<NodeType T>
+bool ValueNode<T>::CanSetValueDirectly()
 {
 	return true;
 }
 
 
-template<NodeTypeEnum T>
-const typename ValueOperator<T>::ValueType& ValueOperator<T>::GetValue()
+template<NodeType T>
+const typename ValueNode<T>::ValueType& ValueNode<T>::GetValue()
 {
 	ASSERT(IsProperlyConnected);
 	Evaluate();
@@ -73,16 +76,16 @@ const typename ValueOperator<T>::ValueType& ValueOperator<T>::GetValue()
 }
 
 
-template<NodeTypeEnum T>
-void ValueOperator<T>::SetValue( const typename ValueOperator<T>::ValueType& NewValue )
+template<NodeType T>
+void ValueNode<T>::SetValue( const typename ValueNode<T>::ValueType& NewValue )
 {
 	Value = NewValue;
 	SetDependantsDirty();
 }
 
 
-template<NodeTypeEnum T>
-Node* ValueOperator<T>::Clone() const
+template<NodeType T>
+Node* ValueNode<T>::Clone() const
 {
-	return new ValueOperator<T>(*this);
+	return new ValueNode<T>(*this);
 }
