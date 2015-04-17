@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../nodes/shadernode.h"
-#include "../nodes/staticmeshnode.h"
+#include "../nodes/meshnode.h"
 #include "../resources/mesh.h"
 #include "../render/drawingapi.h"
 

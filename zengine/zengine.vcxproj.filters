@@ -122,10 +122,10 @@
     <ClInclude Include="include\resources\texture.h">
       <Filter>include\resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\nodes\staticmeshnode.h">
+    <ClInclude Include="include\nodes\shadernode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\nodes\shadernode.h">
+    <ClInclude Include="include\nodes\meshnode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -178,10 +178,10 @@
     <ClCompile Include="source\base\types.cpp">
       <Filter>source\base</Filter>
     </ClCompile>
-    <ClCompile Include="source\nodes\staticmeshnode.cpp">
+    <ClCompile Include="source\nodes\shadernode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="source\nodes\shadernode.cpp">
+    <ClCompile Include="source\nodes\meshnode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>

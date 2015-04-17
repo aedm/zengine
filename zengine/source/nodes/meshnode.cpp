@@ -1,4 +1,4 @@
-#include <include/nodes/staticmeshnode.h>
+#include <include/nodes/meshnode.h>
 #include <include/resources/resourcemanager.h>
 
 
