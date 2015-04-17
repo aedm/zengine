@@ -5,7 +5,7 @@
 
 using namespace std;
 
-class OperatorGraph;
+class NodeGraph;
 
 
 class Document
@@ -13,14 +13,14 @@ class Document
 public:
 	Document();
 
-	vector<OperatorGraph*>		Graphs;
+	vector<NodeGraph*>		Graphs;
 };
 
 
-class OperatorGraph
+class NodeGraph
 {
 public:
-	OperatorGraph();
+	NodeGraph();
 
 	vector<NodeWidget*>		Widgets;
 };

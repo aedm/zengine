@@ -1,7 +1,7 @@
-#include <include/operators/model.h>
+#include <include/nodes/renderablenode.h>
 #include <include/base/helpers.h>
 
-Model::Model()
+RenderableNode::RenderableNode()
 	: Node(NodeType::MODEL, string("Model"))
 	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
@@ -12,14 +12,14 @@ Model::Model()
 }
 
 /// TODO: Use C++11 delegating constructors
-Model::Model( const Model& Original )
+RenderableNode::RenderableNode( const RenderableNode& Original )
 	: Node(Original)
 	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
 	, Mapper(NULL)
 {}
 
-void Model::Render(PrimitiveTypeEnum Primitive)
+void RenderableNode::Render(PrimitiveTypeEnum Primitive)
 {
 	Evaluate();
 	if (!Mapper) return;
@@ -36,12 +36,12 @@ void Model::Render(PrimitiveTypeEnum Primitive)
 	}
 }
 
-void Model::OnSlotConnectionsChanged( Slot* S )
+void RenderableNode::OnSlotConnectionsChanged( Slot* S )
 {
 	SafeDelete(Mapper);
 }
 
-void Model::Operate()
+void RenderableNode::Operate()
 {
 	if (Mapper == NULL)
 	{
@@ -55,15 +55,15 @@ void Model::Operate()
 	}
 }
 
-Model* Model::Create( ShaderNode* ShaderOp, StaticMeshNode* MeshOp )
+RenderableNode* RenderableNode::Create( ShaderNode* ShaderOp, StaticMeshNode* MeshOp )
 {
-	Model* model = new Model();
+	RenderableNode* model = new RenderableNode();
 	model->TheMesh.Connect(MeshOp);
 	model->TheShader.Connect(ShaderOp);
 	return model;
 }
 
-Node* Model::Clone() const
+Node* RenderableNode::Clone() const
 {
-	return new Model(*this);
+	return new RenderableNode(*this);
 }

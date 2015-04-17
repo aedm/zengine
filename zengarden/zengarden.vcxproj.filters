@@ -55,9 +55,6 @@
     <ClCompile Include="source\commands\command.cpp">
       <Filter>source\commands</Filter>
     </ClCompile>
-    <ClCompile Include="source\commands\graphCommands.cpp">
-      <Filter>source\commands</Filter>
-    </ClCompile>
     <ClCompile Include="source\util\textTexture.cpp">
       <Filter>source\util</Filter>
     </ClCompile>
@@ -66,12 +63,6 @@
     </ClCompile>
     <ClCompile Include="source\document.cpp">
       <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\util\glPainter.cpp">
-      <Filter>source\util</Filter>
-    </ClCompile>
-    <ClCompile Include="source\util\editorComponents.cpp">
-      <Filter>source\util</Filter>
     </ClCompile>
     <ClCompile Include="source\graph\grapheditor.cpp">
       <Filter>source\graph</Filter>
@@ -84,6 +75,15 @@
     </ClCompile>
     <ClCompile Include="source\graph\nodewidget.cpp">
       <Filter>source\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="source\commands\graphcommands.cpp">
+      <Filter>source\commands</Filter>
+    </ClCompile>
+    <ClCompile Include="source\util\util.cpp">
+      <Filter>source\util</Filter>
+    </ClCompile>
+    <ClCompile Include="source\util\uipainter.cpp">
+      <Filter>source\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,23 +110,23 @@
     <ClInclude Include="source\commands\command.h">
       <Filter>source\commands</Filter>
     </ClInclude>
-    <ClInclude Include="source\commands\graphCommands.h">
-      <Filter>source\commands</Filter>
-    </ClInclude>
     <ClInclude Include="source\util\textTexture.h">
       <Filter>source\util</Filter>
     </ClInclude>
     <ClInclude Include="source\document.h">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\util\glPainter.h">
-      <Filter>source\util</Filter>
-    </ClInclude>
-    <ClInclude Include="source\util\editorComponents.h">
-      <Filter>source\util</Filter>
-    </ClInclude>
     <ClInclude Include="source\graph\nodewidget.h">
       <Filter>source\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="source\commands\graphcommands.h">
+      <Filter>source\commands</Filter>
+    </ClInclude>
+    <ClInclude Include="source\util\util.h">
+      <Filter>source\util</Filter>
+    </ClInclude>
+    <ClInclude Include="source\util\uipainter.h">
+      <Filter>source\util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

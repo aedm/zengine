@@ -1,24 +1,24 @@
-#include "glPainter.h"
-//#include "../../include/editorComponents.h"
+#include "uipainter.h"
+#include "util.h"
 #include <zengine.h>
 #include <QTextStream>
 #include <QDir>
 #include <QString>
 #include <QByteArray>
 
-GLPainter* ThePainter = NULL;
+UiPainter* ThePainter = NULL;
 
-void InitCanvas()
+void InitPainter()
 {
-	ThePainter = new GLPainter();
+	ThePainter = new UiPainter();
 }
 
-void DisposeCanvas()
+void DisposePainter()
 {
 	SafeDelete(ThePainter);
 }
 
-GLPainter::GLPainter()
+UiPainter::UiPainter()
 {
 	/// Fonts
 	TitleFont.setPixelSize(ADJUST(11));
@@ -55,11 +55,11 @@ GLPainter::GLPainter()
 	TexturedBoxMeshOp = StaticMeshNode::Create(textureMesh);
 
 	/// Models
-	SolidLineModel = Model::Create(SolidColorOp, LineMeshOp);
-	SolidRectModel = Model::Create(SolidColorOp, RectMeshOp);
-	SolidBoxModel = Model::Create(SolidColorOp, BoxMeshOp);
-	TexturedBoxModel = Model::Create(SolidTextureOp, TexturedBoxMeshOp);
-	TextBoxModel = Model::Create(TextTextureOp, TexturedBoxMeshOp);
+	SolidLineModel = RenderableNode::Create(SolidColorOp, LineMeshOp);
+	SolidRectModel = RenderableNode::Create(SolidColorOp, RectMeshOp);
+	SolidBoxModel = RenderableNode::Create(SolidColorOp, BoxMeshOp);
+	TexturedBoxModel = RenderableNode::Create(SolidTextureOp, TexturedBoxMeshOp);
+	TextBoxModel = RenderableNode::Create(TextTextureOp, TexturedBoxMeshOp);
 
 	// Renderstate
 	CanvasRenderstate.DepthTest = false;
@@ -67,21 +67,21 @@ GLPainter::GLPainter()
 	CanvasRenderstate.BlendMode = RenderState::BLEND_ALPHA;
 }
 
-GLPainter::~GLPainter()
+UiPainter::~UiPainter()
 {
 	SafeDelete(SolidColorOp);
 	SafeDelete(LineMeshOp);
 	SafeDelete(SolidLineModel);
 }
 
-void GLPainter::DrawLine( float x1, float y1, float x2, float y2 )
+void UiPainter::DrawLine( float x1, float y1, float x2, float y2 )
 {
 	VertexPos vertices[] = { {Vec3(x1+0.5f, y1+0.5f, 0)}, {Vec3(x2+0.5f, y2+0.5f, 0)} };
 	LineMeshOp->GetMesh()->SetVertices(vertices);
 	SolidLineModel->Render(PRIMITIVE_LINES);
 }
 
-void GLPainter::DrawLine( const Vec2& From, const Vec2& To )
+void UiPainter::DrawLine( const Vec2& From, const Vec2& To )
 {
 	VertexPos vertices[] = { 
 		{Vec3(From.X + 0.5f, From.Y + 0.5f, 0)}, 
@@ -90,7 +90,7 @@ void GLPainter::DrawLine( const Vec2& From, const Vec2& To )
 	SolidLineModel->Render(PRIMITIVE_LINES);
 }
 
-void GLPainter::DrawRect( const Vec2& TopLeft, const Vec2& Size )
+void UiPainter::DrawRect( const Vec2& TopLeft, const Vec2& Size )
 {
 	Vec3 pos(TopLeft.X + 0.5f, TopLeft.Y + 0.5f, 0);
 	VertexPos vertices[] = { 
@@ -105,7 +105,7 @@ void GLPainter::DrawRect( const Vec2& TopLeft, const Vec2& Size )
 }
 
 
-void GLPainter::DrawBox( const Vec2& TopLeft, const Vec2& Size )
+void UiPainter::DrawBox( const Vec2& TopLeft, const Vec2& Size )
 {
 	VertexPos vertices[] = { 
 		{ Vec3(TopLeft.X,			TopLeft.Y,			0) }, 
@@ -117,7 +117,7 @@ void GLPainter::DrawBox( const Vec2& TopLeft, const Vec2& Size )
 	SolidBoxModel->Render(PRIMITIVE_TRIANGLES);
 }
 
-void GLPainter::DrawTexture( Texture* Tex, float x, float y )
+void UiPainter::DrawTexture( Texture* Tex, float x, float y )
 {
 	float w(Tex->Width);
 	float h(Tex->Height);
@@ -134,7 +134,7 @@ void GLPainter::DrawTexture( Texture* Tex, float x, float y )
 }
 
 
-void GLPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
+void UiPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
 {
 	float w = Tex->TextSize.width();
 	float h = Tex->TextSize.height();
@@ -153,7 +153,7 @@ void GLPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
 }
 
 
-void GLPainter::Set( int Width, int Height )
+void UiPainter::Set( int Width, int Height )
 {
 	TheDrawingAPI->SetViewport(0, 0, Width, Height);
 	TheDrawingAPI->SetRenderState(&CanvasRenderstate);

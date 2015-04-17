@@ -4,22 +4,20 @@
 #include <zengine.h>
 
 class QString;
-class GLPainter;
+class UiPainter;
 
-extern GLPainter* ThePainter;
+extern UiPainter* ThePainter;
 
-ShaderNode*	LoadShader(const char* VertexFile, const char* FragmentFile);
-OWNERSHIP char*	ReadFileQt(const char* FileName);
 #define ADJUST(x) (x)
 
-void InitCanvas();
-void DisposeCanvas();
+void InitPainter();
+void DisposePainter();
 
-class GLPainter 
+class UiPainter 
 {
 public:
-	GLPainter();
-	~GLPainter();
+	UiPainter();
+	~UiPainter();
 
 	void					Set(int Width, int Height);
 
@@ -47,11 +45,11 @@ private:
 	StaticMeshNode*			BoxMeshOp;
 	StaticMeshNode*			TexturedBoxMeshOp;
 
-	Model*					SolidLineModel;
-	Model*					SolidRectModel;
-	Model*					SolidBoxModel;
-	Model*					TexturedBoxModel;
-	Model*					TextBoxModel;
+	RenderableNode*			SolidLineModel;
+	RenderableNode*			SolidRectModel;
+	RenderableNode*			SolidBoxModel;
+	RenderableNode*			TexturedBoxModel;
+	RenderableNode*			TextBoxModel;
 
 	RenderState				CanvasRenderstate;
 			

@@ -15,8 +15,7 @@
 #include "nodes/valuenodes.h"
 #include "nodes/shadernode.h"
 #include "nodes/meshnode.h"
-
-#include "operators/model.h"
+#include "nodes/renderablenode.h"
 
 #include "shaders/shadermetadata.h"
 #include "shaders/shaderbuilder.h"

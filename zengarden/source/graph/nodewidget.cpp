@@ -1,5 +1,5 @@
 #include "nodewidget.h"
-#include "../util/glPainter.h"
+#include "../util/uipainter.h"
 #include <zengine.h>
 #include <QImage>
 #include <QGLWidget>
@@ -38,12 +38,12 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 NodeWidget::NodeWidget(Node* _Nd)
 	: TitleTexture(NULL)
-	, Op(_Nd)
+	, Nd(_Nd)
 {
 	Selected = false;
-	SetTitle(QString::fromStdString(Op->Name));
+	SetTitle(QString::fromStdString(Nd->Name));
 
-	foreach(Slot* slot, Op->Slots)
+	foreach(Slot* slot, Nd->Slots)
 	{
 		SlotWidget* sw = new SlotWidget();
 		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
@@ -88,12 +88,12 @@ void NodeWidget::Paint(GraphEditor* Panel)
 	for (int i=0; i<Slots.size(); i++)
 	{
 		Vec4 slotFrameColor(1, 1, 1, 0.1);
-		if (Panel->State == GraphEditor::STATE_CONNECTTOOPERATOR) {
+		if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_NODE) {
 			if (Panel->ClickedWidget == this && Panel->ClickedSlot == i) {
 				slotFrameColor = ConnectionColor;
 			}
 		} else if (Panel->HoveredWidget == this && Panel->HoveredSlot == i) {
-			if (Panel->State == GraphEditor::STATE_CONNECTTOSLOT) {
+			if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_SLOT) {
 				slotFrameColor = Panel->ConnectionValid 
 					? ConnectionColorValid : ConnectionColorInvalid;
 			} else slotFrameColor = Vec4(1, 1, 1, 0.6);
@@ -114,11 +114,11 @@ void NodeWidget::Paint(GraphEditor* Panel)
 	Vec4 frameColor(1, 1, 1, 0.1);
 	if (Selected) {
 		frameColor = Vec4(1, 1, 1, 1);
-	} else if (Panel->State == GraphEditor::STATE_CONNECTTOSLOT 
+	} else if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_SLOT 
 		&& Panel->ClickedWidget == this) {
 			frameColor = ConnectionColor;
 	} else if (Panel->HoveredWidget == this) {
-		if (Panel->State == GraphEditor::STATE_CONNECTTOOPERATOR) {
+		if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_NODE) {
 			if (Panel->ClickedWidget != this) {
 				frameColor = Panel->ConnectionValid ? ConnectionColorValid : ConnectionColorInvalid;
 			}
@@ -146,9 +146,9 @@ void NodeWidget::SetPosition( Vec2 Position )
 	EventRepaint();
 }
 
-Node* NodeWidget::GetOperator()
+Node* NodeWidget::GetNode()
 {
-	return Op;
+	return Nd;
 }
 
 Vec2 NodeWidget::GetOutputPosition()

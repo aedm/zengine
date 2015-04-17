@@ -31,9 +31,6 @@
     <Filter Include="source\dom">
       <UniqueIdentifier>{580ede8c-34bf-41af-93ab-7c96b7d5cb9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="source\operators">
-      <UniqueIdentifier>{2b9bcb46-5c32-4ea2-ae28-b3a9f933632f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\render">
       <UniqueIdentifier>{984ecc4c-b78a-472e-ac3f-80a42f033ca8}</UniqueIdentifier>
     </Filter>
@@ -128,6 +125,9 @@
     <ClInclude Include="include\nodes\meshnode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\nodes\renderablenode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -141,9 +141,6 @@
     </ClCompile>
     <ClCompile Include="source\dom\node.cpp">
       <Filter>source\dom</Filter>
-    </ClCompile>
-    <ClCompile Include="source\operators\model.cpp">
-      <Filter>source\operators</Filter>
     </ClCompile>
     <ClCompile Include="source\render\opengl\drawingopengl.cpp">
       <Filter>source\render\opengl</Filter>
@@ -182,6 +179,9 @@
       <Filter>source\nodes</Filter>
     </ClCompile>
     <ClCompile Include="source\nodes\meshnode.cpp">
+      <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\renderablenode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,7 +6,7 @@ Document::Document()
 
 }
 
-OperatorGraph::OperatorGraph()
+NodeGraph::NodeGraph()
 {
 
 }

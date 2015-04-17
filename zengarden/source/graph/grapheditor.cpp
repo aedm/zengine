@@ -1,7 +1,7 @@
 #include "grapheditor.h"
 #include "nodewidget.h"
-#include "../util/glPainter.h"
-#include "../commands/graphCommands.h"
+#include "../util/uipainter.h"
+#include "../commands/graphcommands.h"
 #include "../document.h"
 //#include "operatorPrototypes.h"
 #include <zengine.h>
@@ -22,7 +22,7 @@ GraphEditor::GraphEditor( QWidget* Parent )
 
 	setMouseTracking(true);
 
-	State = STATE_VOID;
+	CurrentState = State::DEFAULT;
 	ClickedWidget = NULL;
 	HoveredWidget = NULL;
 	HoveredSlot = -1;
@@ -103,12 +103,12 @@ void GraphEditor::Paint()
 	ThePainter->Color.SetValue(Vec4(1, 1, 1, 1));
 	for (int i=Graph->Widgets.size()-1; i>=0; i--) {
 		NodeWidget* ndWidget = Graph->Widgets[i];
-		Node* op = ndWidget->GetOperator();
-		for (int i=0; i<op->Slots.size(); i++) {
-			Slot* slot = op->Slots[i];
+		Node* node = ndWidget->GetNode();
+		for (int i=0; i<node->Slots.size(); i++) {
+			Slot* slot = node->Slots[i];
 			Node* connectedOp = slot->GetConnectedNode();
 			if (connectedOp) {
-				NodeWidget* connectedOpWidget = GetOperatorWidget(connectedOp);
+				NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);
 				if (connectedOpWidget != NULL) {
 					/// Draw connection
 					Vec2 p1 = connectedOpWidget->GetOutputPosition();
@@ -119,27 +119,27 @@ void GraphEditor::Paint()
 		}		
 	}
 
-	if (State == STATE_CONNECTTOOPERATOR) {
+	if (CurrentState == State::CONNECT_TO_NODE) {
 		Vec2 from = ClickedWidget->GetInputPosition(ClickedSlot);
 		Vec2 to = CurrentMousePos;
 		ThePainter->Color.SetValue(Vec4(1, 1, 1, 0.7));
 		ThePainter->DrawLine(from, to);
 	}
 
-	if (State == STATE_CONNECTTOSLOT) {
+	if (CurrentState == State::CONNECT_TO_SLOT) {
 		Vec2 from = ClickedWidget->GetOutputPosition();
 		Vec2 to = CurrentMousePos;
 		ThePainter->Color.SetValue(Vec4(1, 1, 1, 0.7));
 		ThePainter->DrawLine(from, to);
 	}
 
-	/// Draw operators
+	/// Draw nodes
 	for (int i=Graph->Widgets.size()-1; i>=0; i--) {
 		Graph->Widgets[i]->Paint(this);
 	}
 
 	/// Draw selection rectangle
-	if (State == STATE_SELECTRECTANGLE)
+	if (CurrentState == State::SELECT_RECTANGLE)
 	{
 		ThePainter->Color.SetValue(Vec4(0.4, 0.9, 1, 0.1));
 		ThePainter->DrawBox(OriginalMousePos, CurrentMousePos - OriginalMousePos);
@@ -148,7 +148,7 @@ void GraphEditor::Paint()
 	}
 }
 
-NodeWidget* GraphEditor::GetOperatorWidget( Node* Op )
+NodeWidget* GraphEditor::GetNodeWidget( Node* Op )
 {
 	auto it = WidgetMap.find(Op);
 	return (it != WidgetMap.end()) ? it->second : NULL;
@@ -186,16 +186,16 @@ bool HasIntersection(Vec2 Pos1, Vec2 Size1, Vec2 Pos2, Vec2 Size2)
 
 void GraphEditor::DeselectAll()
 {
-	foreach (NodeWidget* ow, SelectedOperators)
+	foreach (NodeWidget* ow, SelectedNodes)
 	{
 		ow->Selected = false;
 	}
-	SelectedOperators.clear();
+	SelectedNodes.clear();
 }
 
-void GraphEditor::StorePositionOfSelectedOperators()
+void GraphEditor::StorePositionOfSelectedNodes()
 {
-	foreach (NodeWidget* ow, SelectedOperators)
+	foreach (NodeWidget* ow, SelectedNodes)
 	{
 		ow->OriginalPosition = ow->Position;
 		ow->OriginalSize = ow->Size;
@@ -208,23 +208,23 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 	OriginalMousePos = mousePos;
 	CurrentMousePos = mousePos;
 
-	switch (State)
+	switch (CurrentState)
 	{
-	case STATE_VOID:
+	case State::DEFAULT:
 		if (HoveredWidget) 
 		{
 			if ((event->modifiers() & Qt::AltModifier) > 0)
 			{
 				if (HoveredSlot >= 0) {
-					/// Start connecting from slot to operator
-					State = STATE_CONNECTTOOPERATOR;
+					/// Start connecting from slot to node
+					CurrentState = State::CONNECT_TO_NODE;
 					ClickedWidget = HoveredWidget;
 					ClickedSlot = HoveredSlot;
 					ConnectionValid = false;
 					DeselectAll();
 				} else {
-					/// Start connecting from operator to slot
-					State = STATE_CONNECTTOSLOT;
+					/// Start connecting from node to slot
+					CurrentState = State::CONNECT_TO_SLOT;
 					ClickedWidget = HoveredWidget;
 					ClickedSlot = -1;
 					ConnectionValid = false;
@@ -233,28 +233,28 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 			} else {
 				if (!HoveredWidget->Selected)
 				{
-					/// Select operator
+					/// Select node
 					DeselectAll();
 					HoveredWidget->Selected = true;
-					SelectedOperators.insert(HoveredWidget);
+					SelectedNodes.insert(HoveredWidget);
 				}
-				StorePositionOfSelectedOperators();
-				OperatorsMoved = false;
+				StorePositionOfSelectedNodes();
+				NodesMoved = false;
 				ClickedWidget = HoveredWidget;
-				State = STATE_MOVEOPERATORS;
+				CurrentState = State::MOVE_NODES;
 
-				/// Put operator on top
+				/// Put node on top
 				Graph->Widgets.erase(
 					std::find(Graph->Widgets.begin(), Graph->Widgets.end(), HoveredWidget));
 				Graph->Widgets.insert(Graph->Widgets.begin(), HoveredWidget);
 			}
 		} else {
 			/// No widget was pressed, start rectangular selection
-			State = STATE_SELECTRECTANGLE;
+			CurrentState = State::SELECT_RECTANGLE;
 			DeselectAll();
 		}
 		break;
-	case STATE_CONNECTTOOPERATOR:
+	case State::CONNECT_TO_NODE:
 
 		break;
 	default: break;
@@ -266,12 +266,12 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 {
 	Vec2 mousePos(event->x(), event->y());
-	switch (State)
+	switch (CurrentState)
 	{
-	case STATE_MOVEOPERATORS:
-		if (OperatorsMoved)
+	case State::MOVE_NODES:
+		if (NodesMoved)
 		{
-			foreach (NodeWidget* ow, SelectedOperators)
+			foreach (NodeWidget* ow, SelectedNodes)
 			{
 				Vec2 pos = ow->Position;
 				ow->Position = ow->OriginalPosition;
@@ -280,38 +280,38 @@ void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 		} else {
 			DeselectAll();
 			ClickedWidget->Selected = true;
-			SelectedOperators.insert(ClickedWidget);
+			SelectedNodes.insert(ClickedWidget);
 			update();
 		}
-		State = STATE_VOID;
+		CurrentState = State::DEFAULT;
 		break;
-	case STATE_SELECTRECTANGLE:
+	case State::SELECT_RECTANGLE:
 		foreach (NodeWidget* ow, Graph->Widgets)
 		{
-			if (ow->Selected) SelectedOperators.insert(ow);
+			if (ow->Selected) SelectedNodes.insert(ow);
 		}
-		State = STATE_VOID;
+		CurrentState = State::DEFAULT;
 		update();
 		break;
-	case STATE_CONNECTTOOPERATOR:
+	case State::CONNECT_TO_NODE:
 		if (ConnectionValid) {
-			Node* op = HoveredWidget->GetOperator();
-			Slot* slot = ClickedWidget->GetOperator()->Slots[ClickedSlot];
-			TheCommandStack->Execute(new ConnectNodeToSlotCommand(op, slot));
+			Node* node = HoveredWidget->GetNode();
+			Slot* slot = ClickedWidget->GetNode()->Slots[ClickedSlot];
+			TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
 		}
 		update();
-		State = STATE_VOID;
+		CurrentState = State::DEFAULT;
 		break;
-	case STATE_CONNECTTOSLOT:
+	case State::CONNECT_TO_SLOT:
 		if (ConnectionValid) {
-			Node* op = ClickedWidget->GetOperator();
-			Slot* slot = HoveredWidget->GetOperator()->Slots[HoveredSlot];
-			TheCommandStack->Execute(new ConnectNodeToSlotCommand(op, slot));
+			Node* node = ClickedWidget->GetNode();
+			Slot* slot = HoveredWidget->GetNode()->Slots[HoveredSlot];
+			TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
 		}
 		update();
-		State = STATE_VOID;
+		CurrentState = State::DEFAULT;
 		break;
-	case STATE_VOID:
+	case State::DEFAULT:
 		break;
 	}
 }
@@ -321,7 +321,7 @@ void GraphEditor::OnMouseRightDown( QMouseEvent* event )
 	if ((event->modifiers() & Qt::AltModifier) > 0) {
 		if (HoveredSlot >= 0) {
 			/// Remove connection
-			Slot* slot = HoveredWidget->GetOperator()->Slots[HoveredSlot];
+			Slot* slot = HoveredWidget->GetNode()->Slots[HoveredSlot];
 			if (slot->GetConnectedNode()) {
 				TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
 			}
@@ -348,20 +348,20 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 {
 	Vec2 mousePos(event->x(), event->y());
 	CurrentMousePos = mousePos;
-	switch (State)
+	switch (CurrentState)
 	{
-	case STATE_MOVEOPERATORS:
+	case State::MOVE_NODES:
 		{
-			OperatorsMoved = true;
+			NodesMoved = true;
 			Vec2 mouseDiff = mousePos - OriginalMousePos;
-			foreach (NodeWidget* ow, SelectedOperators)
+			foreach (NodeWidget* ow, SelectedNodes)
 			{
 				ow->Position = ow->OriginalPosition + mouseDiff;
 			}
 			update();
 		}
 		break;
-	case STATE_SELECTRECTANGLE:
+	case State::SELECT_RECTANGLE:
 		foreach (NodeWidget* ow, Graph->Widgets)
 		{
 			ow->Selected = HasIntersection(OriginalMousePos, 
@@ -369,23 +369,23 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		}
 		update();
 		break;
-	case STATE_CONNECTTOOPERATOR:
+	case State::CONNECT_TO_NODE:
 		ConnectionValid = false;
 		UpdateHoveredWidget(mousePos);
 		if (HoveredWidget && HoveredWidget != ClickedWidget) {
-			if (HoveredWidget->GetOperator()->GetType() 
-				== ClickedWidget->GetOperator()->Slots[ClickedSlot]->GetType()) {
+			if (HoveredWidget->GetNode()->GetType() 
+				== ClickedWidget->GetNode()->Slots[ClickedSlot]->GetType()) {
 					ConnectionValid = true;
 			}
 		}
 		update();
 		break;
-	case STATE_CONNECTTOSLOT:
+	case State::CONNECT_TO_SLOT:
 		ConnectionValid = false;
 		UpdateHoveredWidget(mousePos); 
 		if (HoveredSlot >= 0 && HoveredWidget != ClickedWidget) {
-			if (ClickedWidget->GetOperator()->GetType() 
-				== HoveredWidget->GetOperator()->Slots[HoveredSlot]->GetType()) {
+			if (ClickedWidget->GetNode()->GetType() 
+				== HoveredWidget->GetNode()->Slots[HoveredSlot]->GetType()) {
 					ConnectionValid = true;
 			}
 		}
@@ -438,7 +438,7 @@ void GraphEditor::OnKeyPress( QKeyEvent* event )
 	}
 }
 
-void GraphEditor::SetGraph( OperatorGraph* Graph )
+void GraphEditor::SetGraph( NodeGraph* Graph )
 {
 	this->Graph = Graph;
 }

@@ -6,7 +6,6 @@
 
 //class Mesh;
 class Texture;
-class Mesh;
 
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
@@ -17,7 +16,6 @@ class Mesh;
 	ITEM(UINT,			UINT,		"Uint"		) \
 	ITEM(MATRIX44,		Matrix,		"Matrix"	) \
 	ITEM(TEXTURE,		Texture*,	"Texture"	) \
-	ITEM(MESH,			Mesh*,		"Mesh"		) \
 
 
 /// Possible node types
@@ -31,6 +29,7 @@ enum class NodeType
 	/// Node types without an output value
 	SHADER,
 	MODEL,
+	MESH,
 
 	/// Undefined behavior
 	UNDEFINED

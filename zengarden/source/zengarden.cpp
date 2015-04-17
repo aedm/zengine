@@ -1,5 +1,6 @@
 #include "zengarden.h"
-#include "util/glPainter.h"
+#include "util/uipainter.h"
+#include "util/util.h"
 #include "commands/command.h"
 #include "commands/graphCommands.h"
 #include <zengine.h>
@@ -31,23 +32,23 @@ void zengarden::InitModules()
 {
 	InitZengine();
 	//InitEditorComponents();
-	InitCanvas();
+	InitPainter();
 
 	Doc = new Document();
-	OperatorGraph* graph = new OperatorGraph();
+	NodeGraph* graph = new NodeGraph();
 	OpPanel->SetGraph(graph);
 
 	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
 	if (shaderOp)
 	{
 		TheCommandStack->Execute(new CreateNodeCommand(shaderOp, OpPanel));
-		NodeWidget* ow = OpPanel->GetOperatorWidget(shaderOp);
+		NodeWidget* ow = OpPanel->GetNodeWidget(shaderOp);
 		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 50)));
 	}
 
-	Model* model = new Model();
+	RenderableNode* model = new RenderableNode();
 	TheCommandStack->Execute(new CreateNodeCommand(model, OpPanel));
-	NodeWidget* ow = OpPanel->GetOperatorWidget(model);
+	NodeWidget* ow = OpPanel->GetNodeWidget(model);
 	TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(ADJUST(250), 70)));
 
 	//model->TheShader.Connect(shaderOp);

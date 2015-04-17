@@ -99,6 +99,7 @@
     <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\node.h" />
+    <ClInclude Include="include\nodes\renderablenode.h" />
     <ClInclude Include="include\nodes\shadernode.h" />
     <ClInclude Include="include\nodes\meshnode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
@@ -121,9 +122,9 @@
     <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
+    <ClCompile Include="source\nodes\renderablenode.cpp" />
     <ClCompile Include="source\nodes\shadernode.cpp" />
     <ClCompile Include="source\nodes\meshnode.cpp" />
-    <ClCompile Include="source\operators\model.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />

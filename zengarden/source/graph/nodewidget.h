@@ -19,7 +19,7 @@ public:
 	Vec2				GetOutputPosition();
 	Vec2				GetInputPosition(int SlotIndex);
 
-	Node*				GetOperator();
+	Node*				GetNode();
 
 	Event<void>			EventRepaint;
 
@@ -27,7 +27,7 @@ private:
 	/// Command-accessible
 	void				SetPosition(Vec2 Position);
 
-	Node*				Op;
+	Node*				Nd;
 
 	/// Layout
 	void				CalculateLayout();

@@ -1,23 +1,5 @@
-#include "glPainter.h"
-//#include "operatorPrototypes.h"
+#include "util.h"
 #include <QDir>
-
-void InitCanvas();
-void DisposeCanvas();
-
-void InitEditorComponents()
-{
-	Q_INIT_RESOURCE(ui_shaders);
-
-	InitCanvas();
-	//ThePrototypes = new OperatorPrototypes();
-}
-
-void CloseEditorComponents()
-{
-	//SafeDelete(ThePrototypes);
-	DisposeCanvas();
-}
 
 char* ReadFileQt( const char* FileName )
 {

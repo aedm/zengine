@@ -9,6 +9,16 @@ class Texture;
 struct UniformMapping;
 struct SamplerMapping;
 
+
+class ShaderSlot: public Slot
+{
+public:
+	ShaderSlot(Node* Owner, SharedString Name);
+
+	void						Set() const;
+};
+
+
 class ShaderNode: public Node
 {
 public:

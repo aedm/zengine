@@ -36,13 +36,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="source\commands\command.cpp" />
-    <ClCompile Include="source\commands\graphCommands.cpp" />
+    <ClCompile Include="source\commands\graphcommands.cpp" />
     <ClCompile Include="source\document.cpp" />
     <ClCompile Include="source\graph\grapheditor.cpp" />
     <ClCompile Include="source\graph\nodewidget.cpp" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\util\editorComponents.cpp" />
-    <ClCompile Include="source\util\glPainter.cpp" />
+    <ClCompile Include="source\util\util.cpp" />
+    <ClCompile Include="source\util\uipainter.cpp" />
     <ClCompile Include="source\util\textTexture.cpp" />
     <ClCompile Include="source\zengarden.cpp" />
   </ItemGroup>
@@ -73,11 +73,11 @@
   <ItemGroup>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_zengarden.h" />
     <ClInclude Include="source\commands\command.h" />
-    <ClInclude Include="source\commands\graphCommands.h" />
+    <ClInclude Include="source\commands\graphcommands.h" />
     <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
-    <ClInclude Include="source\util\editorComponents.h" />
-    <ClInclude Include="source\util\glPainter.h" />
+    <ClInclude Include="source\util\util.h" />
+    <ClInclude Include="source\util\uipainter.h" />
     <ClInclude Include="source\util\textTexture.h" />
     <CustomBuild Include="source\graph\grapheditor.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

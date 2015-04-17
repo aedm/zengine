@@ -5,6 +5,18 @@
 #include <include/shaders/shaderBuilder.h>
 #include <boost/foreach.hpp>
 
+
+ShaderSlot::ShaderSlot(Node* Owner, SharedString Name)
+	: Slot(NodeType::SHADER, Owner, Name)
+{}
+
+void ShaderSlot::Set() const
+{
+	ShaderNode* node = static_cast<ShaderNode*>(GetConnectedNode());
+	if (node != nullptr) node->Set();
+}
+
+
 ShaderNode::ShaderNode( Shader* _Shader )
 	: Node(NodeType::SHADER, string("Shader"))
 	, ShaderProgram(_Shader)
