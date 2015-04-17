@@ -77,9 +77,6 @@
     <ClInclude Include="include\operators\model.h">
       <Filter>include\operators</Filter>
     </ClInclude>
-    <ClInclude Include="include\operators\shaderoperator.h">
-      <Filter>include\operators</Filter>
-    </ClInclude>
     <ClInclude Include="include\shaders\shaderbuilder.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
@@ -128,6 +125,9 @@
     <ClInclude Include="include\nodes\staticmeshnode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\nodes\shadernode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -143,9 +143,6 @@
       <Filter>source\dom</Filter>
     </ClCompile>
     <ClCompile Include="source\operators\model.cpp">
-      <Filter>source\operators</Filter>
-    </ClCompile>
-    <ClCompile Include="source\operators\shaderoperator.cpp">
       <Filter>source\operators</Filter>
     </ClCompile>
     <ClCompile Include="source\render\opengl\drawingopengl.cpp">
@@ -182,6 +179,9 @@
       <Filter>source\base</Filter>
     </ClCompile>
     <ClCompile Include="source\nodes\staticmeshnode.cpp">
+      <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\shadernode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>

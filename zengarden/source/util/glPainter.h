@@ -8,7 +8,7 @@ class GLPainter;
 
 extern GLPainter* ThePainter;
 
-ShaderOperator*	LoadShader(const char* VertexFile, const char* FragmentFile);
+ShaderNode*	LoadShader(const char* VertexFile, const char* FragmentFile);
 OWNERSHIP char*	ReadFileQt(const char* FileName);
 #define ADJUST(x) (x)
 
@@ -36,9 +36,9 @@ public:
 	QFont					TitleFont;
 
 private:
-	ShaderOperator*			SolidColorOp;
-	ShaderOperator*			SolidTextureOp;
-	ShaderOperator*			TextTextureOp;
+	ShaderNode*				SolidColorOp;
+	ShaderNode*				SolidTextureOp;
+	ShaderNode*				TextTextureOp;
 
 	Texture*				SomeTexture;
 

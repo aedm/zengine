@@ -99,10 +99,10 @@
     <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\node.h" />
+    <ClInclude Include="include\nodes\shadernode.h" />
     <ClInclude Include="include\nodes\staticmeshnode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
     <ClInclude Include="include\operators\model.h" />
-    <ClInclude Include="include\operators\shaderoperator.h" />
     <ClInclude Include="include\render\drawingapi.h" />
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\resourcemanager.h" />
@@ -121,9 +121,9 @@
     <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
+    <ClCompile Include="source\nodes\shadernode.cpp" />
     <ClCompile Include="source\nodes\staticmeshnode.cpp" />
     <ClCompile Include="source\operators\model.cpp" />
-    <ClCompile Include="source\operators\shaderoperator.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shaderoperator.h"
+#include "../nodes/shadernode.h"
 #include "../nodes/staticmeshnode.h"
 #include "../resources/mesh.h"
 #include "../render/drawingapi.h"
@@ -17,7 +17,7 @@ public:
 	Slot					TheShader;
 	MeshSlot				TheMesh;
 
-	static Model*			Create(ShaderOperator* ShaderOp, StaticMeshNode* MeshOp);
+	static Model*			Create(ShaderNode* ShaderOp, StaticMeshNode* MeshOp);
 
 	/// Clone operator
 	virtual Node*	Clone() const;

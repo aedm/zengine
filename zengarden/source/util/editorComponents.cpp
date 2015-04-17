@@ -35,7 +35,7 @@ char* ReadFileQt( const char* FileName )
 	return content;
 }
 
-ShaderOperator* LoadShader( const char* VertexFile, const char* FragmentFile )
+ShaderNode* LoadShader( const char* VertexFile, const char* FragmentFile )
 {
 	char* vertexContent = ReadFileQt(VertexFile);
 	char* fragmentContent = ReadFileQt(FragmentFile);
@@ -46,7 +46,7 @@ ShaderOperator* LoadShader( const char* VertexFile, const char* FragmentFile )
 		Shader* shader = ShaderSource::Build(source);
 		if (shader)
 		{
-			ShaderOperator* shop = new ShaderOperator(shader);
+			ShaderNode* shop = new ShaderNode(shader);
 			return shop;
 		}
 

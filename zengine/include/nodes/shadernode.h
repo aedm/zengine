@@ -6,17 +6,16 @@
 
 class UniformArray;
 class Texture;
-class ShaderOperator;
 struct UniformMapping;
 struct SamplerMapping;
 
-class ShaderOperator: public Node
+class ShaderNode: public Node
 {
 public:
-	ShaderOperator(Shader* _Shader);
-	ShaderOperator(const ShaderOperator& Original);
+	ShaderNode(Shader* _Shader);
+	ShaderNode(const ShaderNode& Original);
 
-	virtual ~ShaderOperator();
+	virtual ~ShaderNode();
 
 	/// Returns a slot created for a certain sampler
 	TextureSlot*				GetSamplerSlotByName(const char* Name);

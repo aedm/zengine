@@ -1,18 +1,18 @@
 #include <include/render/drawingapi.h>
-#include <include/operators/shaderoperator.h>
+#include <include/nodes/shadernode.h>
 #include <include/base/helpers.h>
 #include <include/resources/texture.h>
 #include <include/shaders/shaderBuilder.h>
 #include <boost/foreach.hpp>
 
-ShaderOperator::ShaderOperator( Shader* _Shader )
+ShaderNode::ShaderNode( Shader* _Shader )
 	: Node(NodeType::SHADER, string("Shader"))
 	, ShaderProgram(_Shader)
 {
 	Init();
 }
 
-ShaderOperator::ShaderOperator( const ShaderOperator& Original )
+ShaderNode::ShaderNode( const ShaderNode& Original )
 	: Node(Original)
 	, ShaderProgram(Original.ShaderProgram)
 {
@@ -20,7 +20,7 @@ ShaderOperator::ShaderOperator( const ShaderOperator& Original )
 }
 
 
-void ShaderOperator::Init()
+void ShaderNode::Init()
 {
 	UniformArrays.reserve(ShaderProgram->UniformBlocks.size());
 	foreach(UniformBlock* block, ShaderProgram->UniformBlocks)
@@ -38,7 +38,7 @@ void ShaderOperator::Init()
 }
 
 
-void ShaderOperator::Set()
+void ShaderNode::Set()
 {
 	ASSERT(IsProperlyConnected);
 
@@ -67,12 +67,12 @@ void ShaderOperator::Set()
 	}
 }
 
-void ShaderOperator::OnSlotConnectionsChanged( Slot* S )
+void ShaderNode::OnSlotConnectionsChanged( Slot* S )
 {
 	RegenerateCopyItems();
 }
 
-void ShaderOperator::RegenerateCopyItems()
+void ShaderNode::RegenerateCopyItems()
 {
 	/// Reset copy items
 	foreach(UniformArray* uniformArray, UniformArrays)
@@ -227,7 +227,7 @@ SamplerMapping::SamplerMapping( Sampler* _TargetSampler, TextureSlot* _SourceSlo
 	, SourceSlot(_SourceSlot)
 {}
 
-TextureSlot* ShaderOperator::GetSamplerSlotByName( const char* Name )
+TextureSlot* ShaderNode::GetSamplerSlotByName( const char* Name )
 {
 	foreach (SamplerMapping& p, Samplers)
 	{
@@ -241,7 +241,7 @@ TextureSlot* ShaderOperator::GetSamplerSlotByName( const char* Name )
 	return NULL;
 }
 
-void ShaderOperator::AttachToSampler(const char* Name, Node* Op)
+void ShaderNode::AttachToSampler(const char* Name, Node* Op)
 {
 	if (this == NULL)
 	{
@@ -261,12 +261,12 @@ void ShaderOperator::AttachToSampler(const char* Name, Node* Op)
 	WARN("There is no sampler called '%s'.", Name);
 }
 
-const vector<UniformMapping>& ShaderOperator::GetUniforms()
+const vector<UniformMapping>& ShaderNode::GetUniforms()
 {
 	return Uniforms;
 }
 
-ShaderOperator::~ShaderOperator()
+ShaderNode::~ShaderNode()
 {
 	foreach (SamplerMapping& item, Samplers)
 	{
@@ -279,9 +279,9 @@ ShaderOperator::~ShaderOperator()
 	}
 }
 
-Node* ShaderOperator::Clone() const
+Node* ShaderNode::Clone() const
 {
-	return new ShaderOperator(*this);
+	return new ShaderNode(*this);
 }
 
 UniformArray::CopyItem::CopyItem( const UINT* _Source, UINT* _Target, bool _IsGlobal )
@@ -290,7 +290,7 @@ UniformArray::CopyItem::CopyItem( const UINT* _Source, UINT* _Target, bool _IsGl
 	, IsGlobal(_IsGlobal)
 {}
 
-void ShaderOperator::AttachToUniform(const char* Name, Node* Op, int FloatIndex)
+void ShaderNode::AttachToUniform(const char* Name, Node* Op, int FloatIndex)
 {
 	if (this == NULL)
 	{

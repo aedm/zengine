@@ -37,7 +37,7 @@ void zengarden::InitModules()
 	OperatorGraph* graph = new OperatorGraph();
 	OpPanel->SetGraph(graph);
 
-	ShaderOperator* shaderOp = LoadShader("test.vs", "test.fs");
+	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
 	if (shaderOp)
 	{
 		TheCommandStack->Execute(new CreateNodeCommand(shaderOp, OpPanel));
