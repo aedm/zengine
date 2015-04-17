@@ -12,7 +12,7 @@
 
 #include "shaders/shaders.h"
 
-#include "operators/valueoperators.h"
+#include "nodes/valuenodes.h"
 #include "operators/shaderoperator.h"
 #include "operators/model.h"
 

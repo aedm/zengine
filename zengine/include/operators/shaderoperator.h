@@ -2,7 +2,7 @@
 
 #include "../dom/node.h"
 #include "../shaders/shaders.h"
-#include "valueOperators.h"
+#include "../nodes/valuenodes.h"
 
 class UniformArray;
 class Texture;

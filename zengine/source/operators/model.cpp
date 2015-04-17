@@ -2,12 +2,11 @@
 #include <include/base/helpers.h>
 
 Model::Model()
-	: Node(string("Model"))
+	: Node(NodeType::MODEL, string("Model"))
 	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
 	, Mapper(NULL)
 {
-	Type = NodeType::MODEL;
 	Slots.push_back(&TheShader);
 	Slots.push_back(&TheMesh);
 }
@@ -26,7 +25,7 @@ void Model::Render(PrimitiveTypeEnum Primitive)
 	if (!Mapper) return;
 
 	static_cast<ShaderOperator*>(TheShader.GetConnectedNode())->Set();
-	Mesh* mesh = TheMesh.Value();
+	const Mesh* mesh = TheMesh.GetMesh();
 	if (mesh->IndexHandle)
 	{
 		TheDrawingAPI->RenderIndexedMesh(mesh->IndexHandle, mesh->IndexCount, 
@@ -46,7 +45,7 @@ void Model::Operate()
 {
 	if (Mapper == NULL)
 	{
-		Mesh* mesh = TheMesh.Value();
+		const Mesh* mesh = TheMesh.GetMesh();
 		ShaderOperator* shader = (ShaderOperator*)TheShader.GetConnectedNode();
 		if (mesh && shader)
 		{
@@ -56,7 +55,7 @@ void Model::Operate()
 	}
 }
 
-Model* Model::Create( ShaderOperator* ShaderOp, MeshOperator* MeshOp )
+Model* Model::Create( ShaderOperator* ShaderOp, StaticMeshNode* MeshOp )
 {
 	Model* model = new Model();
 	model->TheMesh.Connect(MeshOp);

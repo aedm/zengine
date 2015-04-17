@@ -12,7 +12,7 @@ VertexFormat* VertexPosUV::Format;
 
 VertexFormat::VertexFormat(UINT BinaryFormat)
 {
-	memset(AttributesArray, 0, sizeof(void*) * VERTEXATTRIB_TYPE_COUNT);
+	memset(AttributesArray, 0, sizeof(void*) * (UINT)VertexAttributeUsage::COUNT);
 
 	this->BinaryFormat = BinaryFormat;
 	int stride = 0;
@@ -21,7 +21,7 @@ VertexFormat::VertexFormat(UINT BinaryFormat)
 		if (BinaryFormat & 1)
 		{
 			VertexAttribute attrib;
-			attrib.Usage = (VertexAttributeEnum)i;
+			attrib.Usage = (VertexAttributeUsage)i;
 			attrib.Size = VariableByteSizes[(UINT)VertexAttributeType[i]];
 			attrib.Offset = stride;
 			Attributes.push_back(attrib);
@@ -34,7 +34,7 @@ VertexFormat::VertexFormat(UINT BinaryFormat)
 		VertexAttribute& attrib = Attributes[i];
 
 		/// AttributesArray points into the vector. Meh.
-		AttributesArray[attrib.Usage] = &attrib;
+		AttributesArray[(UINT)attrib.Usage] = &attrib;
 	}
 
 	Stride = stride;
@@ -56,9 +56,9 @@ VertexFormat::~VertexFormat()
 //	}
 //}
 
-bool VertexFormat::HasAttribute( VertexAttributeEnum Attrib )
+bool VertexFormat::HasAttribute( VertexAttributeUsage Attrib )
 {
-	return (BinaryFormat & (1 << Attrib)) != 0;
+	return (BinaryFormat & (1 << (UINT)Attrib)) != 0;
 }
 
 Mesh::Mesh()

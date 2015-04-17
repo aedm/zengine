@@ -4,22 +4,6 @@
 #include <stdarg.h>
 
 
-/// Array for attribute types
-const NodeType VertexAttributeType[] = {
-#undef ITEM
-#define ITEM(name, type, token) type,
-	VERTEXATTRIBUTE_LIST
-};
-
-
-/// Array for attribute names
-const char* VertexAttributeName[] = {
-#undef ITEM
-#define ITEM(name, type, token) token,
-	VERTEXATTRIBUTE_LIST
-};
-
-
 Logger* TheLogger = new Logger();
 
 void Logger::Log2( LogSeverity Severity, const wchar_t* LogString, ... )

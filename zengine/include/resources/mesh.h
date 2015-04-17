@@ -12,10 +12,10 @@ class VertexFormat;
 
 enum VertexAttributeMask
 {
-	VERTEXATTRIB_POSITION_MASK		= 1 << VERTEXATTRIB_POSITION,
-	VERTEXATTRIB_TEXCOORD_MASK		= 1 << VERTEXATTRIB_TEXCOORD,
-	VERTEXATTRIB_NORMAL_MASK		= 1 << VERTEXATTRIB_NORMAL,
-	VERTEXATTRIB_BINORMAL_MASK		= 1 << VERTEXATTRIB_BINORMAL,
+	VERTEXATTRIB_POSITION_MASK		= 1 << (UINT)VertexAttributeUsage::POSITION,
+	VERTEXATTRIB_TEXCOORD_MASK		= 1 << (UINT)VertexAttributeUsage::TEXCOORD,
+	VERTEXATTRIB_NORMAL_MASK		= 1 << (UINT)VertexAttributeUsage::NORMAL,
+	VERTEXATTRIB_BINORMAL_MASK		= 1 << (UINT)VertexAttributeUsage::BINORMAL,
 	//VERTEXATTRIB_COLOR_MASK			= 1 << VERTEXATTRIB_COLOR
 };
 
@@ -69,14 +69,14 @@ public:
 	void						Set();
 	//void						SetAttributeDefines(ShaderDefines& Defines);
 
-	bool						HasAttribute(VertexAttributeEnum Attrib);
+	bool						HasAttribute(VertexAttributeUsage Attrib);
 
 	//VertexDeclaration			Declaration;
 	int							Stride;
 	UINT						BinaryFormat;
 	vector<VertexAttribute>		Attributes;
 
-	VertexAttribute*			AttributesArray[VERTEXATTRIB_TYPE_COUNT];
+	VertexAttribute*			AttributesArray[(UINT)VertexAttributeUsage::COUNT];
 };
 
 

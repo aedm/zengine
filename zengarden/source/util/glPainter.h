@@ -42,10 +42,10 @@ private:
 
 	Texture*				SomeTexture;
 
-	MeshOperator*			LineMeshOp;
-	MeshOperator*			RectMeshOp;
-	MeshOperator*			BoxMeshOp;
-	MeshOperator*			TexturedBoxMeshOp;
+	StaticMeshNode*			LineMeshOp;
+	StaticMeshNode*			RectMeshOp;
+	StaticMeshNode*			BoxMeshOp;
+	StaticMeshNode*			TexturedBoxMeshOp;
 
 	Model*					SolidLineModel;
 	Model*					SolidRectModel;

@@ -59,7 +59,7 @@ protected:
 template <NodeType T>
 class TypedSlot: public Slot
 {
-	typedef typename OpTypes<T>::Type ValueType;
+	typedef typename NodeTypes<T>::Type ValueType;
 
 public:
 	TypedSlot(Node* Owner, SharedString Name);
@@ -102,7 +102,7 @@ public:
 	virtual bool				CanSetValueDirectly();
 
 protected:
-	Node(const string& Name);
+	Node(NodeType Type, const string& Name);
 
 	/// For cloning
 	Node(const Node& Original);
@@ -146,7 +146,7 @@ template<NodeType T>
 class TypedNode: public Node
 {
 public:
-	typedef typename OpTypes<T>::Type ValueType;
+	typedef typename NodeTypes<T>::Type ValueType;
 
 	TypedNode();
 
@@ -188,10 +188,8 @@ const typename TypedSlot<T>::ValueType& TypedSlot<T>::Value()
 
 template<NodeType T>
 TypedNode<T>::TypedNode()
-	: Node(VariableNames[(UINT)T])
-{
-	Type = T;
-}
+	: Node(T, VariableNames[(UINT)T])
+{}
 
 
 template<NodeType T>

@@ -4,8 +4,9 @@
 #include <memory>
 #include <string>
 
-class Mesh;
+//class Mesh;
 class Texture;
+class Mesh;
 
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
@@ -35,30 +36,41 @@ enum class NodeType
 	UNDEFINED
 };
 
-/// Macrolist for attribute types (name, type, token)
-#define VERTEXATTRIBUTE_LIST \
-	ITEM(VERTEXATTRIB_POSITION,		NodeType::VEC3,		"aPosition"	) \
-	ITEM(VERTEXATTRIB_TEXCOORD,		NodeType::VEC2,		"aTexCoord"	) \
-	ITEM(VERTEXATTRIB_NORMAL,		NodeType::VEC3,		"aNormal"	) \
-	ITEM(VERTEXATTRIB_BINORMAL,		NodeType::VEC3,		"aBinormal"	) \
-
-
-/// Array for variable sizes in bytes, index by OpTypeEnum (only OPTYPE_LIST names)
+/// Variable sizes in bytes, indexed by NodeType (only VALUETYPE_LIST names)
 extern const int VariableByteSizes[];
 
-/// Array for variable names, index by OpTypeEnum (only OPTYPE_LIST names)
+/// Variable names, indexed by NodeType (only VALUETYPE_LIST names)
 extern const char* VariableNames[];
 
 
+/// Type helpers
+template<NodeType T> struct NodeTypes;
+#undef ITEM
+#define ITEM(name, type, token) template<> struct NodeTypes<NodeType::name> { typedef type Type; };
+VALUETYPE_LIST
+
+#undef ITEM
+#define ITEM(name, type, token) typedef type name##_TYPE;
+VALUETYPE_LIST
+
+
+/// Macrolist for attribute types (name, type, token)
+#define VERTEXATTRIBUTE_LIST \
+	ITEM(POSITION,		NodeType::VEC3,		"aPosition"	) \
+	ITEM(TEXCOORD,		NodeType::VEC2,		"aTexCoord"	) \
+	ITEM(NORMAL,		NodeType::VEC3,		"aNormal"	) \
+	ITEM(BINORMAL,		NodeType::VEC3,		"aBinormal"	) \
+
+
 /// Possible variable types in vertex attributes
-enum VertexAttributeEnum
+enum class VertexAttributeUsage
 {
 	#undef ITEM
 	#define ITEM(name, type, token) name,
 	VERTEXATTRIBUTE_LIST
 	
 	/// Number of possible vertex attributes
-	VERTEXATTRIB_TYPE_COUNT
+	COUNT
 };
 
 /// Array for attribute types, index by VertexAttributeEnum
@@ -68,15 +80,6 @@ extern const NodeType VertexAttributeType[];
 extern const char* VertexAttributeName[];
 
 
-/// Type helpers
-template<NodeType T> struct OpTypes;
-	#undef ITEM
-	#define ITEM(name, type, token) template<> struct OpTypes<NodeType::name> { typedef type Type; };
-	VALUETYPE_LIST
-
-	#undef ITEM
-	#define ITEM(name, type, token) typedef type name##_TYPE;
-	VALUETYPE_LIST
 
 
 /// Additional types

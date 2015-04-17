@@ -71,9 +71,9 @@ NodeType Slot::GetType() const
 	return Type;
 }
 
-Node::Node(const string& _Name)
+Node::Node(NodeType _Type, const string& _Name)
 	: Name(_Name)
-	, Type(NodeType::UNDEFINED)
+	, Type(_Type)
 {
 	IsDirty = true;
 	IsProperlyConnected = true;

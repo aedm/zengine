@@ -49,6 +49,12 @@
     <Filter Include="include\render">
       <UniqueIdentifier>{ee22b4d5-c892-4aa4-b356-a126766315f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\nodes">
+      <UniqueIdentifier>{5c5922b1-6bda-45a4-ba8e-2df017e06c9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\nodes">
+      <UniqueIdentifier>{4004ebad-7827-4367-bdc5-3eca317094c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\shader2.txt">
@@ -68,16 +74,10 @@
     <ClInclude Include="include\dom\node.h">
       <Filter>include\dom</Filter>
     </ClInclude>
-    <ClInclude Include="include\operators\meshoperator.h">
-      <Filter>include\operators</Filter>
-    </ClInclude>
     <ClInclude Include="include\operators\model.h">
       <Filter>include\operators</Filter>
     </ClInclude>
     <ClInclude Include="include\operators\shaderoperator.h">
-      <Filter>include\operators</Filter>
-    </ClInclude>
-    <ClInclude Include="include\operators\valueoperators.h">
       <Filter>include\operators</Filter>
     </ClInclude>
     <ClInclude Include="include\shaders\shaderbuilder.h">
@@ -116,6 +116,18 @@
     <ClInclude Include="include\base\types.h">
       <Filter>include\base</Filter>
     </ClInclude>
+    <ClInclude Include="include\nodes\valuenodes.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\resources\mesh.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\resources\texture.h">
+      <Filter>include\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nodes\staticmeshnode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -129,9 +141,6 @@
     </ClCompile>
     <ClCompile Include="source\dom\node.cpp">
       <Filter>source\dom</Filter>
-    </ClCompile>
-    <ClCompile Include="source\operators\meshoperator.cpp">
-      <Filter>source\operators</Filter>
     </ClCompile>
     <ClCompile Include="source\operators\model.cpp">
       <Filter>source\operators</Filter>
@@ -171,6 +180,9 @@
     </ClCompile>
     <ClCompile Include="source\base\types.cpp">
       <Filter>source\base</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\staticmeshnode.cpp">
+      <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -43,12 +43,16 @@ GLPainter::GLPainter()
 	IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
 
 	/// Meshes
-	LineMeshOp = MeshOperator::Create(TheResourceManager->CreateMesh());
-	RectMeshOp = MeshOperator::Create(TheResourceManager->CreateMesh());
-	BoxMeshOp = MeshOperator::Create(TheResourceManager->CreateMesh());
-	BoxMeshOp->GetValue()->SetIndices(boxIndices);
-	TexturedBoxMeshOp = MeshOperator::Create(TheResourceManager->CreateMesh());
-	TexturedBoxMeshOp->GetValue()->SetIndices(boxIndices);
+	LineMeshOp = StaticMeshNode::Create(TheResourceManager->CreateMesh());
+	RectMeshOp = StaticMeshNode::Create(TheResourceManager->CreateMesh());
+
+	Mesh* boxMesh = TheResourceManager->CreateMesh();
+	boxMesh->SetIndices(boxIndices);
+	BoxMeshOp = StaticMeshNode::Create(boxMesh);
+
+	Mesh* textureMesh = TheResourceManager->CreateMesh();
+	textureMesh->SetIndices(boxIndices);
+	TexturedBoxMeshOp = StaticMeshNode::Create(textureMesh);
 
 	/// Models
 	SolidLineModel = Model::Create(SolidColorOp, LineMeshOp);
@@ -73,7 +77,7 @@ GLPainter::~GLPainter()
 void GLPainter::DrawLine( float x1, float y1, float x2, float y2 )
 {
 	VertexPos vertices[] = { {Vec3(x1+0.5f, y1+0.5f, 0)}, {Vec3(x2+0.5f, y2+0.5f, 0)} };
-	LineMeshOp->GetValue()->SetVertices(vertices);
+	LineMeshOp->GetMesh()->SetVertices(vertices);
 	SolidLineModel->Render(PRIMITIVE_LINES);
 }
 
@@ -82,7 +86,7 @@ void GLPainter::DrawLine( const Vec2& From, const Vec2& To )
 	VertexPos vertices[] = { 
 		{Vec3(From.X + 0.5f, From.Y + 0.5f, 0)}, 
 		{Vec3(To.X + 0.5f, To.Y + 0.5f, 0)} };
-	LineMeshOp->GetValue()->SetVertices(vertices);
+	LineMeshOp->GetMesh()->SetVertices(vertices);
 	SolidLineModel->Render(PRIMITIVE_LINES);
 }
 
@@ -96,7 +100,7 @@ void GLPainter::DrawRect( const Vec2& TopLeft, const Vec2& Size )
 		{ pos + Vec3(0, Size.Y - 1, 0) }, 
 		{ pos }, 
 	};
-	RectMeshOp->GetValue()->SetVertices(vertices);
+	RectMeshOp->GetMesh()->SetVertices(vertices);
 	SolidRectModel->Render(PRIMITIVE_LINE_STRIP);
 }
 
@@ -109,7 +113,7 @@ void GLPainter::DrawBox( const Vec2& TopLeft, const Vec2& Size )
 		{ Vec3(TopLeft.X,			TopLeft.Y + Size.Y, 0) }, 
 		{ Vec3(TopLeft.X + Size.X,	TopLeft.Y + Size.Y, 0) }, 
 	};
-	BoxMeshOp->GetValue()->SetVertices(vertices);
+	BoxMeshOp->GetMesh()->SetVertices(vertices);
 	SolidBoxModel->Render(PRIMITIVE_TRIANGLES);
 }
 
@@ -125,7 +129,7 @@ void GLPainter::DrawTexture( Texture* Tex, float x, float y )
 	};
 
 	TexOp.SetValue(Tex);
-	TexturedBoxMeshOp->GetValue()->SetVertices(vertices);
+	TexturedBoxMeshOp->GetMesh()->SetVertices(vertices);
 	TexturedBoxModel->Render();
 }
 
@@ -144,7 +148,7 @@ void GLPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
 	};
 
 	TexOp.SetValue(Tex->TheTexture);
-	TexturedBoxMeshOp->GetValue()->SetVertices(vertices);
+	TexturedBoxMeshOp->GetMesh()->SetVertices(vertices);
 	TextBoxModel->Render();
 }
 

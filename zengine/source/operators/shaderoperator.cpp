@@ -6,10 +6,9 @@
 #include <boost/foreach.hpp>
 
 ShaderOperator::ShaderOperator( Shader* _Shader )
-	: Node(string("Shader"))
+	: Node(NodeType::SHADER, string("Shader"))
 	, ShaderProgram(_Shader)
 {
-	Type = NodeType::SHADER;
 	Init();
 }
 
@@ -166,7 +165,7 @@ void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& 
 				switch(local->Type)
 				{
 				#undef ITEM
-				#define ITEM(name, type) \
+				#define ITEM(name, type, token) \
 				case NodeType::name: slot = new TypedSlot<NodeType::name>(Owner, local->Desc->UniformName); break;
 				VALUETYPE_LIST
 

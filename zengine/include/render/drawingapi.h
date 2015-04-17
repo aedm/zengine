@@ -158,7 +158,7 @@ protected:
 /// One attribute as vertex buffer element
 struct VertexAttribute
 {
-	VertexAttributeEnum			Usage;
+	VertexAttributeUsage		Usage;
 	int							Size;
 	int							Offset;
 };
@@ -168,7 +168,7 @@ struct ShaderAttributeDesc
 {
 	NodeType					Type;
 	AttributeId					Handle;
-	VertexAttributeEnum			Usage;
+	VertexAttributeUsage		Usage;
 	string						Name;
 };
 
