@@ -14,7 +14,7 @@ class GraphEditor: public QGLWidget { Q_OBJECT
 	friend class NodeWidget;
 
 public:
-	GraphEditor(QWidget* Parent);	
+	GraphEditor(QWidget* Parent, QGLWidget* Share);	
 
 	NodeWidget*						GetNodeWidget(Node* Nd);
 	void							SetGraph(NodeGraph* Graph);

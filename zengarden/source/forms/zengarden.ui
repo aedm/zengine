@@ -51,11 +51,6 @@
         </property>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Tab 2</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
     <item>
@@ -215,7 +210,7 @@
     <item>
      <widget class="QTabWidget" name="rightPanel">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="usesScrollButtons">
        <bool>false</bool>
@@ -235,11 +230,6 @@
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Tab 1</string>
-       </attribute>
-      </widget>
-      <widget class="QWidget" name="tab_4">
-       <attribute name="title">
-        <string>Tab 2</string>
        </attribute>
       </widget>
      </widget>

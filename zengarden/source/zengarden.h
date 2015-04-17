@@ -2,25 +2,36 @@
 #define ZENGARDEN_H
 
 #include <QtWidgets/QMainWindow>
+#include <QtOpenGL/QGLWidget>
 #include "ui_zengarden.h"
 #include "graph/grapheditor.h"
 #include "document.h"
 #include <zengine.h>
 
-class zengarden : public QMainWindow
+class ZenGarden : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	zengarden(QWidget *parent = 0);
-	~zengarden();
+	ZenGarden(QWidget *parent = 0);
+	~ZenGarden();
 
 private:
-	Ui::zengardenClass ui;
-	void Log(LogMessage Message);
 
-	GraphEditor*				OpPanel;
+	/// Open viewers
+	GraphEditor*				OpenGraphViewer(bool LeftPanel, NodeGraph* Graph);
+
+	/// The GL widget used for initializing OpenGL and sharing context
+	QGLWidget*					CommonGLWidget;
+
+	/// Handles Zengine log messages
+	void						Log(LogMessage Message);
+
+	//GraphEditor*				TheGraphEditor;
 	Document*					Doc;
+
+	/// App UI
+	Ui::zengardenClass ui;
 
 private slots:
 	void InitModules();

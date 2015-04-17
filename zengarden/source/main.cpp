@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[])
 {
-	QApplication a(argc, argv);
-	a.setStyle(QStyleFactory::create("fusion"));
+	QApplication app(argc, argv);
+	app.setStyle(QStyleFactory::create("fusion"));
 
 	QPalette palette;
 	palette.setColor(QPalette::Window, QColor(53, 53, 53));
@@ -21,9 +21,9 @@ int main(int argc, char *argv[])
 
 	palette.setColor(QPalette::Highlight, QColor(120, 10, 120).lighter());
 	palette.setColor(QPalette::HighlightedText, Qt::black);
-	a.setPalette(palette);
+	app.setPalette(palette);
 
-	zengarden w;
-	w.show();
-	return a.exec();
+	ZenGarden mainWindow;
+	mainWindow.show();
+	return app.exec();
 }

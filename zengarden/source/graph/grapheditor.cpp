@@ -12,8 +12,8 @@
 #include <QTimer>
 #include <QMouseEvent>
 
-GraphEditor::GraphEditor( QWidget* Parent )
-	: QGLWidget(Parent)
+GraphEditor::GraphEditor(QWidget* Parent, QGLWidget* Share)
+	: QGLWidget(Parent, Share)
 	, Graph(NULL)
 {
 	//QPushButton* button = new QPushButton(this);

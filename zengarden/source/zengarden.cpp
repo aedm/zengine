@@ -8,60 +8,66 @@
 #include <QtCore/QTime>
 
 
-zengarden::zengarden(QWidget *parent)
+ZenGarden::ZenGarden(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
 
-	OpPanel = new GraphEditor(ui.tab);
-	OpPanel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ui.leftPanelFirstTabLayout->addWidget(OpPanel);
-
-	TheLogger->OnLog += MakeDelegate(this, &zengarden::Log);
+	TheLogger->OnLog += MakeDelegate(this, &ZenGarden::Log);
 
 	QTimer::singleShot(0, this, SLOT(InitModules()));
-
 }
 
-zengarden::~zengarden()
+ZenGarden::~ZenGarden()
 {
 	DisposeModules();
 }
 
-void zengarden::InitModules()
+void ZenGarden::InitModules()
 {
+	/// Initialize OpenGL and its dependencies
+	CommonGLWidget = new QGLWidget();
+	if (!CommonGLWidget->isValid())
+	{
+		ERR("No GL context!");
+	}
+	CommonGLWidget->makeCurrent();
 	InitZengine();
-	//InitEditorComponents();
 	InitPainter();
 
+	/// Create blank document
 	Doc = new Document();
 	NodeGraph* graph = new NodeGraph();
-	OpPanel->SetGraph(graph);
+	Doc->Graphs.push_back(graph);
+	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
+	/// Add some dummy nodes
 	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
 	if (shaderOp)
 	{
-		TheCommandStack->Execute(new CreateNodeCommand(shaderOp, OpPanel));
-		NodeWidget* ow = OpPanel->GetNodeWidget(shaderOp);
+		TheCommandStack->Execute(new CreateNodeCommand(shaderOp, graphEditor));
+		NodeWidget* ow = graphEditor->GetNodeWidget(shaderOp);
 		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 50)));
 	}
 
 	RenderableNode* model = new RenderableNode();
-	TheCommandStack->Execute(new CreateNodeCommand(model, OpPanel));
-	NodeWidget* ow = OpPanel->GetNodeWidget(model);
+	TheCommandStack->Execute(new CreateNodeCommand(model, graphEditor));
+	NodeWidget* ow = graphEditor->GetNodeWidget(model);
 	TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(ADJUST(250), 70)));
 
 	//model->TheShader.Connect(shaderOp);
-	OpPanel->update();
+
+	/// Build main screen
+	//TheGraphEditor->update();
 }
 
-void zengarden::DisposeModules()
+void ZenGarden::DisposeModules()
 {
-	//CloseEditorComponents();
+	DisposePainter();
 	CloseZengine();
 }
 
-void zengarden::Log(LogMessage Message)
+void ZenGarden::Log(LogMessage Message)
 {
 	//switch (Message.Severity)
 	//{
@@ -71,4 +77,15 @@ void zengarden::Log(LogMessage Message)
 	//}
 	//ui.LogViewer->append(QString("[ ") + QTime::currentTime().toString("HH:mm:ss") + QString(" ]  ") + QString::fromUtf16((ushort*)Message.Message));
 	//ui.LogViewer->repaint();
+}
+
+GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, NodeGraph* Graph)
+{
+	QTabWidget* tabWidget = LeftPanel ? ui.leftPanel : ui.rightPanel;
+	GraphEditor* graphEditor = new GraphEditor(tabWidget, CommonGLWidget);
+	graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tabWidget->addTab(graphEditor, "graph");
+
+	graphEditor->SetGraph(Graph);
+	return graphEditor;
 }
