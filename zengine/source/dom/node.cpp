@@ -19,7 +19,7 @@ bool Slot::Connect( Node* Nd )
 {
 	if (ConnectedNode != Nd)
 	{
-		if (Nd && Nd->GetType() != GetType()) 
+		if (Nd && NodeType::ALLOW_ALL != Type && Nd->GetType() != Type) 
 		{
 			ERR("Slot and operator type mismatch");
 			ASSERT(false);
@@ -30,7 +30,13 @@ bool Slot::Connect( Node* Nd )
 		ConnectedNode = Nd;
 		if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
 		
-		FinalizeAttach();
+		if (Owner)
+		{
+			/// TODO: simplify this
+			Owner->CheckConnections();
+			Owner->OnSlotConnectionsChanged(this);
+			Owner->OnSlotValueChanged(this);
+		}
 	}
 
 	return true;
@@ -43,18 +49,6 @@ void Slot::DisconnectFromNode()
 	ConnectedNode->DisconnectFromSlot(this);
 	ConnectedNode = NULL;
 }
-
-
-void Slot::FinalizeAttach()
-{
-	if (Owner)
-	{
-		Owner->CheckConnections();
-		Owner->OnSlotConnectionsChanged(this);
-		Owner->OnSlotValueChanged(this);
-	}
-}
-
 
 Node* Slot::GetNode() const 
 {

@@ -407,9 +407,9 @@ bool GraphEditor::UpdateHoveredWidget(Vec2 MousePos)
 		if (IsInsideRect(MousePos, ow->Position, ow->Size))
 		{
 			hovered = ow;
-			for (int o=0; o<ow->Slots.size(); o++)
+			for (int o=0; o<ow->WidgetSlots.size(); o++)
 			{
-				NodeWidget::SlotWidget* sw = ow->Slots[o];
+				NodeWidget::SlotWidget* sw = ow->WidgetSlots[o];
 				if (IsInsideRect(MousePos, ow->Position + sw->Position, sw->Size)) {
 					slot = o;
 					break;

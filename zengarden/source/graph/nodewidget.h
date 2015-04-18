@@ -4,13 +4,16 @@
 #include "grapheditor.h"
 #include <zengine.h>
 
-class NodeWidget {
+class NodeWidget: public Node {
 	friend class MoveNodeCommand;
 	friend class GraphEditor;
 
 public:
 	NodeWidget(Node* Nd);
 	~NodeWidget();
+
+	/// Inspected node
+	Slot				InspectedNode;
 
 	void				Paint(GraphEditor* Panel);
 
@@ -26,8 +29,6 @@ public:
 private:
 	/// Command-accessible
 	void				SetPosition(Vec2 Position);
-
-	Node*				Nd;
 
 	/// Layout
 	void				CalculateLayout();
@@ -52,7 +53,7 @@ private:
 		Vec2			SpotPos;
 	};
 
-	vector<SlotWidget*>	Slots;
+	vector<SlotWidget*>	WidgetSlots;
 
 	TextTexture*		TitleTexture;
 };

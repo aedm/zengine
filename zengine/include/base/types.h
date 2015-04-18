@@ -9,27 +9,33 @@ class Texture;
 
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
-	ITEM(FLOAT,			float,		"Float"		) \
-	ITEM(VEC2,			Vec2,		"Vec2"		) \
-	ITEM(VEC3,			Vec3,		"Vec3"		) \
-	ITEM(VEC4,			Vec4,		"Vec4"		) \
-	ITEM(UINT,			UINT,		"Uint"		) \
-	ITEM(MATRIX44,		Matrix,		"Matrix"	) \
-	ITEM(TEXTURE,		Texture*,	"Texture"	) \
+	ITEM(FLOAT,			float,		"float"		) \
+	ITEM(VEC2,			Vec2,		"vec2"		) \
+	ITEM(VEC3,			Vec3,		"vec3"		) \
+	ITEM(VEC4,			Vec4,		"vec4"		) \
+	ITEM(UINT,			UINT,		"uint"		) \
+	ITEM(MATRIX44,		Matrix,		"matrix"	) \
+	ITEM(TEXTURE,		Texture*,	"texture"	) \
 
 
 /// Possible node types
 enum class NodeType
 {
-	/// Node types with an output value
+	/// Node types holding a value type
 	#undef ITEM
 	#define ITEM(name, type, token) name,
 	VALUETYPE_LIST
 
-	/// Node types without an output value
+	/// Other node types 
 	SHADER,
 	MODEL,
 	MESH,
+
+	/// Editor nodes
+	UI,
+
+	/// Slot type that allows all node connections
+	ALLOW_ALL,
 
 	/// Undefined behavior
 	UNDEFINED

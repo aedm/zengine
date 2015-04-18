@@ -50,7 +50,6 @@ protected:
 
 	/// Biolerplate
 	void					DisconnectFromNode();
-	void					FinalizeAttach();
 };
 
 
