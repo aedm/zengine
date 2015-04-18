@@ -3,7 +3,7 @@
 #include "../util/uipainter.h"
 #include "../commands/graphcommands.h"
 #include "../document.h"
-//#include "operatorPrototypes.h"
+#include "operatorprototypes.h"
 #include <zengine.h>
 #include <QBoxLayout>
 #include <QPainter>
@@ -330,13 +330,13 @@ void GraphEditor::OnMouseRightDown( QMouseEvent* event )
 		return;
 	}
 
-	//Node* op = ThePrototypes->AskUser(event->globalPos());
-	//if (op)
-	//{
-	//	TheCommandStack->Execute(new CreateOperatorCommand(op, this));
-	//	OperatorWidget* ow = GetOperatorWidget(op);
-	//	TheCommandStack->Execute(new MoveOperatorCommand(ow, Vec2(event->x(), event->y())));
-	//}
+	Node* node = ThePrototypes->AskUser(event->globalPos());
+	if (node)
+	{
+		TheCommandStack->Execute(new CreateNodeCommand(node, this));
+		NodeWidget* nodeWidget = GetNodeWidget(node);
+		TheCommandStack->Execute(new MoveNodeCommand(nodeWidget, Vec2(event->x(), event->y())));
+	}
 }
 
 void GraphEditor::OnMouseRightUp( QMouseEvent* event )

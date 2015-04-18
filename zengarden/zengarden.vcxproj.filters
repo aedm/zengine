@@ -85,6 +85,15 @@
     <ClCompile Include="source\util\uipainter.cpp">
       <Filter>source\util</Filter>
     </ClCompile>
+    <ClCompile Include="source\graph\operatorprototypes.cpp">
+      <Filter>source\graph</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_operatorprototypes.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_operatorprototypes.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -101,6 +110,12 @@
     </CustomBuild>
     <CustomBuild Include="source\graph\grapheditor.h">
       <Filter>source\graph</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\graph\operatorprototypes.h">
+      <Filter>source\graph</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\forms\operatorSelector.ui">
+      <Filter>source\forms</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="source\util\uipainter.h">
       <Filter>source\util</Filter>
+    </ClInclude>
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_operatorSelector.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
