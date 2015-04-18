@@ -3,7 +3,7 @@
 #include "../util/uipainter.h"
 #include "../commands/graphcommands.h"
 #include "../document.h"
-#include "operatorprototypes.h"
+#include "prototypes.h"
 #include <zengine.h>
 #include <QBoxLayout>
 #include <QPainter>

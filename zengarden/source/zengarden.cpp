@@ -3,7 +3,7 @@
 #include "util/util.h"
 #include "commands/command.h"
 #include "commands/graphCommands.h"
-#include "graph/operatorprototypes.h"
+#include "graph/prototypes.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
@@ -35,7 +35,7 @@ void ZenGarden::InitModules()
 	CommonGLWidget->makeCurrent();
 	InitZengine();
 	InitPainter();
-	OperatorPrototypes::Init();
+	Prototypes::Init();
 
 	/// Create blank document
 	Doc = new Document();
@@ -65,7 +65,7 @@ void ZenGarden::InitModules()
 
 void ZenGarden::DisposeModules()
 {
-	OperatorPrototypes::Dispose();
+	Prototypes::Dispose();
 	DisposePainter();
 	CloseZengine();
 }

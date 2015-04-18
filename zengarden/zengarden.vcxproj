@@ -14,7 +14,7 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_operatorprototypes.cpp">
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
@@ -35,7 +35,7 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_operatorprototypes.cpp">
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_prototypes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
@@ -46,7 +46,7 @@
     <ClCompile Include="source\document.cpp" />
     <ClCompile Include="source\graph\grapheditor.cpp" />
     <ClCompile Include="source\graph\nodewidget.cpp" />
-    <ClCompile Include="source\graph\operatorprototypes.cpp" />
+    <ClCompile Include="source\graph\prototypes.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\util\util.cpp" />
     <ClCompile Include="source\util\uipainter.cpp" />
@@ -84,13 +84,13 @@
     <ClInclude Include="source\commands\graphcommands.h" />
     <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
-    <CustomBuild Include="source\graph\operatorprototypes.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing operatorprototypes.h...</Message>
+    <CustomBuild Include="source\graph\prototypes.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing prototypes.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing operatorprototypes.h...</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing prototypes.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
     </CustomBuild>

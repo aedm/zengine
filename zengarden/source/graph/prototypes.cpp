@@ -1,7 +1,7 @@
-#include "operatorprototypes.h"
+#include "prototypes.h"
 #include <ui_operatorSelector.h>
 
-OperatorPrototypes* ThePrototypes = NULL;
+Prototypes* ThePrototypes = NULL;
 
 class SelectorItem: public QTreeWidgetItem 
 {
@@ -17,32 +17,38 @@ public:
 };
 
 
-OperatorPrototypes::OperatorPrototypes()
+Prototypes::Prototypes()
 {
-	Prototypes.push_back(new FloatNode());
-	Prototypes.push_back(new Vec4Node());
-	Prototypes.push_back(new TextureNode());
+	AddPrototype(new FloatNode(),		NodeClass::STATIC_FLOAT);
+	AddPrototype(new Vec4Node(),		NodeClass::STATIC_VEC4);
+	AddPrototype(new TextureNode(),		NodeClass::STATIC_TEXTURE);
 }
 
-OperatorPrototypes::~OperatorPrototypes()
+void Prototypes::AddPrototype(Node* node, NodeClass nodeClass)
 {
-	foreach (Node* nd, Prototypes) 
+	PrototypeNodes.push_back(node);
+	NodeIndexMap[type_index(typeid(*node))] = nodeClass;
+}
+
+Prototypes::~Prototypes()
+{
+	foreach(Node* nd, PrototypeNodes)
 	{
 		delete nd;
 	}
-	Prototypes.clear();
+	PrototypeNodes.clear();
 }
 
-Node* OperatorPrototypes::AskUser(QPoint Position)
+Node* Prototypes::AskUser(QPoint Position)
 {
 	QDialog dialog(NULL, Qt::FramelessWindowHint);
 	Dialog = &dialog;
 	Ui::OperatorSelector selector;
 	selector.setupUi(&dialog);
-	for (int i=0; i<Prototypes.size(); i++)
+	for (int i = 0; i<PrototypeNodes.size(); i++)
 	{
 		selector.treeWidget->addTopLevelItem(
-			new SelectorItem(NULL, QString::fromStdString(Prototypes[i]->Name), i+1));
+			new SelectorItem(NULL, QString::fromStdString(PrototypeNodes[i]->Name), i + 1));
 	}
 	dialog.setModal(true);
 	dialog.resize(150, 300);
@@ -50,21 +56,21 @@ Node* OperatorPrototypes::AskUser(QPoint Position)
 	connect(selector.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(OnItemSelected(QTreeWidgetItem*, int)));
 	//dialog.connect(SIGNAL(itemClicked()), this, SLOT(OnItemSelected()));
 	int ret = dialog.exec();
-	return (ret > 0) ? Prototypes[ret-1]->Clone() : NULL;
+	return (ret > 0) ? PrototypeNodes[ret-1]->Clone() : NULL;
 }
 
-void OperatorPrototypes::OnItemSelected(QTreeWidgetItem* Item, int)
+void Prototypes::OnItemSelected(QTreeWidgetItem* Item, int)
 {
 	SelectorItem* item = static_cast<SelectorItem*>(Item);
 	if (item->NodeIndex >= 0) Dialog->done(item->NodeIndex);
 }
 
-void OperatorPrototypes::Init()
+void Prototypes::Init()
 {
-	ThePrototypes = new OperatorPrototypes();
+	ThePrototypes = new Prototypes();
 }
 
-void OperatorPrototypes::Dispose()
+void Prototypes::Dispose()
 {
 	SafeDelete(ThePrototypes);
 }
