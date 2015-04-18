@@ -69,7 +69,7 @@ void ShaderNode::Set()
 	for (UINT i=0; i<Samplers.size(); i++)
 	{
 		SamplerMapping& slot = Samplers[i];
-		Texture* const texture = slot.SourceSlot->Value();
+		Texture* const texture = slot.SourceSlot->Get();
 		if (texture)
 		{
 			TheDrawingAPI->SetTexture(slot.TargetSampler->Handle, texture->Handle, i);
@@ -124,7 +124,7 @@ void ShaderNode::RegenerateCopyItems()
 				#undef ITEM
 				#define ITEM(name, type, token) \
 			case NodeType::name: \
-				source = reinterpret_cast<const UINT*>(&ToValueSlot<NodeType::name>(slot)->Value()); \
+				source = reinterpret_cast<const UINT*>(&ToValueSlot<NodeType::name>(slot)->Get()); \
 				break;
 				VALUETYPE_LIST
 
@@ -178,7 +178,7 @@ void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& 
 				{
 				#undef ITEM
 				#define ITEM(name, type, token) \
-				case NodeType::name: slot = new TypedSlot<NodeType::name>(Owner, local->Desc->UniformName); break;
+				case NodeType::name: slot = new ValueSlot<NodeType::name>(Owner, local->Desc->UniformName); break;
 				VALUETYPE_LIST
 
 				default: SHOULDNT_HAPPEN; break;

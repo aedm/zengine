@@ -30,27 +30,8 @@
     <item>
      <widget class="QTabWidget" name="leftPanel">
       <property name="currentIndex">
-       <number>0</number>
+       <number>-1</number>
       </property>
-      <widget class="QWidget" name="tab">
-       <attribute name="title">
-        <string>Tab 1</string>
-       </attribute>
-       <layout class="QHBoxLayout" name="leftPanelFirstTabLayout">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
      </widget>
     </item>
     <item>
@@ -210,7 +191,7 @@
     <item>
      <widget class="QTabWidget" name="rightPanel">
       <property name="currentIndex">
-       <number>0</number>
+       <number>-1</number>
       </property>
       <property name="usesScrollButtons">
        <bool>false</bool>
@@ -227,11 +208,6 @@
       <property name="tabBarAutoHide">
        <bool>false</bool>
       </property>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>Tab 1</string>
-       </attribute>
-      </widget>
      </widget>
     </item>
    </layout>

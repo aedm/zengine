@@ -12,7 +12,6 @@ using namespace std;
 using namespace fastdelegate;
 
 class Node;
-template<NodeType T> class TypedNode;
 
 /// Nodes can have multiple input slots. Each slot's value is set by an another node's output.
 class Slot
@@ -52,22 +51,6 @@ protected:
 	/// Biolerplate
 	void					DisconnectFromNode();
 	void					FinalizeAttach();
-};
-
-
-/// Slot expecting a value node.
-template <NodeType T>
-class TypedSlot: public Slot
-{
-	typedef typename NodeTypes<T>::Type ValueType;
-
-public:
-	TypedSlot(Node* Owner, SharedString Name);
-
-	const ValueType&		Value();
-
-	/// Returns connected typed node
-	TypedNode<T>*			GetNode() const;
 };
 
 
@@ -140,61 +123,5 @@ private:
 	void						CheckConnections();
 };
 
-
-/// Node with an output value.
-template<NodeType T>
-class TypedNode: public Node
-{
-public:
-	typedef typename NodeTypes<T>::Type ValueType;
-
-	TypedNode();
-
-	/// For cloning
-	TypedNode(const TypedNode<T>& Original);
-
-	/// Returns value of node. Reevaluates if necessary
-	virtual const ValueType&	GetValue() = NULL;
-};
-
-
-/// Node and slot types
-typedef TypedSlot<NodeType::FLOAT>		FloatSlot;
-typedef TypedSlot<NodeType::VEC4>		Vec4Slot;
-typedef TypedSlot<NodeType::MATRIX44>	Matrix4Slot;
-typedef TypedSlot<NodeType::TEXTURE>		TextureSlot;
-
-
-/// Helper cast
-template<NodeType T> 
-inline static TypedSlot<T>* ToValueSlot(Slot* slot) 
-{ 
-	return static_cast<TypedSlot<T>*>(slot); 
-}
-
-
-template <NodeType T>
-TypedSlot<T>::TypedSlot( Node* Owner, SharedString Name )
-	: Slot(T, Owner, Name)
-{}
-
-
-template <NodeType T>
-const typename TypedSlot<T>::ValueType& TypedSlot<T>::Value()
-{
-	return static_cast<TypedNode<T>*>(GetConnectedNode())->GetValue();
-}
-
-
-template<NodeType T>
-TypedNode<T>::TypedNode()
-	: Node(T, VariableNames[(UINT)T])
-{}
-
-
-template<NodeType T>
-TypedNode<T>::TypedNode( const TypedNode<T>& Original ) 
-	: Node(Original)
-{}
 
 

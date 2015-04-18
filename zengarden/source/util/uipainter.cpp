@@ -128,7 +128,7 @@ void UiPainter::DrawTexture( Texture* Tex, float x, float y )
 		{ Vec3(x + w, y + h, 0), Vec2(1, 1) }, 
 	};
 
-	TexOp.SetValue(Tex);
+	TexOp.Set(Tex);
 	TexturedBoxMeshOp->GetMesh()->SetVertices(vertices);
 	TexturedBoxModel->Render();
 }
@@ -147,7 +147,7 @@ void UiPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
 		{ Vec3(Position.X + w,	Position.Y + h, 0), Vec2(u, v) }, 
 	};
 
-	TexOp.SetValue(Tex->TheTexture);
+	TexOp.Set(Tex->TheTexture);
 	TexturedBoxMeshOp->GetMesh()->SetVertices(vertices);
 	TextBoxModel->Render();
 }
@@ -157,7 +157,7 @@ void UiPainter::Set( int Width, int Height )
 {
 	TheDrawingAPI->SetViewport(0, 0, Width, Height);
 	TheDrawingAPI->SetRenderState(&CanvasRenderstate);
-	Color.SetValue(Vec4(1,1,1,1));
+	Color.Set(Vec4(1,1,1,1));
 
 	//this->Width = Width;
 	//this->Height = Height;

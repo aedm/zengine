@@ -100,7 +100,7 @@ void GraphEditor::OnWidgetRepaint()
 void GraphEditor::Paint()
 {
 	/// Draw connections
-	ThePainter->Color.SetValue(Vec4(1, 1, 1, 1));
+	ThePainter->Color.Set(Vec4(1, 1, 1, 1));
 	for (int i=Graph->Widgets.size()-1; i>=0; i--) {
 		NodeWidget* ndWidget = Graph->Widgets[i];
 		Node* node = ndWidget->GetNode();
@@ -122,14 +122,14 @@ void GraphEditor::Paint()
 	if (CurrentState == State::CONNECT_TO_NODE) {
 		Vec2 from = ClickedWidget->GetInputPosition(ClickedSlot);
 		Vec2 to = CurrentMousePos;
-		ThePainter->Color.SetValue(Vec4(1, 1, 1, 0.7));
+		ThePainter->Color.Set(Vec4(1, 1, 1, 0.7));
 		ThePainter->DrawLine(from, to);
 	}
 
 	if (CurrentState == State::CONNECT_TO_SLOT) {
 		Vec2 from = ClickedWidget->GetOutputPosition();
 		Vec2 to = CurrentMousePos;
-		ThePainter->Color.SetValue(Vec4(1, 1, 1, 0.7));
+		ThePainter->Color.Set(Vec4(1, 1, 1, 0.7));
 		ThePainter->DrawLine(from, to);
 	}
 
@@ -141,9 +141,9 @@ void GraphEditor::Paint()
 	/// Draw selection rectangle
 	if (CurrentState == State::SELECT_RECTANGLE)
 	{
-		ThePainter->Color.SetValue(Vec4(0.4, 0.9, 1, 0.1));
+		ThePainter->Color.Set(Vec4(0.4, 0.9, 1, 0.1));
 		ThePainter->DrawBox(OriginalMousePos, CurrentMousePos - OriginalMousePos);
-		ThePainter->Color.SetValue(Vec4(0.6, 0.9, 1, 0.6));
+		ThePainter->Color.Set(Vec4(0.6, 0.9, 1, 0.6));
 		ThePainter->DrawRect(OriginalMousePos, CurrentMousePos - OriginalMousePos);
 	}
 }

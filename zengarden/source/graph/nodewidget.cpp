@@ -72,16 +72,16 @@ void NodeWidget::CalculateLayout()
 
 void NodeWidget::Paint(GraphEditor* Panel)
 {
-	ThePainter->Color.SetValue(Vec4(0, 0.2, 0.4, Opacity));
+	ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
 	ThePainter->DrawBox(Position, Vec2(Size.X, TitleHeight));
 
-	ThePainter->Color.SetValue(Vec4(0, 0, 0, Opacity));
+	ThePainter->Color.Set(Vec4(0, 0, 0, Opacity));
 	ThePainter->DrawBox(Position + Vec2(0, TitleHeight), Size - Vec2(0, TitleHeight));
 	
-	ThePainter->Color.SetValue(Vec4(0.2, 0.7, 0.9, 1));
+	ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
 	ThePainter->DrawBox(Position + OutputPosition - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
 	
-	ThePainter->Color.SetValue(Vec4(0.9, 0.9, 0.9, 1));
+	ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
 	float centerX = floor((Size.X - float(TitleTexture->TextSize.width())) * 0.5f);
 	ThePainter->DrawTextTexture(TitleTexture, Position + Vec2(centerX, TitlePadding + 1));
 
@@ -100,14 +100,14 @@ void NodeWidget::Paint(GraphEditor* Panel)
 		}
 
 		SlotWidget* sw = Slots[i];
-		ThePainter->Color.SetValue(slotFrameColor);
+		ThePainter->Color.Set(slotFrameColor);
 		//ThePainter->DrawRect(Position.X+2, slotY, Position.X + Size.X - 40, slotY + sw->Text.TextSize.height());
 		ThePainter->DrawRect(Position + sw->Position, sw->Size);
 
-		ThePainter->Color.SetValue(Vec4(0.9, 0.9, 0.9, 1));
+		ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
 		ThePainter->DrawTextTexture(&sw->Text, Position + sw->Position + SlotPadding);
 
-		ThePainter->Color.SetValue(Vec4(0.2, 0.7, 0.9, 1));
+		ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
 		ThePainter->DrawBox(Position + sw->SpotPos - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
 	}
 	
@@ -124,7 +124,7 @@ void NodeWidget::Paint(GraphEditor* Panel)
 			}
 		} else frameColor = Vec4(1, 1, 1, 0.3);
 	} 
-	ThePainter->Color.SetValue(frameColor);
+	ThePainter->Color.Set(frameColor);
 	ThePainter->DrawRect(Position, Size);
 }
 
