@@ -29,7 +29,7 @@ public:
 	bool					Connect(Node* Nd);
 
 	/// Returns connected node
-	Node*					GetConnectedNode() const;
+	Node*					GetNode() const;
 
 	/// Type of object this slot accepts
 	/// TODO: get rid of this
@@ -79,10 +79,6 @@ public:
 
 	/// Clone node
 	virtual Node*				Clone() const;
-
-	/// If true, this is a primitive type, value can be set directly
-	/// TODO: kill this
-	virtual bool				CanSetValueDirectly();
 
 protected:
 	Node(NodeType Type, const string& Name);

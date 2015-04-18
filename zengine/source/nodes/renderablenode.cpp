@@ -24,7 +24,7 @@ void RenderableNode::Render(PrimitiveTypeEnum Primitive)
 	Evaluate();
 	if (!Mapper) return;
 
-	static_cast<ShaderNode*>(TheShader.GetConnectedNode())->Set();
+	static_cast<ShaderNode*>(TheShader.GetNode())->Set();
 	const Mesh* mesh = TheMesh.GetMesh();
 	if (mesh->IndexHandle)
 	{
@@ -46,7 +46,7 @@ void RenderableNode::Operate()
 	if (Mapper == NULL)
 	{
 		const Mesh* mesh = TheMesh.GetMesh();
-		ShaderNode* shader = (ShaderNode*)TheShader.GetConnectedNode();
+		ShaderNode* shader = (ShaderNode*)TheShader.GetNode();
 		if (mesh && shader)
 		{
 			Mapper = TheDrawingAPI->CreateAttributeMapper(mesh->Format->Attributes, 

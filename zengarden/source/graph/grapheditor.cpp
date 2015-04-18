@@ -106,7 +106,7 @@ void GraphEditor::Paint()
 		Node* node = ndWidget->GetNode();
 		for (int i=0; i<node->Slots.size(); i++) {
 			Slot* slot = node->Slots[i];
-			Node* connectedOp = slot->GetConnectedNode();
+			Node* connectedOp = slot->GetNode();
 			if (connectedOp) {
 				NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);
 				if (connectedOpWidget != NULL) {
@@ -322,7 +322,7 @@ void GraphEditor::OnMouseRightDown( QMouseEvent* event )
 		if (HoveredSlot >= 0) {
 			/// Remove connection
 			Slot* slot = HoveredWidget->GetNode()->Slots[HoveredSlot];
-			if (slot->GetConnectedNode()) {
+			if (slot->GetNode()) {
 				TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
 			}
 			update();

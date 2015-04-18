@@ -49,7 +49,7 @@ ConnectNodeToSlotCommand::ConnectNodeToSlotCommand( Node* _FromNode, Slot* _ToSl
 	: NewNode(_FromNode)
 	, ToSlot(_ToSlot)
 {
-	OldNode = ToSlot->GetConnectedNode();
+	OldNode = ToSlot->GetNode();
 }
 
 bool ConnectNodeToSlotCommand::Do()

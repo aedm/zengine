@@ -29,7 +29,7 @@ MeshSlot::MeshSlot(Node* Owner, SharedString Name)
 
 const Mesh* MeshSlot::GetMesh() const
 {
-	MeshNode* node = static_cast<MeshNode*>(GetConnectedNode());
+	MeshNode* node = static_cast<MeshNode*>(GetNode());
 	return node == nullptr ? nullptr : node->GetMesh();
 }
 

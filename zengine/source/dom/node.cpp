@@ -56,7 +56,7 @@ void Slot::FinalizeAttach()
 }
 
 
-Node* Slot::GetConnectedNode() const 
+Node* Slot::GetNode() const 
 {
 	return ConnectedNode;
 }
@@ -118,7 +118,7 @@ void Node::SetDependantsDirty()
 {
 	foreach(Slot* dependant, Dependants)
 	{
-		dependant->GetConnectedNode()->OnSlotValueChanged(dependant);
+		dependant->GetNode()->OnSlotValueChanged(dependant);
 	}
 }
 
@@ -126,7 +126,7 @@ void Node::CheckConnections()
 {
 	foreach (Slot* slot, Slots)
 	{
-		if (slot->GetConnectedNode() == NULL)
+		if (slot->GetNode() == NULL)
 		{
 			IsProperlyConnected = false;
 			return;
@@ -141,7 +141,7 @@ void Node::Evaluate()
 	{
 		foreach(Slot* slot, Slots) 
 		{
-			slot->GetConnectedNode()->Evaluate();
+			slot->GetNode()->Evaluate();
 		}
 		Operate();
 		IsDirty = false;
@@ -155,11 +155,6 @@ Node::~Node()
 	{
 		deps.back()->Connect(NULL);
 	}
-}
-
-bool Node::CanSetValueDirectly()
-{
-	return false;
 }
 
 Node* Node::Clone() const

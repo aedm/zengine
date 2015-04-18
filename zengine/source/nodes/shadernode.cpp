@@ -12,7 +12,7 @@ ShaderSlot::ShaderSlot(Node* Owner, SharedString Name)
 
 void ShaderSlot::Set() const
 {
-	ShaderNode* node = static_cast<ShaderNode*>(GetConnectedNode());
+	ShaderNode* node = static_cast<ShaderNode*>(GetNode());
 	if (node != nullptr) node->Set();
 }
 
@@ -96,7 +96,7 @@ void ShaderNode::RegenerateCopyItems()
 	bool allConnected = true;
 	foreach(UniformMapping& item, Uniforms)
 	{
-		if (item.TargetUniform->IsLocal && item.SourceSlot->GetConnectedNode() == NULL)
+		if (item.TargetUniform->IsLocal && item.SourceSlot->GetNode() == NULL)
 		{
 			allConnected = false;
 			break;
