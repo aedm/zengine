@@ -17,19 +17,30 @@ class Node;
 class Slot
 {
 public:
-	Slot(NodeType Type, Node* Owner, SharedString Name);
+	Slot(NodeType Type, Node* Owner, SharedString Name, bool IsMultiSlot = false);
 	virtual ~Slot();
 
 	/// The operator which this slot is a member of
 	Node* const				Owner;
 
-	/// Attach slot to node. Slot value will be taken from the node.
-	/// If node parameter is nullptr, slot will be detached. 
+	/// Attaches slot to node. 
+	/// - for non-multislots, this overrides the current connection.
+	/// - for multislots, the node will be added to the list of connected nodes. 
+	/// nullptr is not allowed.
 	/// Returns false if connection is not possible due to type mismatch.
 	bool					Connect(Node* Nd);
 
-	/// Returns connected node
+	/// Disconnects a node from this slot. 
+	void					Disconnect(Node* Nd);
+
+	/// Disconnects all nodes from this slot.
+	void					DisconnectAll();
+
+	/// Returns connected node (errorlog & nullptr if multislot)
 	Node*					GetNode() const;
+
+	/// Returns all connected nodes (errorlog & nullptr if not multislot)
+	const vector<Node*>*	GetMultiNodes() const;
 
 	/// Type of object this slot accepts
 	/// TODO: get rid of this
@@ -38,18 +49,21 @@ public:
 	/// Returns the name of the slot
 	SharedString			GetName();
 
+	/// True if the slot can connect to multiple nodes
+	const bool				IsMultiSlot;
+
 protected:
-	/// Slot is connected to this one
+	/// The slot is connected to this node (nullptr if multislot)
 	Node*					ConnectedNode;
+
+	/// The slot is connected to these nodes (empty if not multislot)
+	vector<Node*>			MultiNodes;
 
 	/// Name of the slot. Can't be changed.
 	SharedString			Name;
 
 	/// Output type
 	const NodeType			Type;
-
-	/// Biolerplate
-	void					DisconnectFromNode();
 };
 
 

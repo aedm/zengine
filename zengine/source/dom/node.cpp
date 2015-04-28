@@ -2,9 +2,10 @@
 #include <include/base/helpers.h>
 #include <algorithm>
 
-Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name )
+Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot)
 	: Owner(_Owner)
 	, Type(_Type)
+	, IsMultiSlot(_IsMultiSlot)
 {
 	ConnectedNode = NULL;
 	Name = _Name;
@@ -17,42 +18,113 @@ Slot::~Slot()
 
 bool Slot::Connect( Node* Nd )
 {
-	if (ConnectedNode != Nd)
+	if (Nd && NodeType::ALLOW_ALL != Type && Nd->GetType() != Type)
 	{
-		if (Nd && NodeType::ALLOW_ALL != Type && Nd->GetType() != Type) 
+		ERR("Slot and operator type mismatch");
+		ASSERT(false);
+		return false;
+	}
+	if (!IsMultiSlot)
+	{
+		if (ConnectedNode != Nd)
 		{
-			ERR("Slot and operator type mismatch");
-			ASSERT(false);
-			return false;
-		}
+			if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
+			ConnectedNode = Nd;
+			if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
 
-		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
-		ConnectedNode = Nd;
-		if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
-		
-		if (Owner)
-		{
-			/// TODO: simplify this
-			Owner->CheckConnections();
-			Owner->OnSlotConnectionsChanged(this);
-			Owner->OnSlotValueChanged(this);
+			if (Owner)
+			{
+				/// TODO: simplify this
+				Owner->CheckConnections();
+				Owner->OnSlotConnectionsChanged(this);
+				Owner->OnSlotValueChanged(this);
+			}
 		}
 	}
-
+	else
+	{
+		ASSERT(Nd != nullptr);
+		for (Node* node : MultiNodes) {
+			if (node == Nd) {
+				ERR("Node already connected to slot.");
+				return false;
+			}
+		}
+		MultiNodes.push_back(Nd);
+		/// TODO: simplify this
+		Owner->CheckConnections();
+		Owner->OnSlotConnectionsChanged(this);
+		Owner->OnSlotValueChanged(this);
+	}
 	return true;
 }
 
-
-void Slot::DisconnectFromNode()
+void Slot::Disconnect(Node* Nd)
 {
-	ASSERT(ConnectedNode);
-	ConnectedNode->DisconnectFromSlot(this);
-	ConnectedNode = NULL;
+	if (IsMultiSlot) {
+		for (auto it = MultiNodes.begin(); it != MultiNodes.end(); it++) {
+			if (*it == Nd) {
+				Nd->DisconnectFromSlot(this);
+				MultiNodes.erase(it);
+				/// TODO: simplify this
+				Owner->CheckConnections();
+				Owner->OnSlotConnectionsChanged(this);
+				Owner->OnSlotValueChanged(this);
+				return;
+			}
+		}
+		ERR("Node was not found.");
+	}
+	else 
+	{
+		ASSERT(Nd == ConnectedNode);
+		ASSERT(Nd != nullptr);
+		DisconnectAll();
+	}
 }
+
+
+void Slot::DisconnectAll()
+{
+	if (IsMultiSlot) {
+		for (auto it = MultiNodes.begin(); it != MultiNodes.end(); it++) {
+			(*it)->DisconnectFromSlot(this);
+		}
+		MultiNodes.clear();
+		/// TODO: simplify this
+		Owner->CheckConnections();
+		Owner->OnSlotConnectionsChanged(this);
+		Owner->OnSlotValueChanged(this);
+	}
+	else
+	{
+		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
+		ConnectedNode = nullptr;
+		/// TODO: simplify this
+		Owner->CheckConnections();
+		Owner->OnSlotConnectionsChanged(this);
+		Owner->OnSlotValueChanged(this);
+	}
+}
+
+
 
 Node* Slot::GetNode() const 
 {
+	if (IsMultiSlot) {
+		ERR("Can't call GetNode() on multislot.");
+		return nullptr;
+	}
 	return ConnectedNode;
+}
+
+const vector<Node*>* Slot::GetMultiNodes() const
+{
+	if (!IsMultiSlot) {
+		ERR("Can't call GetMultiNodes() on non-multislot.");
+		return nullptr;
+	}
+	return &MultiNodes;
 }
 
 SharedString Slot::GetName()
