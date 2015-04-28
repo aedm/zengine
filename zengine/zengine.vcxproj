@@ -103,7 +103,6 @@
     <ClInclude Include="include\nodes\shadernode.h" />
     <ClInclude Include="include\nodes\meshnode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
-    <ClInclude Include="include\operators\model.h" />
     <ClInclude Include="include\render\drawingapi.h" />
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\resourcemanager.h" />

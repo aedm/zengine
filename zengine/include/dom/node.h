@@ -11,9 +11,22 @@
 using namespace std;
 using namespace fastdelegate;
 
+/// Notifications that nodes send to each other when something changed.
+/// An accompanying UINT data can also be set for each event type.
+enum class NodeMessage {
+	/// Direct slot connection changed.
+	SLOT_CONNECTION_CHANGED,
+
+	/// The value of a connected node changed, reevaluation might be needed
+	VALUE_CHANGED,
+
+	/// Node looks changed, watchers need to redraw it.
+	NEEDS_REDRAW,
+};
+
 class Node;
 
-/// Nodes can have multiple input slots. Each slot's value is set by an another node's output.
+/// Nodes can have multiple input slots, which connects it to other slots.
 class Slot
 {
 public:
@@ -105,15 +118,12 @@ protected:
 	/// Main operation
 	virtual void				Operate() {}
 
-	/// Callback for when one of the slots connection has changed
-	virtual void				OnSlotConnectionsChanged(Slot* S) {}
+	/// Sends a message to dependants
+	void						SendMessage(NodeMessage Message);
 
-	/// Callback for when one of the slots value has changed
-	virtual void				OnSlotValueChanged(Slot* DirtySlot);
+	/// Receives message through a slot
+	virtual void				HandleMessage(Slot* S, NodeMessage Message);
 
-	/// Notify slots about changed value
-	void						SetDependantsDirty();
-	
 	/// Output type
 	NodeType					Type;
 

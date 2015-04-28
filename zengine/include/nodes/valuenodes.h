@@ -121,7 +121,7 @@ template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& NewValue)
 {
 	Value = NewValue;
-	SetDependantsDirty();
+	SendMessage(NodeMessage::VALUE_CHANGED);
 }
 
 

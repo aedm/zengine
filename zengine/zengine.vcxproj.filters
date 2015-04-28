@@ -19,9 +19,6 @@
     <Filter Include="include\dom">
       <UniqueIdentifier>{5e682bea-3e34-4a64-acc7-e6a3100869dd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\operators">
-      <UniqueIdentifier>{572cf8d3-2a81-4710-89d1-baeb2bb2b097}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include\shaders">
       <UniqueIdentifier>{4960c071-4981-432e-8c00-0f556fca3880}</UniqueIdentifier>
     </Filter>
@@ -70,9 +67,6 @@
     </ClInclude>
     <ClInclude Include="include\dom\node.h">
       <Filter>include\dom</Filter>
-    </ClInclude>
-    <ClInclude Include="include\operators\model.h">
-      <Filter>include\operators</Filter>
     </ClInclude>
     <ClInclude Include="include\shaders\shaderbuilder.h">
       <Filter>include\shaders</Filter>
