@@ -2,6 +2,11 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
 
+#ifdef QT_STATIC_BUILD
+#include <QtCore/QtPlugin>
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+#endif
+
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
