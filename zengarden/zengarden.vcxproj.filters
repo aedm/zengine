@@ -35,6 +35,11 @@
     <Filter Include="source\shaders">
       <UniqueIdentifier>{83ac644f-364a-4e9d-b83a-b0bdfced8bcb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Release-static">
+      <UniqueIdentifier>{f03f3af1-42d0-4cd7-8150-7e1a38e4799f}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
@@ -45,12 +50,6 @@
     </ClCompile>
     <ClCompile Include="source\zengarden.cpp">
       <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="source\commands\command.cpp">
       <Filter>source\commands</Filter>
@@ -67,12 +66,6 @@
     <ClCompile Include="source\graph\grapheditor.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="source\graph\nodewidget.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
@@ -88,11 +81,32 @@
     <ClCompile Include="source\graph\prototypes.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_zengarden.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_prototypes.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_prototypes.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_grapheditor.cpp">
+      <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
