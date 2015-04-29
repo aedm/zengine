@@ -19,7 +19,7 @@ public:
 private:
 
 	/// Open viewers
-	GraphEditor*				OpenGraphViewer(bool LeftPanel, NodeGraph* Graph);
+	GraphEditor*				OpenGraphViewer(bool LeftPanel, GraphNode* Graph);
 
 	/// The GL widget used for initializing OpenGL and sharing context
 	QGLWidget*					CommonGLWidget;

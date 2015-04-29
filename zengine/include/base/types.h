@@ -33,6 +33,8 @@ enum class NodeType
 
 	/// Editor nodes
 	UI,
+	GRAPH,
+	WIDGET,
 
 	/// Slot type that allows all node connections
 	ALLOW_ALL,

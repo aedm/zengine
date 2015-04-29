@@ -7,7 +7,7 @@
 
 using namespace std;
 class NodeWidget;
-class NodeGraph;
+class GraphNode;
 
 class GraphEditor: public QGLWidget { Q_OBJECT
 	friend class CreateNodeCommand;
@@ -17,7 +17,7 @@ public:
 	GraphEditor(QWidget* Parent, QGLWidget* Share);	
 
 	NodeWidget*						GetNodeWidget(Node* Nd);
-	void							SetGraph(NodeGraph* Graph);
+	void							SetGraph(GraphNode* Graph);
 
 private:
 	void							OnGraphNeedsRepaint();
@@ -42,7 +42,7 @@ private:
 	NodeWidget*						AddNode(Node* Nd);
 
 	/// All wigdets on the graph
-	NodeGraph*						Graph;
+	GraphNode*						Graph;
 
 	/// Mapping from node to widget
 	map<Node*, NodeWidget*>			WidgetMap;

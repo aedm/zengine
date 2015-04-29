@@ -6,7 +6,9 @@ Document::Document()
 
 }
 
-NodeGraph::NodeGraph()
+GraphNode::GraphNode()
+	: Node(NodeType::GRAPH, "Graph")
+	, Widgets(NodeType::WIDGET, this, nullptr, true)
 {
 
 }

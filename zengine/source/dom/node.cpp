@@ -103,13 +103,10 @@ Node* Slot::GetNode() const
 }
 
 
-const vector<Node*>* Slot::GetMultiNodes() const
+const vector<Node*>& Slot::GetMultiNodes() const
 {
-	if (!IsMultiSlot) {
-		ERR("Can't call GetMultiNodes() on non-multislot.");
-		return nullptr;
-	}
-	return &MultiNodes;
+	ASSERT(IsMultiSlot);
+	return MultiNodes;
 }
 
 
@@ -122,6 +119,36 @@ SharedString Slot::GetName()
 NodeType Slot::GetType() const
 {
 	return Type;
+}
+
+void Slot::ChangeNodeIndex(Node* Nd, UINT TargetIndex)
+{
+	ASSERT(IsMultiSlot);
+	ASSERT(TargetIndex < MultiNodes.size());
+
+	auto it = std::find(MultiNodes.begin(), MultiNodes.end(), Nd);
+	ASSERT(it != MultiNodes.end());
+	UINT index = it - MultiNodes.begin();
+
+	Node* node = MultiNodes[index];
+	if (index < TargetIndex) {
+		for (UINT i = index; i < TargetIndex; i++) {
+			MultiNodes[i] = MultiNodes[i + 1];
+		}
+		MultiNodes[TargetIndex] = node;
+	} else {
+		for (UINT i = index; i > TargetIndex; i--) {
+			MultiNodes[i] = MultiNodes[i - 1];
+		}
+		MultiNodes[TargetIndex] = node;
+	}
+}
+
+Node* Slot::operator[](UINT Index)
+{
+	ASSERT(IsMultiSlot);
+	ASSERT(Index < MultiNodes.size());
+	return MultiNodes[Index];
 }
 
 

@@ -87,7 +87,7 @@ NodeWidget* GraphEditor::AddNode( Node* Nd )
 	NodeWidget* nw = new NodeWidget(Nd);
 	nw->EventRepaint += MakeDelegate(this, &GraphEditor::OnWidgetRepaint);
 	WidgetMap[Nd] = nw;
-	Graph->Widgets.push_back(nw);
+	Graph->Widgets.Connect(nw);
 	update();
 	return nw;
 }
@@ -101,8 +101,9 @@ void GraphEditor::Paint()
 {
 	/// Draw connections
 	ThePainter->Color.Set(Vec4(1, 1, 1, 1));
-	for (int i=Graph->Widgets.size()-1; i>=0; i--) {
-		NodeWidget* ndWidget = Graph->Widgets[i];
+	const vector<Node*>& nodes = Graph->Widgets.GetMultiNodes();
+	for (int i=nodes.size()-1; i>=0; i--) {
+		NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
 		Node* node = ndWidget->GetNode();
 		for (int i=0; i<node->Slots.size(); i++) {
 			Slot* slot = node->Slots[i];
@@ -134,8 +135,8 @@ void GraphEditor::Paint()
 	}
 
 	/// Draw nodes
-	for (int i=Graph->Widgets.size()-1; i>=0; i--) {
-		Graph->Widgets[i]->Paint(this);
+	for (int i=nodes.size()-1; i>=0; i--) {
+		static_cast<NodeWidget*>(Graph->Widgets[i])->Paint(this);
 	}
 
 	/// Draw selection rectangle
@@ -244,9 +245,7 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 				CurrentState = State::MOVE_NODES;
 
 				/// Put node on top
-				Graph->Widgets.erase(
-					std::find(Graph->Widgets.begin(), Graph->Widgets.end(), HoveredWidget));
-				Graph->Widgets.insert(Graph->Widgets.begin(), HoveredWidget);
+				Graph->Widgets.ChangeNodeIndex(HoveredWidget, 0);
 			}
 		} else {
 			/// No widget was pressed, start rectangular selection
@@ -286,9 +285,10 @@ void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 		CurrentState = State::DEFAULT;
 		break;
 	case State::SELECT_RECTANGLE:
-		foreach (NodeWidget* ow, Graph->Widgets)
+		for (Node* node : Graph->Widgets.GetMultiNodes())
 		{
-			if (ow->Selected) SelectedNodes.insert(ow);
+			NodeWidget* widget = static_cast<NodeWidget*>(node);
+			if (widget->Selected) SelectedNodes.insert(widget);
 		}
 		CurrentState = State::DEFAULT;
 		update();
@@ -362,10 +362,11 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		}
 		break;
 	case State::SELECT_RECTANGLE:
-		foreach (NodeWidget* ow, Graph->Widgets)
+		for (Node* node : Graph->Widgets.GetMultiNodes())
 		{
-			ow->Selected = HasIntersection(OriginalMousePos, 
-				CurrentMousePos - OriginalMousePos, ow->Position, ow->Size);
+			NodeWidget* widget = static_cast<NodeWidget*>(node);
+			widget->Selected = HasIntersection(OriginalMousePos,
+				CurrentMousePos - OriginalMousePos, widget->Position, widget->Size);
 		}
 		update();
 		break;
@@ -401,16 +402,16 @@ bool GraphEditor::UpdateHoveredWidget(Vec2 MousePos)
 {
 	NodeWidget* hovered = NULL;
 	int slot = -1;
-	for (int i=0; i<Graph->Widgets.size(); i++)
+	for (Node* node : Graph->Widgets.GetMultiNodes())
 	{
-		NodeWidget* ow = Graph->Widgets[i];
-		if (IsInsideRect(MousePos, ow->Position, ow->Size))
+		NodeWidget* widget = static_cast<NodeWidget*>(node);
+		if (IsInsideRect(MousePos, widget->Position, widget->Size))
 		{
-			hovered = ow;
-			for (int o=0; o<ow->WidgetSlots.size(); o++)
+			hovered = widget;
+			for (int o=0; o<widget->WidgetSlots.size(); o++)
 			{
-				NodeWidget::SlotWidget* sw = ow->WidgetSlots[o];
-				if (IsInsideRect(MousePos, ow->Position + sw->Position, sw->Size)) {
+				NodeWidget::SlotWidget* sw = widget->WidgetSlots[o];
+				if (IsInsideRect(MousePos, widget->Position + sw->Position, sw->Size)) {
 					slot = o;
 					break;
 				}
@@ -438,7 +439,7 @@ void GraphEditor::OnKeyPress( QKeyEvent* event )
 	}
 }
 
-void GraphEditor::SetGraph( NodeGraph* Graph )
+void GraphEditor::SetGraph( GraphNode* Graph )
 {
 	this->Graph = Graph;
 }

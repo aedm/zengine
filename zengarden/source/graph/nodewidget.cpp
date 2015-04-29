@@ -37,7 +37,7 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
 NodeWidget::NodeWidget(Node* _Nd)
-	: Node(NodeType::UI, "")
+	: Node(NodeType::WIDGET, "")
 	, InspectedNode(NodeType::ALLOW_ALL, this, nullptr)
 	, TitleTexture(NULL)
 	//, Nd(_Nd)

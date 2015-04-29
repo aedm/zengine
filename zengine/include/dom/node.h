@@ -39,12 +39,15 @@ public:
 	/// Attaches slot to node. 
 	/// - for non-multislots, this overrides the current connection.
 	/// - for multislots, the node will be added to the list of connected nodes. 
-	/// nullptr is not allowed.
 	/// Returns false if connection is not possible due to type mismatch.
 	bool					Connect(Node* Nd);
 
 	/// Disconnects a node from this slot. 
 	void					Disconnect(Node* Nd);
+
+	/// Removes the connected node from connected nodes list, 
+	/// and reinserts it at the "TargetIndex" position. Only for multislots.
+	void					ChangeNodeIndex(Node* Nd, UINT TargetIndex);
 
 	/// Disconnects all nodes from this slot.
 	void					DisconnectAll();
@@ -52,8 +55,8 @@ public:
 	/// Returns connected node (errorlog & nullptr if multislot)
 	Node*					GetNode() const;
 
-	/// Returns all connected nodes (errorlog & nullptr if not multislot)
-	const vector<Node*>*	GetMultiNodes() const;
+	/// Returns all connected nodes (only for multislot)
+	const vector<Node*>&	GetMultiNodes() const;
 
 	/// Type of object this slot accepts
 	/// TODO: get rid of this
@@ -64,6 +67,9 @@ public:
 
 	/// True if the slot can connect to multiple nodes
 	const bool				IsMultiSlot;
+
+	/// Return the Nth connected node from a multislot
+	Node*					operator[] (UINT Index);
 
 protected:
 	/// The slot is connected to this node (nullptr if multislot)

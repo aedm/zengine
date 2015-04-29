@@ -39,7 +39,7 @@ void ZenGarden::InitModules()
 
 	/// Create blank document
 	Doc = new Document();
-	NodeGraph* graph = new NodeGraph();
+	GraphNode* graph = new GraphNode();
 	Doc->Graphs.push_back(graph);
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
@@ -82,7 +82,7 @@ void ZenGarden::Log(LogMessage Message)
 	//ui.LogViewer->repaint();
 }
 
-GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, NodeGraph* Graph)
+GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 {
 	QTabWidget* tabWidget = LeftPanel ? ui.leftPanel : ui.rightPanel;
 	GraphEditor* graphEditor = new GraphEditor(tabWidget, CommonGLWidget);
