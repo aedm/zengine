@@ -2,6 +2,8 @@
 
 
 Document::Document()
+	: Node(NodeType::DOCUMENT, "Document")
+	, Graphs(NodeType::GRAPH, this, nullptr, true)
 {
 
 }

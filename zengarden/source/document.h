@@ -8,12 +8,12 @@ using namespace std;
 class GraphNode;
 
 
-class Document
+class Document: Node
 {
 public:
 	Document();
 
-	vector<GraphNode*>		Graphs;
+	Slot					Graphs;
 };
 
 

@@ -40,7 +40,7 @@ void ZenGarden::InitModules()
 	/// Create blank document
 	Doc = new Document();
 	GraphNode* graph = new GraphNode();
-	Doc->Graphs.push_back(graph);
+	Doc->Graphs.Connect(graph);
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
 	/// Add some dummy nodes
