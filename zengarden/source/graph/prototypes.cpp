@@ -39,9 +39,9 @@ Prototypes::~Prototypes()
 	PrototypeNodes.clear();
 }
 
-Node* Prototypes::AskUser(QPoint Position)
+Node* Prototypes::AskUser(QWidget* Parent, QPoint Position)
 {
-	QDialog dialog(NULL, Qt::FramelessWindowHint);
+	QDialog dialog(Parent, Qt::FramelessWindowHint);
 	Dialog = &dialog;
 	Ui::OperatorSelector selector;
 	selector.setupUi(&dialog);

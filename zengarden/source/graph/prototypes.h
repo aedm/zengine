@@ -30,7 +30,7 @@ public:
 	static void					Init();
 	static void					Dispose();
 
-	Node*						AskUser(QPoint Position);
+	Node*						AskUser(QWidget* Parent, QPoint Position);
 		
 private:
 	void						AddPrototype(Node* node, NodeClass nodeClass);

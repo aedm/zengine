@@ -330,7 +330,7 @@ void GraphEditor::OnMouseRightDown( QMouseEvent* event )
 		return;
 	}
 
-	Node* node = ThePrototypes->AskUser(event->globalPos());
+	Node* node = ThePrototypes->AskUser(this, event->globalPos());
 	if (node)
 	{
 		TheCommandStack->Execute(new CreateNodeCommand(node, this));
