@@ -6,6 +6,7 @@
 #include "ui_zengarden.h"
 #include "graph/grapheditor.h"
 #include "document.h"
+#include "watchers/documentwatcher.h"
 #include <zengine.h>
 
 class ZenGarden : public QMainWindow
@@ -29,13 +30,16 @@ private:
 
 	//GraphEditor*				TheGraphEditor;
 	Document*					Doc;
+	DocumentWatcher*			DocWatcher;
+	UINT						NextGraphIndex;
 
 	/// App UI
 	Ui::zengardenClass ui;
 
 private slots:
-	void InitModules();
-	void DisposeModules();
+	void						InitModules();
+	void						DisposeModules();
+	void						NewGraph();
 };
 
 #endif // ZENGARDEN_H

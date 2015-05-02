@@ -40,6 +40,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="source\watchers">
+      <UniqueIdentifier>{ab397aa6-233e-45b5-996d-ea3371ec1451}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
@@ -108,6 +111,9 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_grapheditor.cpp">
       <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\documentwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -159,6 +165,9 @@
     </ClInclude>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_operatorSelector.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\documentwatcher.h">
+      <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

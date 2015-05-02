@@ -77,6 +77,7 @@
     <ClCompile Include="source\util\util.cpp" />
     <ClCompile Include="source\util\uipainter.cpp" />
     <ClCompile Include="source\util\textTexture.cpp" />
+    <ClCompile Include="source\watchers\documentwatcher.cpp" />
     <ClCompile Include="source\zengarden.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +119,7 @@
     <ClInclude Include="source\commands\graphcommands.h" />
     <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
+    <ClInclude Include="source\watchers\documentwatcher.h" />
     <CustomBuild Include="source\graph\prototypes.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing prototypes.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>

@@ -11,11 +11,12 @@
 
 ZenGarden::ZenGarden(QWidget *parent)
 	: QMainWindow(parent)
+	, NextGraphIndex(0)
 {
 	ui.setupUi(this);
 
 	TheLogger->OnLog += MakeDelegate(this, &ZenGarden::Log);
-
+	connect(ui.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
 	QTimer::singleShot(0, this, SLOT(InitModules()));
 }
 
@@ -39,7 +40,10 @@ void ZenGarden::InitModules()
 
 	/// Create blank document
 	Doc = new Document();
+	DocWatcher = new DocumentWatcher(ui.graphsListView, Doc);
+
 	GraphNode* graph = new GraphNode();
+
 	Doc->Graphs.Connect(graph);
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
@@ -91,4 +95,11 @@ GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 
 	graphEditor->SetGraph(Graph);
 	return graphEditor;
+}
+
+void ZenGarden::NewGraph()
+{
+	GraphNode* graph = new GraphNode();
+	graph->Name = string("Graph ") + to_string(++NextGraphIndex);
+	Doc->Graphs.Connect(graph);
 }

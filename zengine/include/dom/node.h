@@ -17,6 +17,9 @@ enum class NodeMessage {
 	/// Direct slot connection changed.
 	SLOT_CONNECTION_CHANGED,
 
+	/// Some transitive connection changed
+	TRANSITIVE_CONNECTION_CHANGED,
+
 	/// The value of a connected node changed, reevaluation might be needed
 	VALUE_CHANGED,
 

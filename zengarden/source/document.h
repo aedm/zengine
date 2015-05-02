@@ -8,7 +8,7 @@ using namespace std;
 class GraphNode;
 
 
-class Document: Node
+class Document: public Node
 {
 public:
 	Document();

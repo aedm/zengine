@@ -198,6 +198,7 @@ void Node::HandleMessage(Slot* S, NodeMessage Message)
 	{
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
 		CheckConnections();
+		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
 		/// Fall through:
 	case NodeMessage::VALUE_CHANGED:
 		if (!IsDirty)
@@ -205,6 +206,9 @@ void Node::HandleMessage(Slot* S, NodeMessage Message)
 			IsDirty = true;
 			SendMessage(NodeMessage::VALUE_CHANGED);
 		}
+		break;
+	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
+		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
 		break;
 	case NodeMessage::NEEDS_REDRAW:
 		/// Only watchers need to handle this.
@@ -220,7 +224,7 @@ void Node::SendMessage(NodeMessage Message)
 {
 	for (Slot* slot : Dependants) 
 	{
-		slot->GetNode()->HandleMessage(slot, Message);
+		slot->Owner->HandleMessage(slot, Message);
 	}
 }
 
