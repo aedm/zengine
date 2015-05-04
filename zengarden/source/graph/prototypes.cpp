@@ -74,3 +74,27 @@ void Prototypes::Dispose()
 {
 	SafeDelete(ThePrototypes);
 }
+
+QString Prototypes::GetNodeClassString(Node* Nd)
+{
+	switch (GetNodeClass(Nd)) {
+	case NodeClass::STATIC_FLOAT:		return QString("Static Float");
+	case NodeClass::STATIC_TEXTURE:		return QString("Static Texture");
+	case NodeClass::STATIC_VEC4:		return QString("Static Vec4");
+	case NodeClass::UNKNOWN:			return QString("unknown");
+	}
+	ASSERT(false);
+	return QString();
+}
+
+NodeClass Prototypes::GetNodeClass(Node* Nd)
+{
+	try {
+		const type_info& tid = typeid(*Nd);
+		auto tin = type_index(tid);
+		return NodeIndexMap.at(type_index(typeid(*Nd)));
+	}
+	catch (out_of_range ex) {
+		return NodeClass::UNKNOWN;
+	}
+}
