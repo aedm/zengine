@@ -3,3 +3,5 @@ zengine/.msbuild
 zengine/lib/zengine-debug.lib
 *.sdf
 zengarden/app/zengarden-static.exp
+*.opensdf
+*.exp
