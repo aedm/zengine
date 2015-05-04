@@ -34,7 +34,7 @@ bool Slot::Connect( Node* Nd )
 			ConnectedNode = Nd;
 			if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
 
-			Owner->HandleMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+			Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 		}
 	}
 	else
@@ -47,7 +47,7 @@ bool Slot::Connect( Node* Nd )
 			}
 		}
 		MultiNodes.push_back(Nd);
-		Owner->HandleMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 	return true;
 }
@@ -60,7 +60,7 @@ void Slot::Disconnect(Node* Nd)
 			if (*it == Nd) {
 				Nd->DisconnectFromSlot(this);
 				MultiNodes.erase(it);
-				Owner->HandleMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+				Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 				return;
 			}
 		}
@@ -82,13 +82,13 @@ void Slot::DisconnectAll()
 			(*it)->DisconnectFromSlot(this);
 		}
 		MultiNodes.clear();
-		Owner->HandleMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 	else
 	{
 		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
 		ConnectedNode = nullptr;
-		Owner->HandleMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 }
 
@@ -192,7 +192,7 @@ NodeType Node::GetType() const
 }
 
 
-void Node::HandleMessage(Slot* S, NodeMessage Message)
+void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
 	switch (Message)
 	{
@@ -220,12 +220,19 @@ void Node::HandleMessage(Slot* S, NodeMessage Message)
 }
 
 
-void Node::SendMessage(NodeMessage Message)
+void Node::SendMessage(NodeMessage Message, const void* Payload)
 {
 	for (Slot* slot : Dependants) 
 	{
-		slot->Owner->HandleMessage(slot, Message);
+		slot->Owner->ReceiveMessage(slot, Message, Payload);
 	}
+}
+
+
+void Node::ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload)
+{
+	HandleMessage(S, Message, Payload);
+	OnMessageReceived(S, Message, Payload);
 }
 
 

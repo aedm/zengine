@@ -79,7 +79,7 @@ void ShaderNode::Set()
 	}
 }
 
-void ShaderNode::HandleMessage(Slot* S, NodeMessage Message)
+void ShaderNode::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
 	switch (Message)
 	{

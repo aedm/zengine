@@ -13,18 +13,34 @@ public:
 	ValueSlot(Node* Owner, SharedString Name);
 
 	const ValueType&			Get() const;
+
+	void						SetDefaultValue(const ValueType& Value);
+
+protected:
+	/// Default value
+	ValueType					DefaultValue;
 };
 
 template<NodeType T>
 ValueSlot<T>::ValueSlot(Node* Owner, SharedString Name)
 	: Slot(T, Owner, Name)
+	, DefaultValue(ValueType())
 {}
 
 template<NodeType T>
 const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const
 {
-	return static_cast<ValueNode<T>*>(GetNode())->Get();
+	Node* node = GetNode();
+	return node ? static_cast<ValueNode<T>*>(node)->Get() : DefaultValue;
 }
+
+template<NodeType T>
+void ValueSlot<T>::SetDefaultValue(const ValueType& Value)
+{
+	DefaultValue = Value;
+	if (GetNode() != nullptr) Owner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
+}
+
 
 /// Helper cast
 template<NodeType T>

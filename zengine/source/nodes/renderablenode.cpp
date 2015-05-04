@@ -37,7 +37,7 @@ void RenderableNode::Render(PrimitiveTypeEnum Primitive)
 	}
 }
 
-void RenderableNode::HandleMessage(Slot* S, NodeMessage Message)
+void RenderableNode::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
 	switch (Message)
 	{

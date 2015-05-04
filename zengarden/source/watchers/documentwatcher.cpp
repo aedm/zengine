@@ -6,23 +6,29 @@ enum MyRoles {
 	GraphNodeRole = Qt::UserRole + 1
 };
 
+
 DocumentWatcher::DocumentWatcher(QListView* _ListView, Document* DocumentNode)
-	: Node(NodeType::DOCUMENT, "DocumentWatcher")
-	, DocumentSlot(NodeType::DOCUMENT, this, nullptr)
+	: Watcher(DocumentNode)
 	, ListView(_ListView)
 {
-	DocumentSlot.Connect(DocumentNode);
 	Model = new QStandardItemModel();
 	ListView->setModel(Model);
 }
 
-void DocumentWatcher::HandleMessage(Slot* S, NodeMessage Message)
+
+DocumentWatcher::~DocumentWatcher()
 {
+	delete Model;
+}
+
+
+void DocumentWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
+{
+	Document* doc = static_cast<Document*>(WatcherSlot.GetNode());
 	switch (Message)
 	{
-	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
+	case NodeMessage::SLOT_CONNECTION_CHANGED:
 	{
-		Document* doc = static_cast<Document*>(DocumentSlot.GetNode());
 		Model->clear();
 		for (Node* node : doc->Graphs.GetMultiNodes())
 		{
@@ -39,8 +45,4 @@ void DocumentWatcher::HandleMessage(Slot* S, NodeMessage Message)
 	}
 }
 
-DocumentWatcher::~DocumentWatcher()
-{
-	delete Model;
-}
 

@@ -81,6 +81,7 @@
     <ClCompile Include="source\watchers\documentwatcher.cpp" />
     <ClCompile Include="source\watchers\logwatcher.cpp" />
     <ClCompile Include="source\watchers\watcherwidget.cpp" />
+    <ClCompile Include="source\watchers\watcher.cpp" />
     <ClCompile Include="source\zengarden.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +123,7 @@
     <ClInclude Include="source\commands\graphcommands.h" />
     <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
+    <ClInclude Include="source\watchers\watcher.h" />
     <CustomBuild Include="source\propertyeditor\propertyeditor.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </Message>

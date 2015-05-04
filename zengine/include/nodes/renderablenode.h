@@ -23,7 +23,7 @@ public:
 	virtual Node*	Clone() const;
 
 private:
-	virtual void			HandleMessage(Slot* S, NodeMessage Message) override;
+	virtual void			HandleMessage(Slot* S, NodeMessage Message, const void* Payload) override;
 
 	virtual void			Operate() override;
 

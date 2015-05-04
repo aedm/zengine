@@ -57,7 +57,7 @@ protected:
 	vector<SamplerMapping>		Samplers;
 
 	/// Hook to do fancy stuff when the slots of the operator changed
-	virtual void				HandleMessage(Slot* S, NodeMessage Message) override;
+	virtual void				HandleMessage(Slot* S, NodeMessage Message, const void* Payload) override;
 
 	/// Recreates source->destination pointer pairs for collecting uniforms
 	void						RegenerateCopyItems();

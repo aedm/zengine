@@ -1,20 +1,20 @@
 #pragma once
 
 #include "../document.h"
+#include "watcher.h"
 #include <zengine.h>
 #include <QtWidgets/QListView>
 #include <QtGui/QStandardItemModel>
 
-class DocumentWatcher : public Node
+class DocumentWatcher : public Watcher
 {
 public:
 	DocumentWatcher(QListView* ListView, Document* DocumentNode);
 	virtual ~DocumentWatcher();
 
 protected:
-	virtual void		HandleMessage(Slot* S, NodeMessage Message);
+	virtual void		HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload);
 
-	Slot				DocumentSlot;
 	QListView*			ListView;
 	QStandardItemModel* Model;
 };

@@ -115,6 +115,9 @@ public:
 	/// Clone node
 	virtual Node*				Clone() const;
 
+	/// Hook for watchers (UI only)
+	Event<Slot*, NodeMessage, const void*> OnMessageReceived;
+
 protected:
 	Node(NodeType Type, const string& Name);
 
@@ -128,10 +131,10 @@ protected:
 	virtual void				Operate() {}
 
 	/// Sends a message to dependants
-	void						SendMessage(NodeMessage Message);
+	void						SendMessage(NodeMessage Message, const void* Payload = nullptr);
 
-	/// Receives message through a slot
-	virtual void				HandleMessage(Slot* S, NodeMessage Message);
+	/// Handle received messages
+	virtual void				HandleMessage(Slot* S, NodeMessage Message, const void* Payload);
 
 	/// Output type
 	NodeType					Type;
@@ -149,6 +152,9 @@ private:
 
 	/// Check if all slots are properly connected to an operator
 	void						CheckConnections();
+
+	/// Receives message through a slot
+	void						ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload = nullptr);
 };
 
 
