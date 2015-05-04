@@ -4,6 +4,7 @@
 #include <zengine.h>
 #include <QtWidgets/QTextEdit>
 
+/// Handles Zengine log messages
 class LogWatcher : public QWidget
 {
 public:

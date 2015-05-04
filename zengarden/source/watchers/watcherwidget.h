@@ -19,6 +19,7 @@ public:
 
 	/// Triggered when a new node needs to be watched
 	Event<Node*, WatcherWidget*>	OnWatchNode;
+	Event<Node*>					OnSelectNode;
 
 	WatcherPosition					Position;
 	bool							CanBeClosed;

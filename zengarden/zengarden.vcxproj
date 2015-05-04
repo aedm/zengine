@@ -74,6 +74,7 @@
     <ClCompile Include="source\graph\nodewidget.cpp" />
     <ClCompile Include="source\graph\prototypes.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\propertyeditor\propertyeditor.cpp" />
     <ClCompile Include="source\util\util.cpp" />
     <ClCompile Include="source\util\uipainter.cpp" />
     <ClCompile Include="source\util\textTexture.cpp" />
@@ -121,6 +122,26 @@
     <ClInclude Include="source\commands\graphcommands.h" />
     <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
+    <CustomBuild Include="source\propertyeditor\propertyeditor.h">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">
+      </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">
+      </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">
+      </Command>
+    </CustomBuild>
     <ClInclude Include="source\watchers\documentwatcher.h" />
     <ClInclude Include="source\watchers\logwatcher.h" />
     <ClInclude Include="source\watchers\watcherwidget.h" />

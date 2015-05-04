@@ -8,6 +8,7 @@
 #include "document.h"
 #include "watchers/documentwatcher.h"
 #include "watchers/logwatcher.h"
+#include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 
 class ZenGarden : public QMainWindow
@@ -26,9 +27,6 @@ private:
 	/// The GL widget used for initializing OpenGL and sharing context
 	QGLWidget*					CommonGLWidget;
 
-	/// Handles Zengine log messages
-	void						Log(LogMessage Message);
-
 	//GraphEditor*				TheGraphEditor;
 	Document*					Doc;
 	DocumentWatcher*			DocWatcher;
@@ -37,6 +35,11 @@ private:
 	/// App UI
 	Ui::zengardenClass ui;
 	LogWatcher*					TheLogWatcher;
+
+	/// Node was selected, update property panel
+	void						SetNodeForPropertyEditor(Node* Nd);
+
+	PropertyEditor*				PropEditor;
 
 private slots:
 	void						InitModules();

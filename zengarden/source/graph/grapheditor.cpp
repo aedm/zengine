@@ -12,9 +12,10 @@
 #include <QTimer>
 #include <QMouseEvent>
 
-GraphEditor::GraphEditor(QWidget* Parent, QGLWidget* Share)
+GraphEditor::GraphEditor(WatcherWidget* Parent, QGLWidget* Share)
 	: QGLWidget(Parent, Share)
 	, Graph(NULL)
+	, ParentWidget(Parent)
 {
 	//QPushButton* button = new QPushButton(this);
 	//button->move(10, 10);
@@ -238,6 +239,7 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 					DeselectAll();
 					HoveredWidget->Selected = true;
 					SelectedNodes.insert(HoveredWidget);
+					ParentWidget->OnSelectNode(HoveredWidget->GetNode());
 				}
 				StorePositionOfSelectedNodes();
 				NodesMoved = false;
@@ -251,6 +253,7 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 			/// No widget was pressed, start rectangular selection
 			CurrentState = State::SELECT_RECTANGLE;
 			DeselectAll();
+			ParentWidget->OnSelectNode(nullptr);
 		}
 		break;
 	case State::CONNECT_TO_NODE:
@@ -410,7 +413,7 @@ bool GraphEditor::UpdateHoveredWidget(Vec2 MousePos)
 			hovered = widget;
 			for (int o=0; o<widget->WidgetSlots.size(); o++)
 			{
-				NodeWidget::SlotWidget* sw = widget->WidgetSlots[o];
+				NodeWidget::WidgetSlot* sw = widget->WidgetSlots[o];
 				if (IsInsideRect(MousePos, widget->Position + sw->Position, sw->Size)) {
 					slot = o;
 					break;

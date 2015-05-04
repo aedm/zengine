@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../watchers/watcherwidget.h"
 #include <zengine.h>
 #include <QFrame>
 #include <QGLWidget>
@@ -14,7 +15,7 @@ class GraphEditor: public QGLWidget { Q_OBJECT
 	friend class NodeWidget;
 
 public:
-	GraphEditor(QWidget* Parent, QGLWidget* Share);	
+	GraphEditor(WatcherWidget* Parent, QGLWidget* Share);	
 
 	NodeWidget*						GetNodeWidget(Node* Nd);
 	void							SetGraph(GraphNode* Graph);
@@ -87,5 +88,8 @@ private:
 
 	/// Finds which widget and slot is hovered by the mouse pointer
 	bool							UpdateHoveredWidget(Vec2 MousePos);
+
+	/// Parent
+	WatcherWidget*					ParentWidget;
 };
 

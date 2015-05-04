@@ -43,6 +43,9 @@
     <Filter Include="source\watchers">
       <UniqueIdentifier>{ab397aa6-233e-45b5-996d-ea3371ec1451}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\propertyeditor">
+      <UniqueIdentifier>{72dc207d-7892-4245-baad-987e3103abe3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
@@ -120,6 +123,9 @@
     <ClCompile Include="source\watchers\logwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\propertyeditor\propertyeditor.cpp">
+      <Filter>source\propertyeditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -142,6 +148,9 @@
     </CustomBuild>
     <CustomBuild Include="source\graph\prototypes.h">
       <Filter>source\graph</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\propertyeditor\propertyeditor.h">
+      <Filter>source\propertyeditor</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
