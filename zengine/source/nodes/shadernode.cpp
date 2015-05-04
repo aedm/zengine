@@ -79,9 +79,16 @@ void ShaderNode::Set()
 	}
 }
 
-void ShaderNode::OnSlotConnectionsChanged( Slot* S )
+void ShaderNode::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
-	RegenerateCopyItems();
+	switch (Message)
+	{
+	case NodeMessage::SLOT_CONNECTION_CHANGED:
+		RegenerateCopyItems();
+		break;
+	default:
+		break;
+	}
 }
 
 void ShaderNode::RegenerateCopyItems()

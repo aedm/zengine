@@ -37,7 +37,7 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
 NodeWidget::NodeWidget(Node* _Nd)
-	: Node(NodeType::UI, "")
+	: Node(NodeType::WIDGET, "")
 	, InspectedNode(NodeType::ALLOW_ALL, this, nullptr)
 	, TitleTexture(NULL)
 	//, Nd(_Nd)
@@ -49,7 +49,7 @@ NodeWidget::NodeWidget(Node* _Nd)
 
 	foreach(Slot* slot, _Nd->Slots)
 	{
-		SlotWidget* sw = new SlotWidget();
+		WidgetSlot* sw = new WidgetSlot();
 		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
 		WidgetSlots.push_back(sw);
 	}
@@ -62,7 +62,7 @@ void NodeWidget::CalculateLayout()
 {
 	TitleHeight = TitleTexture->TextSize.height() + TitlePadding * 2.0f + 1.0f;
 	float slotY = TitleHeight + SlotSpacing;
-	foreach(SlotWidget* sw, WidgetSlots)
+	foreach(WidgetSlot* sw, WidgetSlots)
 	{
 		sw->Position = Vec2(SlotLeftMargin, slotY);
 		sw->Size = Vec2(SlotWidth, float(sw->Text.TextSize.height()) + SlotPadding.Y * 2.0f);
@@ -103,7 +103,7 @@ void NodeWidget::Paint(GraphEditor* Panel)
 			} else slotFrameColor = Vec4(1, 1, 1, 0.2);
 		}
 
-		SlotWidget* sw = WidgetSlots[i];
+		WidgetSlot* sw = WidgetSlots[i];
 		ThePainter->Color.Set(slotFrameColor);
 		//ThePainter->DrawRect(Position.X+2, slotY, Position.X + Size.X - 40, slotY + sw->Text.TextSize.height());
 		ThePainter->DrawRect(Position + sw->Position, sw->Size);
@@ -162,6 +162,6 @@ Vec2 NodeWidget::GetOutputPosition()
 
 Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 {
-	SlotWidget* sw = WidgetSlots[SlotIndex];
+	WidgetSlot* sw = WidgetSlots[SlotIndex];
 	return Position + sw->SpotPos;
 }

@@ -40,10 +40,11 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Generated Files\Debug-static">
-      <UniqueIdentifier>{349e70f8-3200-44f6-a445-dc1edb21d060}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
+    <Filter Include="source\watchers">
+      <UniqueIdentifier>{ab397aa6-233e-45b5-996d-ea3371ec1451}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\propertyeditor">
+      <UniqueIdentifier>{72dc207d-7892-4245-baad-987e3103abe3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -86,9 +87,6 @@
     <ClCompile Include="source\graph\prototypes.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_zengarden.cpp">
-      <Filter>Generated Files\Debug-static</Filter>
-    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -97,9 +95,6 @@
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_zengarden.cpp">
       <Filter>Generated Files\Release-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_prototypes.cpp">
-      <Filter>Generated Files\Debug-static</Filter>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -110,9 +105,6 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_prototypes.cpp">
       <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_grapheditor.cpp">
-      <Filter>Generated Files\Debug-static</Filter>
-    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -121,6 +113,21 @@
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_grapheditor.cpp">
       <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\documentwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\watcherwidget.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\logwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\propertyeditor\propertyeditor.cpp">
+      <Filter>source\propertyeditor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\watcher.cpp">
+      <Filter>source\watchers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +151,9 @@
     </CustomBuild>
     <CustomBuild Include="source\graph\prototypes.h">
       <Filter>source\graph</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\propertyeditor\propertyeditor.h">
+      <Filter>source\propertyeditor</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +183,18 @@
     </ClInclude>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_operatorSelector.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\documentwatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\watcherwidget.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\logwatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\watcher.h">
+      <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

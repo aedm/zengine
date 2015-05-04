@@ -11,10 +11,12 @@ Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot)
 	Name = _Name;
 }
 
+
 Slot::~Slot()
 {
 	Connect(NULL);
 }
+
 
 bool Slot::Connect( Node* Nd )
 {
@@ -32,13 +34,7 @@ bool Slot::Connect( Node* Nd )
 			ConnectedNode = Nd;
 			if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
 
-			if (Owner)
-			{
-				/// TODO: simplify this
-				Owner->CheckConnections();
-				Owner->OnSlotConnectionsChanged(this);
-				Owner->OnSlotValueChanged(this);
-			}
+			Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 		}
 	}
 	else
@@ -51,13 +47,11 @@ bool Slot::Connect( Node* Nd )
 			}
 		}
 		MultiNodes.push_back(Nd);
-		/// TODO: simplify this
-		Owner->CheckConnections();
-		Owner->OnSlotConnectionsChanged(this);
-		Owner->OnSlotValueChanged(this);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 	return true;
 }
+
 
 void Slot::Disconnect(Node* Nd)
 {
@@ -66,10 +60,7 @@ void Slot::Disconnect(Node* Nd)
 			if (*it == Nd) {
 				Nd->DisconnectFromSlot(this);
 				MultiNodes.erase(it);
-				/// TODO: simplify this
-				Owner->CheckConnections();
-				Owner->OnSlotConnectionsChanged(this);
-				Owner->OnSlotValueChanged(this);
+				Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 				return;
 			}
 		}
@@ -91,22 +82,15 @@ void Slot::DisconnectAll()
 			(*it)->DisconnectFromSlot(this);
 		}
 		MultiNodes.clear();
-		/// TODO: simplify this
-		Owner->CheckConnections();
-		Owner->OnSlotConnectionsChanged(this);
-		Owner->OnSlotValueChanged(this);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 	else
 	{
 		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
 		ConnectedNode = nullptr;
-		/// TODO: simplify this
-		Owner->CheckConnections();
-		Owner->OnSlotConnectionsChanged(this);
-		Owner->OnSlotValueChanged(this);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 }
-
 
 
 Node* Slot::GetNode() const 
@@ -118,24 +102,55 @@ Node* Slot::GetNode() const
 	return ConnectedNode;
 }
 
-const vector<Node*>* Slot::GetMultiNodes() const
+
+const vector<Node*>& Slot::GetMultiNodes() const
 {
-	if (!IsMultiSlot) {
-		ERR("Can't call GetMultiNodes() on non-multislot.");
-		return nullptr;
-	}
-	return &MultiNodes;
+	ASSERT(IsMultiSlot);
+	return MultiNodes;
 }
+
 
 SharedString Slot::GetName()
 {
 	return Name;
 }
 
+
 NodeType Slot::GetType() const
 {
 	return Type;
 }
+
+void Slot::ChangeNodeIndex(Node* Nd, UINT TargetIndex)
+{
+	ASSERT(IsMultiSlot);
+	ASSERT(TargetIndex < MultiNodes.size());
+
+	auto it = std::find(MultiNodes.begin(), MultiNodes.end(), Nd);
+	ASSERT(it != MultiNodes.end());
+	UINT index = it - MultiNodes.begin();
+
+	Node* node = MultiNodes[index];
+	if (index < TargetIndex) {
+		for (UINT i = index; i < TargetIndex; i++) {
+			MultiNodes[i] = MultiNodes[i + 1];
+		}
+		MultiNodes[TargetIndex] = node;
+	} else {
+		for (UINT i = index; i > TargetIndex; i--) {
+			MultiNodes[i] = MultiNodes[i - 1];
+		}
+		MultiNodes[TargetIndex] = node;
+	}
+}
+
+Node* Slot::operator[](UINT Index)
+{
+	ASSERT(IsMultiSlot);
+	ASSERT(Index < MultiNodes.size());
+	return MultiNodes[Index];
+}
+
 
 Node::Node(NodeType _Type, const string& _Name)
 	: Name(_Name)
@@ -145,10 +160,12 @@ Node::Node(NodeType _Type, const string& _Name)
 	IsProperlyConnected = true;
 }
 
+
 Node::Node( const Node& Original )
 	: Name(Original.Name)
 	, Type(Original.Type)
 {}
+
 
 void Node::ConnectToSlot(Slot* S)
 {
@@ -156,37 +173,68 @@ void Node::ConnectToSlot(Slot* S)
 	Dependants.push_back(S);
 }
 
+
 void Node::DisconnectFromSlot( Slot* S )
 {
 	Dependants.erase(std::remove(Dependants.begin(), Dependants.end(), S), Dependants.end());
 }
+
 
 const vector<Slot*>& Node::GetDependants() const
 {
 	return Dependants;
 }
 
+
 NodeType Node::GetType() const
 {
 	return Type;
 }
 
-void Node::OnSlotValueChanged(Slot* DirtySlot)
+
+void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
-	if (!IsDirty)
+	switch (Message)
 	{
-		IsDirty = true;
-		SetDependantsDirty();
+	case NodeMessage::SLOT_CONNECTION_CHANGED:
+		CheckConnections();
+		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+		/// Fall through:
+	case NodeMessage::VALUE_CHANGED:
+		if (!IsDirty)
+		{
+			IsDirty = true;
+			SendMessage(NodeMessage::VALUE_CHANGED);
+		}
+		break;
+	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
+		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+		break;
+	case NodeMessage::NEEDS_REDRAW:
+		/// Only watchers need to handle this.
+		break;
+	default:
+		WARN("Unhandled message: ", (UINT)Message);
+		break;
 	}
 }
 
-void Node::SetDependantsDirty()
+
+void Node::SendMessage(NodeMessage Message, const void* Payload)
 {
-	foreach(Slot* dependant, Dependants)
+	for (Slot* slot : Dependants) 
 	{
-		dependant->GetNode()->OnSlotValueChanged(dependant);
+		slot->Owner->ReceiveMessage(slot, Message, Payload);
 	}
 }
+
+
+void Node::ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload)
+{
+	HandleMessage(S, Message, Payload);
+	OnMessageReceived(S, Message, Payload);
+}
+
 
 void Node::CheckConnections()
 {
@@ -201,6 +249,7 @@ void Node::CheckConnections()
 	IsProperlyConnected = true;
 }
 
+
 void Node::Evaluate()
 {
 	if (IsDirty && IsProperlyConnected)
@@ -214,6 +263,7 @@ void Node::Evaluate()
 	}
 }
 
+
 Node::~Node()
 {
 	const vector<Slot*>& deps = GetDependants();
@@ -223,9 +273,11 @@ Node::~Node()
 	}
 }
 
+
 Node* Node::Clone() const
 {
 	ASSERT(false);
 	return NULL;
 }
+
 

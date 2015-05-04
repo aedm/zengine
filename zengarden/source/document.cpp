@@ -2,11 +2,15 @@
 
 
 Document::Document()
+	: Node(NodeType::DOCUMENT, "Document")
+	, Graphs(NodeType::GRAPH, this, nullptr, true)
 {
 
 }
 
-NodeGraph::NodeGraph()
+GraphNode::GraphNode()
+	: Node(NodeType::GRAPH, "Graph")
+	, Widgets(NodeType::WIDGET, this, nullptr, true)
 {
 
 }

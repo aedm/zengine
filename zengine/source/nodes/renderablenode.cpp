@@ -5,7 +5,7 @@ RenderableNode::RenderableNode()
 	: Node(NodeType::MODEL, string("Model"))
 	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
-	, Mapper(NULL)
+	, Mapper(nullptr)
 {
 	Slots.push_back(&TheShader);
 	Slots.push_back(&TheMesh);
@@ -16,7 +16,8 @@ RenderableNode::RenderableNode( const RenderableNode& Original )
 	: Node(Original)
 	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
-	, Mapper(NULL)
+	, Mapper(nullptr)
+	, MappedVertexFormat(nullptr)
 {}
 
 void RenderableNode::Render(PrimitiveTypeEnum Primitive)
@@ -36,9 +37,24 @@ void RenderableNode::Render(PrimitiveTypeEnum Primitive)
 	}
 }
 
-void RenderableNode::OnSlotConnectionsChanged( Slot* S )
+void RenderableNode::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
-	SafeDelete(Mapper);
+	switch (Message)
+	{
+	case NodeMessage::SLOT_CONNECTION_CHANGED:
+		SafeDelete(Mapper);
+		MappedVertexFormat = nullptr;
+		break;
+	case NodeMessage::VALUE_CHANGED:
+		if (S == &TheShader || (S == &TheMesh && TheMesh.GetMesh()->Format != MappedVertexFormat))
+		{
+			SafeDelete(Mapper);
+			MappedVertexFormat = nullptr;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 void RenderableNode::Operate()
@@ -49,6 +65,7 @@ void RenderableNode::Operate()
 		ShaderNode* shader = (ShaderNode*)TheShader.GetNode();
 		if (mesh && shader)
 		{
+			MappedVertexFormat = mesh->Format;
 			Mapper = TheDrawingAPI->CreateAttributeMapper(mesh->Format->Attributes, 
 				shader->ShaderProgram->Attributes, mesh->Format->Stride);
 		}

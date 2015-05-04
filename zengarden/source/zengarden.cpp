@@ -11,11 +11,14 @@
 
 ZenGarden::ZenGarden(QWidget *parent)
 	: QMainWindow(parent)
+	, NextGraphIndex(0)
+	, PropEditor(nullptr)
 {
 	ui.setupUi(this);
 
-	TheLogger->OnLog += MakeDelegate(this, &ZenGarden::Log);
+	//TheLogger->OnLog += Delegate(this, &ZenGarden::Log);
 
+	connect(ui.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
 	QTimer::singleShot(0, this, SLOT(InitModules()));
 }
 
@@ -26,6 +29,9 @@ ZenGarden::~ZenGarden()
 
 void ZenGarden::InitModules()
 {
+	TheLogWatcher = new LogWatcher(this);
+	ui.leftPanel->addTab(TheLogWatcher, "Log");
+
 	/// Initialize OpenGL and its dependencies
 	CommonGLWidget = new QGLWidget();
 	if (!CommonGLWidget->isValid())
@@ -39,8 +45,11 @@ void ZenGarden::InitModules()
 
 	/// Create blank document
 	Doc = new Document();
-	NodeGraph* graph = new NodeGraph();
-	Doc->Graphs.push_back(graph);
+	DocWatcher = new DocumentWatcher(ui.graphsListView, Doc);
+
+	GraphNode* graph = new GraphNode();
+
+	Doc->Graphs.Connect(graph);
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
 	/// Add some dummy nodes
@@ -70,25 +79,32 @@ void ZenGarden::DisposeModules()
 	CloseZengine();
 }
 
-void ZenGarden::Log(LogMessage Message)
-{
-	//switch (Message.Severity)
-	//{
-	//case LOG_INFO:		ui.LogViewer->setTextColor(Qt::black);	break;
-	//case LOG_WARNING:	ui.LogViewer->setTextColor(Qt::blue);	break;
-	//case LOG_ERROR:		ui.LogViewer->setTextColor(Qt::red);	break;
-	//}
-	//ui.LogViewer->append(QString("[ ") + QTime::currentTime().toString("HH:mm:ss") + QString(" ]  ") + QString::fromUtf16((ushort*)Message.Message));
-	//ui.LogViewer->repaint();
-}
-
-GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, NodeGraph* Graph)
+GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 {
 	QTabWidget* tabWidget = LeftPanel ? ui.leftPanel : ui.rightPanel;
-	GraphEditor* graphEditor = new GraphEditor(tabWidget, CommonGLWidget);
+	WatcherPosition position = LeftPanel ? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
+	WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position, true);
+	watcherWidget->OnSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
+
+	GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);
 	graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tabWidget->addTab(graphEditor, "graph");
 
 	graphEditor->SetGraph(Graph);
 	return graphEditor;
+}
+
+void ZenGarden::NewGraph()
+{
+	GraphNode* graph = new GraphNode();
+	graph->Name = string("Graph ") + to_string(++NextGraphIndex);
+	Doc->Graphs.Connect(graph);
+}
+
+void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
+{
+	SafeDelete(PropEditor);
+	if (Nd != nullptr) {
+		PropEditor = new PropertyEditor(Nd, ui.propertyPanel);
+	}
 }

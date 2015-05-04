@@ -27,4 +27,4 @@ bool InitZengine();
 void CloseZengine();
 
 /// Will be called once after Zengine init is done
-extern Event<void> EventZengineInitDone;
+extern Event<> EventZengineInitDone;

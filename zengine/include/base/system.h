@@ -18,55 +18,37 @@ public:
 	static void				ReadFilesInFolder(const wchar_t* Folder, const wchar_t* Extension, vector<wstring>& oFileList);
 };
 
-template <typename T>
-class Event;
+template <class X, class Y, class RetType, typename... Params>
+FastDelegate<RetType(Params...)> Delegate(Y* x, RetType(X::*func)(Params...)) {
+	return FastDelegate<RetType(Params...)>(x, func);
+}
 
-template <>
-class Event<void>
-{
-public:
-	void operator += (const FastDelegate0<void>& Delegate)
-	{
-		Delegates.insert(Delegate);
-	}
+template <class X, class Y, class RetType, typename... Params>
+FastDelegate<RetType(Params...)> Delegate(Y* x, RetType(X::*func)(Params...) const) {
+	return FastDelegate<RetType(Params...)>(x, func);
+}
 
-	void operator -= (const FastDelegate0<void>& Delegate)
-	{
-		Delegates.erase(Delegate);
-	}
-
-	void operator ()()
-	{
-		for (set<const FastDelegate0<void>>::iterator it = Delegates.begin(); it != Delegates.end(); ++it)
-		{
-			(*it)();
-		}
-	}
-
-	set<const FastDelegate0<void>>	Delegates;	
-};
-
-template <typename T>
+template <typename... Types>
 class Event
 {
 public:
-	void operator += (const FastDelegate1<T, void>& Delegate)
+	void operator += (const FastDelegate<void(Types...)>& Delegate)
 	{
 		Delegates.insert(Delegate);
 	}
 
-	void operator -= (const FastDelegate1<T, void>& Delegate)
+	void operator -= (const FastDelegate<void(Types...)>& Delegate)
 	{
 		Delegates.erase(Delegate);
 	}
 
-	void operator () (T Message)
+	void operator () (Types... Message)
 	{
-		for (set<const FastDelegate1<T, void>>::iterator it = Delegates.begin(); it != Delegates.end(); ++it)
+		for (set<const FastDelegate<void(Types...)>>::iterator it = Delegates.begin(); it != Delegates.end(); ++it)
 		{
-			(*it)(Message);
+			(*it)(Message...);
 		}
 	}
 
-	set<const FastDelegate1<T, void>>	Delegates;
+	set<const FastDelegate<void(Types...)>>	Delegates;
 };

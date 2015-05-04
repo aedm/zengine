@@ -13,18 +13,34 @@ public:
 	ValueSlot(Node* Owner, SharedString Name);
 
 	const ValueType&			Get() const;
+
+	void						SetDefaultValue(const ValueType& Value);
+
+protected:
+	/// Default value
+	ValueType					DefaultValue;
 };
 
 template<NodeType T>
 ValueSlot<T>::ValueSlot(Node* Owner, SharedString Name)
 	: Slot(T, Owner, Name)
+	, DefaultValue(ValueType())
 {}
 
 template<NodeType T>
 const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const
 {
-	return static_cast<ValueNode<T>*>(GetNode())->Get();
+	Node* node = GetNode();
+	return node ? static_cast<ValueNode<T>*>(node)->Get() : DefaultValue;
 }
+
+template<NodeType T>
+void ValueSlot<T>::SetDefaultValue(const ValueType& Value)
+{
+	DefaultValue = Value;
+	if (GetNode() != nullptr) Owner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
+}
+
 
 /// Helper cast
 template<NodeType T>
@@ -55,7 +71,37 @@ public:
 	ValueNode(const ValueNode<T>& Original);
 
 	/// Returns value of node. Reevaluates if necessary
-	virtual const ValueType&	Get();
+	virtual const ValueType&	Get() = 0;
+};
+
+
+template<NodeType T>
+ValueNode<T>::ValueNode(const string& Name)
+	: Node(T, Name)
+{}
+
+
+template<NodeType T>
+ValueNode<T>::ValueNode( const ValueNode<T>& Original )
+	: Node(Original)
+{}
+
+
+/// Simple static value nodes
+template<NodeType T>
+class StaticValueNode : public ValueNode < T >
+{
+public:
+	StaticValueNode();
+
+	/// For cloning
+	StaticValueNode(const StaticValueNode<T>& Original);
+
+	/// Returns value of node. Reevaluates if necessary
+	virtual const ValueType&	Get() override;
+
+	/// Sets value of node.
+	void						Set(const ValueType& NewValue);
 
 	/// Clone node
 	virtual Node*				Clone() const override;
@@ -67,61 +113,40 @@ protected:
 
 
 template<NodeType T>
-ValueNode<T>::ValueNode(const string& Name)
-	: Node(T, Name)
+StaticValueNode<T>::StaticValueNode()
+	: ValueNode(VariableNames[(UINT)T])
 {
 	Value = ValueType();
 }
 
 
 template<NodeType T>
-ValueNode<T>::ValueNode( const ValueNode<T>& Original )
-	: Node(Original)
+StaticValueNode<T>::StaticValueNode(const StaticValueNode<T>& Original)
+	: ValueNode(Original)
 {
 	Value = Original.Value;
 }
 
 
 template<NodeType T>
-const typename ValueNode<T>::ValueType& ValueNode<T>::Get()
+Node* StaticValueNode<T>::Clone() const
 {
-	ASSERT(IsProperlyConnected);
-	Evaluate();
+	return new StaticValueNode<T>(*this);
+}
+
+
+template<NodeType T>
+const typename StaticValueNode<T>::ValueType& StaticValueNode<T>::Get()
+{
 	return Value;
 }
-
-
-template<NodeType T>
-Node* ValueNode<T>::Clone() const
-{
-	return new ValueNode<T>(*this);
-}
-
-
-
-/// Simple static value nodes
-template<NodeType T>
-class StaticValueNode : public ValueNode < T >
-{
-public:
-	StaticValueNode();
-
-	/// Sets value of node.
-	void						Set(const ValueType& NewValue);
-};
-
-
-template<NodeType T>
-StaticValueNode<T>::StaticValueNode()
-	: ValueNode(VariableNames[(UINT)T])
-{}
 
 
 template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& NewValue)
 {
 	Value = NewValue;
-	SetDependantsDirty();
+	SendMessage(NodeMessage::VALUE_CHANGED);
 }
 
 

@@ -24,7 +24,7 @@ public:
 
 	Node*				GetNode();
 
-	Event<void>			EventRepaint;
+	Event<>				EventRepaint;
 
 private:
 	/// Command-accessible
@@ -45,7 +45,7 @@ private:
 	/// Height of the titlebar
 	float				TitleHeight;
 
-	struct SlotWidget
+	struct WidgetSlot
 	{
 		TextTexture		Text;
 		Vec2			Position;
@@ -53,7 +53,7 @@ private:
 		Vec2			SpotPos;
 	};
 
-	vector<SlotWidget*>	WidgetSlots;
+	vector<WidgetSlot*>	WidgetSlots;
 
 	TextTexture*		TitleTexture;
 };

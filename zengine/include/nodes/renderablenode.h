@@ -23,8 +23,10 @@ public:
 	virtual Node*	Clone() const;
 
 private:
-	virtual void			OnSlotConnectionsChanged(Slot* S) override;
+	virtual void			HandleMessage(Slot* S, NodeMessage Message, const void* Payload) override;
+
 	virtual void			Operate() override;
 
 	AttributeMapper*		Mapper;
+	VertexFormat*			MappedVertexFormat;
 };

@@ -5,6 +5,7 @@
 #include <QTreeWidgetItem>
 #include <unordered_map>
 #include <typeindex>
+#include <QtCore/QString>
 
 class Prototypes;
 extern Prototypes* ThePrototypes;
@@ -16,7 +17,9 @@ enum class NodeClass
 {
 	STATIC_FLOAT,
 	STATIC_VEC4,
-	STATIC_TEXTURE
+	STATIC_TEXTURE,
+
+	UNKNOWN,
 };
 
 class Prototypes: public QObject
@@ -30,7 +33,10 @@ public:
 	static void					Init();
 	static void					Dispose();
 
-	Node*						AskUser(QPoint Position);
+	Node*						AskUser(QWidget* Parent, QPoint Position);
+
+	QString						GetNodeClassString(Node* Nd);
+	NodeClass					GetNodeClass(Node* Nd);
 		
 private:
 	void						AddPrototype(Node* node, NodeClass nodeClass);
