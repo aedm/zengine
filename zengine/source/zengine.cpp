@@ -5,7 +5,7 @@
 ResourceManager* TheResourceManager = NULL;
 DrawingAPI* TheDrawingAPI = NULL;
 
-Event<void> EventZengineInitDone;
+Event<> EventZengineInitDone;
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine()

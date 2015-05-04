@@ -15,7 +15,8 @@ ZenGarden::ZenGarden(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	TheLogger->OnLog += MakeDelegate(this, &ZenGarden::Log);
+	//TheLogger->OnLog += Delegate(this, &ZenGarden::Log);
+
 	connect(ui.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
 	QTimer::singleShot(0, this, SLOT(InitModules()));
 }
@@ -27,6 +28,9 @@ ZenGarden::~ZenGarden()
 
 void ZenGarden::InitModules()
 {
+	TheLogWatcher = new LogWatcher(this);
+	ui.leftPanel->addTab(TheLogWatcher, "Log");
+
 	/// Initialize OpenGL and its dependencies
 	CommonGLWidget = new QGLWidget();
 	if (!CommonGLWidget->isValid())

@@ -7,6 +7,7 @@
 #include "graph/grapheditor.h"
 #include "document.h"
 #include "watchers/documentwatcher.h"
+#include "watchers/logwatcher.h"
 #include <zengine.h>
 
 class ZenGarden : public QMainWindow
@@ -35,6 +36,7 @@ private:
 
 	/// App UI
 	Ui::zengardenClass ui;
+	LogWatcher*					TheLogWatcher;
 
 private slots:
 	void						InitModules();

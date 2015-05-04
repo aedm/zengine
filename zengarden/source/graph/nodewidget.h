@@ -24,7 +24,7 @@ public:
 
 	Node*				GetNode();
 
-	Event<void>			EventRepaint;
+	Event<>				EventRepaint;
 
 private:
 	/// Command-accessible

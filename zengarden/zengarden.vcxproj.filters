@@ -114,6 +114,12 @@
     <ClCompile Include="source\watchers\documentwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\watcherwidget.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\logwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -167,6 +173,12 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\documentwatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\watcherwidget.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\logwatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>

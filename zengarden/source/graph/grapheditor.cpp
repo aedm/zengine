@@ -27,7 +27,7 @@ GraphEditor::GraphEditor(QWidget* Parent, QGLWidget* Share)
 	HoveredWidget = NULL;
 	HoveredSlot = -1;
 
-	EventZengineInitDone += MakeDelegate(this, &GraphEditor::Init);
+	EventZengineInitDone += Delegate(this, &GraphEditor::Init);
 }
 
 void GraphEditor::paintGL()
@@ -85,7 +85,7 @@ void GraphEditor::keyPressEvent( QKeyEvent* event )
 NodeWidget* GraphEditor::AddNode( Node* Nd )
 {
 	NodeWidget* nw = new NodeWidget(Nd);
-	nw->EventRepaint += MakeDelegate(this, &GraphEditor::OnWidgetRepaint);
+	nw->EventRepaint += Delegate(this, &GraphEditor::OnWidgetRepaint);
 	WidgetMap[Nd] = nw;
 	Graph->Widgets.Connect(nw);
 	update();
