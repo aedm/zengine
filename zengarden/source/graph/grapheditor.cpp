@@ -35,7 +35,7 @@ void GraphEditor::paintGL()
 {
 	ThePainter->Set(width(), height());
 
-	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+	glClearColor(0.26f, 0.26f, 0.26f, 1.0f);
 	TheDrawingAPI->Clear();
 	
 	Paint();	

@@ -36,7 +36,7 @@ void ZenGarden::InitModules()
 	QPalette pal = ui.dummy->palette();
 	QPalette pal2 = ui.dummy3->palette();
 	pal.setColor(QPalette::Background, pal.background().color().light(125));
-	pal.setColor(QPalette::WindowText, pal.background().color().light());
+	pal.setColor(QPalette::WindowText, pal.background().color().light(135));
 	ui.dummy->setPalette(pal);
 	pal.setColor(QPalette::WindowText, pal.background().color().dark());
 	ui.dummy2->setPalette(pal);
