@@ -179,4 +179,9 @@
       <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="doc\shader3.txt">
+      <Filter>doc</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

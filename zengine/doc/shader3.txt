@@ -1,0 +1,100 @@
+
+:name "Alpha blend"
+:returns vec4
+
+:param vec4 First "First color"
+:param vec4 Second "Second color"
+:param float Ratio
+
+:ui Second.x label="Red" min=0 max=1 default=0.5 scale=linear
+:ui Second.y label="Green" min=0 max=1 default=0.5 scale=linear
+:ui Ratio min=0 max=0 default=0.5 scale=linear
+
+SHADER
+{
+	return First * Ratio + Second * (1-Ratio);
+}
+
+------------------------------------------------------
+
+// For framebuffer rendertargets
+
+:name "World position to framebuffer"
+:returns void
+
+:global gGlobalTime
+:varying vWorldPosition
+:option ADD_TIME "Add time"
+
+SHADER
+{
+	#ifdef ADD_TIME
+		gl_FragColor = vec4(vWorldPosition + sin(gTime), 1.0);
+	#else 
+		gl_FragColor = vec4(vWorldPosition, 1.0);
+	#endif
+}
+
+compiles to:
+
+uniform float gGlobalTime;
+in vec3 vWorldPosition;
+
+#define ADD_TIME
+void __shader0
+{
+	#ifdef ADD_TIME
+		gl_FragColor = vec4(vWorldPosition + sin(gTime), 1.0);
+	#else 
+		gl_FragColor = vec4(vWorldPosition, 1.0);
+	#endif
+}
+#undef ADD_TIME
+
+void main()
+{
+	__shader0();
+}
+
+------------------------------------------------------
+
+/// Custom rendertarget
+
+:name "Accumulate albedo"
+:returns void
+
+:rendertarget vec3 Albedo blend=add
+
+:param vec3 Color
+
+SHADER
+{
+	Albedo = Color;
+}
+
+
+compiles to:
+
+layout (location = 0) out vec3 Albedo;
+
+void __shader0(vec3 Color)
+{
+	Albedo = Color;
+}
+
+------------------------------------------------------
+
+/// Post-process solid pass
+
+:name "Albedo to color"
+:returns void
+
+:rendertarget vec4 gl_FragColor blend=none
+:rendersource vec3 Albedo
+
+SHADER
+{
+	gl_FragColor = vec4(Albedo, 1.0);
+}
+
+

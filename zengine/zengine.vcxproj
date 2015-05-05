@@ -136,6 +136,9 @@
     <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
     <ClCompile Include="source\zengine.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="doc\shader3.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
