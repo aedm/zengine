@@ -129,6 +129,21 @@
     <ClCompile Include="source\watchers\watcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\propertyeditor\staticvalueeditor.cpp">
+      <Filter>source\propertyeditor</Filter>
+    </ClCompile>
+    <ClCompile Include="source\propertyeditor\parameterwidgets.cpp">
+      <Filter>source\propertyeditor</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_parameterwidgets.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_parameterwidgets.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_parameterwidgets.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -153,6 +168,9 @@
       <Filter>source\graph</Filter>
     </CustomBuild>
     <CustomBuild Include="source\propertyeditor\propertyeditor.h">
+      <Filter>source\propertyeditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\propertyeditor\parameterwidgets.h">
       <Filter>source\propertyeditor</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -195,6 +213,9 @@
     </ClInclude>
     <ClInclude Include="source\watchers\watcher.h">
       <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\propertyeditor\staticvalueeditor.h">
+      <Filter>source\propertyeditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

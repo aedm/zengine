@@ -19,6 +19,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_parameterwidgets.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">true</ExcludedFromBuild>
@@ -47,6 +51,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_parameterwidgets.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_prototypes.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -56,6 +64,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_parameterwidgets.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -74,7 +86,9 @@
     <ClCompile Include="source\graph\nodewidget.cpp" />
     <ClCompile Include="source\graph\prototypes.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\propertyeditor\parameterwidgets.cpp" />
     <ClCompile Include="source\propertyeditor\propertyeditor.cpp" />
+    <ClCompile Include="source\propertyeditor\staticvalueeditor.cpp" />
     <ClCompile Include="source\util\util.cpp" />
     <ClCompile Include="source\util\uipainter.cpp" />
     <ClCompile Include="source\util\textTexture.cpp" />
@@ -123,6 +137,21 @@
     <ClInclude Include="source\commands\graphcommands.h" />
     <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
+    <CustomBuild Include="source\propertyeditor\parameterwidgets.h">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing parameterwidgets.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_DLL "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing parameterwidgets.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_DLL "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">Moc%27ing parameterwidgets.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\.msbuild\qtGeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DQT_STATIC_BUILD -DUNICODE -DWIN32 -DWIN64 -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_DLL "-I." "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\.msbuild\qtGeneratedFiles\$(ConfigurationName)\." "-I.\.msbuild\qtGeneratedFiles"</Command>
+    </CustomBuild>
+    <ClInclude Include="source\propertyeditor\staticvalueeditor.h" />
     <ClInclude Include="source\watchers\watcher.h" />
     <CustomBuild Include="source\propertyeditor\propertyeditor.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

@@ -8,10 +8,13 @@
 class PropertyEditor : public Node
 {
 public:
-	PropertyEditor(Node* Nd, QWidget* PropertyPanel);
 	virtual ~PropertyEditor();
 
+	static PropertyEditor*	ForNode(Node* Nd, QWidget* PropertyPanel);
+
 protected:
+	PropertyEditor(Node* Nd, QWidget* PropertyPanel);
+
 	QWidget*				PropertyPanel;
 	QBoxLayout*				Layout;
 

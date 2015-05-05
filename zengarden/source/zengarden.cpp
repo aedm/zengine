@@ -32,6 +32,18 @@ void ZenGarden::InitModules()
 	TheLogWatcher = new LogWatcher(this);
 	ui.leftPanel->addTab(TheLogWatcher, "Log");
 
+	/// Set palette
+	QPalette pal = ui.dummy->palette();
+	QPalette pal2 = ui.dummy3->palette();
+	pal.setColor(QPalette::Background, pal.background().color().light(125));
+	pal.setColor(QPalette::WindowText, pal.background().color().light());
+	ui.dummy->setPalette(pal);
+	pal.setColor(QPalette::WindowText, pal.background().color().dark());
+	ui.dummy2->setPalette(pal);
+	pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
+	ui.dummy3->setPalette(pal2);
+	ui.dummy->repaint();
+
 	/// Initialize OpenGL and its dependencies
 	CommonGLWidget = new QGLWidget();
 	if (!CommonGLWidget->isValid())
@@ -105,6 +117,6 @@ void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
 {
 	SafeDelete(PropEditor);
 	if (Nd != nullptr) {
-		PropEditor = new PropertyEditor(Nd, ui.propertyPanel);
+		PropEditor = PropertyEditor::ForNode(Nd, ui.propertyPanel);
 	}
 }

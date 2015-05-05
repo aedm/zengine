@@ -1,5 +1,6 @@
 #include "propertyeditor.h"
 #include "../graph/prototypes.h"
+#include "staticvalueeditor.h"
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QSpacerItem>
@@ -44,8 +45,8 @@ PropertyEditor::PropertyEditor(Node* Nd, QWidget* _PropertyPanel)
 	}
 
 	/// Spacer on bottom
-	QSpacerItem* spacer = new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	Layout->addItem(spacer);
+	//QSpacerItem* spacer = new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding);
+	//Layout->addItem(spacer);
 }
 
 PropertyEditor::~PropertyEditor()
@@ -55,5 +56,17 @@ PropertyEditor::~PropertyEditor()
 		delete w;
 	}
 	delete Layout;
+}
+
+PropertyEditor* PropertyEditor::ForNode(Node* Nd, QWidget* PropertyPanel)
+{
+	switch (ThePrototypes->GetNodeClass(Nd))
+	{
+	case NodeClass::STATIC_FLOAT:
+		return new StaticFloatEditor(Nd, PropertyPanel);
+	default:
+		return new PropertyEditor(Nd, PropertyPanel);
+	}
+
 }
 
