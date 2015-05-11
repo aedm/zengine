@@ -17,7 +17,9 @@ namespace Shaders
 	ITEM(vec4)				\
 	ITEM(mat4)				\
 	ITEM(sampler2D)			\
+	ITEM(void)				\
 	ITEM(name)				\
+	ITEM(returns)				\
 	ITEM(section)			\
 	ITEM(min)				\
 	ITEM(max)				\
@@ -27,6 +29,9 @@ namespace Shaders
 	ITEM(logarithmic)		\
 	ITEM(uniform)			\
 	ITEM(input)				\
+	ITEM(output)			\
+	ITEM(sampler)			\
+	ITEM(param)				\
 	ITEM(using)				\
 	ITEM(auto)				\
 	ITEM(option)			\
@@ -40,6 +45,7 @@ enum ShaderTokenEnum
 	TOKEN_COMMENT_LINE,
 	TOKEN_METADATA,				// "//!"
 	TOKEN_SEMICOLON,			// ";"
+	TOKEN_COLON,				// ":"
 	TOKEN_EQUALS,				// "="
 	TOKEN_STRING,
 #undef ITEM
@@ -55,15 +61,17 @@ struct SubString
 	ShaderTokenEnum			Token;
 	const char*				Begin;
 	UINT					Length;
-	string					ToString();
-	OWNERSHIP string*		ToStringPtr();
+	string					ToString() const;
+	OWNERSHIP string*		ToStringPtr() const;
 };
 
 struct SourceLine
 {
 	int					LineNumber;
 	vector<SubString>	SubStrings;
-	SourceLine(int LineNumber);
+	SubString			EntireLine;
+
+	SourceLine(int LineNumber, const char* LineBegin);
 };
 
 OWNERSHIP vector<SourceLine*>* SplitToWords(const char* Text);

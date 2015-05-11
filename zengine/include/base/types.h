@@ -28,8 +28,13 @@ enum class NodeType
 
 	/// Other node types 
 	SHADER,
+	SHADER_SOURCE,
+	SHADER_STUB,
 	MODEL,
 	MESH,
+
+	/// Empty stub value type
+	NONE,
 
 	/// Editor nodes
 	UI,

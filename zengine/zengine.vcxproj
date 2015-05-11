@@ -111,10 +111,13 @@
     <ClInclude Include="include\shaders\shaderbuilder.h" />
     <ClInclude Include="include\shaders\shadermetadata.h" />
     <ClInclude Include="include\shaders\shaders.h" />
+    <ClInclude Include="include\shader\shader2.h" />
+    <ClInclude Include="include\shader\shaderstub.h" />
     <ClInclude Include="include\zengine.h" />
     <ClInclude Include="source\render\opengl\drawingopengl.h" />
     <ClInclude Include="source\shaders\analyzer.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />
+    <ClInclude Include="source\shader\stubanalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp" />
@@ -134,6 +137,9 @@
     <ClCompile Include="source\shaders\shaderMetadata.cpp" />
     <ClCompile Include="source\shaders\shaders.cpp" />
     <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
+    <ClCompile Include="source\shader\shader2.cpp" />
+    <ClCompile Include="source\shader\shaderstub.cpp" />
+    <ClCompile Include="source\shader\stubanalyzer.cpp" />
     <ClCompile Include="source\zengine.cpp" />
   </ItemGroup>
   <ItemGroup>

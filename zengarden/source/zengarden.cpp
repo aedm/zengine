@@ -64,6 +64,10 @@ void ZenGarden::InitModules()
 	Doc->Graphs.Connect(graph);
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
+	/// TEST
+	char* testShaderStubSource = ReadFileQt("test2.fs");
+	auto x = new ShaderStub(testShaderStubSource);
+
 	/// Add some dummy nodes
 	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
 	if (shaderOp)

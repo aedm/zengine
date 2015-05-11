@@ -10,6 +10,8 @@
 #include "resources/mesh.h"
 #include "resources/texture.h"
 
+#include "shader/shaderstub.h"
+
 #include "shaders/shaders.h"
 
 #include "nodes/valuenodes.h"

@@ -49,6 +49,12 @@
     <Filter Include="source\nodes">
       <UniqueIdentifier>{4004ebad-7827-4367-bdc5-3eca317094c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\shader2">
+      <UniqueIdentifier>{e1c8b8e0-49d5-4fbf-b209-3f61262c7a8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\shader2">
+      <UniqueIdentifier>{22a5743a-e08c-408c-a761-ec21c9f462da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\shader2.txt">
@@ -122,6 +128,15 @@
     <ClInclude Include="include\nodes\renderablenode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\shader\shader2.h">
+      <Filter>include\shader2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader\shaderstub.h">
+      <Filter>include\shader2</Filter>
+    </ClInclude>
+    <ClInclude Include="source\shader\stubanalyzer.h">
+      <Filter>source\shader2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -177,6 +192,15 @@
     </ClCompile>
     <ClCompile Include="source\nodes\renderablenode.cpp">
       <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shader\shader2.cpp">
+      <Filter>source\shader2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shader\shaderstub.cpp">
+      <Filter>source\shader2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shader\stubanalyzer.cpp">
+      <Filter>source\shader2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

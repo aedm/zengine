@@ -8,7 +8,8 @@ namespace Shaders
 
 static EnumMapperA ShaderTokenMapper[] = { 
 	{"//!",			TOKEN_METADATA },
-	{";",			TOKEN_SEMICOLON	},
+	{ ";",			TOKEN_SEMICOLON },
+	{ ":",			TOKEN_COLON },
 	{"=",			TOKEN_EQUALS },
 	#undef ITEM
 	#define ITEM(name) { MAGIC(name), TOKEN_##name },
@@ -72,8 +73,14 @@ SubString GetNextWord(const char* Position, int LineNumber)
 	/// Handle quoted strings
 	if (*begin == '"') return GetNextQuote(begin, LineNumber);
 
+	if (begin[0] == ':') {
+		return SubString(begin, 1, TOKEN_COLON);
+	}
+
 	/// Handle special comment tag: "//!" is a valid word for us
-	if (begin[0]=='/' && begin[1]=='/' && begin[2]=='!') return SubString(begin, 3, TOKEN_METADATA);
+	if (begin[0] == '/' && begin[1] == '/' && begin[2] == '!') {
+		return SubString(begin, 3, TOKEN_METADATA);
+	}
 
 	const char* pos = SkipUntil(begin, "/;= \t\n\r\"");
 
@@ -104,14 +111,17 @@ vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
 	SourceLine* line = NULL;
 	while (*pos != 0)
 	{
+		const char* beforeWhitespaces = pos; /// Position before skipping whitespaces
 		pos = SkipWhiteSpace(pos);
 
 		/// Skip possible line endings, increment line number
+		const char* beforeLineEndings = pos; /// Position before line endings
 		const char* nextLine = SkipAll(pos, "\r\n");
 		if (nextLine != pos)
 		{
 			if (line) 
 			{
+				line->EntireLine.Length = beforeLineEndings - line->EntireLine.Begin;
 				lines->push_back(line);
 				line = NULL;
 			}
@@ -122,7 +132,7 @@ vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
 			continue;
 		}
 
-		if (line == NULL) line = new SourceLine(lineNumber);
+		if (line == NULL) line = new SourceLine(lineNumber, beforeWhitespaces);
 
 		/// Process next work
 		SubString subString = GetNextWord(pos, lineNumber);
@@ -148,7 +158,7 @@ SubString::SubString( const char* _Begin, UINT _Length, ShaderTokenEnum _Token )
 	, Token(_Token)
 {}
 
-string SubString::ToString()
+string SubString::ToString() const
 {
 	if (Token == TOKEN_STRING) 
 	{
@@ -157,13 +167,14 @@ string SubString::ToString()
 	return string(Begin, Length);
 }
 
-OWNERSHIP string* SubString::ToStringPtr()
+OWNERSHIP string* SubString::ToStringPtr() const
 {
 	return new string(Begin, Length);
 }
 
-SourceLine::SourceLine( int _LineNumber )
+SourceLine::SourceLine(int _LineNumber, const char* LineBegin)
 	: LineNumber(_LineNumber)
+	, EntireLine(LineBegin, 0, TOKEN_UNKNOWN)
 {}
 
 }

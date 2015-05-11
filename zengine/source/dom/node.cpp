@@ -14,7 +14,7 @@ Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot)
 
 Slot::~Slot()
 {
-	Connect(NULL);
+	DisconnectAll();
 }
 
 
