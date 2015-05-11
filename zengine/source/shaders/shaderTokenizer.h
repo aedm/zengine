@@ -31,6 +31,7 @@ namespace Shaders
 	ITEM(input)				\
 	ITEM(output)			\
 	ITEM(sampler)			\
+	ITEM(sampler2d)			\
 	ITEM(param)				\
 	ITEM(using)				\
 	ITEM(auto)				\

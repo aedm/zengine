@@ -2,11 +2,13 @@
 
 #include "../dom/node.h"
 #include <vector>
+#include <map>
 
 using namespace std;
+//class ShaderSource2;
 
 /// Shader parameter, becomes a slot
-/// ":param vec4 MyColor"
+/// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct ShaderStubParameter {
 	NodeType			Type;
 	string				Name;
@@ -20,20 +22,13 @@ struct ShaderStubVariable {
 	string				Name;
 };
 
-/// 2D Texture sampler
-/// ":sampler MyTexture"
-struct ShaderStubSampler {
-	string				Name;
-};
-
 /// All metadata collected from a shader stub source.
 struct ShaderStubMetadata {
 	ShaderStubMetadata(const string& Name, NodeType ReturnType, 
 		const string& StrippedSource,
 		const vector<OWNERSHIP ShaderStubParameter*>& Parameters,
 		const vector<ShaderStubVariable*>& Inputs,
-		const vector<ShaderStubVariable*>& Outputs,
-		const vector<ShaderStubSampler*>& Samplers);
+		const vector<ShaderStubVariable*>& Outputs);
 
 	~ShaderStubMetadata();
 
@@ -45,50 +40,35 @@ struct ShaderStubMetadata {
 	const vector<ShaderStubParameter*>	Parameters;
 	const vector<ShaderStubVariable*>	Inputs;
 	const vector<ShaderStubVariable*>	Outputs;
-	const vector<ShaderStubSampler*>	Samplers;
 };
 
-
-///// Shader compile option, like "#define USE_DEPTH_BIAS"
-//struct ShaderStubOption
-//{
-//	ShaderStubOption(const string& Label, const string& Macro);
-//
-//	/// UI name to display, eg. "Use depth bias"
-//	const string				Label;
-//
-//	/// Shader macro to be defined upon activation, eg. "USE_DEPTH_BIAS"
-//	const string				Macro;
-//};
-
-
-class ShaderSource2 : public Node
-{
-public:
-	ShaderSource2();
-	virtual ~ShaderSource2();
-
-	Slot				Stub;
-};
 
 class ShaderStub : public Node
 {
 public:
-	ShaderStub(const char* Source);
+	ShaderStub(const string& Source);
+	ShaderStub(const ShaderStub& Original);
 	virtual ~ShaderStub();
 
-	void				SetStubSource();
-	const char*			GetStubSource();
-	ShaderStubMetadata*	GetStubMetadata();
+	virtual Node*					Clone() const;
 
-	ShaderSource2*		GetShaderSource();
+	void							SetStubSource(const string& Source);
+	const string&					GetStubSource() const;
+	ShaderStubMetadata*				GetStubMetadata() const;
+
+	//ShaderSource2*					GetShaderSource();
+	const map<ShaderStubParameter*, Slot*> GetParameterSlotMap();
 
 protected:
 	/// Metadata
-	ShaderStubMetadata*	Metadata;
+	ShaderStubMetadata*				Metadata;
 
-	const char*			StubSource;
-	ShaderSource2*		ShaderSrc;
+	string							Source;
+
+	//ShaderSource2*						ShaderSrc;
+
+	/// Maps stub parameters to stub slots
+	map<ShaderStubParameter*, Slot*>	ParameterSlotMap;
 };
 
 

@@ -35,5 +35,4 @@ private:
 	vector<ShaderStubParameter*>	Parameters;
 	vector<ShaderStubVariable*>		Inputs;
 	vector<ShaderStubVariable*>		Outputs;
-	vector<ShaderStubSampler*>		Samplers;
 };

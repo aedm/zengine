@@ -1,62 +1,90 @@
 #include "stubanalyzer.h"
 #include <include/shader/shaderstub.h>
+#include <include/shader/shadersource2.h>
 
-ShaderSource2::ShaderSource2()
-	: Node(NodeType::SHADER_SOURCE, "ShaderSource")
-	, Stub(NodeType::SHADER_STUB, this, nullptr)
+ShaderStub::ShaderStub(const string& _Source)
+	: Node(NodeType::SHADER_STUB, "ShaderStub")
+	, Metadata(nullptr)
+	//, ShaderSrc(nullptr)
 {
-
+	SetStubSource(_Source);
 }
 
-ShaderSource2::~ShaderSource2()
-{}
-
-
-ShaderStub::ShaderStub(const char* Source)
-	: Node(NodeType::SHADER_STUB, "ShaderStub")
+ShaderStub::ShaderStub(const ShaderStub& Original)
+	: Node(Original)
+	, Metadata(nullptr)
 {
-	ASSERT(Source != nullptr);
-	Metadata = StubAnalyzer::FromText(Source);
+	SetStubSource(Original.GetStubSource());
 }
 
 ShaderStub::~ShaderStub()
-{}
-
-void ShaderStub::SetStubSource()
 {
+	SafeDelete(Metadata);
+}
+
+void ShaderStub::SetStubSource(const string& _Source)
+{
+	Source = _Source;
+
+	/// TODO: dont do this
+	for (Slot* slot : Slots) delete slot;
+	Slots.clear();
+	ParameterSlotMap.clear();
 	
+	SafeDelete(Metadata);
+	Metadata = StubAnalyzer::FromText(Source.c_str());
+
+	if (Metadata == nullptr) return;
+
+	for (auto param : Metadata->Parameters)
+	{
+		Slot* slot = new Slot(param->Type, this, make_shared<string>(param->Name), false);
+		Slots.push_back(slot);
+		ParameterSlotMap[param] = slot;
+	}
 }
 
-const char* ShaderStub::GetStubSource()
-{
-	NOT_IMPLEMENTED;
-	return nullptr;
-}
+//ShaderSource2* ShaderStub::GetShaderSource()
+//{
+//	if (ShaderSrc == nullptr)
+//	{
+//		ShaderSrc = new ShaderSource2();
+//		ShaderSrc->Stub.Connect(this);
+//	}
+//	return ShaderSrc;
+//}
 
-ShaderSource2* ShaderStub::GetShaderSource()
-{
-	NOT_IMPLEMENTED;
-	return nullptr;
-}
-
-ShaderStubMetadata* ShaderStub::GetStubMetadata()
+ShaderStubMetadata* ShaderStub::GetStubMetadata() const
 {
 	return Metadata;
+}
+
+const map<ShaderStubParameter*, Slot*> ShaderStub::GetParameterSlotMap()
+{
+	return ParameterSlotMap;
+}
+
+Node* ShaderStub::Clone() const
+{
+	return new ShaderStub(*this);
+}
+
+const string& ShaderStub::GetStubSource() const
+{
+	return Source;
 }
 
 ShaderStubMetadata::ShaderStubMetadata(const string& _Name, NodeType _ReturnType,
 	const string& _StrippedSource,
 	OWNERSHIP const vector<ShaderStubParameter*>& _Parameters,
 	const vector<ShaderStubVariable*>& _Inputs,
-	const vector<ShaderStubVariable*>& _Outputs,
-	const vector<ShaderStubSampler*>& _Samplers)
+	const vector<ShaderStubVariable*>& _Outputs)
 	: Name(_Name)
 	, ReturnType(_ReturnType)
 	, Parameters(_Parameters)
 	, StrippedSource(_StrippedSource)
 	, Inputs(_Inputs)
-	, Outputs(_Outputs),
-	Samplers(_Samplers)
+	, Outputs(_Outputs)
 {}
 
 ShaderStubMetadata::~ShaderStubMetadata()

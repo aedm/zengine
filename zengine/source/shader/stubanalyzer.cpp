@@ -11,7 +11,7 @@ OWNERSHIP ShaderStubMetadata* StubAnalyzer::FromText(const char* StubSource)
 
 	return new ShaderStubMetadata(*analyzer.Name, analyzer.ReturnType,
 		analyzer.StrippedSource, analyzer.Parameters, analyzer.Inputs,
-		analyzer.Outputs, analyzer.Samplers);
+		analyzer.Outputs);
 }
 
 StubAnalyzer::StubAnalyzer(const char* StubSource)
@@ -119,13 +119,14 @@ NodeType StubAnalyzer::TokenToType(const SubString& SubStr)
 {
 	switch (SubStr.Token)
 	{
-	case TOKEN_void:	return NodeType::NONE;	
-	case TOKEN_float:	return NodeType::FLOAT;	
-	case TOKEN_vec2:	return NodeType::VEC2;	
-	case TOKEN_vec3:	return NodeType::VEC3;	
-	case TOKEN_vec4:	return NodeType::VEC4;	
+	case TOKEN_void:		return NodeType::NONE;
+	case TOKEN_float:		return NodeType::FLOAT;
+	case TOKEN_vec2:		return NodeType::VEC2;
+	case TOKEN_vec3:		return NodeType::VEC3;
+	case TOKEN_vec4:		return NodeType::VEC4;
+	case TOKEN_sampler2d:	return NodeType::TEXTURE;
 	default:
-		ERR("line %d: Wrong return type '%s', use [void|float|vec2|vec3|vec4]'",
+		ERR("line %d: Wrong type '%s'",
 			CurrentLineNumber, SubStr.ToString().c_str());
 		return NodeType::NONE;
 	}

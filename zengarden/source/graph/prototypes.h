@@ -18,6 +18,7 @@ enum class NodeClass
 	STATIC_FLOAT,
 	STATIC_VEC4,
 	STATIC_TEXTURE,
+	SHADER_STUB,
 
 	UNKNOWN,
 };
@@ -37,10 +38,10 @@ public:
 
 	QString						GetNodeClassString(Node* Nd);
 	NodeClass					GetNodeClass(Node* Nd);
-		
-private:
+
 	void						AddPrototype(Node* node, NodeClass nodeClass);
-	
+
+private:
 	vector<Node*>				PrototypeNodes;
 	unordered_map<type_index, NodeClass> NodeIndexMap;
 

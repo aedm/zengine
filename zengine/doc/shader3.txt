@@ -108,7 +108,7 @@ SHADER
 :name "Sampler"
 :returns vec4
 
-:sampler Texture "My Texture"
+:param sampler2d Texture "My Texture"
 :param vec2 TexCoord
 
 SHADER
