@@ -14,6 +14,9 @@ using namespace fastdelegate;
 /// Notifications that nodes send to each other when something changed.
 /// An accompanying UINT data can also be set for each event type.
 enum class NodeMessage {
+	/// A slot was added or removed.
+	SLOT_STRUCTURE_CHANGED,
+
 	/// Direct slot connection changed.
 	SLOT_CONNECTION_CHANGED,
 
@@ -137,6 +140,9 @@ protected:
 	/// Handle received messages
 	virtual void				HandleMessage(Slot* S, NodeMessage Message, const void* Payload);
 
+	/// Receives message through a slot
+	void						ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload = nullptr);
+
 	/// Output type
 	NodeType					Type;
 
@@ -153,9 +159,6 @@ private:
 
 	/// Check if all slots are properly connected to an operator
 	void						CheckConnections();
-
-	/// Receives message through a slot
-	void						ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload = nullptr);
 };
 
 

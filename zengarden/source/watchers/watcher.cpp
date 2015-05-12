@@ -1,7 +1,7 @@
 #include "watcher.h"
 
-Watcher::Watcher(Node* Nd)
-	: Node(NodeType::UI, "")
+Watcher::Watcher(Node* Nd, NodeType Type)
+	: Node(Type, "")
 	, WatcherSlot(NodeType::ALLOW_ALL, this, nullptr)
 {
 	WatcherSlot.Connect(Nd);
@@ -25,5 +25,10 @@ Watcher::~Watcher()
 
 void Watcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
 {}
+
+Node* Watcher::GetNode()
+{
+	return WatcherSlot.GetNode();
+}
 
 

@@ -36,25 +36,30 @@ static const Vec4 ConnectionColorValid(0, 1, 0, 1);
 static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
-NodeWidget::NodeWidget(Node* _Nd)
-	: Node(NodeType::WIDGET, "")
-	, InspectedNode(NodeType::ALLOW_ALL, this, nullptr)
+NodeWidget::NodeWidget(Node* Nd)
+	: Watcher(Nd, NodeType::WIDGET)
 	, TitleTexture(NULL)
-	//, Nd(_Nd)
 {
-	Slots.push_back(&InspectedNode);
 	Selected = false;
-	InspectedNode.Connect(_Nd);
-	SetTitle(QString::fromStdString(_Nd->Name));
+	SetTitle(QString::fromStdString(Nd->Name));
 
-	foreach(Slot* slot, _Nd->Slots)
+	CreateWidgetSlots();
+}
+
+
+void NodeWidget::CreateWidgetSlots()
+{
+	for (auto x : WidgetSlots) delete x;
+	WidgetSlots.clear();
+
+	Node* node = GetNode();
+	for(Slot* slot : node->Slots)
 	{
 		WidgetSlot* sw = new WidgetSlot();
 		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
 		sw->TheSlot = slot;
 		WidgetSlots.push_back(sw);
 	}
-
 	CalculateLayout();
 }
 
@@ -63,7 +68,7 @@ void NodeWidget::CalculateLayout()
 {
 	TitleHeight = TitleTexture->TextSize.height() + TitlePadding * 2.0f + 1.0f;
 	float slotY = TitleHeight + SlotSpacing;
-	foreach(WidgetSlot* sw, WidgetSlots)
+	for(WidgetSlot* sw : WidgetSlots)
 	{
 		sw->Position = Vec2(SlotLeftMargin, slotY);
 		sw->Size = Vec2(SlotWidth, float(sw->Text.TextSize.height()) + SlotPadding.Y * 2.0f);
@@ -151,11 +156,6 @@ void NodeWidget::SetPosition( Vec2 Position )
 	EventRepaint();
 }
 
-Node* NodeWidget::GetNode()
-{
-	return InspectedNode.GetNode();
-}
-
 Vec2 NodeWidget::GetOutputPosition()
 {
 	return Position + OutputPosition;
@@ -165,4 +165,18 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 {
 	WidgetSlot* sw = WidgetSlots[SlotIndex];
 	return Position + sw->SpotPos;
+}
+
+void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
+{
+	switch (Message)
+	{
+	case NodeMessage::SLOT_STRUCTURE_CHANGED:
+		CreateWidgetSlots();
+		break;
+	case NodeMessage::SLOT_CONNECTION_CHANGED:
+		/// TODO: redraw using this
+		break;
+	default: break;
+	}
 }

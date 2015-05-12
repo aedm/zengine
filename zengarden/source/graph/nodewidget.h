@@ -2,9 +2,10 @@
 
 #include "../util/textTexture.h"
 #include "grapheditor.h"
+#include "../watchers/watcher.h"
 #include <zengine.h>
 
-class NodeWidget: public Node {
+class NodeWidget: public Watcher {
 	friend class MoveNodeCommand;
 	friend class GraphEditor;
 
@@ -12,21 +13,17 @@ public:
 	NodeWidget(Node* Nd);
 	~NodeWidget();
 
-	/// Inspected node
-	Slot				InspectedNode;
-
 	void				Paint(GraphEditor* Panel);
-
 	void				SetTitle(const QString& Title);
-
 	Vec2				GetOutputPosition();
 	Vec2				GetInputPosition(int SlotIndex);
-
-	Node*				GetNode();
 
 	Event<>				EventRepaint;
 
 private:
+	virtual void		HandleSniffedMessage(Slot* S, NodeMessage Message, 
+							const void* Payload) override;
+
 	/// Command-accessible
 	void				SetPosition(Vec2 Position);
 
@@ -55,6 +52,7 @@ private:
 	};
 
 	vector<WidgetSlot*>	WidgetSlots;
+	void				CreateWidgetSlots();
 
 	TextTexture*		TitleTexture;
 };

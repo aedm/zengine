@@ -5,8 +5,10 @@
 class Watcher : public Node
 {
 public:
-	Watcher(Node* Nd);
+	Watcher(Node* Nd, NodeType Type = NodeType::UI);
 	virtual ~Watcher();
+
+	Node*				GetNode();
 
 protected:
 	virtual void		HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload);

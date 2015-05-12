@@ -11,7 +11,11 @@ Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot,
 	ASSERT(Owner != nullptr);
 	ConnectedNode = NULL;
 	Name = _Name;
-	if (AutoAddToSlotList) Owner->Slots.push_back(this);
+	if (AutoAddToSlotList) 
+	{
+		Owner->Slots.push_back(this);
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
+	}
 }
 
 
@@ -214,6 +218,7 @@ void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
 		break;
 	case NodeMessage::NEEDS_REDRAW:
+	case NodeMessage::SLOT_STRUCTURE_CHANGED:
 		/// Only watchers need to handle this.
 		break;
 	default:

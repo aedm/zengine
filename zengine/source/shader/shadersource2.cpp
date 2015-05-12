@@ -44,6 +44,13 @@ void ShaderSource2::CollectMetadata()
 	ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
 	const map<ShaderStubParameter*, Slot*>& paramSlotMap = stub->GetParameterSlotMap();
 	
+	for (Slot* slot : Slots) {
+		if (slot != &Stub) delete slot;
+	}
+	Slots.clear();
+	Slots.push_back(&Stub);
+	ReceiveMessage(nullptr, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
+		
 	for (auto param : stubMeta->Parameters) 
 	{
 		Slot* stubSlot = paramSlotMap.at(param);
