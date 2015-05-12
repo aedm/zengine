@@ -18,7 +18,8 @@ const int GlobalUniformOffsets[] = {
 
 Shader::Shader( ShaderHandle _Handle, const vector<UniformBlock*>& _UniformBlocks, 
 	const vector<Sampler*>& _Samplers, const CompileSettings* _Settings,
-	const vector<ShaderAttributeDesc>& _Attributes, const shared_ptr<ShaderSource>& _Source)
+	const vector<ShaderAttributeDesc>& _Attributes, 
+	const shared_ptr<ShaderSource>& _Source)
 	: Handle(_Handle)
 	, UniformBlocks(_UniformBlocks)
 	, Samplers(_Samplers)

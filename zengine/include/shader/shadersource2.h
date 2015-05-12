@@ -37,7 +37,9 @@ public:
 	ShaderSource2();
 	virtual ~ShaderSource2();
 
-	Slot				Stub;
+	virtual Node*				Clone() const override;
+
+	Slot						Stub;
 
 protected:
 	virtual void				HandleMessage(Slot* S, NodeMessage Message,

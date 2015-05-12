@@ -2,13 +2,16 @@
 #include <include/base/helpers.h>
 #include <algorithm>
 
-Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot)
+Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot, 
+	bool AutoAddToSlotList)
 	: Owner(_Owner)
 	, Type(_Type)
 	, IsMultiSlot(_IsMultiSlot)
 {
+	ASSERT(Owner != nullptr);
 	ConnectedNode = NULL;
 	Name = _Name;
+	if (AutoAddToSlotList) Owner->Slots.push_back(this);
 }
 
 
@@ -240,7 +243,8 @@ void Node::CheckConnections()
 {
 	foreach (Slot* slot, Slots)
 	{
-		if (slot->GetNode() == NULL)
+		/// TODO: handle multislots
+		if (!slot->IsMultiSlot && slot->GetNode() == NULL)
 		{
 			IsProperlyConnected = false;
 			return;

@@ -57,7 +57,7 @@ public:
 	ShaderStubMetadata*				GetStubMetadata() const;
 
 	//ShaderSource2*					GetShaderSource();
-	const map<ShaderStubParameter*, Slot*> GetParameterSlotMap();
+	const map<ShaderStubParameter*, Slot*>& GetParameterSlotMap();
 
 protected:
 	/// Metadata

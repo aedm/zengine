@@ -82,6 +82,7 @@ QString Prototypes::GetNodeClassString(Node* Nd)
 	case NodeClass::STATIC_TEXTURE:		return QString("Static Texture");
 	case NodeClass::STATIC_VEC4:		return QString("Static Vec4");
 	case NodeClass::SHADER_STUB:		return QString("ShaderStub");
+	case NodeClass::SHADER_SOURCE:		return QString("Shader Source");
 	case NodeClass::UNKNOWN:			return QString("unknown");
 	}
 	ASSERT(false);

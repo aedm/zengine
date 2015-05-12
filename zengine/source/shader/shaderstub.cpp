@@ -39,7 +39,6 @@ void ShaderStub::SetStubSource(const string& _Source)
 	for (auto param : Metadata->Parameters)
 	{
 		Slot* slot = new Slot(param->Type, this, make_shared<string>(param->Name), false);
-		Slots.push_back(slot);
 		ParameterSlotMap[param] = slot;
 	}
 }
@@ -59,7 +58,7 @@ ShaderStubMetadata* ShaderStub::GetStubMetadata() const
 	return Metadata;
 }
 
-const map<ShaderStubParameter*, Slot*> ShaderStub::GetParameterSlotMap()
+const map<ShaderStubParameter*, Slot*>& ShaderStub::GetParameterSlotMap()
 {
 	return ParameterSlotMap;
 }

@@ -33,7 +33,8 @@ class Node;
 class Slot
 {
 public:
-	Slot(NodeType Type, Node* Owner, SharedString Name, bool IsMultiSlot = false);
+	Slot(NodeType Type, Node* Owner, SharedString Name, bool IsMultiSlot = false,
+		bool AutoAddToSlotList = true);
 	virtual ~Slot();
 
 	/// The operator which this slot is a member of

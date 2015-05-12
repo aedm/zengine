@@ -6,10 +6,7 @@ RenderableNode::RenderableNode()
 	, TheShader(NodeType::SHADER, this, make_shared<string>("Shader"))
 	, TheMesh(this, make_shared<string>("Mesh"))
 	, Mapper(nullptr)
-{
-	Slots.push_back(&TheShader);
-	Slots.push_back(&TheMesh);
-}
+{}
 
 /// TODO: Use C++11 delegating constructors
 RenderableNode::RenderableNode( const RenderableNode& Original )

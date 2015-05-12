@@ -51,6 +51,7 @@ private:
 		Vec2			Position;
 		Vec2			Size;
 		Vec2			SpotPos;
+		Slot*			TheSlot;
 	};
 
 	vector<WidgetSlot*>	WidgetSlots;

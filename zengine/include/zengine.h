@@ -11,6 +11,7 @@
 #include "resources/texture.h"
 
 #include "shader/shaderstub.h"
+#include "shader/shadersource2.h"
 
 #include "shaders/shaders.h"
 

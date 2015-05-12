@@ -3,13 +3,20 @@
 
 ShaderSource2::ShaderSource2()
 	: Node(NodeType::SHADER_SOURCE, "ShaderSource")
-	, Stub(NodeType::SHADER_STUB, this, nullptr)
-{
-
-}
+	, Stub(NodeType::SHADER_STUB, this, make_shared<string>("Stub"))
+	, Metadata(nullptr)
+{}
 
 ShaderSource2::~ShaderSource2()
 {}
+
+
+Node* ShaderSource2::Clone() const
+{
+	/// Shader sources get all their data from the slot, so nothing to do here.
+	return new ShaderSource2();
+}
+
 
 void ShaderSource2::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
@@ -17,7 +24,7 @@ void ShaderSource2::HandleMessage(Slot* S, NodeMessage Message, const void* Payl
 	{
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
 	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-		CollectMetadata();
+		if (S == &Stub) CollectMetadata();
 		break;
 		//case NodeMessage::VALUE_CHANGED:
 		//	break;
@@ -35,8 +42,14 @@ void ShaderSource2::CollectMetadata()
 	if (stub == nullptr) return;
 
 	ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
-
-	NOT_IMPLEMENTED;
+	const map<ShaderStubParameter*, Slot*>& paramSlotMap = stub->GetParameterSlotMap();
+	
+	for (auto param : stubMeta->Parameters) 
+	{
+		Slot* stubSlot = paramSlotMap.at(param);
+		Slot* slot = new Slot(stubSlot->GetType(), this, stubSlot->GetName(), false, true);
+		slot->Connect(stubSlot->GetNode());
+	}
 }
 
 

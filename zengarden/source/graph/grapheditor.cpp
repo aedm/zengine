@@ -106,8 +106,8 @@ void GraphEditor::Paint()
 	for (int i=nodes.size()-1; i>=0; i--) {
 		NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
 		Node* node = ndWidget->GetNode();
-		for (int i=0; i<node->Slots.size(); i++) {
-			Slot* slot = node->Slots[i];
+		for (int i=0; i<ndWidget->WidgetSlots.size(); i++) {
+			Slot* slot = ndWidget->WidgetSlots[i]->TheSlot;
 			Node* connectedOp = slot->GetNode();
 			if (connectedOp) {
 				NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);

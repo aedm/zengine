@@ -164,7 +164,6 @@ void ShaderNode::RegenerateCopyItems()
 
 void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& oUniformMap )
 {
-	vector<Slot*>& oSlots = Owner->Slots;
 	foreach(Uniform* uniform, Block->Uniforms)
 	{
 		if (uniform->IsLocal)
@@ -177,7 +176,6 @@ void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& 
 				{
 					FloatSlot* slot = new FloatSlot(Owner, (*local->Desc->Elements)[i].UIName);
 					oUniformMap.push_back(UniformMapping(local, i * sizeof(float), this, slot));
-					oSlots.push_back(slot);
 				}
 			} else {
 				Slot* slot = NULL;
@@ -190,7 +188,6 @@ void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& 
 
 				default: SHOULDNT_HAPPEN; break;
 				}
-				oSlots.push_back(slot);
 				oUniformMap.push_back(UniformMapping(local, 0, this, slot));
 			}
 		} else {

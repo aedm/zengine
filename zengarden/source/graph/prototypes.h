@@ -19,6 +19,7 @@ enum class NodeClass
 	STATIC_VEC4,
 	STATIC_TEXTURE,
 	SHADER_STUB,
+	SHADER_SOURCE,
 
 	UNKNOWN,
 };

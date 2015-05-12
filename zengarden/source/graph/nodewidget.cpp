@@ -51,6 +51,7 @@ NodeWidget::NodeWidget(Node* _Nd)
 	{
 		WidgetSlot* sw = new WidgetSlot();
 		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
+		sw->TheSlot = slot;
 		WidgetSlots.push_back(sw);
 	}
 
