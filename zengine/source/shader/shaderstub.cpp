@@ -5,7 +5,7 @@
 ShaderStub::ShaderStub(const string& _Source)
 	: Node(NodeType::SHADER_STUB, "ShaderStub")
 	, Metadata(nullptr)
-	//, ShaderSrc(nullptr)
+	, ShaderSrc(nullptr)
 {
 	SetStubSource(_Source);
 }
@@ -13,6 +13,7 @@ ShaderStub::ShaderStub(const string& _Source)
 ShaderStub::ShaderStub(const ShaderStub& Original)
 	: Node(Original)
 	, Metadata(nullptr)
+	, ShaderSrc(nullptr)
 {
 	SetStubSource(Original.GetStubSource());
 }
@@ -43,15 +44,15 @@ void ShaderStub::SetStubSource(const string& _Source)
 	}
 }
 
-//ShaderSource2* ShaderStub::GetShaderSource()
-//{
-//	if (ShaderSrc == nullptr)
-//	{
-//		ShaderSrc = new ShaderSource2();
-//		ShaderSrc->Stub.Connect(this);
-//	}
-//	return ShaderSrc;
-//}
+ShaderSource2* ShaderStub::GetShaderSource()
+{
+	if (ShaderSrc == nullptr)
+	{
+		ShaderSrc = new ShaderSource2();
+		ShaderSrc->Stub.Connect(this);
+	}
+	return ShaderSrc;
+}
 
 ShaderStubMetadata* ShaderStub::GetStubMetadata() const
 {

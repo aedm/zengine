@@ -4,14 +4,16 @@
 
 struct ShaderSourceVariable
 {
-	NodeType		Tpye;
+	ShaderSourceVariable(NodeType Type, const string& Name);
+
+	NodeType		Type;
 	string			Name;
 	/// TODO: layout, vertexformat usage etc.
 };
 
 struct ShaderSourceUniform
 {
-	NodeType		Tpye;
+	NodeType		Type;
 	string			Name;
 	Slot*			TheSlot;
 };
@@ -31,6 +33,7 @@ struct ShaderSourceMetadata
 	const vector<ShaderSourceUniform*>	Uniforms;
 };
 
+
 class ShaderSource2 : public Node
 {
 public:
@@ -43,10 +46,13 @@ public:
 
 protected:
 	virtual void				HandleMessage(Slot* S, NodeMessage Message,
-		const void* Payload) override;
+									const void* Payload) override;
+	void						CollectMetadata();
+	void						GenerateSource();
 
 	ShaderSourceMetadata*		Metadata;
-
-	void						CollectMetadata();
+	string						Source;
+	
+	static const string&		GetTypeString(NodeType Type);
 };
 

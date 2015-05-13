@@ -5,7 +5,7 @@
 #include <map>
 
 using namespace std;
-//class ShaderSource2;
+class ShaderSource2;
 
 /// Shader parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
@@ -56,7 +56,7 @@ public:
 	const string&					GetStubSource() const;
 	ShaderStubMetadata*				GetStubMetadata() const;
 
-	//ShaderSource2*					GetShaderSource();
+	ShaderSource2*					GetShaderSource();
 	const map<ShaderStubParameter*, Slot*>& GetParameterSlotMap();
 
 protected:
@@ -65,7 +65,7 @@ protected:
 
 	string							Source;
 
-	//ShaderSource2*						ShaderSrc;
+	ShaderSource2*					ShaderSrc;
 
 	/// Maps stub parameters to stub slots
 	map<ShaderStubParameter*, Slot*>	ParameterSlotMap;

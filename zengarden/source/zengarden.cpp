@@ -68,8 +68,7 @@ void ZenGarden::InitModules()
 	char* testShaderStubSource = ReadFileQt("test2.fs");
 	auto x = new ShaderStub(testShaderStubSource);
 	ThePrototypes->AddPrototype(x, NodeClass::SHADER_STUB);
-	ThePrototypes->AddPrototype(new ShaderSource2(), NodeClass::SHADER_SOURCE);
-
+	auto src = x->GetShaderSource();
 
 	/// Add some dummy nodes
 	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
