@@ -2,20 +2,32 @@
 
 #include "../dom/node.h"
 
+enum class ShaderGlobalType
+{
+	LOCAL,	/// For non-global uniforms
+
+	TIME,
+	///etc
+};
+
 struct ShaderSourceVariable
 {
 	ShaderSourceVariable(NodeType Type, const string& Name);
 
-	NodeType		Type;
-	string			Name;
+	NodeType			Type;
+	string				Name;
 	/// TODO: layout, vertexformat usage etc.
 };
 
 struct ShaderSourceUniform
 {
-	NodeType		Type;
-	string			Name;
-	Slot*			TheSlot;
+	ShaderSourceUniform(NodeType Type, const string& Name, Slot* slot,
+		ShaderGlobalType GlobalType);
+
+	NodeType			Type;
+	string				Name;
+	Slot*				TheSlot;
+	ShaderGlobalType	GlobalType;
 };
 
 
@@ -41,7 +53,8 @@ public:
 	virtual ~ShaderSource2();
 
 	virtual Node*				Clone() const override;
-
+	const string&				GetSource() const;
+	const ShaderSourceMetadata* GetMetadata() const;
 	Slot						Stub;
 
 protected:

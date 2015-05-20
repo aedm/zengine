@@ -62,11 +62,8 @@ void ShaderSource2::CollectMetadata()
 		Slot* slot = new Slot(stubSlot->GetType(), this, stubSlot->GetName(), false, true);
 		slot->Connect(stubSlot->GetNode());
 		
-		ShaderSourceUniform* uniform = new ShaderSourceUniform();
-		uniform->Name = param->Name;
-		uniform->Type = param->Type;
-		uniform->TheSlot = slot;
-		uniforms.push_back(uniform);
+		uniforms.push_back(new ShaderSourceUniform(
+			param->Type, param->Name, slot, ShaderGlobalType::LOCAL));
 	}
 
 	/// Inputs
@@ -164,6 +161,16 @@ const string& ShaderSource2::GetTypeString(NodeType Type)
 	}
 }
 
+const string& ShaderSource2::GetSource() const
+{
+	return Source;
+}
+
+const ShaderSourceMetadata* ShaderSource2::GetMetadata() const
+{
+	return Metadata;
+}
+
 
 ShaderSourceMetadata::ShaderSourceMetadata(
 	const vector<OWNERSHIP ShaderSourceVariable*>& _Inputs,
@@ -185,4 +192,12 @@ ShaderSourceMetadata::~ShaderSourceMetadata()
 ShaderSourceVariable::ShaderSourceVariable(NodeType _Type, const string& _Name)
 	: Name(_Name)
 	, Type(_Type)
+{}
+
+ShaderSourceUniform::ShaderSourceUniform(NodeType _Type, const string& _Name, Slot* _slot, 
+	ShaderGlobalType _GlobalType)
+	: Type(_Type)
+	, Name(_Name)
+	, TheSlot(_slot)
+	, GlobalType(_GlobalType)
 {}

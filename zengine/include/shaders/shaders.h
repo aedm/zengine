@@ -91,7 +91,7 @@ public:
 	Uniform(NodeType Type, UniformId Handle, int ByteOffset, bool IsLocal);
 
 	/// Type of the uniform variable. (float, vec2...)
-	const NodeType				Type;				
+	const NodeType				Type;
 	
 	/// Graphics API uniform handle. Only valid for uniforms in global space.
 	/// For uniforms in a real uniform buffer (future feature) this should be -1.

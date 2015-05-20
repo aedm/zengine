@@ -30,6 +30,7 @@ enum class NodeType
 	SHADER,
 	SHADER_SOURCE,
 	SHADER_STUB,
+	PASS,
 	MODEL,
 	MESH,
 
