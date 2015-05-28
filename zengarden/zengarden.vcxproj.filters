@@ -144,6 +144,9 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_parameterwidgets.cpp">
       <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\passwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -216,6 +219,9 @@
     </ClInclude>
     <ClInclude Include="source\propertyeditor\staticvalueeditor.h">
       <Filter>source\propertyeditor</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\passwatcher.h">
+      <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@ enum class NodeClass
 	STATIC_TEXTURE,
 	SHADER_STUB,
 	SHADER_SOURCE,
+	PASS,
 
 	UNKNOWN,
 };

@@ -2,6 +2,7 @@
 
 #include <zengine.h>
 #include <QtWidgets/QWidget>
+#include <QtOpenGL/QGLWidget>
 
 enum class WatcherPosition 
 {
@@ -13,7 +14,7 @@ class WatcherWidget : public QWidget
 {
 public:
 	WatcherWidget(QWidget* Parent, WatcherPosition Position, bool CanBeClosed);
-	~WatcherWidget();
+	virtual ~WatcherWidget();
 
 	Node*							Watcher;
 
@@ -23,4 +24,13 @@ public:
 
 	WatcherPosition					Position;
 	bool							CanBeClosed;
+};
+
+class GLWatcherWidget : public WatcherWidget
+{
+public:
+	GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position);
+	virtual ~GLWatcherWidget();
+
+	QGLWidget*						GLWidget;
 };

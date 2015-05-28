@@ -22,6 +22,7 @@ Prototypes::Prototypes()
 	AddPrototype(new FloatNode(),		NodeClass::STATIC_FLOAT);
 	AddPrototype(new Vec4Node(),		NodeClass::STATIC_VEC4);
 	AddPrototype(new TextureNode(),		NodeClass::STATIC_TEXTURE);
+	AddPrototype(new Pass(),			NodeClass::PASS);
 }
 
 void Prototypes::AddPrototype(Node* node, NodeClass nodeClass)
@@ -83,6 +84,7 @@ QString Prototypes::GetNodeClassString(Node* Nd)
 	case NodeClass::STATIC_VEC4:		return QString("Static Vec4");
 	case NodeClass::SHADER_STUB:		return QString("ShaderStub");
 	case NodeClass::SHADER_SOURCE:		return QString("Shader Source");
+	case NodeClass::PASS:				return QString("Pass");
 	case NodeClass::UNKNOWN:			return QString("unknown");
 	}
 	ASSERT(false);

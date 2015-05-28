@@ -22,6 +22,7 @@ GraphEditor::GraphEditor(WatcherWidget* Parent, QGLWidget* Share)
 	//button->setText("nyirfa");
 
 	setMouseTracking(true);
+	setFocusPolicy(Qt::ClickFocus);
 
 	CurrentState = State::DEFAULT;
 	ClickedWidget = NULL;
@@ -436,8 +437,15 @@ void GraphEditor::OnKeyPress( QKeyEvent* event )
 	case Qt::Key_Delete:
 		//new DeleteOperatorCommand()
 		//TheCommandStack->Execute(new CreateOperatorCommand(op, this));
-
 		break;
+
+	/// Space opens watcher
+	case Qt::Key_Space:
+		if (SelectedNodes.size() == 1) {
+			ParentWidget->OnWatchNode((*SelectedNodes.begin())->GetNode(), ParentWidget);
+		}
+		break;
+
 	default: break;
 	}
 }

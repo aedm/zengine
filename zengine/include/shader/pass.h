@@ -23,6 +23,8 @@ public:
 	Pass();
 	virtual ~Pass();
 
+	virtual Node*		Clone() const override;
+
 	Slot				FragmentShader;
 	Slot				VertexShader;
 

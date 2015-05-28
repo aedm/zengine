@@ -4,6 +4,7 @@
 #include "commands/command.h"
 #include "commands/graphCommands.h"
 #include "graph/prototypes.h"
+#include "watchers/passwatcher.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
@@ -100,9 +101,11 @@ void ZenGarden::DisposeModules()
 GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 {
 	QTabWidget* tabWidget = LeftPanel ? ui.leftPanel : ui.rightPanel;
-	WatcherPosition position = LeftPanel ? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
+	WatcherPosition position = LeftPanel 
+		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 	WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position, true);
 	watcherWidget->OnSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
+	watcherWidget->OnWatchNode += Delegate(this, &ZenGarden::Watch);
 
 	GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);
 	graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -125,4 +128,36 @@ void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
 	if (Nd != nullptr) {
 		PropEditor = PropertyEditor::ForNode(Nd, ui.propertyPanel);
 	}
+}
+
+void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
+{
+	QTabWidget* tabWidget = Widget->Position == WatcherPosition::RIGHT_TAB 
+		? ui.leftPanel : ui.rightPanel;
+	WatcherPosition position = Widget->Position == WatcherPosition::RIGHT_TAB 
+		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
+
+	WatcherWidget* watcherWidget = nullptr;
+
+	switch (Nd->GetType()) {
+	case NodeType::PASS:
+	{
+		GLWatcherWidget* glWatcherWidget =
+			new GLWatcherWidget(tabWidget, CommonGLWidget, position);
+		PassWatcher* passWatcher = 
+			new PassWatcher(static_cast<Pass*>(Nd), glWatcherWidget);
+		watcherWidget = glWatcherWidget;
+		break;
+	}
+	default: return;
+	}
+
+	int index = tabWidget->addTab(watcherWidget, QString::fromStdString(Nd->Name));
+	tabWidget->setCurrentIndex(index);
+
+	//GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);
+	//graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	//tabWidget->addTab(graphEditor, "graph");
+
+	//graphEditor->SetGraph(Graph);
 }

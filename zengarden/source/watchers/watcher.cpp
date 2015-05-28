@@ -1,9 +1,12 @@
 #include "watcher.h"
+#include "watcherwidget.h"
 
-Watcher::Watcher(Node* Nd, NodeType Type)
+Watcher::Watcher(Node* Nd, WatcherWidget* _Widget, NodeType Type)
 	: Node(Type, "")
 	, WatcherSlot(NodeType::ALLOW_ALL, this, nullptr)
+	, Widget(_Widget)
 {
+	if (_Widget) _Widget->Watcher = this;
 	WatcherSlot.Connect(Nd);
 	Nd->OnMessageReceived += Delegate(this, &Watcher::SniffMessage);
 }

@@ -23,6 +23,8 @@ private:
 
 	/// Open viewers
 	GraphEditor*				OpenGraphViewer(bool LeftPanel, GraphNode* Graph);
+	void						Watch(Node* Nd, WatcherWidget* Widget);
+	void						SetNodeForPropertyEditor(Node* Nd);
 
 	/// The GL widget used for initializing OpenGL and sharing context
 	QGLWidget*					CommonGLWidget;
@@ -35,9 +37,6 @@ private:
 	/// App UI
 	Ui::zengardenClass ui;
 	LogWatcher*					TheLogWatcher;
-
-	/// Node was selected, update property panel
-	void						SetNodeForPropertyEditor(Node* Nd);
 
 	PropertyEditor*				PropEditor;
 

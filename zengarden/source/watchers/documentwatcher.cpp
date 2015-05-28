@@ -8,7 +8,7 @@ enum MyRoles {
 
 
 DocumentWatcher::DocumentWatcher(QListView* _ListView, Document* DocumentNode)
-	: Watcher(DocumentNode)
+	: Watcher(DocumentNode, nullptr)
 	, ListView(_ListView)
 {
 	Model = new QStandardItemModel();

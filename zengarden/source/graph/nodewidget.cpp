@@ -37,7 +37,7 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
 NodeWidget::NodeWidget(Node* Nd)
-	: Watcher(Nd, NodeType::WIDGET)
+	: Watcher(Nd, nullptr, NodeType::WIDGET)
 	, TitleTexture(NULL)
 {
 	Selected = false;

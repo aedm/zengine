@@ -38,8 +38,8 @@ void Pass::BuildRenderPipeline()
 	const string& vertexSource = vertex->GetSource();
 	const string& fragmentSource = fragment->GetSource();
 
-	ShaderCompileDesc* shaderCompileDesc =
-		TheDrawingAPI->CreateShaderFromSource(vertexSource.c_str(), fragmentSource.c_str());
+	ShaderCompileDesc* shaderCompileDesc = TheDrawingAPI->CreateShaderFromSource(
+		vertexSource.c_str(), fragmentSource.c_str());
 	if (shaderCompileDesc == nullptr) return;
 
 	Handle = shaderCompileDesc->Handle;
@@ -111,5 +111,10 @@ void Pass::Set(Globals* Global)
 const vector<VertexAttributeUsage>& Pass::GetUsedAttributes()
 {
 	return Attributes;
+}
+
+Node* Pass::Clone() const
+{
+	return new Pass();
 }
 
