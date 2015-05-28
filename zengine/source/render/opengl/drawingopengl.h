@@ -36,11 +36,6 @@ public:
 	DrawingOpenGL();
 	virtual ~DrawingOpenGL();
 
-	/// Renderer setup
-	//virtual void 				Init(void* Handle, bool Doublebuffer) override;
-	//virtual OWNERSHIP Surface*	CreateSurface(void* Handle, int Width, int Height) = 0; 
-	//virtual bool				ResizeSurface(Surface* DrawDev, int Width, int Height) = 0;
-
 	/// Resets renderer. Call this upon context switch.
 	virtual void				OnContextSwitch() override;
 
@@ -56,12 +51,15 @@ public:
 	virtual void*				MapVertexBuffer(VertexBufferHandle Handle) override;
 	virtual void				UnMapVertexBuffer(VertexBufferHandle Handle) override;
 	virtual AttributeMapper*	CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs, const vector<ShaderAttributeDesc>& ShaderAttribs, UINT Stride) override;
+	virtual void				SetVertexBuffer(VertexBufferHandle Handle) override;
+	virtual void				EnableVertexAttribute(UINT Index, NodeType Type, UINT Offset, UINT Stride) override;
 
 	/// Index buffer handling
 	virtual IndexBufferHandle	CreateIndexBuffer(UINT IndexCount) override;
 	virtual void				DestroyIndexBuffer(IndexBufferHandle Handle) override;
 	virtual void*				MapIndexBuffer(IndexBufferHandle Handle) override;
 	virtual void				UnMapIndexBuffer(IndexBufferHandle Handle) override;
+	virtual void				SetIndexBuffer(IndexBufferHandle Handle) override;
 
 	/// Texture and surface handling
 	virtual TextureHandle		CreateTexture(int Width, int Height, TexelTypeEnum Type) override;
@@ -84,6 +82,9 @@ public:
 	virtual void				RenderMesh(VertexBufferHandle VertexHandle, 
 									UINT VertexCount, 
 									const AttributeMapper* Mapper,
+									PrimitiveTypeEnum PrimitiveType) override;
+	virtual void				Render(IndexBufferHandle IndexBuffer,
+									UINT VertexCount,
 									PrimitiveTypeEnum PrimitiveType) override;
 
 private:

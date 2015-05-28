@@ -451,6 +451,18 @@ void DrawingOpenGL::RenderMesh( VertexBufferHandle VertexHandle, UINT VertexCoun
 	CheckGLError();
 }
 
+void DrawingOpenGL::Render(IndexBufferHandle IndexBuffer, UINT Count, PrimitiveTypeEnum PrimitiveType)
+{
+	if (IndexBuffer != 0)
+	{
+		BindIndexBuffer(IndexBuffer);
+		glDrawElements(GetGLPrimitive(PrimitiveType), Count, GL_UNSIGNED_INT, NULL);
+		CheckGLError();
+	} else {
+		glDrawArrays(GetGLPrimitive(PrimitiveType), 0, Count);
+	}
+}
+
 void DrawingOpenGL::SetViewport( int X, int Y, int Width, int Height, float DepthMin /*= 0.0f*/, float DepthMax /*= 1.0f*/ )
 {
 	glViewport(X, Y, Width, Height);
@@ -647,6 +659,34 @@ void DrawingOpenGL::BindTexture( GLuint TextureID )
 	if (BoundTextureShadow[ActiveTextureShadow] == TextureID) return;
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	BoundTextureShadow[ActiveTextureShadow] = TextureID;
+}
+
+void DrawingOpenGL::SetVertexBuffer(VertexBufferHandle Handle)
+{
+	BindVertexBuffer(Handle);
+}
+
+void DrawingOpenGL::SetIndexBuffer(IndexBufferHandle Handle)
+{
+	BindIndexBuffer(Handle);
+}
+
+void DrawingOpenGL::EnableVertexAttribute(UINT Index, NodeType Type, UINT Offset, UINT Stride)
+{
+	GLint size = 0;
+	GLenum type = 0;
+	switch (Type)
+	{
+	case NodeType::FLOAT:		size = 1;	type = GL_FLOAT;	break;
+	case NodeType::VEC2:		size = 2;	type = GL_FLOAT;	break;
+	case NodeType::VEC3:		size = 3;	type = GL_FLOAT;	break;
+	case NodeType::VEC4:		size = 4;	type = GL_FLOAT;	break;
+	default:
+		ERR(L"Unhandled vertex attribute type");
+		break;
+	}
+	glEnableVertexAttribArray(Index);
+	glVertexAttribPointer(Index, size, type, GL_FALSE, Stride, (void*)Offset);
 }
 
 AttributeMapperOpenGL::AttributeMapperOpenGL()

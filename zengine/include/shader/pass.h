@@ -1,7 +1,8 @@
 #pragma once
 
+#include "shadersource2.h"
 #include "../dom/node.h"
-#include <include/shader/shadersource2.h>
+#include "../shaders/shaders.h"
 #include <map>
 
 using namespace std;
@@ -10,7 +11,8 @@ struct PassUniform
 {
 	UniformId			Handle;
 	Slot*				TheSlot;
-
+	ShaderGlobalType	GlobalType;
+	NodeType			Type;
 };
 
 /// A renderpass is a way to render an object. Materials consist of several
@@ -24,11 +26,15 @@ public:
 	Slot				FragmentShader;
 	Slot				VertexShader;
 
+	void				Set(Globals* Global);
+	const vector<VertexAttributeUsage>&		GetUsedAttributes();
+	
 protected:
 	virtual void		HandleMessage(Slot* S, NodeMessage Message, const void* Payload) override;
 
 	void				BuildRenderPipeline();
-
-	map<string, ShaderSourceUniform*>	UniformMap;
-	vector<ShaderSourceUniform*>	Uniforms;
+	
+	ShaderHandle		Handle;
+	vector<PassUniform>	Uniforms;
+	vector<VertexAttributeUsage> Attributes;
 };

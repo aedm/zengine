@@ -31,8 +31,10 @@ enum class NodeType
 	SHADER_SOURCE,
 	SHADER_STUB,
 	PASS,
+	MATERIAL,
 	MODEL,
 	MESH,
+	DRAWABLE,
 
 	/// Empty stub value type
 	NONE,

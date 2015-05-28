@@ -52,12 +52,15 @@ public:
 	virtual void*				MapVertexBuffer(VertexBufferHandle Handle) = 0;
 	virtual void				UnMapVertexBuffer(VertexBufferHandle Handle) = 0;
 	virtual AttributeMapper*	CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs, const vector<ShaderAttributeDesc>& ShaderAttribs, UINT Stride) = 0;
+	virtual void				SetVertexBuffer(VertexBufferHandle Handle) = 0;
+	virtual void				EnableVertexAttribute(UINT Index, NodeType Type, UINT Offset, UINT Stride) = 0;
 
 	/// Index buffer handling
 	virtual IndexBufferHandle	CreateIndexBuffer(UINT IndexCount) = 0;
 	virtual void				DestroyIndexBuffer(IndexBufferHandle Handle) = 0;
 	virtual void*				MapIndexBuffer(IndexBufferHandle Handle) = 0;
 	virtual void				UnMapIndexBuffer(IndexBufferHandle Handle) = 0;
+	virtual void				SetIndexBuffer(IndexBufferHandle Handle) = 0;
 
 	/// Rendering
 	virtual void				RenderIndexedMesh(IndexBufferHandle IndexHandle, 
@@ -68,6 +71,9 @@ public:
 	virtual void				RenderMesh(VertexBufferHandle VertexHandle, 
 									UINT VertexCount, 
 									const AttributeMapper* Mapper,
+									PrimitiveTypeEnum PrimitiveType) = 0;
+	virtual void				Render(IndexBufferHandle IndexBuffer,
+									UINT Count,
 									PrimitiveTypeEnum PrimitiveType) = 0;
 	//virtual void				RenderMesh(const Mesh* MeshInstance) = 0;
 	//virtual void				RenderTrianglesDirect(int VertexCount, int PrimitiveCount, const VertexFormat* Format, const void* Vertices, const void* Indices) = 0;

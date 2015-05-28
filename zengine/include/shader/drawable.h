@@ -1,0 +1,18 @@
+#pragma once
+
+#include "material.h"
+#include "../nodes/meshnode.h"
+#include "../shaders/shaders.h"
+
+class Drawable : public Node
+{
+public:
+	Drawable();
+	virtual ~Drawable();
+
+	MeshSlot			TheMesh;
+	Slot				TheMaterial;
+
+	void				Draw(Globals* Global);
+
+};

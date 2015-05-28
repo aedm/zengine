@@ -128,9 +128,6 @@
     <ClInclude Include="include\nodes\renderablenode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
-    <ClInclude Include="include\shader\shader2.h">
-      <Filter>include\shader2</Filter>
-    </ClInclude>
     <ClInclude Include="include\shader\shaderstub.h">
       <Filter>include\shader2</Filter>
     </ClInclude>
@@ -141,6 +138,12 @@
       <Filter>include\shader2</Filter>
     </ClInclude>
     <ClInclude Include="include\shader\pass.h">
+      <Filter>include\shader2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader\material.h">
+      <Filter>include\shader2</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader\drawable.h">
       <Filter>include\shader2</Filter>
     </ClInclude>
   </ItemGroup>
@@ -199,9 +202,6 @@
     <ClCompile Include="source\nodes\renderablenode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>
-    <ClCompile Include="source\shader\shader2.cpp">
-      <Filter>source\shader2</Filter>
-    </ClCompile>
     <ClCompile Include="source\shader\shaderstub.cpp">
       <Filter>source\shader2</Filter>
     </ClCompile>
@@ -212,6 +212,12 @@
       <Filter>source\shader2</Filter>
     </ClCompile>
     <ClCompile Include="source\shader\pass.cpp">
+      <Filter>source\shader2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shader\material.cpp">
+      <Filter>source\shader2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shader\drawable.cpp">
       <Filter>source\shader2</Filter>
     </ClCompile>
   </ItemGroup>

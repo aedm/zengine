@@ -111,8 +111,9 @@
     <ClInclude Include="include\shaders\shaderbuilder.h" />
     <ClInclude Include="include\shaders\shadermetadata.h" />
     <ClInclude Include="include\shaders\shaders.h" />
+    <ClInclude Include="include\shader\drawable.h" />
+    <ClInclude Include="include\shader\material.h" />
     <ClInclude Include="include\shader\pass.h" />
-    <ClInclude Include="include\shader\shader2.h" />
     <ClInclude Include="include\shader\shadersource2.h" />
     <ClInclude Include="include\shader\shaderstub.h" />
     <ClInclude Include="include\zengine.h" />
@@ -139,8 +140,9 @@
     <ClCompile Include="source\shaders\shaderMetadata.cpp" />
     <ClCompile Include="source\shaders\shaders.cpp" />
     <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
+    <ClCompile Include="source\shader\drawable.cpp" />
+    <ClCompile Include="source\shader\material.cpp" />
     <ClCompile Include="source\shader\pass.cpp" />
-    <ClCompile Include="source\shader\shader2.cpp" />
     <ClCompile Include="source\shader\shadersource2.cpp" />
     <ClCompile Include="source\shader\shaderstub.cpp" />
     <ClCompile Include="source\shader\stubanalyzer.cpp" />
