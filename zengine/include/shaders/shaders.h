@@ -20,6 +20,7 @@ class ShaderSource;
 
 extern const EnumMapperA GlobalUniformMapper[];
 extern const int GlobalUniformOffsets[];
+extern const NodeType GlobalUniformTypes[];
 
 /// Macrolist for global uniforms (name, type, variable/token)
 #define GLOBALUSAGE_LIST \

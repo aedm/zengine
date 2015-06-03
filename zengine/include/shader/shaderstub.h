@@ -1,11 +1,21 @@
 #pragma once
 
 #include "../dom/node.h"
+#include "../shaders/shaders.h"
 #include <vector>
 #include <map>
 
 using namespace std;
 class ShaderSource2;
+
+enum class ShaderGlobalType
+{
+#undef ITEM
+#define ITEM(name, type, variable) name,
+	GLOBALUSAGE_LIST
+
+	LOCAL,	/// For non-global uniforms
+};
 
 /// Shader parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
@@ -22,11 +32,20 @@ struct ShaderStubVariable {
 	string				Name;
 };
 
+/// --
+struct ShaderStubGlobal {
+	NodeType			Type;
+	string				Name;
+	ShaderGlobalType	Usage;
+};
+
+
 /// All metadata collected from a shader stub source.
 struct ShaderStubMetadata {
 	ShaderStubMetadata(const string& Name, NodeType ReturnType, 
 		const string& StrippedSource,
 		const vector<OWNERSHIP ShaderStubParameter*>& Parameters,
+		const vector<ShaderStubGlobal*>& Globals,
 		const vector<ShaderStubVariable*>& Inputs,
 		const vector<ShaderStubVariable*>& Outputs);
 
@@ -38,6 +57,7 @@ struct ShaderStubMetadata {
 	const string					StrippedSource;
 
 	const vector<ShaderStubParameter*>	Parameters;
+	const vector<ShaderStubGlobal*>		Globals;
 	const vector<ShaderStubVariable*>	Inputs;
 	const vector<ShaderStubVariable*>	Outputs;
 };

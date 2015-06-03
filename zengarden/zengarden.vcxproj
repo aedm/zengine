@@ -95,6 +95,7 @@
     <ClCompile Include="source\watchers\documentwatcher.cpp" />
     <ClCompile Include="source\watchers\logwatcher.cpp" />
     <ClCompile Include="source\watchers\passwatcher.cpp" />
+    <ClCompile Include="source\watchers\stubwatcher.cpp" />
     <ClCompile Include="source\watchers\watcherwidget.cpp" />
     <ClCompile Include="source\watchers\watcher.cpp" />
     <ClCompile Include="source\zengarden.cpp" />
@@ -154,6 +155,7 @@
     </CustomBuild>
     <ClInclude Include="source\propertyeditor\staticvalueeditor.h" />
     <ClInclude Include="source\watchers\passwatcher.h" />
+    <ClInclude Include="source\watchers\stubwatcher.h" />
     <ClInclude Include="source\watchers\watcher.h" />
     <CustomBuild Include="source\propertyeditor\propertyeditor.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

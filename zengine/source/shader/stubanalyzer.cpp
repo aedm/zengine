@@ -10,8 +10,8 @@ OWNERSHIP ShaderStubMetadata* StubAnalyzer::FromText(const char* StubSource)
 	}
 
 	return new ShaderStubMetadata(*analyzer.Name, analyzer.ReturnType,
-		analyzer.StrippedSource, analyzer.Parameters, analyzer.Inputs,
-		analyzer.Outputs);
+		analyzer.StrippedSource, analyzer.Parameters, analyzer.Globals, 
+		analyzer.Inputs, analyzer.Outputs);
 }
 
 StubAnalyzer::StubAnalyzer(const char* StubSource)
@@ -51,6 +51,9 @@ void StubAnalyzer::AnalyzeMetadataLine(SourceLine* line)
 		break;
 	case TOKEN_param:
 		AnalyzeParam(line);
+		break;
+	case TOKEN_global:
+		AnalyzeGlobal(line);
 		break;
 	case TOKEN_input:
 		AnalyzeVariable(line, Inputs);
@@ -115,6 +118,40 @@ void StubAnalyzer::AnalyzeVariable(SourceLine* line, vector<ShaderStubVariable*>
 }
 
 
+void StubAnalyzer::AnalyzeGlobal(SourceLine* line)
+{
+	if (line->SubStrings.size() < 4) {
+		ERR("line %d: Wrong syntax", CurrentLineNumber);
+		return;
+	}
+
+	SubString& name = line->SubStrings[3];
+	int usage = 
+		EnumMapperA::GetEnumFromString(GlobalUniformMapper, name.Begin, name.Length);
+	if (usage < 0)
+	{
+		ERR("line %d: Unrecognized global uniform '%s'.", CurrentLineNumber, 
+			name.ToString().c_str());
+		return;
+	}
+	
+	NodeType declaredType = TokenToType(line->SubStrings[2]);
+	NodeType expectedType = GlobalUniformTypes[usage];
+	if (declaredType != expectedType) 
+	{
+		ERR("line %d: wrong type for global uniform '%s'.", CurrentLineNumber,
+			name.ToString().c_str());
+		return;
+	}
+
+	ShaderStubGlobal* global = new ShaderStubGlobal();
+	global->Name = name.ToString();
+	global->Type = declaredType;
+	global->Usage = (ShaderGlobalType)usage;
+	Globals.push_back(global);
+}
+
+
 NodeType StubAnalyzer::TokenToType(const SubString& SubStr)
 {
 	switch (SubStr.Token)
@@ -124,6 +161,7 @@ NodeType StubAnalyzer::TokenToType(const SubString& SubStr)
 	case TOKEN_vec2:		return NodeType::VEC2;
 	case TOKEN_vec3:		return NodeType::VEC3;
 	case TOKEN_vec4:		return NodeType::VEC4;
+	case TOKEN_mat4:		return NodeType::MATRIX44;
 	case TOKEN_sampler2d:	return NodeType::TEXTURE;
 	default:
 		ERR("line %d: Wrong type '%s'",

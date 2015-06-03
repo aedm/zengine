@@ -21,6 +21,7 @@ private:
 	void							AnalyzeName(SourceLine* line);
 	void							AnalyzeReturns(SourceLine* line);
 	void							AnalyzeParam(SourceLine* line);
+	void							AnalyzeGlobal(SourceLine* line);
 	void							AnalyzeVariable(SourceLine* line, 
 										vector<ShaderStubVariable*>& Storage);
 
@@ -33,6 +34,7 @@ private:
 	string							StrippedSource;
 	NodeType						ReturnType;
 	vector<ShaderStubParameter*>	Parameters;
+	vector<ShaderStubGlobal*>		Globals;
 	vector<ShaderStubVariable*>		Inputs;
 	vector<ShaderStubVariable*>		Outputs;
 };

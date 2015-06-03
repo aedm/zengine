@@ -1,16 +1,7 @@
 #pragma once
 
+#include "shaderstub.h"
 #include "../dom/node.h"
-#include "../shaders/shaders.h"
-
-enum class ShaderGlobalType
-{
-	#undef ITEM
-	#define ITEM(name, type, variable) name,
-		GLOBALUSAGE_LIST
-
-	LOCAL,	/// For non-global uniforms
-};
 
 struct ShaderSourceVariable
 {

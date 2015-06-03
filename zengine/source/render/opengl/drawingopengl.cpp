@@ -131,12 +131,14 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource( const char* 
 	if (!CompileAndAttachShader(program, GL_VERTEX_SHADER, VertexSource))
 	{
 		WARN(L"Vertex shader compilation failed.");
+		INFO("\n%s", VertexSource);
 		glDeleteProgram(program);
 		return NULL;
 	}
 	if (!CompileAndAttachShader(program, GL_FRAGMENT_SHADER, FragmentSource))
 	{
 		WARN(L"Fragment shader compilation failed.");
+		INFO("\n%s", FragmentSource);
 		glDeleteProgram(program);
 		return NULL;
 	}

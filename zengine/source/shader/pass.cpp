@@ -1,11 +1,12 @@
 #include <include/shader/pass.h>
+#include <include/shader/shaderstub.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
 Pass::Pass()
 	: Node(NodeType::PASS, "Pass")
-	, VertexShader(NodeType::SHADER_SOURCE, this, make_shared<string>("Vertex shader"))
-	, FragmentShader(NodeType::SHADER_SOURCE, this, make_shared<string>("Fragment shader"))
+	, VertexShader(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
+	, FragmentShader(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
 {
 }
 
@@ -30,9 +31,14 @@ void Pass::BuildRenderPipeline()
 	Attributes.clear();
 	Handle = 0;
 
-	ShaderSource2* vertex = static_cast<ShaderSource2*>(VertexShader.GetNode());
-	ShaderSource2* fragment = static_cast<ShaderSource2*>(FragmentShader.GetNode());
+	//ShaderSource2* vertex = static_cast<ShaderSource2*>(VertexShader.GetNode());
+	//ShaderSource2* fragment = static_cast<ShaderSource2*>(FragmentShader.GetNode());
+	ShaderStub* vertexStub = static_cast<ShaderStub*>(VertexShader.GetNode());
+	ShaderStub* fragmentStub = static_cast<ShaderStub*>(FragmentShader.GetNode());
+	if (vertexStub == nullptr || fragmentStub == nullptr) return;
 
+	ShaderSource2* vertex = vertexStub->GetShaderSource();
+	ShaderSource2* fragment = fragmentStub->GetShaderSource();
 	if (vertex == nullptr || fragment == nullptr) return;
 
 	const string& vertexSource = vertex->GetSource();

@@ -1,15 +1,9 @@
 :name "test"
-:returns float
+:returns void
 
-:param vec4 Color
-:param sampler2d Texture
-:param float Ratio
-
-:input vec3 Normal
-:input vec3 EyeToTarget
-:output vec3 Color
+:output vec4 Color
 
 SHADER
 {
-	outColor = Color * inNormal;
+	Color = vec4(0.0, 1.0, 0.0, 1.0);
 }

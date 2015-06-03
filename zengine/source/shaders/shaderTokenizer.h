@@ -19,7 +19,7 @@ namespace Shaders
 	ITEM(sampler2D)			\
 	ITEM(void)				\
 	ITEM(name)				\
-	ITEM(returns)				\
+	ITEM(returns)			\
 	ITEM(section)			\
 	ITEM(min)				\
 	ITEM(max)				\
@@ -33,6 +33,7 @@ namespace Shaders
 	ITEM(sampler)			\
 	ITEM(sampler2d)			\
 	ITEM(param)				\
+	ITEM(global)				\
 	ITEM(using)				\
 	ITEM(auto)				\
 	ITEM(option)			\

@@ -66,10 +66,34 @@ void ZenGarden::InitModules()
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
 	/// TEST
-	char* testShaderStubSource = ReadFileQt("test2.fs");
-	auto x = new ShaderStub(testShaderStubSource);
-	ThePrototypes->AddPrototype(x, NodeClass::SHADER_STUB);
-	auto src = x->GetShaderSource();
+	{
+		/// fragment shader
+		char* testShaderStubSource = ReadFileQt("test2.fs");
+		auto fragmentStub = new ShaderStub(testShaderStubSource);
+		ThePrototypes->AddPrototype(fragmentStub, NodeClass::SHADER_STUB);
+		TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graphEditor));
+		NodeWidget* ow = graphEditor->GetNodeWidget(fragmentStub);
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 150)));
+		delete testShaderStubSource;
+
+		/// vertex shader
+		testShaderStubSource = ReadFileQt("test2.vs");
+		auto vertexStub = new ShaderStub(testShaderStubSource);
+		ThePrototypes->AddPrototype(vertexStub, NodeClass::SHADER_STUB);
+		TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graphEditor));
+		ow = graphEditor->GetNodeWidget(vertexStub);
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 250)));
+
+		/// pass
+		auto pass = new Pass();
+		pass->FragmentShader.Connect(fragmentStub);
+		pass->VertexShader.Connect(vertexStub);
+		TheCommandStack->Execute(new CreateNodeCommand(pass, graphEditor));
+		ow = graphEditor->GetNodeWidget(pass);
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(180, 200)));
+
+	}
+
 
 	/// Add some dummy nodes
 	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");

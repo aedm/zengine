@@ -3,7 +3,7 @@
 Globals TheGlobals;
 
 /// Array for global uniform types
-static const NodeType GlobalUniformTypes[] = {
+const NodeType GlobalUniformTypes[] = {
 #undef ITEM
 #define ITEM(name, type, token) NodeType::type,
 	GLOBALUSAGE_LIST

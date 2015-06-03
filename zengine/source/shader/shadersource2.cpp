@@ -66,6 +66,13 @@ void ShaderSource2::CollectMetadata()
 			param->Type, param->Name, slot, ShaderGlobalType::LOCAL));
 	}
 
+	/// Globals
+	for (auto global : stubMeta->Globals)
+	{
+		uniforms.push_back(new ShaderSourceUniform(
+			global->Type, global->Name, nullptr, global->Usage));
+	}
+
 	/// Inputs
 	vector<ShaderSourceVariable*> inputs;
 	for (auto output : stubMeta->Inputs)
@@ -90,6 +97,8 @@ void ShaderSource2::GenerateSource()
 	Source.clear();
 
 	stringstream stream;
+
+	stream << "#version 150" << endl;
 
 	/// Inputs
 	for (auto var : Metadata->Inputs)
@@ -142,8 +151,9 @@ const string& ShaderSource2::GetTypeString(NodeType Type)
 	static const string svec3("vec3");
 	static const string svec4("vec4");
 	static const string suint("uint");
-	static const string smatrix44("matrix44");
+	static const string smatrix44("mat4");
 	static const string ssampler2d("sampler2d");
+	static const string svoid("void");
 	static const string serror("UNKNOWN_TYPE");
 
 	switch (Type)
@@ -155,6 +165,7 @@ const string& ShaderSource2::GetTypeString(NodeType Type)
 	case NodeType::UINT:		return suint;
 	case NodeType::MATRIX44:	return smatrix44;
 	case NodeType::TEXTURE:		return ssampler2d;
+	case NodeType::NONE:		return svoid;
 	default: 
 		ERR("Unhandled type: %d", Type);
 		return serror;

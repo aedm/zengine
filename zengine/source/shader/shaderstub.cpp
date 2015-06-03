@@ -77,11 +77,13 @@ const string& ShaderStub::GetStubSource() const
 ShaderStubMetadata::ShaderStubMetadata(const string& _Name, NodeType _ReturnType,
 	const string& _StrippedSource,
 	OWNERSHIP const vector<ShaderStubParameter*>& _Parameters,
+	const vector<ShaderStubGlobal*>& _Globals,
 	const vector<ShaderStubVariable*>& _Inputs,
 	const vector<ShaderStubVariable*>& _Outputs)
 	: Name(_Name)
 	, ReturnType(_ReturnType)
 	, Parameters(_Parameters)
+	, Globals(_Globals)
 	, StrippedSource(_StrippedSource)
 	, Inputs(_Inputs)
 	, Outputs(_Outputs)

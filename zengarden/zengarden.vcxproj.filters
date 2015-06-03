@@ -147,6 +147,9 @@
     <ClCompile Include="source\watchers\passwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\stubwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -221,6 +224,9 @@
       <Filter>source\propertyeditor</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\passwatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\stubwatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>

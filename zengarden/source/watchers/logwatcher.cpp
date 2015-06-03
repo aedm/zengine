@@ -25,7 +25,7 @@ void LogWatcher::Log(LogMessage Message)
 	switch (Message.Severity)
 	{
 	case LOG_INFO:		TextEdit->setTextColor(Qt::gray);	break;
-	case LOG_WARNING:	TextEdit->setTextColor(Qt::blue);	break;
+	case LOG_WARNING:	TextEdit->setTextColor(QColor(Qt::blue).light(150));	break;
 	case LOG_ERROR:		TextEdit->setTextColor(QColor(Qt::red).light(130));	break;
 	}
 	TextEdit->append(QString("[ ") + QTime::currentTime().toString("HH:mm:ss") + QString(" ]  ") + QString::fromUtf16((ushort*)Message.Message));
