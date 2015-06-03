@@ -9,4 +9,12 @@ class PassWatcher : public Watcher
 public:
 	PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget);
 	virtual ~PassWatcher();
+
+protected:
+	void			Paint(GLWidget* Widget);
+
+	Drawable*		TheDrawable;
+	Material*		TheMaterial;
+	MeshNode*		TheMesh;
+	Globals			TheGlobals;
 };

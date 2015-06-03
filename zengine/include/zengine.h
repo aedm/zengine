@@ -14,6 +14,7 @@
 #include "shader/shadersource2.h"
 #include "shader/pass.h"
 #include "shader/material.h"
+#include "shader/drawable.h"
 
 #include "shaders/shaders.h"
 
