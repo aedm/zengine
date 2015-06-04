@@ -10,8 +10,19 @@ PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
 	TheMaterial = new Material();
 	TheMaterial->SolidPass.Connect(PassNode);
 
-	TheMesh = new StaticMeshNode();
-	
+	/// Mesh
+	Vec2 TopLeft(10, 10), Size(100, 100);
+	IndexEntry boxIndices[] = { 0, 1, 2, 2, 1, 3 };
+	VertexPos vertices[] = {
+		{ Vec3(TopLeft.X, TopLeft.Y, 0) },
+		{ Vec3(TopLeft.X + Size.X, TopLeft.Y, 0) },
+		{ Vec3(TopLeft.X, TopLeft.Y + Size.Y, 0) },
+		{ Vec3(TopLeft.X + Size.X, TopLeft.Y + Size.Y, 0) },
+	};
+	Mesh* boxMesh = TheResourceManager->CreateMesh();
+	boxMesh->SetIndices(boxIndices);
+	boxMesh->SetVertices(vertices);
+	TheMesh = StaticMeshNode::Create(boxMesh);
 
 	TheDrawable = new Drawable();
 	TheDrawable->TheMaterial.Connect(TheMaterial);
@@ -26,7 +37,15 @@ PassWatcher::~PassWatcher()
 
 void PassWatcher::Paint(GLWidget* Widget)
 {
-	TheDrawingAPI->Clear(true, true, 0xff00ff00);
+	TheDrawingAPI->Clear(true, true, 0x80a080a0);
+
+	Vec2 size = Vec2(Widget->width(), Widget->height());
+	TheGlobals.RenderTargetSize = size;
+	TheGlobals.RenderTargetSizeRecip = Vec2(1.0f / size.X, 1.0f / size.Y);
+
+	TheGlobals.View.LoadIdentity();
+	TheGlobals.Projection = Matrix::Ortho(0, 0, size.X, size.Y);
+	TheGlobals.Transformation = TheGlobals.View * TheGlobals.Projection;
 
 	TheDrawable->Draw(&TheGlobals);
 }

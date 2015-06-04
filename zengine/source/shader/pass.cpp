@@ -76,7 +76,7 @@ void Pass::BuildRenderPipeline()
 	
 	/// Collect required attributes
 	for (auto attributeDesc : shaderCompileDesc->Attributes) {
-		Attributes.push_back(attributeDesc.Usage);
+		Attributes.push_back(attributeDesc);
 	}
 
 }
@@ -110,11 +110,9 @@ void Pass::Set(Globals* Global)
 			TheDrawingAPI->SetUniform(uniform.Handle, uniform.Type, source); 
 		}
 	}
-
-	NOT_IMPLEMENTED;
 }
 
-const vector<VertexAttributeUsage>& Pass::GetUsedAttributes()
+const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes()
 {
 	return Attributes;
 }

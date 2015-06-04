@@ -22,13 +22,14 @@ void Drawable::Draw(Globals* Global)
 
 	/// Set vertex buffer and attributes
 	TheDrawingAPI->SetVertexBuffer(mesh->VertexHandle);
-	for (VertexAttributeUsage usage : pass->GetUsedAttributes())
+	for (ShaderAttributeDesc desc : pass->GetUsedAttributes())
 	{
-		VertexAttribute* attribute = mesh->Format->AttributesArray[(UINT)usage];
+		VertexAttribute* attribute = mesh->Format->AttributesArray[(UINT)desc.Usage];
 		if (attribute != nullptr) 
 		{
-			TheDrawingAPI->EnableVertexAttribute((UINT)usage, 
-				VertexAttributeType[(UINT)usage], attribute->Offset, mesh->Format->Stride);
+			TheDrawingAPI->EnableVertexAttribute(desc.Handle, 
+				VertexAttributeType[(UINT)desc.Usage], attribute->Offset, 
+				mesh->Format->Stride);
 		}
 	}
 

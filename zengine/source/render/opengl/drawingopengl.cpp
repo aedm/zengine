@@ -458,6 +458,7 @@ void DrawingOpenGL::Render(IndexBufferHandle IndexBuffer, UINT Count, PrimitiveT
 	if (IndexBuffer != 0)
 	{
 		BindIndexBuffer(IndexBuffer);
+		CheckGLError();
 		glDrawElements(GetGLPrimitive(PrimitiveType), Count, GL_UNSIGNED_INT, NULL);
 		CheckGLError();
 	} else {

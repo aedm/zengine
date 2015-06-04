@@ -34,6 +34,7 @@ GraphEditor::GraphEditor(WatcherWidget* Parent, QGLWidget* Share)
 
 void GraphEditor::paintGL()
 {
+	TheDrawingAPI->OnContextSwitch();
 	ThePainter->Set(width(), height());
 
 	glClearColor(0.26f, 0.26f, 0.26f, 1.0f);

@@ -6,5 +6,5 @@
 
 SHADER
 {
-	gl_Position = vec4(aPosition, 0.1) * gTransformation; 
+	gl_Position = vec4(aPosition, 1.0) * gTransformation; 
 }

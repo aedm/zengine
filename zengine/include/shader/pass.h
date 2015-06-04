@@ -29,7 +29,7 @@ public:
 	Slot				VertexShader;
 
 	void				Set(Globals* Global);
-	const vector<VertexAttributeUsage>&		GetUsedAttributes();
+	const vector<ShaderAttributeDesc>&		GetUsedAttributes();
 	
 protected:
 	virtual void		HandleMessage(Slot* S, NodeMessage Message, const void* Payload) override;
@@ -38,5 +38,5 @@ protected:
 	
 	ShaderHandle		Handle;
 	vector<PassUniform>	Uniforms;
-	vector<VertexAttributeUsage> Attributes;
+	vector<ShaderAttributeDesc> Attributes;
 };

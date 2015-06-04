@@ -64,6 +64,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent* event)
 
 void GLWidget::paintGL()
 {
+	TheDrawingAPI->OnContextSwitch();
+	TheDrawingAPI->SetViewport(0, 0, width(), height());
 	OnPaint(this);
 }
 
