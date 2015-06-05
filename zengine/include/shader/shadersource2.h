@@ -51,14 +51,12 @@ public:
 	Slot						Stub;
 
 protected:
+	friend class ShaderSourceBuilder;
+
 	virtual void				HandleMessage(Slot* S, NodeMessage Message,
 									const void* Payload) override;
-	void						CollectMetadata();
-	void						GenerateSource();
 
 	ShaderSourceMetadata*		Metadata;
 	string						Source;
-	
-	static const string&		GetTypeString(NodeType Type);
 };
 
