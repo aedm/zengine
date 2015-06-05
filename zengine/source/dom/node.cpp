@@ -29,6 +29,7 @@ bool Slot::Connect( Node* Nd )
 {
 	if (Nd && NodeType::ALLOW_ALL != Type && Nd->GetType() != Type)
 	{
+		/// TODO: use ASSERT only
 		ERR("Slot and operator type mismatch");
 		ASSERT(false);
 		return false;
@@ -278,7 +279,7 @@ Node::~Node()
 	const vector<Slot*>& deps = GetDependants();
 	while (deps.size())
 	{
-		deps.back()->Connect(NULL);
+		deps.back()->Disconnect(this);
 	}
 }
 

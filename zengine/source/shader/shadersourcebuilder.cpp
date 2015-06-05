@@ -152,3 +152,14 @@ const string& ShaderSourceBuilder::GetTypeString(NodeType Type)
 		return serror;
 	}
 }
+
+void ShaderSourceBuilder::CollectDependencies(Node* Root)
+{
+	NodeData* data = new NodeData();
+	DataMap[Root] = data;
+
+	for (Slot* slot : Root->Slots) 
+	{
+		NOT_IMPLEMENTED;
+	}
+}

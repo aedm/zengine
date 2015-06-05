@@ -47,17 +47,17 @@ public:
 	/// - for non-multislots, this overrides the current connection.
 	/// - for multislots, the node will be added to the list of connected nodes. 
 	/// Returns false if connection is not possible due to type mismatch.
-	bool					Connect(Node* Nd);
+	virtual bool			Connect(Node* Nd);
 
 	/// Disconnects a node from this slot. 
-	void					Disconnect(Node* Nd);
+	virtual void			Disconnect(Node* Nd);
+
+	/// Disconnects all nodes from this slot.
+	virtual void			DisconnectAll();
 
 	/// Removes the connected node from connected nodes list, 
 	/// and reinserts it at the "TargetIndex" position. Only for multislots.
 	void					ChangeNodeIndex(Node* Nd, UINT TargetIndex);
-
-	/// Disconnects all nodes from this slot.
-	void					DisconnectAll();
 
 	/// Returns connected node (errorlog & nullptr if multislot)
 	Node*					GetNode() const;
@@ -97,6 +97,7 @@ protected:
 class Node
 {
 	friend class Slot;
+	template<NodeType T> friend class ValueSlot;
 
 public:
 	virtual ~Node();
