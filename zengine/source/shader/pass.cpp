@@ -39,7 +39,8 @@ void Pass::BuildRenderPipeline()
 
 	ShaderSource2* vertex = vertexStub->GetShaderSource();
 	ShaderSource2* fragment = fragmentStub->GetShaderSource();
-	if (vertex == nullptr || fragment == nullptr) return;
+	if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
+		fragment == nullptr || fragment->GetMetadata() == nullptr) return;
 
 	const string& vertexSource = vertex->GetSource();
 	const string& fragmentSource = fragment->GetSource();
@@ -68,7 +69,7 @@ void Pass::BuildRenderPipeline()
 		ShaderSourceUniform* sourceUniform = uniformMap.at(uniformDesc.Name);
 		PassUniform passUniform;
 		passUniform.Handle = uniformDesc.Handle;
-		passUniform.TheSlot = sourceUniform->TheSlot;
+		passUniform.TheNode = sourceUniform->TheNode;
 		passUniform.GlobalType = sourceUniform->GlobalType;
 		passUniform.Type = sourceUniform->Type;
 		Uniforms.push_back(passUniform);
@@ -90,14 +91,14 @@ void Pass::Set(Globals* Global)
 	{
 		if (uniform.GlobalType == ShaderGlobalType::LOCAL) {
 			/// Local uniform, takes value from a slot
-			ASSERT(uniform.TheSlot != nullptr);
+			ASSERT(uniform.TheNode != nullptr);
 			switch (uniform.Type)
 			{
 			#undef ITEM
 			#define ITEM(name, type, token) \
 				case NodeType::name: \
 					TheDrawingAPI->SetUniform(uniform.Handle, NodeType::name, \
-						&ToValueSlot<NodeType::name>(uniform.TheSlot)->Get()); \
+						&static_cast<ValueNode<NodeType::name>*>(uniform.TheNode)->Get()); \
 					break;
 			VALUETYPE_LIST
 

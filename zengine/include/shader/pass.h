@@ -10,7 +10,7 @@ using namespace std;
 struct PassUniform
 {
 	UniformId			Handle;
-	Slot*				TheSlot;
+	Node*				TheNode;
 	ShaderGlobalType	GlobalType;
 	NodeType			Type;
 };

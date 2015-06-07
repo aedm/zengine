@@ -74,10 +74,10 @@ ShaderSourceVariable::ShaderSourceVariable(NodeType _Type, const string& _Name)
 	, Type(_Type)
 {}
 
-ShaderSourceUniform::ShaderSourceUniform(NodeType _Type, const string& _Name, Slot* _slot, 
+ShaderSourceUniform::ShaderSourceUniform(NodeType _Type, const string& _Name, Node* Nd,
 	ShaderGlobalType _GlobalType)
 	: Type(_Type)
 	, Name(_Name)
-	, TheSlot(_slot)
+	, TheNode(Nd)
 	, GlobalType(_GlobalType)
 {}

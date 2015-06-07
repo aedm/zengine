@@ -14,12 +14,12 @@ struct ShaderSourceVariable
 
 struct ShaderSourceUniform
 {
-	ShaderSourceUniform(NodeType Type, const string& Name, Slot* slot,
+	ShaderSourceUniform(NodeType Type, const string& Name, Node* Nd,
 		ShaderGlobalType GlobalType);
 
 	NodeType			Type;
 	string				Name;
-	Slot*				TheSlot;
+	Node*				TheNode;
 	ShaderGlobalType	GlobalType;
 };
 
