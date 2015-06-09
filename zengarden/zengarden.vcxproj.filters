@@ -46,6 +46,11 @@
     <Filter Include="source\propertyeditor">
       <UniqueIdentifier>{72dc207d-7892-4245-baad-987e3103abe3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Debug-static">
+      <UniqueIdentifier>{69c91d7f-e4c7-4091-82fb-49bab94bd89b}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
@@ -87,33 +92,6 @@
     <ClCompile Include="source\graph\prototypes.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_zengarden.cpp">
-      <Filter>Generated Files\Release-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_prototypes.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_prototypes.cpp">
-      <Filter>Generated Files\Release-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_grapheditor.cpp">
-      <Filter>Generated Files\Release-static</Filter>
-    </ClCompile>
     <ClCompile Include="source\watchers\documentwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
@@ -135,6 +113,39 @@
     <ClCompile Include="source\propertyeditor\parameterwidgets.cpp">
       <Filter>source\propertyeditor</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\passwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\stubwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_zengarden.cpp">
+      <Filter>Generated Files\Debug-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_zengarden.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_prototypes.cpp">
+      <Filter>Generated Files\Debug-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_prototypes.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_prototypes.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_parameterwidgets.cpp">
+      <Filter>Generated Files\Debug-static</Filter>
+    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_parameterwidgets.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -144,11 +155,17 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_parameterwidgets.cpp">
       <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
-    <ClCompile Include="source\watchers\passwatcher.cpp">
-      <Filter>source\watchers</Filter>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_grapheditor.cpp">
+      <Filter>Generated Files\Debug-static</Filter>
     </ClCompile>
-    <ClCompile Include="source\watchers\stubwatcher.cpp">
-      <Filter>source\watchers</Filter>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_grapheditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_grapheditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_grapheditor.cpp">
+      <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
