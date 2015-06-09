@@ -10,11 +10,11 @@ class Texture;
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
 	ITEM(FLOAT,			float,		"float"		) \
-	ITEM(VEC2,			Vec2,		"vec2"		) \
-	ITEM(VEC3,			Vec3,		"vec3"		) \
-	ITEM(VEC4,			Vec4,		"vec4"		) \
-	ITEM(UINT,			UINT,		"uint"		) \
-	ITEM(MATRIX44,		Matrix,		"matrix"	) \
+	ITEM(VEC2,			Vec2,		  "vec2"		) \
+	ITEM(VEC3,			Vec3,		  "vec3"		) \
+	ITEM(VEC4,			Vec4,		  "vec4"		) \
+	ITEM(UINT,			UINT,		  "uint"		) \
+	ITEM(MATRIX44,	Matrix,		"matrix"	) \
 	ITEM(TEXTURE,		Texture*,	"texture"	) \
 
 
@@ -53,16 +53,17 @@ enum class NodeType
 };
 
 /// Variable sizes in bytes, indexed by NodeType (only VALUETYPE_LIST names)
-extern const int VariableByteSizes[];
+extern const int gVariableByteSizes[];
 
 /// Variable names, indexed by NodeType (only VALUETYPE_LIST names)
-extern const char* VariableNames[];
+extern const char* gVariableNames[];
 
 
 /// Type helpers
 template<NodeType T> struct NodeTypes;
 #undef ITEM
-#define ITEM(name, type, token) template<> struct NodeTypes<NodeType::name> { typedef type Type; };
+#define ITEM(name, type, token) \
+  template<> struct NodeTypes<NodeType::name> { typedef type Type; };
 VALUETYPE_LIST
 
 #undef ITEM
@@ -74,7 +75,7 @@ VALUETYPE_LIST
 #define VERTEXATTRIBUTE_LIST \
 	ITEM(POSITION,		NodeType::VEC3,		"aPosition"	) \
 	ITEM(TEXCOORD,		NodeType::VEC2,		"aTexCoord"	) \
-	ITEM(NORMAL,		NodeType::VEC3,		"aNormal"	) \
+	ITEM(NORMAL,		  NodeType::VEC3,		"aNormal"	) \
 	ITEM(BINORMAL,		NodeType::VEC3,		"aBinormal"	) \
 
 
@@ -90,13 +91,10 @@ enum class VertexAttributeUsage
 };
 
 /// Array for attribute types, index by VertexAttributeEnum
-extern const NodeType VertexAttributeType[];
+extern const NodeType gVertexAttributeType[];
 
 /// Array for attribute names, index by VertexAttributeEnum
-extern const char* VertexAttributeName[];
-
-
-
+extern const char* gVertexAttributeName[];
 
 /// Additional types
 typedef std::shared_ptr<std::string> SharedString;

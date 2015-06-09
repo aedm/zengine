@@ -1,7 +1,7 @@
 #include <include/base/types.h>
 
 /// Array for variable sizes in bytes
-const char* VariableNames[] = {
+const char* gVariableNames[] = {
 #undef ITEM
 #define ITEM(name, type, token) token,
 	VALUETYPE_LIST
@@ -9,7 +9,7 @@ const char* VariableNames[] = {
 
 
 /// Array for variable sizes in bytes
-const int VariableByteSizes[] = {
+const int gVariableByteSizes[] = {
 #undef ITEM
 #define ITEM(name, type, token) sizeof(type),
 	VALUETYPE_LIST
@@ -17,7 +17,7 @@ const int VariableByteSizes[] = {
 
 
 /// Array for attribute types
-const NodeType VertexAttributeType[] = {
+const NodeType gVertexAttributeType[] = {
 #undef ITEM
 #define ITEM(name, type, token) type,
 	VERTEXATTRIBUTE_LIST
@@ -25,7 +25,7 @@ const NodeType VertexAttributeType[] = {
 
 
 /// Array for attribute names
-const char* VertexAttributeName[] = {
+const char* gVertexAttributeName[] = {
 #undef ITEM
 #define ITEM(name, type, token) token,
 	VERTEXATTRIBUTE_LIST

@@ -245,7 +245,7 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource( const char* 
 		bool found = false;
 		for (UINT o = 0; o<(UINT)VertexAttributeUsage::COUNT; o++)
 		{
-			if (strcmp(VertexAttributeName[o], name) == 0)
+			if (strcmp(gVertexAttributeName[o], name) == 0)
 			{
 				attribute.Usage = (VertexAttributeUsage)o;
 				found = true;
@@ -394,7 +394,7 @@ AttributeMapper* DrawingOpenGL::CreateAttributeMapper( const vector<VertexAttrib
 			{
 				MappedAttributeOpenGL attr;
 				attr.Index = shaderAttr.Handle;
-				switch(VertexAttributeType[(UINT)bufferAttr.Usage])
+				switch(gVertexAttributeType[(UINT)bufferAttr.Usage])
 				{
 				case NodeType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
 				case NodeType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;

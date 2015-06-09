@@ -13,7 +13,7 @@ ShaderSource2::~ShaderSource2()
 	SafeDelete(Metadata);
 	/// There are dynamically created slots that won't be automatically 
 	/// disconencted.
-	for (Slot* slot : Slots)
+	for (Slot* slot : slotList)
 	{
 		slot->DisconnectAll(false);
 	}

@@ -60,7 +60,7 @@ protected:
 
 template<NodeType T>
 StaticValueNode<T>::StaticValueNode()
-	: ValueNode(VariableNames[(UINT)T])
+	: ValueNode(gVariableNames[(UINT)T])
 {
 	Value = ValueType();
 }
@@ -152,25 +152,25 @@ void ValueSlot<T>::SetDefaultValue(const ValueType& Value)
 {
 	ASSERT(IsDefaulted());
 	Default.Set(Value);
-	Owner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
+	owner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
 }
 
 
 template<NodeType T>
 bool ValueSlot<T>::Connect(Node* Nd)
 {
-	if (ConnectedNode == Nd || (Nd == nullptr && ConnectedNode == &Default)) return true;
-	if (Nd && Nd->GetType() != Type)
+	if (node == Nd || (Nd == nullptr && node == &Default)) return true;
+	if (Nd && Nd->GetType() != type)
 	{
 		/// TODO: use ASSERT only
 		ERR("Slot and operator type mismatch");
 		ASSERT(false);
 		return false;
 	}
-	if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
-	ConnectedNode = Nd ? Nd : &Default;
-	ConnectedNode->ConnectToSlot(this);
-	Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+	if (node) node->DisconnectFromSlot(this);
+	node = Nd ? Nd : &Default;
+	node->ConnectToSlot(this);
+	owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	return true;
 }
 
@@ -178,27 +178,27 @@ bool ValueSlot<T>::Connect(Node* Nd)
 template<NodeType T>
 void ValueSlot<T>::Disconnect(Node* Nd)
 {
-	ASSERT(Nd == ConnectedNode);
+	ASSERT(Nd == node);
 	ASSERT(Nd != nullptr);
-	ConnectedNode->DisconnectFromSlot(this);
-	ConnectedNode = nullptr;
-	if (ConnectedNode == &Default)
+	node->DisconnectFromSlot(this);
+	node = nullptr;
+	if (node == &Default)
 	{
 		/// Avoid infinite loop when called by the default node's destructor.
 		return;
 	}
 	Default.ConnectToSlot(this);
-	Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+	owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 }
 
 
 template<NodeType T>
 void ValueSlot<T>::DisconnectAll(bool NotifyOwner)
 {
-	if (ConnectedNode == &Default) return;
+	if (node == &Default) return;
 	Default.ConnectToSlot(this);
 	if (NotifyOwner) {
-		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+		owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 }
 

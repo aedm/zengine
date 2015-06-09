@@ -12,7 +12,7 @@ Drawable::~Drawable()
 
 void Drawable::Draw(Globals* Global)
 {
-	if (!IsProperlyConnected) return;
+	if (!isProperlyConnected) return;
 	Material* material = static_cast<Material*>(TheMaterial.GetNode());
 	const Mesh* mesh = TheMesh.GetMesh();
 
@@ -29,7 +29,7 @@ void Drawable::Draw(Globals* Global)
 		if (attribute != nullptr) 
 		{
 			TheDrawingAPI->EnableVertexAttribute(desc.Handle, 
-				VertexAttributeType[(UINT)desc.Usage], attribute->Offset, 
+				gVertexAttributeType[(UINT)desc.Usage], attribute->Offset, 
 				mesh->Format->Stride);
 		}
 	}

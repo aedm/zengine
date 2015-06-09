@@ -149,7 +149,7 @@ OWNERSHIP Shader* ShaderSource::Build(const shared_ptr<ShaderSource>& Source)
 
 		if (uniform)
 		{
-			byteOffset += VariableByteSizes[UINT(uniform->Type)];
+			byteOffset += gVariableByteSizes[UINT(uniform->Type)];
 			uniforms.push_back(uniform);
 		}
 	}

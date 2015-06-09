@@ -84,20 +84,20 @@ void UiPainter::DrawLine( float x1, float y1, float x2, float y2 )
 void UiPainter::DrawLine( const Vec2& From, const Vec2& To )
 {
 	VertexPos vertices[] = { 
-		{Vec3(From.X + 0.5f, From.Y + 0.5f, 0)}, 
-		{Vec3(To.X + 0.5f, To.Y + 0.5f, 0)} };
+		{Vec3(From.x + 0.5f, From.y + 0.5f, 0)}, 
+		{Vec3(To.x + 0.5f, To.y + 0.5f, 0)} };
 	LineMeshOp->GetMesh()->SetVertices(vertices);
 	SolidLineModel->Render(PRIMITIVE_LINES);
 }
 
 void UiPainter::DrawRect( const Vec2& TopLeft, const Vec2& Size )
 {
-	Vec3 pos(TopLeft.X + 0.5f, TopLeft.Y + 0.5f, 0);
+	Vec3 pos(TopLeft.x + 0.5f, TopLeft.y + 0.5f, 0);
 	VertexPos vertices[] = { 
 		{ pos }, 
-		{ pos + Vec3(Size.X - 1, 0, 0) }, 
-		{ pos + Vec3(Size.X - 1, Size.Y - 1, 0) }, 
-		{ pos + Vec3(0, Size.Y - 1, 0) }, 
+		{ pos + Vec3(Size.x - 1, 0, 0) }, 
+		{ pos + Vec3(Size.x - 1, Size.y - 1, 0) }, 
+		{ pos + Vec3(0, Size.y - 1, 0) }, 
 		{ pos }, 
 	};
 	RectMeshOp->GetMesh()->SetVertices(vertices);
@@ -108,10 +108,10 @@ void UiPainter::DrawRect( const Vec2& TopLeft, const Vec2& Size )
 void UiPainter::DrawBox( const Vec2& TopLeft, const Vec2& Size )
 {
 	VertexPos vertices[] = { 
-		{ Vec3(TopLeft.X,			TopLeft.Y,			0) }, 
-		{ Vec3(TopLeft.X + Size.X,	TopLeft.Y,			0) }, 
-		{ Vec3(TopLeft.X,			TopLeft.Y + Size.Y, 0) }, 
-		{ Vec3(TopLeft.X + Size.X,	TopLeft.Y + Size.Y, 0) }, 
+		{ Vec3(TopLeft.x,			TopLeft.y,			0) }, 
+		{ Vec3(TopLeft.x + Size.x,	TopLeft.y,			0) }, 
+		{ Vec3(TopLeft.x,			TopLeft.y + Size.y, 0) }, 
+		{ Vec3(TopLeft.x + Size.x,	TopLeft.y + Size.y, 0) }, 
 	};
 	BoxMeshOp->GetMesh()->SetVertices(vertices);
 	SolidBoxModel->Render(PRIMITIVE_TRIANGLES);
@@ -141,10 +141,10 @@ void UiPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
 	float u = w / float(Tex->TheTexture->Width);
 	float v = h / float(Tex->TheTexture->Height);
 	VertexPosUV vertices[] = { 
-		{ Vec3(Position.X,		Position.Y,     0), Vec2(0, 0) }, 
-		{ Vec3(Position.X + w,	Position.Y,     0), Vec2(u, 0) }, 
-		{ Vec3(Position.X,		Position.Y + h, 0), Vec2(0, v) }, 
-		{ Vec3(Position.X + w,	Position.Y + h, 0), Vec2(u, v) }, 
+		{ Vec3(Position.x,		Position.y,     0), Vec2(0, 0) }, 
+		{ Vec3(Position.x + w,	Position.y,     0), Vec2(u, 0) }, 
+		{ Vec3(Position.x,		Position.y + h, 0), Vec2(0, v) }, 
+		{ Vec3(Position.x + w,	Position.y + h, 0), Vec2(u, v) }, 
 	};
 
 	TexOp.Set(Tex->TheTexture);

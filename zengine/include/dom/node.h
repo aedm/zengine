@@ -14,153 +14,151 @@ using namespace fastdelegate;
 /// Notifications that nodes send to each other when something changed.
 /// An accompanying UINT data can also be set for each event type.
 enum class NodeMessage {
-	/// A slot was added or removed.
-	SLOT_STRUCTURE_CHANGED,
+  /// A slot was added or removed.
+  SLOT_STRUCTURE_CHANGED,
 
-	/// Direct slot connection changed.
-	SLOT_CONNECTION_CHANGED,
+  /// Direct slot connection changed.
+  SLOT_CONNECTION_CHANGED,
 
-	/// Some transitive connection changed
-	TRANSITIVE_CONNECTION_CHANGED,
+  /// Some transitive connection changed
+  TRANSITIVE_CONNECTION_CHANGED,
 
-	/// The value of a connected node changed, reevaluation might be needed
-	VALUE_CHANGED,
+  /// The value of a connected node changed, reevaluation might be needed
+  VALUE_CHANGED,
 
-	/// Node looks changed, watchers need to redraw it.
-	NEEDS_REDRAW,
+  /// Node looks changed, watchers need to redraw it.
+  NEEDS_REDRAW,
 };
 
 class Node;
 
 /// Nodes can have multiple input slots, which connects it to other slots.
-class Slot
-{
+class Slot {
 public:
-	Slot(NodeType Type, Node* Owner, SharedString Name, bool IsMultiSlot = false,
-		bool AutoAddToSlotList = true);
-	virtual ~Slot();
+  Slot(NodeType Type, Node* Owner, SharedString Name, bool IsMultiSlot = false,
+       bool AutoAddToSlotList = true);
+  virtual ~Slot();
 
-	/// The operator which this slot is a member of
-	Node* const				Owner;
+  /// The operator which this slot is a member of
+  Node* const owner;
 
-	/// Attaches slot to node. 
-	/// - for non-multislots, this overrides the current connection.
-	/// - for multislots, the node will be added to the list of connected nodes. 
-	/// Returns false if connection is not possible due to type mismatch.
-	virtual bool			Connect(Node* Nd);
+  /// Attaches slot to node. 
+  /// - for non-multislots, this overrides the current connection.
+  /// - for multislots, the node will be added to the list of connected nodes. 
+  /// Returns false if connection is not possible due to type mismatch.
+  virtual bool Connect(Node* node);
 
-	/// Disconnects a node from this slot. 
-	virtual void			Disconnect(Node* Nd);
+  /// Disconnects a node from this slot. 
+  virtual void Disconnect(Node* node);
 
-	/// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
-	/// send a SLOT_CONNECTION_CHANGED message to its owner.
-	virtual void			DisconnectAll(bool NotifyOwner);
+  /// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
+  /// send a SLOT_CONNECTION_CHANGED message to its owner.
+  virtual void DisconnectAll(bool notifyOwner);
 
-	/// Removes the connected node from connected nodes list, 
-	/// and reinserts it at the "TargetIndex" position. Only for multislots.
-	void					ChangeNodeIndex(Node* Nd, UINT TargetIndex);
+  /// Removes the connected node from connected nodes list, 
+  /// and reinserts it at the "TargetIndex" position. Only for multislots.
+  void ChangeNodeIndex(Node* node, UINT targetIndex);
 
-	/// Returns connected node (errorlog & nullptr if multislot)
-	Node*					GetNode() const;
+  /// Returns connected node (errorlog & nullptr if multislot)
+  Node* GetNode() const;
 
-	/// Returns all connected nodes (only for multislot)
-	const vector<Node*>&	GetMultiNodes() const;
+  /// Returns all connected nodes (only for multislot)
+  const vector<Node*>& GetMultiNodes() const;
 
-	/// Type of object this slot accepts
-	/// TODO: get rid of this
-	NodeType				GetType() const;
-	
-	/// Returns the name of the slot
-	SharedString			GetName();
+  /// Type of object this slot accepts
+  /// TODO: get rid of this
+  NodeType GetType() const;
 
-	/// True if the slot can connect to multiple nodes
-	const bool				IsMultiSlot;
+  /// Returns the name of the slot
+  SharedString GetName();
 
-	/// Return the Nth connected node from a multislot
-	Node*					operator[] (UINT Index);
+  /// True if the slot can connect to multiple nodes
+  const bool isMultiSlot;
+
+  /// Return the Nth connected node from a multislot
+  Node* operator[] (UINT index);
 
 protected:
-	/// The slot is connected to this node (nullptr if multislot)
-	Node*					ConnectedNode;
+  /// The slot is connected to this node (nullptr if multislot)
+  Node* node;
 
-	/// The slot is connected to these nodes (empty if not multislot)
-	vector<Node*>			MultiNodes;
+  /// The slot is connected to these nodes (empty if not multislot)
+  vector<Node*> multiNodes;
 
-	/// Name of the slot. Can't be changed.
-	SharedString			Name;
+  /// Name of the slot. Can't be changed.
+  SharedString name;
 
-	/// Output type
-	const NodeType			Type;
+  /// Output type
+  const NodeType type;
 };
 
 
 /// An operation that takes its slot values as input and computes an output
-class Node
-{
-	friend class Slot;
-	template<NodeType T> friend class ValueSlot;
+class Node {
+  friend class Slot;
+  template<NodeType T> friend class ValueSlot;
 
 public:
-	virtual ~Node();
+  virtual ~Node();
 
-	/// Parameters of this node.
-	vector<Slot*>				Slots;
+  /// Parameters of this node.
+  vector<Slot*>	slotList;
 
-	/// Name of the node
-	string						Name;
-	
-	/// Returns object type.
-	NodeType					GetType() const;			
+  /// Name of the node
+  string name;
 
-	/// List of slots this node's output is connected to
-	const vector<Slot*>&		GetDependants() const;	
+  /// Returns object type.
+  NodeType GetType() const;
 
-	/// Reruns Operate() if dirty (on dirty ancestors too)
-	void						Evaluate();
+  /// List of slots this node's output is connected to
+  const vector<Slot*>& GetDependants() const;
 
-	/// Clone node
-	virtual Node*				Clone() const;
+  /// Reruns Operate() if dirty (on dirty ancestors too)
+  void Evaluate();
 
-	/// Hook for watchers (UI only)
-	Event<Slot*, NodeMessage, const void*> OnMessageReceived;
+  /// Clone node
+  virtual Node* Clone() const;
+
+  /// Hook for watchers (UI only)
+  Event<Slot*, NodeMessage, const void*> onMessageReceived;
 
 protected:
-	Node(NodeType Type, const string& Name);
+  Node(NodeType type, const string& name);
 
-	/// For cloning
-	Node(const Node& Original);
+  /// For cloning
+  Node(const Node& original);
 
-	/// True is all slots are properly connected
-	bool						IsProperlyConnected;
+  /// True is all slots are properly connected
+  bool isProperlyConnected;
 
-	/// Main operation
-	virtual void				Operate() {}
+  /// Main operation
+  virtual void Operate() {}
 
-	/// Sends a message to dependants
-	void						SendMessage(NodeMessage Message, const void* Payload = nullptr);
+  /// Sends a message to dependants
+  void SendMessage(NodeMessage message, const void* payload = nullptr);
 
-	/// Handle received messages
-	virtual void				HandleMessage(Slot* S, NodeMessage Message, const void* Payload);
+  /// Handle received messages
+  virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);
 
-	/// Receives message through a slot
-	void						ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload = nullptr);
+  /// Receives message through a slot
+  void ReceiveMessage(Slot* slot, NodeMessage message, const void* payload = nullptr);
 
-	/// Output type
-	NodeType					Type;
+  /// Output type
+  NodeType type;
 
-	/// Check if all slots are properly connected to an operator
-	void						CheckConnections();
+  /// Check if all slots are properly connected to an operator
+  void CheckConnections();
 
 private:
-	/// True if Operate() needs to be called
-	bool						IsDirty;
+  /// True if Operate() needs to be called
+  bool isDirty;
 
-	/// Slots that this node is connected to (as an input)
-	vector<Slot*>				Dependants;
+  /// Slots that this node is connected to (as an input)
+  vector<Slot*> dependants;
 
-	/// Add or remove slot to/from notification list
-	void						ConnectToSlot(Slot* S);			
-	void						DisconnectFromSlot(Slot* S);	
+  /// Add or remove slot to/from notification list
+  void ConnectToSlot(Slot* slot);
+  void DisconnectFromSlot(Slot* slot);
 };
 
 

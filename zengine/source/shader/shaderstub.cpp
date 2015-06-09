@@ -28,8 +28,8 @@ void ShaderStub::SetStubSource(const string& _Source)
 	Source = _Source;
 
 	/// TODO: dont do this
-	for (Slot* slot : Slots) delete slot;
-	Slots.clear();
+	for (Slot* slot : slotList) delete slot;
+	slotList.clear();
 	ParameterSlotMap.clear();
 	
 	SafeDelete(Metadata);

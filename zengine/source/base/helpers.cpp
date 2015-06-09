@@ -13,7 +13,7 @@ void Logger::Log2( LogSeverity Severity, const wchar_t* LogString, ... )
 	va_start(args, LogString);
 	vswprintf(tmp, 4096, LogString, args);
 	va_end(args);
-	OnLog(LogMessage(Severity, tmp));
+	onLog(LogMessage(Severity, tmp));
 }
 
 void Logger::LogFunc2(LogSeverity Severity, const wchar_t* Function, const wchar_t* LogString, ...)
@@ -26,7 +26,7 @@ void Logger::LogFunc2(LogSeverity Severity, const wchar_t* Function, const wchar
 	vswprintf(tmp + funlen, 4096 - funlen, LogString, args);
 	va_end(args);
 
-	OnLog(LogMessage(Severity, tmp));
+	onLog(LogMessage(Severity, tmp));
 }
 
 void Logger::LogFunc2(LogSeverity Severity, const wchar_t* Function, const char* LogString, ...)
@@ -45,13 +45,13 @@ void Logger::LogFunc2(LogSeverity Severity, const wchar_t* Function, const char*
 	wchar_t tmp[4096]; 
 	swprintf(tmp, 4096, L"%s%s", Function, tmp_wstring.c_str());
 
-	OnLog(LogMessage(Severity, tmp));
+	onLog(LogMessage(Severity, tmp));
 }
 
 LogMessage::LogMessage( LogSeverity Severity, const wchar_t* Message )
 {
-	this->Severity = Severity;
-	this->Message = Message;
+	this->severity = Severity;
+	this->message = Message;
 }
 
 namespace Convert

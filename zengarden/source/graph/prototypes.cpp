@@ -49,7 +49,7 @@ Node* Prototypes::AskUser(QWidget* Parent, QPoint Position)
 	for (int i = 0; i<PrototypeNodes.size(); i++)
 	{
 		selector.treeWidget->addTopLevelItem(
-			new SelectorItem(NULL, QString::fromStdString(PrototypeNodes[i]->Name), i + 1));
+			new SelectorItem(NULL, QString::fromStdString(PrototypeNodes[i]->name), i + 1));
 	}
 	dialog.setModal(true);
 	dialog.resize(150, 300);

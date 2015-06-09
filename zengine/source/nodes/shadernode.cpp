@@ -52,7 +52,7 @@ void ShaderNode::Init()
 
 void ShaderNode::Set()
 {
-	ASSERT(IsProperlyConnected);
+	ASSERT(isProperlyConnected);
 
 	ShaderProgram->Set();
 
@@ -140,7 +140,7 @@ void ShaderNode::RegenerateCopyItems()
 			UINT* target = reinterpret_cast<UINT*>(
 				reinterpret_cast<char*>(item.Array->Values) + 
 				item.TargetUniform->ByteOffset + item.ByteOffset);
-			UINT floatCount = VariableByteSizes[(UINT)slot->GetType()] / sizeof(float);
+			UINT floatCount = gVariableByteSizes[(UINT)slot->GetType()] / sizeof(float);
 			for (UINT i=0; i<floatCount; i++)
 			{
 				item.Array->CopyItems.push_back(
@@ -151,7 +151,7 @@ void ShaderNode::RegenerateCopyItems()
 			const UINT* source = reinterpret_cast<const UINT*>(GlobalUniformOffsets[global->Usage]);
 			UINT* target = reinterpret_cast<UINT*>(
 				reinterpret_cast<char*>(item.Array->Values) + global->ByteOffset);
-			UINT floatCount = VariableByteSizes[(UINT)global->Type] / sizeof(float);
+			UINT floatCount = gVariableByteSizes[(UINT)global->Type] / sizeof(float);
 			for (UINT i=0; i<floatCount; i++)
 			{
 				item.Array->CopyItems.push_back(
@@ -171,7 +171,7 @@ void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& 
 			LocalUniform* local = static_cast<LocalUniform*>(uniform);
 			if (local->Desc->Elements)
 			{
-				int numSlots = VariableByteSizes[UINT(local->Type)] / sizeof(float);
+				int numSlots = gVariableByteSizes[UINT(local->Type)] / sizeof(float);
 				for (int i=0; i<numSlots; i++)
 				{
 					FloatSlot* slot = new FloatSlot(Owner, (*local->Desc->Elements)[i].UIName);

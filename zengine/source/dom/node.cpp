@@ -4,17 +4,17 @@
 
 Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot, 
 	bool AutoAddToSlotList)
-	: Owner(_Owner)
-	, Type(_Type)
-	, IsMultiSlot(_IsMultiSlot)
+	: owner(_Owner)
+	, type(_Type)
+	, isMultiSlot(_IsMultiSlot)
 {
-	ASSERT(Owner != nullptr);
-	ConnectedNode = NULL;
-	Name = _Name;
+	ASSERT(owner != nullptr);
+	node = NULL;
+	name = _Name;
 	if (AutoAddToSlotList) 
 	{
-		Owner->Slots.push_back(this);
-		Owner->ReceiveMessage(this, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
+		owner->slotList.push_back(this);
+		owner->ReceiveMessage(this, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
 	}
 }
 
@@ -27,35 +27,35 @@ Slot::~Slot()
 
 bool Slot::Connect( Node* Nd )
 {
-	if (Nd && NodeType::ALLOW_ALL != Type && Nd->GetType() != Type)
+	if (Nd && NodeType::ALLOW_ALL != type && Nd->GetType() != type)
 	{
 		/// TODO: use ASSERT only
 		ERR("Slot and operator type mismatch");
 		ASSERT(false);
 		return false;
 	}
-	if (!IsMultiSlot)
+	if (!isMultiSlot)
 	{
-		if (ConnectedNode != Nd)
+		if (node != Nd)
 		{
-			if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
-			ConnectedNode = Nd;
-			if (ConnectedNode) ConnectedNode->ConnectToSlot(this);
+			if (node) node->DisconnectFromSlot(this);
+			node = Nd;
+			if (node) node->ConnectToSlot(this);
 
-			Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+			owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 		}
 	}
 	else
 	{
 		ASSERT(Nd != nullptr);
-		for (Node* node : MultiNodes) {
+		for (Node* node : multiNodes) {
 			if (node == Nd) {
 				ERR("Node already connected to slot.");
 				return false;
 			}
 		}
-		MultiNodes.push_back(Nd);
-		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+		multiNodes.push_back(Nd);
+		owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 	return true;
 }
@@ -63,12 +63,12 @@ bool Slot::Connect( Node* Nd )
 
 void Slot::Disconnect(Node* Nd)
 {
-	if (IsMultiSlot) {
-		for (auto it = MultiNodes.begin(); it != MultiNodes.end(); it++) {
+	if (isMultiSlot) {
+		for (auto it = multiNodes.begin(); it != multiNodes.end(); it++) {
 			if (*it == Nd) {
 				Nd->DisconnectFromSlot(this);
-				MultiNodes.erase(it);
-				Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+				multiNodes.erase(it);
+				owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 				return;
 			}
 		}
@@ -76,7 +76,7 @@ void Slot::Disconnect(Node* Nd)
 	}
 	else 
 	{
-		ASSERT(Nd == ConnectedNode);
+		ASSERT(Nd == node);
 		ASSERT(Nd != nullptr);
 		DisconnectAll(true);
 	}
@@ -85,120 +85,120 @@ void Slot::Disconnect(Node* Nd)
 
 void Slot::DisconnectAll(bool NotifyOwner)
 {
-	if (IsMultiSlot) {
-		for (auto it = MultiNodes.begin(); it != MultiNodes.end(); it++) {
+	if (isMultiSlot) {
+		for (auto it = multiNodes.begin(); it != multiNodes.end(); it++) {
 			(*it)->DisconnectFromSlot(this);
 		}
-		MultiNodes.clear();
+		multiNodes.clear();
 	}
 	else
 	{
-		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
-		ConnectedNode = nullptr;
+		if (node) node->DisconnectFromSlot(this);
+		node = nullptr;
 	}
 
 	if (NotifyOwner) {
-		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+		owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 }
 
 
 Node* Slot::GetNode() const 
 {
-	if (IsMultiSlot) {
+	if (isMultiSlot) {
 		ERR("Can't call GetNode() on multislot.");
 		return nullptr;
 	}
-	return ConnectedNode;
+	return node;
 }
 
 
 const vector<Node*>& Slot::GetMultiNodes() const
 {
-	ASSERT(IsMultiSlot);
-	return MultiNodes;
+	ASSERT(isMultiSlot);
+	return multiNodes;
 }
 
 
 SharedString Slot::GetName()
 {
-	return Name;
+	return name;
 }
 
 
 NodeType Slot::GetType() const
 {
-	return Type;
+	return type;
 }
 
 void Slot::ChangeNodeIndex(Node* Nd, UINT TargetIndex)
 {
-	ASSERT(IsMultiSlot);
-	ASSERT(TargetIndex < MultiNodes.size());
+	ASSERT(isMultiSlot);
+	ASSERT(TargetIndex < multiNodes.size());
 
-	auto it = std::find(MultiNodes.begin(), MultiNodes.end(), Nd);
-	ASSERT(it != MultiNodes.end());
-	UINT index = it - MultiNodes.begin();
+	auto it = std::find(multiNodes.begin(), multiNodes.end(), Nd);
+	ASSERT(it != multiNodes.end());
+	UINT index = it - multiNodes.begin();
 
-	Node* node = MultiNodes[index];
+	Node* node = multiNodes[index];
 	if (index < TargetIndex) {
 		for (UINT i = index; i < TargetIndex; i++) {
-			MultiNodes[i] = MultiNodes[i + 1];
+			multiNodes[i] = multiNodes[i + 1];
 		}
-		MultiNodes[TargetIndex] = node;
+		multiNodes[TargetIndex] = node;
 	} else {
 		for (UINT i = index; i > TargetIndex; i--) {
-			MultiNodes[i] = MultiNodes[i - 1];
+			multiNodes[i] = multiNodes[i - 1];
 		}
-		MultiNodes[TargetIndex] = node;
+		multiNodes[TargetIndex] = node;
 	}
 }
 
 Node* Slot::operator[](UINT Index)
 {
-	ASSERT(IsMultiSlot);
-	ASSERT(Index < MultiNodes.size());
-	return MultiNodes[Index];
+	ASSERT(isMultiSlot);
+	ASSERT(Index < multiNodes.size());
+	return multiNodes[Index];
 }
 
 
 Node::Node(NodeType _Type, const string& _Name)
-	: Name(_Name)
-	, Type(_Type)
+	: name(_Name)
+	, type(_Type)
 {
-	IsDirty = true;
-	IsProperlyConnected = true;
+	isDirty = true;
+	isProperlyConnected = true;
 }
 
 
 Node::Node( const Node& Original )
-	: Name(Original.Name)
-	, Type(Original.Type)
+	: name(Original.name)
+	, type(Original.type)
 {}
 
 
 void Node::ConnectToSlot(Slot* S)
 {
 	/// No need for typecheck, the Slot already did that.
-	Dependants.push_back(S);
+	dependants.push_back(S);
 }
 
 
 void Node::DisconnectFromSlot( Slot* S )
 {
-	Dependants.erase(std::remove(Dependants.begin(), Dependants.end(), S), Dependants.end());
+	dependants.erase(std::remove(dependants.begin(), dependants.end(), S), dependants.end());
 }
 
 
 const vector<Slot*>& Node::GetDependants() const
 {
-	return Dependants;
+	return dependants;
 }
 
 
 NodeType Node::GetType() const
 {
-	return Type;
+	return type;
 }
 
 
@@ -211,9 +211,9 @@ void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 		//SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
 		/// Fall through:
 	case NodeMessage::VALUE_CHANGED:
-		if (!IsDirty)
+		if (!isDirty)
 		{
-			IsDirty = true;
+			isDirty = true;
 			SendMessage(NodeMessage::VALUE_CHANGED);
 		}
 		break;
@@ -225,9 +225,9 @@ void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 
 void Node::SendMessage(NodeMessage Message, const void* Payload)
 {
-	for (Slot* slot : Dependants) 
+	for (Slot* slot : dependants) 
 	{
-		slot->Owner->ReceiveMessage(slot, Message, Payload);
+		slot->owner->ReceiveMessage(slot, Message, Payload);
 	}
 }
 
@@ -235,35 +235,35 @@ void Node::SendMessage(NodeMessage Message, const void* Payload)
 void Node::ReceiveMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
 	HandleMessage(S, Message, Payload);
-	OnMessageReceived(S, Message, Payload);
+	onMessageReceived(S, Message, Payload);
 }
 
 
 void Node::CheckConnections()
 {
-	foreach (Slot* slot, Slots)
+	foreach (Slot* slot, slotList)
 	{
 		/// TODO: handle multislots
-		if (!slot->IsMultiSlot && slot->GetNode() == NULL)
+		if (!slot->isMultiSlot && slot->GetNode() == NULL)
 		{
-			IsProperlyConnected = false;
+			isProperlyConnected = false;
 			return;
 		}
 	}
-	IsProperlyConnected = true;
+	isProperlyConnected = true;
 }
 
 
 void Node::Evaluate()
 {
-	if (IsDirty && IsProperlyConnected)
+	if (isDirty && isProperlyConnected)
 	{
-		foreach(Slot* slot, Slots) 
+		foreach(Slot* slot, slotList) 
 		{
 			slot->GetNode()->Evaluate();
 		}
 		Operate();
-		IsDirty = false;
+		isDirty = false;
 	}
 }
 

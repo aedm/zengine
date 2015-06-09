@@ -33,7 +33,7 @@ void DocumentWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const v
 		for (Node* node : doc->Graphs.GetMultiNodes())
 		{
 			GraphNode* graph = static_cast<GraphNode*>(node);
-			QStandardItem* item = new QStandardItem(QString::fromStdString(graph->Name));
+			QStandardItem* item = new QStandardItem(QString::fromStdString(graph->name));
 			item->setData(QVariant::fromValue(graph), GraphNodeRole);
 			Model->appendRow(item);
 			//GraphNode* p = index.data(GraphNodeRole).value<GraphNode*>();
