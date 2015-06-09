@@ -12,6 +12,7 @@ public:
 
 protected:
 	void			Paint(GLWidget* Widget);
+	virtual void	HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload) override;
 
 	Drawable*		TheDrawable;
 	Material*		TheMaterial;

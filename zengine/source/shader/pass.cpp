@@ -5,8 +5,11 @@
 
 Pass::Pass()
 	: Node(NodeType::PASS, "Pass")
-	, VertexShader(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
-	, FragmentShader(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
+	, VertexStub(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
+	, FragmentStub(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
+	, VertexSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
+	, FragmentSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
+	, Handle(-1)
 {
 }
 
@@ -18,8 +21,27 @@ void Pass::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 	switch (Message)
 	{
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
+		if (S == &VertexStub) {
+			if (VertexStub.GetNode() == nullptr) {
+				VertexSource.Connect(nullptr);
+			} else {
+				VertexSource.Connect(static_cast<ShaderStub*>(
+					VertexStub.GetNode())->GetShaderSource());
+			}
+		}
+		else if (S == &FragmentStub) {
+			if (FragmentStub.GetNode() == nullptr) {
+				FragmentSource.Connect(nullptr);
+			} else {
+				FragmentSource.Connect(static_cast<ShaderStub*>(
+					FragmentStub.GetNode())->GetShaderSource());
+			}
+		}
+		break;
 	case NodeMessage::VALUE_CHANGED:
-		BuildRenderPipeline();
+		if (S == &VertexSource || S == &FragmentSource) {
+			BuildRenderPipeline();
+		}
 		break;
 	default: break;
 	}
@@ -27,14 +49,15 @@ void Pass::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 
 void Pass::BuildRenderPipeline()
 {
+	INFO("Building render pipeline...");
 	Uniforms.clear();
 	Attributes.clear();
-	Handle = 0;
+	Handle = -1;
 
 	//ShaderSource2* vertex = static_cast<ShaderSource2*>(VertexShader.GetNode());
 	//ShaderSource2* fragment = static_cast<ShaderSource2*>(FragmentShader.GetNode());
-	ShaderStub* vertexStub = static_cast<ShaderStub*>(VertexShader.GetNode());
-	ShaderStub* fragmentStub = static_cast<ShaderStub*>(FragmentShader.GetNode());
+	ShaderStub* vertexStub = static_cast<ShaderStub*>(VertexStub.GetNode());
+	ShaderStub* fragmentStub = static_cast<ShaderStub*>(FragmentStub.GetNode());
 	if (vertexStub == nullptr || fragmentStub == nullptr) return;
 
 	ShaderSource2* vertex = vertexStub->GetShaderSource();
@@ -84,6 +107,8 @@ void Pass::BuildRenderPipeline()
 
 void Pass::Set(Globals* Global)
 {
+	ASSERT(Handle != -1);
+
 	TheDrawingAPI->SetShaderProgram(Handle);
 
 	/// Set uniforms
@@ -121,5 +146,10 @@ const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes()
 Node* Pass::Clone() const
 {
 	return new Pass();
+}
+
+bool Pass::IsComplete()
+{
+	return Handle != -1;
 }
 

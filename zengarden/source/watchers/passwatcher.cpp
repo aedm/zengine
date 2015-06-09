@@ -49,3 +49,18 @@ void PassWatcher::Paint(GLWidget* Widget)
 
 	TheDrawable->Draw(&TheGlobals);
 }
+
+void PassWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
+{
+	switch (Message)
+	{
+	case NodeMessage::NEEDS_REDRAW:
+	case NodeMessage::VALUE_CHANGED:
+		Pass* pass = static_cast<Pass*>(GetNode());
+		if (S == &pass->FragmentSource || S == &pass->VertexSource) {
+			GLWidget* glWidget = static_cast<GLWatcherWidget*>(Widget)->TheGLWidget;
+			glWidget->updateGL();
+		}
+		break;
+	}
+}

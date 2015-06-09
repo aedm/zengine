@@ -25,10 +25,18 @@ public:
 
 	virtual Node*		Clone() const override;
 
-	Slot				FragmentShader;
-	Slot				VertexShader;
+	Slot				FragmentStub;
+	Slot				VertexStub;
+
+	/// Hidden, automatic slots
+	Slot				FragmentSource;
+	Slot				VertexSource;
 
 	void				Set(Globals* Global);
+
+	/// Returns true if pass can be used
+	bool				IsComplete();
+
 	const vector<ShaderAttributeDesc>&		GetUsedAttributes();
 	
 protected:

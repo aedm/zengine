@@ -80,6 +80,10 @@ public:
 	const map<ShaderStubParameter*, Slot*>& GetParameterSlotMap();
 
 protected:
+	/// Handle received messages
+	virtual void					HandleMessage(Slot* S, NodeMessage Message, 
+										const void* Payload) override;
+
 	/// Metadata
 	ShaderStubMetadata*				Metadata;
 

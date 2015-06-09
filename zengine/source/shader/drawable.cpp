@@ -18,6 +18,7 @@ void Drawable::Draw(Globals* Global)
 
 	/// Set pass (pipeline state)
 	Pass* pass = material->GetPass();
+	if (!pass->IsComplete()) return;
 	pass->Set(Global);
 
 	/// Set vertex buffer and attributes

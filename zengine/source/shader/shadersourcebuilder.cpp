@@ -9,6 +9,7 @@ void ShaderSourceBuilder::FromStub(ShaderStub* Stub, ShaderSource2* Source)
 ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* _Stub, ShaderSource2* _Source)
 	: Source(_Source)
 {
+	INFO("Building shader source...");
 	SafeDelete(Source->Metadata);
 	for (Slot* slot : Source->Slots) {
 		if (slot != &Source->Stub) delete slot;
@@ -28,14 +29,14 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* _Stub, ShaderSource2* _Sour
 				CollectStubMetadata(node);
 			}
 			else {
-				NOT_IMPLEMENTED;
+				///NOT_IMPLEMENTED;
+				/// TODO: generate uniforms here
 			}
 		}
 		GenerateSlots();
 		GenerateSource();
 		_Source->Metadata = new ShaderSourceMetadata(Inputs, Outputs, Uniforms);
 	} catch (...) {
-		Source->ReceiveMessage(nullptr, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
 	}
 }
 
@@ -90,7 +91,11 @@ void ShaderSourceBuilder::CollectDependencies(Node* Root)
 		for (Slot* slot : Root->Slots)
 		{
 			Node* node = slot->GetNode();
-			if (DataMap.find(node) != DataMap.end())
+			if (node == nullptr) {
+				WARN("Incomplete shader graph.");
+				throw exception();
+			}
+			if (DataMap.find(node) == DataMap.end())
 			{
 				CollectDependencies(node);
 			}
@@ -246,7 +251,7 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream)
 					throw exception();
 				}
 				NodeData* paramData = DataMap.at(paramNode);
-				stream << GetTypeString(param->Type) << ' ' << paramData->VariableName;
+				stream << paramData->VariableName;
 				if (i < stubMeta->Parameters.size() - 1) stream << ", ";
 			}
 			stream << ");" << endl;

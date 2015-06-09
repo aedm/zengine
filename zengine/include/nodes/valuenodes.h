@@ -115,12 +115,12 @@ public:
 
 	/// Attaches slot to node. If the node parameter is nullptr, 
 	/// the slot connects to the built-in node instead.
-	virtual bool				Connect(Node* Nd);
+	virtual bool				Connect(Node* Nd) override;
 
 	/// Disconnects a node from this slot, and connects it
 	/// to the built-in node.
-	virtual void				Disconnect(Node* Nd);
-	virtual void				DisconnectAll();
+	virtual void				Disconnect(Node* Nd) override;
+	virtual void				DisconnectAll(bool NotifyOwner) override;
 	
 	/// Returns true if slot is connected to its own default node
 	bool						IsDefaulted();
@@ -193,11 +193,13 @@ void ValueSlot<T>::Disconnect(Node* Nd)
 
 
 template<NodeType T>
-void ValueSlot<T>::DisconnectAll()
+void ValueSlot<T>::DisconnectAll(bool NotifyOwner)
 {
 	if (ConnectedNode == &Default) return;
 	Default.ConnectToSlot(this);
-	Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+	if (NotifyOwner) {
+		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+	}
 }
 
 

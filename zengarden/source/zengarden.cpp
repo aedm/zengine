@@ -86,8 +86,8 @@ void ZenGarden::InitModules()
 
 		/// pass
 		auto pass = new Pass();
-		pass->FragmentShader.Connect(fragmentStub);
-		pass->VertexShader.Connect(vertexStub);
+		pass->FragmentStub.Connect(fragmentStub);
+		pass->VertexStub.Connect(vertexStub);
 		TheCommandStack->Execute(new CreateNodeCommand(pass, graphEditor));
 		ow = graphEditor->GetNodeWidget(pass);
 		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(180, 200)));

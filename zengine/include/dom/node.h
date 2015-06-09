@@ -52,8 +52,9 @@ public:
 	/// Disconnects a node from this slot. 
 	virtual void			Disconnect(Node* Nd);
 
-	/// Disconnects all nodes from this slot.
-	virtual void			DisconnectAll();
+	/// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
+	/// send a SLOT_CONNECTION_CHANGED message to its owner.
+	virtual void			DisconnectAll(bool NotifyOwner);
 
 	/// Removes the connected node from connected nodes list, 
 	/// and reinserts it at the "TargetIndex" position. Only for multislots.
@@ -147,6 +148,9 @@ protected:
 	/// Output type
 	NodeType					Type;
 
+	/// Check if all slots are properly connected to an operator
+	void						CheckConnections();
+
 private:
 	/// True if Operate() needs to be called
 	bool						IsDirty;
@@ -157,9 +161,6 @@ private:
 	/// Add or remove slot to/from notification list
 	void						ConnectToSlot(Slot* S);			
 	void						DisconnectFromSlot(Slot* S);	
-
-	/// Check if all slots are properly connected to an operator
-	void						CheckConnections();
 };
 
 

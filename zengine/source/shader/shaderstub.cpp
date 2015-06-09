@@ -74,6 +74,21 @@ const string& ShaderStub::GetStubSource() const
 	return Source;
 }
 
+void ShaderStub::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
+{
+	switch (Message)
+	{
+	case NodeMessage::SLOT_CONNECTION_CHANGED:
+		CheckConnections();
+		/// Fall through:
+	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
+		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+		break;
+	default:
+		break;
+	}
+}
+
 ShaderStubMetadata::ShaderStubMetadata(const string& _Name, NodeType _ReturnType,
 	const string& _StrippedSource,
 	OWNERSHIP const vector<ShaderStubParameter*>& _Parameters,

@@ -21,7 +21,7 @@ Slot::Slot(NodeType _Type, Node* _Owner, SharedString _Name, bool _IsMultiSlot,
 
 Slot::~Slot()
 {
-	DisconnectAll();
+	DisconnectAll(false);
 }
 
 
@@ -78,24 +78,26 @@ void Slot::Disconnect(Node* Nd)
 	{
 		ASSERT(Nd == ConnectedNode);
 		ASSERT(Nd != nullptr);
-		DisconnectAll();
+		DisconnectAll(true);
 	}
 }
 
 
-void Slot::DisconnectAll()
+void Slot::DisconnectAll(bool NotifyOwner)
 {
 	if (IsMultiSlot) {
 		for (auto it = MultiNodes.begin(); it != MultiNodes.end(); it++) {
 			(*it)->DisconnectFromSlot(this);
 		}
 		MultiNodes.clear();
-		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 	else
 	{
 		if (ConnectedNode) ConnectedNode->DisconnectFromSlot(this);
 		ConnectedNode = nullptr;
+	}
+
+	if (NotifyOwner) {
 		Owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 	}
 }
@@ -206,7 +208,7 @@ void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 	{
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
 		CheckConnections();
-		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+		//SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
 		/// Fall through:
 	case NodeMessage::VALUE_CHANGED:
 		if (!IsDirty)
@@ -215,15 +217,7 @@ void Node::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 			SendMessage(NodeMessage::VALUE_CHANGED);
 		}
 		break;
-	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
-		break;
-	case NodeMessage::NEEDS_REDRAW:
-	case NodeMessage::SLOT_STRUCTURE_CHANGED:
-		/// Only watchers need to handle this.
-		break;
 	default:
-		WARN("Unhandled message: ", (UINT)Message);
 		break;
 	}
 }

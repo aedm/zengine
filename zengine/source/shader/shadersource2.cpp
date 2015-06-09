@@ -11,6 +11,12 @@ ShaderSource2::ShaderSource2()
 ShaderSource2::~ShaderSource2()
 {
 	SafeDelete(Metadata);
+	/// There are dynamically created slots that won't be automatically 
+	/// disconencted.
+	for (Slot* slot : Slots)
+	{
+		slot->DisconnectAll(false);
+	}
 }
 
 
@@ -30,12 +36,12 @@ void ShaderSource2::HandleMessage(Slot* S, NodeMessage Message, const void* Payl
 		if (S == &Stub)
 		{
 			ShaderSourceBuilder::FromStub(static_cast<ShaderStub*>(Stub.GetNode()), this);
+			SendMessage(NodeMessage::VALUE_CHANGED, nullptr);
 		}
 		break;
-		//case NodeMessage::VALUE_CHANGED:
-		//	break;
-		//case NodeMessage::NEEDS_REDRAW:
-		//	break;
+	case NodeMessage::VALUE_CHANGED:
+		SendMessage(NodeMessage::NEEDS_REDRAW, nullptr);
+		break;
 	default:
 		break;
 	}
