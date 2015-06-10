@@ -3,38 +3,35 @@
 
 
 MeshNode::MeshNode()
-	: Node(NodeType::MESH, "Meshzzz")
-{}
+  : Node(NodeType::MESH, "Meshzzz") {}
 
 
 StaticMeshNode::StaticMeshNode()
-	: MeshNode()
-{}
+  : MeshNode() {}
 
-StaticMeshNode::~StaticMeshNode()
-{
-	if (mMesh) TheResourceManager->DiscardMesh(mMesh);
-}
 
-StaticMeshNode* StaticMeshNode::Create( OWNERSHIP Mesh* _Value )
-{
-	StaticMeshNode* meshNode = new StaticMeshNode();
-	meshNode->mMesh = _Value;
-	return meshNode;
-}
-
-MeshSlot::MeshSlot(Node* Owner, SharedString Name)
-	: Slot(NodeType::MESH, Owner, Name)
-{}
-
-const Mesh* MeshSlot::GetMesh() const
-{
-	MeshNode* node = static_cast<MeshNode*>(GetNode());
-	return node == nullptr ? nullptr : node->GetMesh();
+StaticMeshNode::~StaticMeshNode() {
+  if (mMesh) TheResourceManager->DiscardMesh(mMesh);
 }
 
 
-Mesh* MeshNode::GetMesh() const
-{
-	return mMesh;
+StaticMeshNode* StaticMeshNode::Create(OWNERSHIP Mesh* mesh) {
+  StaticMeshNode* meshNode = new StaticMeshNode();
+  meshNode->mMesh = mesh;
+  return meshNode;
+}
+
+
+MeshSlot::MeshSlot(Node* owner, SharedString name)
+  : Slot(NodeType::MESH, owner, name) {}
+
+
+const Mesh* MeshSlot::GetMesh() const {
+  MeshNode* node = static_cast<MeshNode*>(GetNode());
+  return node == nullptr ? nullptr : node->GetMesh();
+}
+
+
+Mesh* MeshNode::GetMesh() const {
+  return mMesh;
 }
