@@ -29,7 +29,7 @@ GraphEditor::GraphEditor(WatcherWidget* Parent, QGLWidget* Share)
 	HoveredWidget = NULL;
 	HoveredSlot = -1;
 
-	EventZengineInitDone += Delegate(this, &GraphEditor::Init);
+	OnZengineInitDone += Delegate(this, &GraphEditor::Init);
 }
 
 void GraphEditor::paintGL()

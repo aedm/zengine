@@ -2,19 +2,14 @@
 
 
 Material::Material()
-	: Node(NodeType::MATERIAL, "Material")
-	, mSolidPass(NodeType::PASS, this, make_shared<string>("Solid pass"))
-{}
+  : Node(NodeType::MATERIAL, "Material")
+  , mSolidPass(NodeType::PASS, this, make_shared<string>("Solid pass")) {}
 
 
-Material::~Material()
-{}
+Material::~Material() {}
 
-void Material::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
-{
-}
+void Material::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {}
 
-Pass* Material::GetPass()
-{
-	return static_cast<Pass*>(mSolidPass.GetNode());
+Pass* Material::GetPass() {
+  return static_cast<Pass*>(mSolidPass.GetNode());
 }

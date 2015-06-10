@@ -6,10 +6,10 @@
 class ShaderSourceBuilder
 {
 public:
-	static void FromStub(ShaderStub* Stub, ShaderSource2* Source);
+	static void FromStub(ShaderStub* stub, ShaderSource2* source);
 
 private:
-	ShaderSourceBuilder(ShaderStub* Stub, ShaderSource2* Source);
+	ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source);
 	~ShaderSourceBuilder();
 
 	struct NodeData
@@ -26,36 +26,35 @@ private:
 	};
 
 	/// Creates topological order of dependency tree
-	void						CollectDependencies(Node* Root);
+	void CollectDependencies(Node* root);
 	
 	/// Generates function and variable names
-	void						GenerateNames();
+	void GenerateNames();
 
 	/// Generate metadata
-	void						CollectStubMetadata(Node* Nd);
-	void						GenerateSourceMetadata();
-	void						GenerateSlots();
+	void CollectStubMetadata(Node* node);
+  void GenerateSourceMetadata();
+	void GenerateSlots();
 
 	/// Generate source
-	void						GenerateSource();
-	void						GenerateSourceHeader(stringstream& stream);
-	void						GenerateSourceFunctions(stringstream& stream);
-	void						GenerateSourceMain(stringstream& stream);
+	void GenerateSource();
+	void GenerateSourceHeader(stringstream& stream);
+	void GenerateSourceFunctions(stringstream& stream);
+	void GenerateSourceMain(stringstream& stream);
 
-	static const string&		GetTypeString(NodeType Type);
+	static const string& GetTypeString(NodeType type);
 
 	/// Topologic order of dependencies
-	vector<Node*>				Dependencies;
+	vector<Node*> mDependencies;
 
 	/// Metadata for analyzing nodes
-	map<Node*, NodeData*>		DataMap;
+	map<Node*, NodeData*> mDataMap;
 
-	//ShaderStub*					Stub;
-	ShaderSource2*				Source;
+	ShaderSource2* mSource;
 
 	/// Metadata
-	map<string, ShaderSourceVariable*>	InputsMap;
-	vector<ShaderSourceVariable*>	Inputs;
-	vector<ShaderSourceVariable*>	Outputs;
-	vector<ShaderSourceUniform*>	Uniforms;
+	map<string, ShaderSourceVariable*> mInputsMap;
+	vector<ShaderSourceVariable*>	mInputs;
+	vector<ShaderSourceVariable*>	mOutputs;
+	vector<ShaderSourceUniform*> mUniforms;
 };

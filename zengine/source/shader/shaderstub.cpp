@@ -2,109 +2,94 @@
 #include <include/shader/shaderstub.h>
 #include <include/shader/shadersource2.h>
 
-ShaderStub::ShaderStub(const string& _Source)
-	: Node(NodeType::SHADER_STUB, "ShaderStub")
-	, mMetadata(nullptr)
-	, mShaderSrc(nullptr)
-{
-	SetStubSource(_Source);
+ShaderStub::ShaderStub(const string& source)
+  : Node(NodeType::SHADER_STUB, "ShaderStub")
+  , mMetadata(nullptr)
+  , mShaderSrc(nullptr) {
+  SetStubSource(source);
 }
 
-ShaderStub::ShaderStub(const ShaderStub& Original)
-	: Node(Original)
-	, mMetadata(nullptr)
-	, mShaderSrc(nullptr)
-{
-	SetStubSource(Original.GetStubSource());
+ShaderStub::ShaderStub(const ShaderStub& original)
+  : Node(original)
+  , mMetadata(nullptr)
+  , mShaderSrc(nullptr) {
+  SetStubSource(original.GetStubSource());
 }
 
-ShaderStub::~ShaderStub()
-{
-	SafeDelete(mMetadata);
+ShaderStub::~ShaderStub() {
+  SafeDelete(mMetadata);
 }
 
-void ShaderStub::SetStubSource(const string& _Source)
-{
-	mSource = _Source;
+void ShaderStub::SetStubSource(const string& source) {
+  mSource = source;
 
-	/// TODO: dont do this
-	for (Slot* slot : mSlots) delete slot;
-	mSlots.clear();
-	mParameterSlotMap.clear();
-	
-	SafeDelete(mMetadata);
-	mMetadata = StubAnalyzer::FromText(mSource.c_str());
+  /// TODO: dont do this
+  for (Slot* slot : mSlots) delete slot;
+  mSlots.clear();
+  mParameterSlotMap.clear();
 
-	if (mMetadata == nullptr) return;
+  SafeDelete(mMetadata);
+  mMetadata = StubAnalyzer::FromText(mSource.c_str());
 
-	for (auto param : mMetadata->parameters)
-	{
-		Slot* slot = new Slot(param->type, this, make_shared<string>(param->name), false);
-		mParameterSlotMap[param] = slot;
-	}
+  if (mMetadata == nullptr) return;
+
+  for (auto param : mMetadata->parameters) {
+    Slot* slot = new Slot(param->type, this, make_shared<string>(param->name), false);
+    mParameterSlotMap[param] = slot;
+  }
 }
 
-ShaderSource2* ShaderStub::GetShaderSource()
-{
-	if (mShaderSrc == nullptr)
-	{
-		mShaderSrc = new ShaderSource2();
-		mShaderSrc->mStub.Connect(this);
-	}
-	return mShaderSrc;
+ShaderSource2* ShaderStub::GetShaderSource() {
+  if (mShaderSrc == nullptr) {
+    mShaderSrc = new ShaderSource2();
+    mShaderSrc->mStub.Connect(this);
+  }
+  return mShaderSrc;
 }
 
-ShaderStubMetadata* ShaderStub::GetStubMetadata() const
-{
-	return mMetadata;
+ShaderStubMetadata* ShaderStub::GetStubMetadata() const {
+  return mMetadata;
 }
 
-const map<ShaderStubParameter*, Slot*>& ShaderStub::GetParameterSlotMap()
-{
-	return mParameterSlotMap;
+const map<ShaderStubParameter*, Slot*>& ShaderStub::GetParameterSlotMap() {
+  return mParameterSlotMap;
 }
 
-Node* ShaderStub::Clone() const
-{
-	return new ShaderStub(*this);
+Node* ShaderStub::Clone() const {
+  return new ShaderStub(*this);
 }
 
-const string& ShaderStub::GetStubSource() const
-{
-	return mSource;
+const string& ShaderStub::GetStubSource() const {
+  return mSource;
 }
 
-void ShaderStub::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
-{
-	switch (Message)
-	{
-	case NodeMessage::SLOT_CONNECTION_CHANGED:
-		CheckConnections();
-		/// Fall through:
-	case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-		SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
-		break;
-	default:
-		break;
-	}
+void ShaderStub::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+  switch (message) {
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+      CheckConnections();
+      /// Fall through:
+    case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
+      SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+      break;
+    default:
+      break;
+  }
 }
 
-ShaderStubMetadata::ShaderStubMetadata(const string& _Name, NodeType _ReturnType,
-	const string& _StrippedSource,
-	OWNERSHIP const vector<ShaderStubParameter*>& _Parameters,
-	const vector<ShaderStubGlobal*>& _Globals,
-	const vector<ShaderStubVariable*>& _Inputs,
-	const vector<ShaderStubVariable*>& _Outputs)
-	: name(_Name)
-	, returnType(_ReturnType)
-	, parameters(_Parameters)
-	, globals(_Globals)
-	, strippedSource(_StrippedSource)
-	, inputs(_Inputs)
-	, outputs(_Outputs)
-{}
+ShaderStubMetadata::ShaderStubMetadata(const string& _name, NodeType _returnType,
+    const string& _strippedSource, 
+    OWNERSHIP const vector<ShaderStubParameter*>& _parameters,
+    const vector<ShaderStubGlobal*>& _globals,
+    const vector<ShaderStubVariable*>& _inputs,
+    const vector<ShaderStubVariable*>& _outputs)
+  : name(_name)
+  , returnType(_returnType)
+  , parameters(_parameters)
+  , globals(_globals)
+  , strippedSource(_strippedSource)
+  , inputs(_inputs)
+  , outputs(_outputs) {}
 
-ShaderStubMetadata::~ShaderStubMetadata()
-{
-	for (auto x : parameters) delete(x);
+ShaderStubMetadata::~ShaderStubMetadata() {
+  for (auto x : parameters) delete(x);
 }
