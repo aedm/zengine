@@ -86,8 +86,8 @@ void ZenGarden::InitModules()
 
 		/// pass
 		auto pass = new Pass();
-		pass->FragmentStub.Connect(fragmentStub);
-		pass->VertexStub.Connect(vertexStub);
+		pass->mFragmentStub.Connect(fragmentStub);
+		pass->mVertexStub.Connect(vertexStub);
 		TheCommandStack->Execute(new CreateNodeCommand(pass, graphEditor));
 		ow = graphEditor->GetNodeWidget(pass);
 		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(180, 200)));
@@ -142,7 +142,7 @@ GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 void ZenGarden::NewGraph()
 {
 	GraphNode* graph = new GraphNode();
-	graph->name = string("Graph ") + to_string(++NextGraphIndex);
+	graph->mName = string("Graph ") + to_string(++NextGraphIndex);
 	Doc->Graphs.Connect(graph);
 }
 
@@ -176,7 +176,7 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 	default: return;
 	}
 
-	int index = tabWidget->addTab(watcherWidget, QString::fromStdString(Nd->name));
+	int index = tabWidget->addTab(watcherWidget, QString::fromStdString(Nd->mName));
 	tabWidget->setCurrentIndex(index);
 
 	//GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);

@@ -11,11 +11,11 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* _Stub, ShaderSource2* _Sour
 {
 	INFO("Building shader source...");
 	SafeDelete(Source->Metadata);
-	for (Slot* slot : Source->slotList) {
+	for (Slot* slot : Source->mSlots) {
 		if (slot != &Source->Stub) delete slot;
 	}
-	Source->slotList.clear();
-	Source->slotList.push_back(&Source->Stub);
+	Source->mSlots.clear();
+	Source->mSlots.push_back(&Source->Stub);
 
 	if (_Stub == nullptr) return;
 
@@ -88,7 +88,7 @@ void ShaderSourceBuilder::CollectDependencies(Node* Root)
 
 	if (Root->GetType() == NodeType::SHADER_STUB)
 	{
-		for (Slot* slot : Root->slotList)
+		for (Slot* slot : Root->mSlots)
 		{
 			Node* node = slot->GetNode();
 			if (node == nullptr) {

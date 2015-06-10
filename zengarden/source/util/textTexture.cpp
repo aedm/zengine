@@ -43,12 +43,12 @@ void TextTexture::SetText( const QString& Text, const QFont& Font )
 	QImage image = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
 
 	/// Upload to texture
-	if (TheTexture == NULL || TheTexture->Width < tw || TheTexture->Height < th)
+	if (TheTexture == NULL || TheTexture->mWidth < tw || TheTexture->mHeight < th)
 	{
 		DestroyTexture();
 		TheTexture = TheResourceManager->CreateTexture(tw, th, TEXELTYPE_RGBA_UINT8, image.bits());
 	} else {
-		TheDrawingAPI->UploadTextureSubData(TheTexture->Handle, 0, 0, tw, th, TEXELTYPE_RGBA_UINT8, 
+		TheDrawingAPI->UploadTextureSubData(TheTexture->mHandle, 0, 0, tw, th, TEXELTYPE_RGBA_UINT8, 
 			image.bits());
 	}
 }

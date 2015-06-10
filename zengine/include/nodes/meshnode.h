@@ -4,34 +4,31 @@
 #include "../resources/mesh.h"
 #include "../nodes/valuenodes.h"
 
-class MeshSlot : public Slot
-{
+class MeshSlot: public Slot {
 public:
-	MeshSlot(Node* Owner, SharedString Name);
+  MeshSlot(Node* owner, SharedString name);
 
-	const Mesh*					GetMesh() const;
+  const Mesh*	GetMesh() const;
 };
 
 
 /// Abstract Mesh node.
-class MeshNode : public Node
-{
+class MeshNode: public Node {
 public:
-	MeshNode();
+  MeshNode();
 
-	Mesh*						GetMesh() const;
+  Mesh*	GetMesh() const;
 
 protected:
-	Mesh*						MeshValue;
+  Mesh*	mMesh;
 };
 
 
 /// A simple static mesh container.
-class StaticMeshNode : public MeshNode
-{
+class StaticMeshNode: public MeshNode {
 public:
-	StaticMeshNode();
-	virtual ~StaticMeshNode();
+  StaticMeshNode();
+  virtual ~StaticMeshNode();
 
-	static StaticMeshNode*		Create(OWNERSHIP Mesh* Value);
+  static StaticMeshNode* Create(OWNERSHIP Mesh* mesh);
 };

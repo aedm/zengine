@@ -79,7 +79,7 @@ bool DeleteNodeCommand::Do()
 {
 	NOT_IMPLEMENTED
 	foreach(NodeWidget* nw, NodeWidgets) {
-		foreach (Slot* slot, nw->GetNode()->slotList) {
+		foreach (Slot* slot, nw->GetNode()->mSlots) {
 			slot->Connect(NULL);
 		}
 	}

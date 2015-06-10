@@ -52,7 +52,7 @@ void ShaderNode::Init()
 
 void ShaderNode::Set()
 {
-	ASSERT(isProperlyConnected);
+	ASSERT(mIsProperlyConnected);
 
 	ShaderProgram->Set();
 
@@ -72,7 +72,7 @@ void ShaderNode::Set()
 		Texture* const texture = slot.SourceSlot->Get();
 		if (texture)
 		{
-			TheDrawingAPI->SetTexture(slot.TargetSampler->Handle, texture->Handle, i);
+			TheDrawingAPI->SetTexture(slot.TargetSampler->Handle, texture->mHandle, i);
 		} else {
 			ERR("Null texture defined for sampler.");
 		}

@@ -5,94 +5,85 @@
 
 /// Nodes holding primitive values.
 template<NodeType T>
-class ValueNode: public Node
-{
+class ValueNode: public Node {
 protected:
-	typedef typename NodeTypes<T>::Type ValueType;
+  typedef typename NodeTypes<T>::Type ValueType;
 
 public:
-	ValueNode(const string& Name);
+  ValueNode(const string& name);
 
-	/// For cloning
-	ValueNode(const ValueNode<T>& Original);
+  /// For cloning
+  ValueNode(const ValueNode<T>& original);
 
-	/// Returns value of node. Reevaluates if necessary
-	virtual const ValueType&	Get() = 0;
+  /// Returns value of node. Reevaluates if necessary
+  virtual const ValueType& Get() = 0;
 };
 
 
 template<NodeType T>
-ValueNode<T>::ValueNode(const string& Name)
-	: Node(T, Name)
-{}
+ValueNode<T>::ValueNode(const string& name)
+  : Node(T, name) {}
 
 
 template<NodeType T>
-ValueNode<T>::ValueNode( const ValueNode<T>& Original )
-	: Node(Original)
-{}
+ValueNode<T>::ValueNode(const ValueNode<T>& original)
+  : Node(original) {}
 
 
 /// Simple static value nodes
 template<NodeType T>
-class StaticValueNode : public ValueNode < T >
-{
+class StaticValueNode: public ValueNode <T> {
 public:
-	StaticValueNode();
+  StaticValueNode();
 
-	/// For cloning
-	StaticValueNode(const StaticValueNode<T>& Original);
+  /// For cloning
+  StaticValueNode(const StaticValueNode<T>& original);
 
-	/// Returns value of node. Reevaluates if necessary
-	virtual const ValueType&	Get() override;
+  /// Returns value of node. Reevaluates if necessary
+  virtual const ValueType& Get() override;
 
-	/// Sets value of node.
-	void						Set(const ValueType& NewValue);
+  /// Sets value of node.
+  void Set(const ValueType& newValue);
 
-	/// Clone node
-	virtual Node*				Clone() const override;
+  /// Clone node
+  virtual Node* Clone() const override;
 
 protected:
-	/// Output value of the node
-	ValueType					Value;
+  /// Output value of the node
+  ValueType mValue;
 };
 
 
 template<NodeType T>
 StaticValueNode<T>::StaticValueNode()
-	: ValueNode(gVariableNames[(UINT)T])
-{
-	Value = ValueType();
+  : ValueNode(gVariableNames[(UINT)T]) {
+  mValue = ValueType();
 }
 
 
 template<NodeType T>
-StaticValueNode<T>::StaticValueNode(const StaticValueNode<T>& Original)
-	: ValueNode(Original)
-{
-	Value = Original.Value;
+StaticValueNode<T>::StaticValueNode(const StaticValueNode<T>& original)
+  : ValueNode(original) {
+  mValue = original.mValue;
 }
 
 
 template<NodeType T>
-Node* StaticValueNode<T>::Clone() const
-{
-	return new StaticValueNode<T>(*this);
+Node* StaticValueNode<T>::Clone() const {
+  return new StaticValueNode<T>(*this);
 }
 
 
 template<NodeType T>
-const typename StaticValueNode<T>::ValueType& StaticValueNode<T>::Get()
-{
-	return Value;
+const typename StaticValueNode<T>::ValueType& StaticValueNode<T>::Get() {
+  return mValue;
 }
 
 
 template<NodeType T>
-void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& NewValue)
-{
-	Value = NewValue;
-	SendMessage(NodeMessage::VALUE_CHANGED);
+void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
+  mValue = newValue;
+  SendMessage(NodeMessage::VALUE_CHANGED);
 }
 
 
@@ -101,131 +92,120 @@ void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& NewValue)
 /// even when there's no external node connected to them. Also, GetNode()
 /// never returns nullptr.
 template<NodeType T>
-class ValueSlot : public Slot
-{
+class ValueSlot: public Slot {
 public:
-	typedef typename NodeTypes<T>::Type ValueType;
+  typedef typename NodeTypes<T>::Type ValueType;
 
-	ValueSlot(Node* Owner, SharedString Name);
+  ValueSlot(Node* owner, SharedString name);
 
-	const ValueType&			Get() const;
+  const ValueType& Get() const;
 
-	/// Sets the value of the built-in Node.
-	void						SetDefaultValue(const ValueType& Value);
+  /// Sets the value of the built-in Node.
+  void SetDefaultValue(const ValueType& value);
 
-	/// Attaches slot to node. If the node parameter is nullptr, 
-	/// the slot connects to the built-in node instead.
-	virtual bool				Connect(Node* Nd) override;
+  /// Attaches slot to node. If the node parameter is nullptr, 
+  /// the slot connects to the built-in node instead.
+  virtual bool Connect(Node* node) override;
 
-	/// Disconnects a node from this slot, and connects it
-	/// to the built-in node.
-	virtual void				Disconnect(Node* Nd) override;
-	virtual void				DisconnectAll(bool NotifyOwner) override;
-	
-	/// Returns true if slot is connected to its own default node
-	bool						IsDefaulted();
+  /// Disconnects a node from this slot, and connects it
+  /// to the built-in node.
+  virtual void Disconnect(Node* node) override;
+  virtual void DisconnectAll(bool notifyOwner) override;
+
+  /// Returns true if slot is connected to its own default node
+  bool IsDefaulted();
 
 protected:
-	/// Default value
-	StaticValueNode<T>			Default;
+  /// Default value
+  StaticValueNode<T> mDefault;
 };
 
 
 template<NodeType T>
-ValueSlot<T>::ValueSlot(Node* Owner, SharedString Name)
-	: Slot(T, Owner, Name)
-{
-	Default.Set(ValueType());
-	Connect(&Default);
+ValueSlot<T>::ValueSlot(Node* owner, SharedString name)
+  : Slot(T, owner, name) {
+  mDefault.Set(ValueType());
+  Connect(&mDefault);
 }
 
 
 template<NodeType T>
-const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const
-{
-	return static_cast<ValueNode<T>*>(GetNode())->Get();
+const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const {
+  return static_cast<ValueNode<T>*>(GetNode())->Get();
 }
 
 
 template<NodeType T>
-void ValueSlot<T>::SetDefaultValue(const ValueType& Value)
-{
-	ASSERT(IsDefaulted());
-	Default.Set(Value);
-	owner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
+void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
+  ASSERT(IsDefaulted());
+  mDefault.Set(value);
+  mOwner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
 }
 
 
 template<NodeType T>
-bool ValueSlot<T>::Connect(Node* Nd)
-{
-	if (node == Nd || (Nd == nullptr && node == &Default)) return true;
-	if (Nd && Nd->GetType() != type)
-	{
-		/// TODO: use ASSERT only
-		ERR("Slot and operator type mismatch");
-		ASSERT(false);
-		return false;
-	}
-	if (node) node->DisconnectFromSlot(this);
-	node = Nd ? Nd : &Default;
-	node->ConnectToSlot(this);
-	owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
-	return true;
+bool ValueSlot<T>::Connect(Node* target) {
+  if (mNode == target || (target == nullptr && mNode == &mDefault)) return true;
+  if (target && target->GetType() != mType) {
+    /// TODO: use ASSERT only
+    ERR("Slot and operator type mismatch");
+    ASSERT(false);
+    return false;
+  }
+  if (mNode) mNode->DisconnectFromSlot(this);
+  mNode = target ? target : &mDefault;
+  mNode->ConnectToSlot(this);
+  mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+  return true;
 }
 
 
 template<NodeType T>
-void ValueSlot<T>::Disconnect(Node* Nd)
-{
-	ASSERT(Nd == node);
-	ASSERT(Nd != nullptr);
-	node->DisconnectFromSlot(this);
-	node = nullptr;
-	if (node == &Default)
-	{
-		/// Avoid infinite loop when called by the default node's destructor.
-		return;
-	}
-	Default.ConnectToSlot(this);
-	owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+void ValueSlot<T>::Disconnect(Node* target) {
+  ASSERT(target == mNode);
+  ASSERT(target != nullptr);
+  mNode->DisconnectFromSlot(this);
+  mNode = nullptr;
+  if (mNode == &mDefault) {
+    /// Avoid infinite loop when called by the default node's destructor.
+    return;
+  }
+  mDefault.ConnectToSlot(this);
+  mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 }
 
 
 template<NodeType T>
-void ValueSlot<T>::DisconnectAll(bool NotifyOwner)
-{
-	if (node == &Default) return;
-	Default.ConnectToSlot(this);
-	if (NotifyOwner) {
-		owner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
-	}
+void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
+  if (mNode == &mDefault) return;
+  mDefault.ConnectToSlot(this);
+  if (notifyOwner) {
+    mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+  }
 }
 
 
 template<NodeType T>
-bool ValueSlot<T>::IsDefaulted()
-{
-	return GetNode() == &Default;
+bool ValueSlot<T>::IsDefaulted() {
+  return GetNode() == &mDefault;
 }
 
 
 /// Helper cast
 template<NodeType T>
-inline static ValueSlot<T>* ToValueSlot(Slot* slot)
-{
-	return static_cast<ValueSlot<T>*>(slot);
+inline static ValueSlot<T>* ToValueSlot(Slot* slot) {
+  return static_cast<ValueSlot<T>*>(slot);
 }
 
 
 /// Node and slot types
 typedef ValueSlot<NodeType::FLOAT>			FloatSlot;
-typedef ValueSlot<NodeType::VEC4>			Vec4Slot;
+typedef ValueSlot<NodeType::VEC4>			  Vec4Slot;
 typedef ValueSlot<NodeType::MATRIX44>		Matrix4Slot;
 typedef ValueSlot<NodeType::TEXTURE>		TextureSlot;
 
-typedef StaticValueNode<NodeType::FLOAT>	FloatNode;
-typedef StaticValueNode<NodeType::VEC4>		Vec4Node;
+typedef StaticValueNode<NodeType::FLOAT>	  FloatNode;
+typedef StaticValueNode<NodeType::VEC4>		  Vec4Node;
 typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
 typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
 

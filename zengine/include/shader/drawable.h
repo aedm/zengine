@@ -4,15 +4,13 @@
 #include "../nodes/meshnode.h"
 #include "../shaders/shaders.h"
 
-class Drawable : public Node
-{
+class Drawable: public Node {
 public:
-	Drawable();
-	virtual ~Drawable();
+  Drawable();
+  virtual ~Drawable();
 
-	MeshSlot			TheMesh;
-	Slot				TheMaterial;
+  MeshSlot mMesh;
+  Slot mMaterial;
 
-	void				Draw(Globals* Global);
-
+  void Draw(Globals* globals);
 };

@@ -8,7 +8,7 @@ PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
 	glWidget->OnPaint += Delegate(this, &PassWatcher::Paint);
 
 	TheMaterial = new Material();
-	TheMaterial->SolidPass.Connect(PassNode);
+	TheMaterial->mSolidPass.Connect(PassNode);
 
 	/// Mesh
 	Vec2 TopLeft(10, 10), Size(100, 100);
@@ -25,8 +25,8 @@ PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
 	TheMesh = StaticMeshNode::Create(boxMesh);
 
 	TheDrawable = new Drawable();
-	TheDrawable->TheMaterial.Connect(TheMaterial);
-	TheDrawable->TheMesh.Connect(TheMesh);
+	TheDrawable->mMaterial.Connect(TheMaterial);
+	TheDrawable->mMesh.Connect(TheMesh);
 }
 
 PassWatcher::~PassWatcher() 
@@ -57,7 +57,7 @@ void PassWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void*
 	case NodeMessage::NEEDS_REDRAW:
 	case NodeMessage::VALUE_CHANGED:
 		Pass* pass = static_cast<Pass*>(GetNode());
-		if (S == &pass->FragmentSource || S == &pass->VertexSource) {
+		if (S == &pass->mFragmentSource || S == &pass->mVertexSource) {
 			GLWidget* glWidget = static_cast<GLWatcherWidget*>(Widget)->TheGLWidget;
 			glWidget->updateGL();
 		}

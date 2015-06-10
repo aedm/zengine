@@ -119,8 +119,8 @@ void UiPainter::DrawBox( const Vec2& TopLeft, const Vec2& Size )
 
 void UiPainter::DrawTexture( Texture* Tex, float x, float y )
 {
-	float w(Tex->Width);
-	float h(Tex->Height);
+	float w(Tex->mWidth);
+	float h(Tex->mHeight);
 	VertexPosUV vertices[] = { 
 		{ Vec3(x,	  y,     0), Vec2(0, 0) }, 
 		{ Vec3(x + w, y,     0), Vec2(1, 0) }, 
@@ -138,8 +138,8 @@ void UiPainter::DrawTextTexture( TextTexture* Tex, const Vec2& Position )
 {
 	float w = Tex->TextSize.width();
 	float h = Tex->TextSize.height();
-	float u = w / float(Tex->TheTexture->Width);
-	float v = h / float(Tex->TheTexture->Height);
+	float u = w / float(Tex->TheTexture->mWidth);
+	float v = h / float(Tex->TheTexture->mHeight);
 	VertexPosUV vertices[] = { 
 		{ Vec3(Position.x,		Position.y,     0), Vec2(0, 0) }, 
 		{ Vec3(Position.x + w,	Position.y,     0), Vec2(u, 0) }, 

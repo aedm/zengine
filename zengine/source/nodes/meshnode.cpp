@@ -13,13 +13,13 @@ StaticMeshNode::StaticMeshNode()
 
 StaticMeshNode::~StaticMeshNode()
 {
-	if (MeshValue) TheResourceManager->DiscardMesh(MeshValue);
+	if (mMesh) TheResourceManager->DiscardMesh(mMesh);
 }
 
 StaticMeshNode* StaticMeshNode::Create( OWNERSHIP Mesh* _Value )
 {
 	StaticMeshNode* meshNode = new StaticMeshNode();
-	meshNode->MeshValue = _Value;
+	meshNode->mMesh = _Value;
 	return meshNode;
 }
 
@@ -36,5 +36,5 @@ const Mesh* MeshSlot::GetMesh() const
 
 Mesh* MeshNode::GetMesh() const
 {
-	return MeshValue;
+	return mMesh;
 }

@@ -3,17 +3,15 @@
 #include "pass.h"
 #include "../shaders/shaders.h"
 
-class Material: public Node
-{
+class Material: public Node {
 public:
-	Material();
-	virtual ~Material();
+  Material();
+  virtual ~Material();
 
-	Slot					SolidPass;
+  Slot mSolidPass;
 
-	Pass*					GetPass();
-	
+  Pass* GetPass();
+
 protected:
-	virtual void			HandleMessage(Slot* S, NodeMessage Message, const void* Payload);
-
+  virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);
 };

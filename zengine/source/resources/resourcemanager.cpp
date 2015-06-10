@@ -3,10 +3,10 @@
 
 ResourceManager::ResourceManager()
 {
-	VertexPos::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK);
-	VertexPosNorm::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
-	VertexPosUVNorm::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
-	VertexPosUV::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
+	VertexPos::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK);
+	VertexPosNorm::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
+	VertexPosUVNorm::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
+	VertexPosUV::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
 }
 
 ResourceManager::~ResourceManager()
@@ -20,8 +20,8 @@ ResourceManager::~ResourceManager()
 	//	delete it->second;
 	//}
 
-	foreach (Mesh* mesh, Meshes) delete mesh;
-	foreach (auto vertexFormat, VertexFormats) delete vertexFormat.second;
+	foreach (Mesh* mesh, mMeshes) delete mesh;
+	foreach (auto vertexFormat, mVertexFormats) delete vertexFormat.second;
 }
 
 //Texture* ResourceManager::CreateTexture(int Width, int Height, TextureType Type, void* PixelData)
@@ -75,11 +75,11 @@ ResourceManager::~ResourceManager()
 
 VertexFormat* ResourceManager::GetVertexFormat( UINT BinaryFormat )
 {
-	map<UINT, VertexFormat*>::iterator it = VertexFormats.find(BinaryFormat);
-	if (it != VertexFormats.end()) return it->second;
+	map<UINT, VertexFormat*>::iterator it = mVertexFormats.find(BinaryFormat);
+	if (it != mVertexFormats.end()) return it->second;
 
 	VertexFormat* format = new VertexFormat(BinaryFormat);
-	VertexFormats[BinaryFormat] = format;
+	mVertexFormats[BinaryFormat] = format;
 
 	return format;
 }
@@ -87,13 +87,13 @@ VertexFormat* ResourceManager::GetVertexFormat( UINT BinaryFormat )
 Mesh* ResourceManager::CreateMesh()
 {
 	Mesh* mesh = new Mesh();
-	Meshes.insert(mesh);
+	mMeshes.insert(mesh);
 	return mesh;
 }
 
 void ResourceManager::DiscardMesh( Mesh* MeshInstance )
 {
-	Meshes.erase(MeshInstance);
+	mMeshes.erase(MeshInstance);
 	delete MeshInstance;
 }
 
@@ -111,7 +111,7 @@ Texture* ResourceManager::CreateTexture( int Width, int Height, TexelTypeEnum Ty
 
 void ResourceManager::DiscardTexture( Texture* TextureInstance )
 {
-	TheDrawingAPI->DeleteTexture(TextureInstance->Handle);
+	TheDrawingAPI->DeleteTexture(TextureInstance->mHandle);
 	delete TextureInstance;
 }
 

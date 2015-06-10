@@ -32,18 +32,18 @@ template <typename... Types>
 class Event {
 public:
   void operator += (const FastDelegate<void(Types...)>& delegate) {
-    delegates.insert(delegate);
+    mDelegates.insert(delegate);
   }
 
   void operator -= (const FastDelegate<void(Types...)>& delegate) {
-    delegates.erase(delegate);
+    mDelegates.erase(delegate);
   }
 
   void operator () (Types... message) {
-    for (auto& delegate : delegates) {
+    for (auto& delegate : mDelegates) {
       delegate(message...);
     }
   }
 
-  set<const FastDelegate<void(Types...)>>	delegates;
+  set<const FastDelegate<void(Types...)>>	mDelegates;
 };

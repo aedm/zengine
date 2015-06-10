@@ -13,41 +13,38 @@ extern ResourceManager* TheResourceManager;
 
 //typedef vector<Texture*> TextureList;
 
-class ResourceManager
-{
-	//friend class XMLSerializer;
-	//friend class XMLDeserializer;
+class ResourceManager {
+  //friend class XMLSerializer;
+  //friend class XMLDeserializer;
 
 public:
-	ResourceManager();
-	~ResourceManager();
+  ResourceManager();
+  ~ResourceManager();
 
-	Texture*						CreateTexture(int Width, int Height, TexelTypeEnum Type, void* TexelData);
-	void							DiscardTexture(Texture* TextureInstance);
+  Texture* CreateTexture(int width, int height, TexelTypeEnum type, void* texelData);
+  void DiscardTexture(Texture* texture);
 
-	//ShaderSource*					CreateShaderSource(ShaderType Type, const char* Source);
+  Mesh* CreateMesh();
+  void DiscardMesh(Mesh* mesh);
 
-	Mesh*							CreateMesh();
-	void							DiscardMesh(Mesh* MeshInstance);
-
-	VertexFormat*					GetVertexFormat(UINT BinaryFormat);
+  VertexFormat* GetVertexFormat(UINT binaryFormat);
 
 private:
-	//struct TexCategory
-	//{
-	//	int							Width;
-	//	int							Height;
-	//	TextureType					Type;
+  //struct TexCategory
+  //{
+  //	int							Width;
+  //	int							Height;
+  //	TextureType					Type;
 
-	//	TexCategory(int Width, int Height, TextureType Type);
-	//	bool operator < (const TexCategory& Category) const;
-	//};
+  //	TexCategory(int Width, int Height, TextureType Type);
+  //	bool operator < (const TexCategory& Category) const;
+  //};
 
-	//TextureList						AllTextures;
-	//vector<ShaderSource*>			AllShaderSources;
+  //TextureList						AllTextures;
+  //vector<ShaderSource*>			AllShaderSources;
 
-	map<UINT, VertexFormat*>		VertexFormats;
-	set<Mesh*>						Meshes;
+  map<UINT, VertexFormat*> mVertexFormats;
+  set<Mesh*> mMeshes;
 
-	//map<TexCategory, TextureList*>	FreeTextures;
+  //map<TexCategory, TextureList*>	FreeTextures;
 };

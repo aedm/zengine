@@ -41,7 +41,7 @@ NodeWidget::NodeWidget(Node* Nd)
 	, TitleTexture(NULL)
 {
 	Selected = false;
-	SetTitle(QString::fromStdString(Nd->name));
+	SetTitle(QString::fromStdString(Nd->mName));
 
 	CreateWidgetSlots();
 }
@@ -53,7 +53,7 @@ void NodeWidget::CreateWidgetSlots()
 	WidgetSlots.clear();
 
 	Node* node = GetNode();
-	for(Slot* slot : node->slotList)
+	for(Slot* slot : node->mSlots)
 	{
 		WidgetSlot* sw = new WidgetSlot();
 		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);

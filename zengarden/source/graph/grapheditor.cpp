@@ -301,7 +301,7 @@ void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 	case State::CONNECT_TO_NODE:
 		if (ConnectionValid) {
 			Node* node = HoveredWidget->GetNode();
-			Slot* slot = ClickedWidget->GetNode()->slotList[ClickedSlot];
+			Slot* slot = ClickedWidget->GetNode()->mSlots[ClickedSlot];
 			TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
 		}
 		update();
@@ -310,7 +310,7 @@ void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 	case State::CONNECT_TO_SLOT:
 		if (ConnectionValid) {
 			Node* node = ClickedWidget->GetNode();
-			Slot* slot = HoveredWidget->GetNode()->slotList[HoveredSlot];
+			Slot* slot = HoveredWidget->GetNode()->mSlots[HoveredSlot];
 			TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
 		}
 		update();
@@ -326,7 +326,7 @@ void GraphEditor::OnMouseRightDown( QMouseEvent* event )
 	if ((event->modifiers() & Qt::AltModifier) > 0) {
 		if (HoveredSlot >= 0) {
 			/// Remove connection
-			Slot* slot = HoveredWidget->GetNode()->slotList[HoveredSlot];
+			Slot* slot = HoveredWidget->GetNode()->mSlots[HoveredSlot];
 			if (slot->GetNode()) {
 				TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
 			}
@@ -380,7 +380,7 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		UpdateHoveredWidget(mousePos);
 		if (HoveredWidget && HoveredWidget != ClickedWidget) {
 			if (HoveredWidget->GetNode()->GetType() 
-				== ClickedWidget->GetNode()->slotList[ClickedSlot]->GetType()) {
+				== ClickedWidget->GetNode()->mSlots[ClickedSlot]->GetType()) {
 					ConnectionValid = true;
 			}
 		}
@@ -391,7 +391,7 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		UpdateHoveredWidget(mousePos); 
 		if (HoveredSlot >= 0 && HoveredWidget != ClickedWidget) {
 			if (ClickedWidget->GetNode()->GetType() 
-				== HoveredWidget->GetNode()->slotList[HoveredSlot]->GetType()) {
+				== HoveredWidget->GetNode()->mSlots[HoveredSlot]->GetType()) {
 					ConnectionValid = true;
 			}
 		}

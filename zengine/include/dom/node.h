@@ -40,7 +40,7 @@ public:
   virtual ~Slot();
 
   /// The operator which this slot is a member of
-  Node* const owner;
+  Node* const mOwner;
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
@@ -73,23 +73,23 @@ public:
   SharedString GetName();
 
   /// True if the slot can connect to multiple nodes
-  const bool isMultiSlot;
+  const bool mIsMultiSlot;
 
   /// Return the Nth connected node from a multislot
   Node* operator[] (UINT index);
 
 protected:
   /// The slot is connected to this node (nullptr if multislot)
-  Node* node;
+  Node* mNode;
 
   /// The slot is connected to these nodes (empty if not multislot)
-  vector<Node*> multiNodes;
+  vector<Node*> mMultiNodes;
 
   /// Name of the slot. Can't be changed.
-  SharedString name;
+  SharedString mName;
 
   /// Output type
-  const NodeType type;
+  const NodeType mType;
 };
 
 
@@ -102,10 +102,10 @@ public:
   virtual ~Node();
 
   /// Parameters of this node.
-  vector<Slot*>	slotList;
+  vector<Slot*>	mSlots;
 
   /// Name of the node
-  string name;
+  string mName;
 
   /// Returns object type.
   NodeType GetType() const;
@@ -129,7 +129,7 @@ protected:
   Node(const Node& original);
 
   /// True is all slots are properly connected
-  bool isProperlyConnected;
+  bool mIsProperlyConnected;
 
   /// Main operation
   virtual void Operate() {}
@@ -144,17 +144,17 @@ protected:
   void ReceiveMessage(Slot* slot, NodeMessage message, const void* payload = nullptr);
 
   /// Output type
-  NodeType type;
+  NodeType mType;
 
   /// Check if all slots are properly connected to an operator
   void CheckConnections();
 
 private:
   /// True if Operate() needs to be called
-  bool isDirty;
+  bool mIsDirty;
 
   /// Slots that this node is connected to (as an input)
-  vector<Slot*> dependants;
+  vector<Slot*> mDependants;
 
   /// Add or remove slot to/from notification list
   void ConnectToSlot(Slot* slot);

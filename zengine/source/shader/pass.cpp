@@ -5,11 +5,11 @@
 
 Pass::Pass()
 	: Node(NodeType::PASS, "Pass")
-	, VertexStub(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
-	, FragmentStub(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
-	, VertexSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
-	, FragmentSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
-	, Handle(-1)
+	, mVertexStub(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
+	, mFragmentStub(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
+	, mVertexSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
+	, mFragmentSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
+	, mHandle(-1)
 {
 }
 
@@ -21,25 +21,25 @@ void Pass::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 	switch (Message)
 	{
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
-		if (S == &VertexStub) {
-			if (VertexStub.GetNode() == nullptr) {
-				VertexSource.Connect(nullptr);
+		if (S == &mVertexStub) {
+			if (mVertexStub.GetNode() == nullptr) {
+				mVertexSource.Connect(nullptr);
 			} else {
-				VertexSource.Connect(static_cast<ShaderStub*>(
-					VertexStub.GetNode())->GetShaderSource());
+				mVertexSource.Connect(static_cast<ShaderStub*>(
+					mVertexStub.GetNode())->GetShaderSource());
 			}
 		}
-		else if (S == &FragmentStub) {
-			if (FragmentStub.GetNode() == nullptr) {
-				FragmentSource.Connect(nullptr);
+		else if (S == &mFragmentStub) {
+			if (mFragmentStub.GetNode() == nullptr) {
+				mFragmentSource.Connect(nullptr);
 			} else {
-				FragmentSource.Connect(static_cast<ShaderStub*>(
-					FragmentStub.GetNode())->GetShaderSource());
+				mFragmentSource.Connect(static_cast<ShaderStub*>(
+					mFragmentStub.GetNode())->GetShaderSource());
 			}
 		}
 		break;
 	case NodeMessage::VALUE_CHANGED:
-		if (S == &VertexSource || S == &FragmentSource) {
+		if (S == &mVertexSource || S == &mFragmentSource) {
 			BuildRenderPipeline();
 		}
 		break;
@@ -50,20 +50,25 @@ void Pass::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
 void Pass::BuildRenderPipeline()
 {
 	INFO("Building render pipeline...");
-	Uniforms.clear();
-	Attributes.clear();
-	Handle = -1;
+	mUniforms.clear();
+	mAttributes.clear();
+	mHandle = -1;
 
 	//ShaderSource2* vertex = static_cast<ShaderSource2*>(VertexShader.GetNode());
 	//ShaderSource2* fragment = static_cast<ShaderSource2*>(FragmentShader.GetNode());
-	ShaderStub* vertexStub = static_cast<ShaderStub*>(VertexStub.GetNode());
-	ShaderStub* fragmentStub = static_cast<ShaderStub*>(FragmentStub.GetNode());
-	if (vertexStub == nullptr || fragmentStub == nullptr) return;
+	//ShaderStub* vStub = static_cast<ShaderStub*>(vertexStub.GetNode());
+	//ShaderStub* fStub = static_cast<ShaderStub*>(fragmentStub.GetNode());
+	//if (vStub == nullptr || fStub == nullptr) return;
 
-	ShaderSource2* vertex = vertexStub->GetShaderSource();
-	ShaderSource2* fragment = fragmentStub->GetShaderSource();
-	if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
-		fragment == nullptr || fragment->GetMetadata() == nullptr) return;
+	//ShaderSource2* vertex = vStub->GetShaderSource();
+	//ShaderSource2* fragment = fStub->GetShaderSource();
+	//if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
+	//	fragment == nullptr || fragment->GetMetadata() == nullptr) return;
+
+  ShaderSource2* vertex = static_cast<ShaderSource2*>(mVertexSource.GetNode());
+  ShaderSource2* fragment = static_cast<ShaderSource2*>(mFragmentSource.GetNode());
+  if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
+  	  fragment == nullptr || fragment->GetMetadata() == nullptr) return;
 
 	const string& vertexSource = vertex->GetSource();
 	const string& fragmentSource = fragment->GetSource();
@@ -72,7 +77,7 @@ void Pass::BuildRenderPipeline()
 		vertexSource.c_str(), fragmentSource.c_str());
 	if (shaderCompileDesc == nullptr) return;
 
-	Handle = shaderCompileDesc->Handle;
+	mHandle = shaderCompileDesc->Handle;
 
 	/// Collect uniforms from shader stage sources
 	map<string, ShaderSourceUniform*> uniformMap;
@@ -91,39 +96,39 @@ void Pass::BuildRenderPipeline()
 	{
 		ShaderSourceUniform* sourceUniform = uniformMap.at(uniformDesc.Name);
 		PassUniform passUniform;
-		passUniform.Handle = uniformDesc.Handle;
-		passUniform.TheNode = sourceUniform->TheNode;
-		passUniform.GlobalType = sourceUniform->GlobalType;
-		passUniform.Type = sourceUniform->Type;
-		Uniforms.push_back(passUniform);
+		passUniform.handle = uniformDesc.Handle;
+		passUniform.node = sourceUniform->TheNode;
+		passUniform.globalType = sourceUniform->GlobalType;
+		passUniform.type = sourceUniform->Type;
+		mUniforms.push_back(passUniform);
 	}
 	
 	/// Collect required attributes
 	for (auto attributeDesc : shaderCompileDesc->Attributes) {
-		Attributes.push_back(attributeDesc);
+		mAttributes.push_back(attributeDesc);
 	}
 
 }
 
 void Pass::Set(Globals* Global)
 {
-	ASSERT(Handle != -1);
+	ASSERT(mHandle != -1);
 
-	TheDrawingAPI->SetShaderProgram(Handle);
+	TheDrawingAPI->SetShaderProgram(mHandle);
 
 	/// Set uniforms
-	for (PassUniform& uniform : Uniforms)
+	for (PassUniform& uniform : mUniforms)
 	{
-		if (uniform.GlobalType == ShaderGlobalType::LOCAL) {
+		if (uniform.globalType == ShaderGlobalType::LOCAL) {
 			/// Local uniform, takes value from a slot
-			ASSERT(uniform.TheNode != nullptr);
-			switch (uniform.Type)
+			ASSERT(uniform.node != nullptr);
+			switch (uniform.type)
 			{
 			#undef ITEM
 			#define ITEM(name, type, token) \
 				case NodeType::name: \
-					TheDrawingAPI->SetUniform(uniform.Handle, NodeType::name, \
-						&static_cast<ValueNode<NodeType::name>*>(uniform.TheNode)->Get()); \
+					TheDrawingAPI->SetUniform(uniform.handle, NodeType::name, \
+						&static_cast<ValueNode<NodeType::name>*>(uniform.node)->Get()); \
 					break;
 			VALUETYPE_LIST
 
@@ -131,16 +136,16 @@ void Pass::Set(Globals* Global)
 			}
 		} else {
 			/// Global uniform, takes value from the Globals object
-			int offset = GlobalUniformOffsets[(UINT)uniform.GlobalType];
+			int offset = GlobalUniformOffsets[(UINT)uniform.globalType];
 			void* source = reinterpret_cast<char*>(Global)+offset;
-			TheDrawingAPI->SetUniform(uniform.Handle, uniform.Type, source); 
+			TheDrawingAPI->SetUniform(uniform.handle, uniform.type, source); 
 		}
 	}
 }
 
 const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes()
 {
-	return Attributes;
+	return mAttributes;
 }
 
 Node* Pass::Clone() const
@@ -148,8 +153,8 @@ Node* Pass::Clone() const
 	return new Pass();
 }
 
-bool Pass::IsComplete()
+bool Pass::isComplete()
 {
-	return Handle != -1;
+	return mHandle != -1;
 }
 
