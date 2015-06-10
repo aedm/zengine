@@ -24,12 +24,12 @@ void RenderableNode::Render(PrimitiveTypeEnum Primitive)
 
 	static_cast<ShaderNode*>(TheShader.GetNode())->Set();
 	const Mesh* mesh = TheMesh.GetMesh();
-	if (mesh->IndexHandle)
+	if (mesh->mIndexHandle)
 	{
-		TheDrawingAPI->RenderIndexedMesh(mesh->IndexHandle, mesh->IndexCount, 
-			mesh->VertexHandle, Mapper, Primitive);
+		TheDrawingAPI->RenderIndexedMesh(mesh->mIndexHandle, mesh->mIndexCount, 
+			mesh->mVertexHandle, Mapper, Primitive);
 	} else {
-		TheDrawingAPI->RenderMesh(mesh->VertexHandle, mesh->VertexCount, Mapper, 
+		TheDrawingAPI->RenderMesh(mesh->mVertexHandle, mesh->mVertexCount, Mapper, 
 			Primitive);
 	}
 }
@@ -43,7 +43,7 @@ void RenderableNode::HandleMessage(Slot* S, NodeMessage Message, const void* Pay
 		MappedVertexFormat = nullptr;
 		break;
 	case NodeMessage::VALUE_CHANGED:
-		if (S == &TheShader || (S == &TheMesh && TheMesh.GetMesh()->Format != MappedVertexFormat))
+		if (S == &TheShader || (S == &TheMesh && TheMesh.GetMesh()->mFormat != MappedVertexFormat))
 		{
 			SafeDelete(Mapper);
 			MappedVertexFormat = nullptr;
@@ -62,9 +62,9 @@ void RenderableNode::Operate()
 		ShaderNode* shader = (ShaderNode*)TheShader.GetNode();
 		if (mesh && shader)
 		{
-			MappedVertexFormat = mesh->Format;
-			Mapper = TheDrawingAPI->CreateAttributeMapper(mesh->Format->Attributes, 
-				shader->ShaderProgram->Attributes, mesh->Format->Stride);
+			MappedVertexFormat = mesh->mFormat;
+			Mapper = TheDrawingAPI->CreateAttributeMapper(mesh->mFormat->mAttributes, 
+				shader->ShaderProgram->Attributes, mesh->mFormat->mStride);
 		}
 	}
 }

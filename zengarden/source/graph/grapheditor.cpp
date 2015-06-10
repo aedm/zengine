@@ -29,7 +29,7 @@ GraphEditor::GraphEditor(WatcherWidget* Parent, QGLWidget* Share)
 	HoveredWidget = NULL;
 	HoveredSlot = -1;
 
-	EventZengineInitDone += Delegate(this, &GraphEditor::Init);
+	OnZengineInitDone += Delegate(this, &GraphEditor::Init);
 }
 
 void GraphEditor::paintGL()
@@ -117,7 +117,7 @@ void GraphEditor::Paint()
 					/// Draw connection
 					Vec2 p1 = connectedOpWidget->GetOutputPosition();
 					Vec2 p2 = ndWidget->GetInputPosition(i);
-					ThePainter->DrawLine(p1.X, p1.Y, p2.X, p2.Y);
+					ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
 				}
 			}
 		}		
@@ -159,33 +159,33 @@ NodeWidget* GraphEditor::GetNodeWidget( Node* Op )
 }
 
 bool IsInsideRect(Vec2 Position, Vec2 Topleft, Vec2 Size) {
-	return (Position.X >= Topleft.X && Position.X <= Topleft.X + Size.X 
-		&& Position.Y >= Topleft.Y && Position.Y <= Topleft.Y + Size.Y);
+	return (Position.x >= Topleft.x && Position.x <= Topleft.x + Size.x 
+		&& Position.y >= Topleft.y && Position.y <= Topleft.y + Size.y);
 }
 
 bool HasIntersection(Vec2 Pos1, Vec2 Size1, Vec2 Pos2, Vec2 Size2)
 {
-	if (Size1.X < 0) {
-		Pos1.X += Size1.X;
-		Size1.X = -Size1.X;
+	if (Size1.x < 0) {
+		Pos1.x += Size1.x;
+		Size1.x = -Size1.x;
 	}
-	if (Size1.Y < 0) {
-		Pos1.Y += Size1.Y;
-		Size1.Y = -Size1.Y;
+	if (Size1.y < 0) {
+		Pos1.y += Size1.y;
+		Size1.y = -Size1.y;
 	}
-	if (Size2.X < 0) {
-		Pos2.X += Size2.X;
-		Size2.X = -Size2.X;
+	if (Size2.x < 0) {
+		Pos2.x += Size2.x;
+		Size2.x = -Size2.x;
 	}
-	if (Size2.Y < 0) {
-		Pos2.Y += Size2.Y;
-		Size2.Y = -Size2.Y;
+	if (Size2.y < 0) {
+		Pos2.y += Size2.y;
+		Size2.y = -Size2.y;
 	}
 	return !(	
-		Pos1.X + Size1.X <= Pos2.X ||
-		Pos1.Y + Size1.Y <= Pos2.Y ||
-		Pos2.X + Size2.X <= Pos1.X ||
-		Pos2.Y + Size2.Y <= Pos1.Y);
+		Pos1.x + Size1.x <= Pos2.x ||
+		Pos1.y + Size1.y <= Pos2.y ||
+		Pos2.x + Size2.x <= Pos1.x ||
+		Pos2.y + Size2.y <= Pos1.y);
 }
 
 void GraphEditor::DeselectAll()
@@ -301,7 +301,7 @@ void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 	case State::CONNECT_TO_NODE:
 		if (ConnectionValid) {
 			Node* node = HoveredWidget->GetNode();
-			Slot* slot = ClickedWidget->GetNode()->Slots[ClickedSlot];
+			Slot* slot = ClickedWidget->GetNode()->mSlots[ClickedSlot];
 			TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
 		}
 		update();
@@ -310,7 +310,7 @@ void GraphEditor::OnMouseLeftUp( QMouseEvent* event )
 	case State::CONNECT_TO_SLOT:
 		if (ConnectionValid) {
 			Node* node = ClickedWidget->GetNode();
-			Slot* slot = HoveredWidget->GetNode()->Slots[HoveredSlot];
+			Slot* slot = HoveredWidget->GetNode()->mSlots[HoveredSlot];
 			TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
 		}
 		update();
@@ -326,7 +326,7 @@ void GraphEditor::OnMouseRightDown( QMouseEvent* event )
 	if ((event->modifiers() & Qt::AltModifier) > 0) {
 		if (HoveredSlot >= 0) {
 			/// Remove connection
-			Slot* slot = HoveredWidget->GetNode()->Slots[HoveredSlot];
+			Slot* slot = HoveredWidget->GetNode()->mSlots[HoveredSlot];
 			if (slot->GetNode()) {
 				TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
 			}
@@ -380,7 +380,7 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		UpdateHoveredWidget(mousePos);
 		if (HoveredWidget && HoveredWidget != ClickedWidget) {
 			if (HoveredWidget->GetNode()->GetType() 
-				== ClickedWidget->GetNode()->Slots[ClickedSlot]->GetType()) {
+				== ClickedWidget->GetNode()->mSlots[ClickedSlot]->GetType()) {
 					ConnectionValid = true;
 			}
 		}
@@ -391,7 +391,7 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		UpdateHoveredWidget(mousePos); 
 		if (HoveredSlot >= 0 && HoveredWidget != ClickedWidget) {
 			if (ClickedWidget->GetNode()->GetType() 
-				== HoveredWidget->GetNode()->Slots[HoveredSlot]->GetType()) {
+				== HoveredWidget->GetNode()->mSlots[HoveredSlot]->GetType()) {
 					ConnectionValid = true;
 			}
 		}

@@ -21,11 +21,11 @@ OWNERSHIP ShaderMetadata* ShaderBuilder::Merge( const vector<ShaderMetadata*>& M
 	vector<ShaderChoice*> choices;
 	vector<LocalDesc*> locals;
 
-	foreach (ShaderMetadata* metadata, MetadataList)
+	for (ShaderMetadata* metadata : MetadataList)
 	{
-		foreach (ShaderOption* option, metadata->Options) options.push_back(option);
-		foreach (ShaderChoice* choice, metadata->Choices) choices.push_back(choice);
-		foreach (LocalDesc* local, metadata->Locals) locals.push_back(local);
+		for (ShaderOption* option : metadata->Options) options.push_back(option);
+		for (ShaderChoice* choice : metadata->Choices) choices.push_back(choice);
+		for (LocalDesc* local : metadata->Locals) locals.push_back(local);
 	}
 
 	return new ShaderMetadata(options, choices, locals);
@@ -45,9 +45,9 @@ ShaderSource* ShaderSource::FromSource( OWNERSHIP const char* VertexSource,
 	source->FragmentMetadata = ShaderBuilder::FromText("fragment", FragmentSource);
 
 	/// Check for identical uniform names
-	foreach (LocalDesc* vertexLocal, source->VertexMetadata->Locals)
+	for (LocalDesc* vertexLocal : source->VertexMetadata->Locals)
 	{
-		foreach (LocalDesc* fragmentLocal, source->FragmentMetadata->Locals)
+		for (LocalDesc* fragmentLocal : source->FragmentMetadata->Locals)
 		{
 			if (vertexLocal->UniformName == fragmentLocal->UniformName)
 			{
@@ -114,7 +114,7 @@ OWNERSHIP Shader* ShaderSource::Build(const shared_ptr<ShaderSource>& Source)
 	vector<Uniform*> uniforms;
 	UINT byteOffset = 0;
 
-	foreach(ShaderUniformDesc& uniformDesc, shaderCompileDesc->Uniforms)
+	for (ShaderUniformDesc& uniformDesc : shaderCompileDesc->Uniforms)
 	{
 		Uniform* uniform = NULL;
 		if (uniformDesc.Name[0] != 'g') 
@@ -149,7 +149,7 @@ OWNERSHIP Shader* ShaderSource::Build(const shared_ptr<ShaderSource>& Source)
 
 		if (uniform)
 		{
-			byteOffset += VariableByteSizes[UINT(uniform->Type)];
+			byteOffset += gVariableByteSizes[UINT(uniform->Type)];
 			uniforms.push_back(uniform);
 		}
 	}
@@ -162,7 +162,7 @@ OWNERSHIP Shader* ShaderSource::Build(const shared_ptr<ShaderSource>& Source)
 
 	/// Process samplers
 	vector<Sampler*> samplers;
-	foreach(ShaderSamplerDesc& samplerDesc, shaderCompileDesc->Samplers)
+	for (ShaderSamplerDesc& samplerDesc : shaderCompileDesc->Samplers)
 	{
 		/// All samplers are locals now, get metadata
 		LocalDesc* localDesc = Source->GetLocalDesc(samplerDesc.Name);
@@ -189,7 +189,7 @@ ShaderSource::ShaderSource()
 
 LocalDesc* ShaderSource::GetLocalDesc( const string& UniformName )
 {
-	foreach(LocalDesc* localDesc, Metadata->Locals)
+	for (LocalDesc* localDesc : Metadata->Locals)
 	{
 		if (*localDesc->UniformName == UniformName) return localDesc;
 	}

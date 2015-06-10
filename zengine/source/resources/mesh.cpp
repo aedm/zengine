@@ -5,47 +5,42 @@
 
 #include <assert.h>
 
-VertexFormat* VertexPos::Format;
-VertexFormat* VertexPosNorm::Format;
-VertexFormat* VertexPosUVNorm::Format;
-VertexFormat* VertexPosUV::Format;
+VertexFormat* VertexPos::format;
+VertexFormat* VertexPosNorm::format;
+VertexFormat* VertexPosUVNorm::format;
+VertexFormat* VertexPosUV::format;
 
-VertexFormat::VertexFormat(UINT BinaryFormat)
-{
-	memset(AttributesArray, 0, sizeof(void*) * (UINT)VertexAttributeUsage::COUNT);
+VertexFormat::VertexFormat(UINT binaryFormat) {
+  memset(mAttributesArray, 0, sizeof(void*) * (UINT)VertexAttributeUsage::COUNT);
 
-	this->BinaryFormat = BinaryFormat;
-	int stride = 0;
-	for (int i=0; BinaryFormat; BinaryFormat>>=1, i++)
-	{
-		if (BinaryFormat & 1)
-		{
-			VertexAttribute attrib;
-			attrib.Usage = (VertexAttributeUsage)i;
-			attrib.Size = VariableByteSizes[(UINT)VertexAttributeType[i]];
-			attrib.Offset = stride;
-			Attributes.push_back(attrib);
-			stride += attrib.Size;
-		}
-	}
+  this->mBinaryFormat = binaryFormat;
+  int stride = 0;
+  for (int i = 0; binaryFormat; binaryFormat >>= 1, i++) {
+    if (binaryFormat & 1) {
+      VertexAttribute attrib;
+      attrib.Usage = (VertexAttributeUsage)i;
+      attrib.Size = gVariableByteSizes[(UINT)gVertexAttributeType[i]];
+      attrib.Offset = stride;
+      mAttributes.push_back(attrib);
+      stride += attrib.Size;
+    }
+  }
 
-	for (UINT i=0; i<Attributes.size(); i++)
-	{
-		VertexAttribute& attrib = Attributes[i];
+  for (UINT i = 0; i < mAttributes.size(); i++) {
+    VertexAttribute& attrib = mAttributes[i];
 
-		/// AttributesArray points into the vector. Meh.
-		AttributesArray[(UINT)attrib.Usage] = &attrib;
-	}
+    /// AttributesArray points into the vector. Meh.
+    mAttributesArray[(UINT)attrib.Usage] = &attrib;
+  }
 
-	Stride = stride;
-	//Declaration = TheDrawingAPI->CreateVertexDeclaration(Attributes);
+  mStride = stride;
+  //Declaration = TheDrawingAPI->CreateVertexDeclaration(Attributes);
 
-	assert(Stride % 4 == 0);	/// Vertex structure size should always be mod4.
+  assert(stride % 4 == 0);	/// Vertex structure size should always be mod4.
 }
 
-VertexFormat::~VertexFormat()
-{
-	//TheDrawingAPI->DestroyVertexDeclaration(Declaration);
+VertexFormat::~VertexFormat() {
+  //TheDrawingAPI->DestroyVertexDeclaration(Declaration);
 }
 
 //void VertexFormat::SetAttributeDefines( ShaderDefines& Defines )
@@ -56,89 +51,77 @@ VertexFormat::~VertexFormat()
 //	}
 //}
 
-bool VertexFormat::HasAttribute( VertexAttributeUsage Attrib )
-{
-	return (BinaryFormat & (1 << (UINT)Attrib)) != 0;
+bool VertexFormat::HasAttribute(VertexAttributeUsage attrib) {
+  return (mBinaryFormat & (1 << (UINT)attrib)) != 0;
 }
 
-Mesh::Mesh()
-{
-	VertexCount = 0;
-	VertexBufferSize = 0;
-	VertexHandle = 0;
+Mesh::Mesh() {
+  mVertexCount = 0;
+  mVertexBufferSize = 0;
+  mVertexHandle = 0;
 
-	IndexCount = 0;
-	IndexHandle = 0;
+  mIndexCount = 0;
+  mIndexHandle = 0;
 
-	WireframeIndexCount = 0;
-	WireframeIndexHandle = 0;
-	
-	Format = NULL;
+  mWireframeIndexCount = 0;
+  mWireframeIndexHandle = 0;
+
+  mFormat = NULL;
 }
 
-Mesh::~Mesh()
-{
-	if (VertexHandle) TheDrawingAPI->DestroyVertexBuffer(VertexHandle);
-	if (IndexHandle) TheDrawingAPI->DestroyIndexBuffer(IndexHandle);
-	if (WireframeIndexHandle) TheDrawingAPI->DestroyIndexBuffer(WireframeIndexHandle);
+Mesh::~Mesh() {
+  if (mVertexHandle) TheDrawingAPI->DestroyVertexBuffer(mVertexHandle);
+  if (mIndexHandle) TheDrawingAPI->DestroyIndexBuffer(mIndexHandle);
+  if (mWireframeIndexHandle) TheDrawingAPI->DestroyIndexBuffer(mWireframeIndexHandle);
 }
 
-void Mesh::AllocateVertices(VertexFormat* Format, UINT VertexCount)							
-{
-	this->Format = Format;
-	this->VertexCount = VertexCount;
+void Mesh::AllocateVertices(VertexFormat* format, UINT vertexCount) {
+  this->mFormat = format;
+  this->mVertexCount = vertexCount;
 
-	UINT newBufferSize = Format->Stride * VertexCount;
-	if (VertexBufferSize != newBufferSize)
-	{
-		VertexBufferSize = newBufferSize;
+  UINT newBufferSize = format->mStride * vertexCount;
+  if (mVertexBufferSize != newBufferSize) {
+    mVertexBufferSize = newBufferSize;
 
-		if (VertexHandle) TheDrawingAPI->DestroyVertexBuffer(VertexHandle);
-		VertexHandle = TheDrawingAPI->CreateVertexBuffer(newBufferSize);
-	}
+    if (mVertexHandle) TheDrawingAPI->DestroyVertexBuffer(mVertexHandle);
+    mVertexHandle = TheDrawingAPI->CreateVertexBuffer(newBufferSize);
+  }
 }
 
-void Mesh::AllocateIndices(UINT IndexCount)
-{
-	if (this->IndexCount != IndexCount)
-	{
-		this->IndexCount = IndexCount;
-		if (IndexHandle) TheDrawingAPI->DestroyIndexBuffer(IndexHandle);
-		IndexHandle = IndexCount ? TheDrawingAPI->CreateIndexBuffer(IndexCount * sizeof(IndexEntry)) : NULL;
-	}
+void Mesh::AllocateIndices(UINT indexCount) {
+  if (this->mIndexCount != indexCount) {
+    this->mIndexCount = indexCount;
+    if (mIndexHandle) TheDrawingAPI->DestroyIndexBuffer(mIndexHandle);
+    mIndexHandle = indexCount ? TheDrawingAPI->CreateIndexBuffer(indexCount * sizeof(IndexEntry)) : NULL;
+  }
 }
 
-void Mesh::AllocateWireframeIndices(UINT IndexCount)
-{
-	if (WireframeIndexCount != IndexCount)
-	{
-		WireframeIndexCount = IndexCount;
-		if (WireframeIndexHandle) TheDrawingAPI->DestroyIndexBuffer(WireframeIndexHandle);
-		WireframeIndexHandle = IndexCount ? TheDrawingAPI->CreateIndexBuffer(WireframeIndexCount) : NULL;
-	}
+void Mesh::AllocateWireframeIndices(UINT indexCount) {
+  if (mWireframeIndexCount != indexCount) {
+    mWireframeIndexCount = indexCount;
+    if (mWireframeIndexHandle) TheDrawingAPI->DestroyIndexBuffer(mWireframeIndexHandle);
+    mWireframeIndexHandle = indexCount ? TheDrawingAPI->CreateIndexBuffer(mWireframeIndexCount) : NULL;
+  }
 }
 
-void Mesh::UploadIndices(const IndexEntry* Indices)
-{
-	//TheDrawingAPI->UploadIndices(IndexHandle, IndexCount, Indices);
-	void* mappedIndices = TheDrawingAPI->MapIndexBuffer(IndexHandle);
-	memcpy(mappedIndices, Indices, IndexCount * sizeof(IndexEntry));
-	TheDrawingAPI->UnMapIndexBuffer(IndexHandle);
+void Mesh::UploadIndices(const IndexEntry* indices) {
+  //TheDrawingAPI->UploadIndices(IndexHandle, IndexCount, Indices);
+  void* mappedIndices = TheDrawingAPI->MapIndexBuffer(mIndexHandle);
+  memcpy(mappedIndices, indices, mIndexCount * sizeof(IndexEntry));
+  TheDrawingAPI->UnMapIndexBuffer(mIndexHandle);
 }
 
-void Mesh::UploadVertices(void* Vertices)
-{
-	void* mappedMesh = TheDrawingAPI->MapVertexBuffer(VertexHandle);
-	memcpy(mappedMesh, Vertices, VertexCount * Format->Stride);
-	TheDrawingAPI->UnMapVertexBuffer(VertexHandle);
+void Mesh::UploadVertices(void* vertices) {
+  void* mappedMesh = TheDrawingAPI->MapVertexBuffer(mVertexHandle);
+  memcpy(mappedMesh, vertices, mVertexCount * mFormat->mStride);
+  TheDrawingAPI->UnMapVertexBuffer(mVertexHandle);
 }
 
 
-void Mesh::UploadVertices( void* Vertices, int VertexCount )
-{
-	void* mappedMesh = TheDrawingAPI->MapVertexBuffer(VertexHandle);
-	memcpy(mappedMesh, Vertices, VertexCount * Format->Stride);
-	TheDrawingAPI->UnMapVertexBuffer(VertexHandle);
+void Mesh::UploadVertices(void* vertices, int vertexCount) {
+  void* mappedMesh = TheDrawingAPI->MapVertexBuffer(mVertexHandle);
+  memcpy(mappedMesh, vertices, vertexCount * mFormat->mStride);
+  TheDrawingAPI->UnMapVertexBuffer(mVertexHandle);
 }
 
 //const wchar_t* VertexAttribute::GetAttribString( VertexAttributeType Type )

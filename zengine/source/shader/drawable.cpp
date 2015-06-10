@@ -2,44 +2,39 @@
 
 
 Drawable::Drawable()
-	: Node(NodeType::PASS, "Drawable")
-	, TheMesh(this, make_shared<string>("Mesh"))
-	, TheMaterial(NodeType::MATERIAL, this, make_shared<string>("Material"))
-{}
+  : Node(NodeType::PASS, "Drawable")
+  , mMesh(this, make_shared<string>("Mesh"))
+  , mMaterial(NodeType::MATERIAL, this, make_shared<string>("Material")) {}
 
-Drawable::~Drawable()
-{}
+Drawable::~Drawable() {}
 
-void Drawable::Draw(Globals* Global)
-{
-	if (!IsProperlyConnected) return;
-	Material* material = static_cast<Material*>(TheMaterial.GetNode());
-	const Mesh* mesh = TheMesh.GetMesh();
+void Drawable::Draw(Globals* globals) {
+  if (!mIsProperlyConnected) return;
+  Material* material = static_cast<Material*>(mMaterial.GetNode());
+  const Mesh* mesh = mMesh.GetMesh();
 
-	/// Set pass (pipeline state)
-	Pass* pass = material->GetPass();
-	pass->Set(Global);
+  /// Set pass (pipeline state)
+  Pass* pass = material->GetPass();
+  if (!pass->isComplete()) return;
+  pass->Set(globals);
 
-	/// Set vertex buffer and attributes
-	TheDrawingAPI->SetVertexBuffer(mesh->VertexHandle);
-	for (ShaderAttributeDesc desc : pass->GetUsedAttributes())
-	{
-		VertexAttribute* attribute = mesh->Format->AttributesArray[(UINT)desc.Usage];
-		if (attribute != nullptr) 
-		{
-			TheDrawingAPI->EnableVertexAttribute(desc.Handle, 
-				VertexAttributeType[(UINT)desc.Usage], attribute->Offset, 
-				mesh->Format->Stride);
-		}
-	}
+  /// Set vertex buffer and attributes
+  TheDrawingAPI->SetVertexBuffer(mesh->mVertexHandle);
+  for (ShaderAttributeDesc desc : pass->GetUsedAttributes()) {
+    VertexAttribute* attribute = mesh->mFormat->mAttributesArray[(UINT)desc.Usage];
+    if (attribute != nullptr) {
+      TheDrawingAPI->EnableVertexAttribute(desc.Handle,
+          gVertexAttributeType[(UINT)desc.Usage], attribute->Offset,
+          mesh->mFormat->mStride);
+    }
+  }
 
-	/// TODO: set output buffers
+  /// TODO: set output buffers
 
-	/// Render mesh
-	if (mesh->IndexHandle)
-	{
-		TheDrawingAPI->Render(mesh->IndexHandle, mesh->IndexCount, PRIMITIVE_TRIANGLES);
-	} else {
-		TheDrawingAPI->Render(0, mesh->VertexCount, PRIMITIVE_TRIANGLES);
-	}
+  /// Render mesh
+  if (mesh->mIndexHandle) {
+    TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, PRIMITIVE_TRIANGLES);
+  } else {
+    TheDrawingAPI->Render(0, mesh->mVertexCount, PRIMITIVE_TRIANGLES);
+  }
 }

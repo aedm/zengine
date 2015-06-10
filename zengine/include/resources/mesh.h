@@ -10,123 +10,114 @@ using namespace std;
 class ResourceManager;
 class VertexFormat;
 
-enum VertexAttributeMask
-{
-	VERTEXATTRIB_POSITION_MASK		= 1 << (UINT)VertexAttributeUsage::POSITION,
-	VERTEXATTRIB_TEXCOORD_MASK		= 1 << (UINT)VertexAttributeUsage::TEXCOORD,
-	VERTEXATTRIB_NORMAL_MASK		= 1 << (UINT)VertexAttributeUsage::NORMAL,
-	VERTEXATTRIB_BINORMAL_MASK		= 1 << (UINT)VertexAttributeUsage::BINORMAL,
-	//VERTEXATTRIB_COLOR_MASK			= 1 << VERTEXATTRIB_COLOR
+enum VertexAttributeMask {
+  VERTEXATTRIB_POSITION_MASK = 1 << (UINT)VertexAttributeUsage::POSITION,
+  VERTEXATTRIB_TEXCOORD_MASK = 1 << (UINT)VertexAttributeUsage::TEXCOORD,
+  VERTEXATTRIB_NORMAL_MASK = 1 << (UINT)VertexAttributeUsage::NORMAL,
+  VERTEXATTRIB_BINORMAL_MASK = 1 << (UINT)VertexAttributeUsage::BINORMAL,
+  //VERTEXATTRIB_COLOR_MASK			= 1 << VERTEXATTRIB_COLOR
 };
 
 
 /// Common vertex formats
-struct VertexPos
-{
-	Vec3						Position;
+struct VertexPos {
+  Vec3 position;
 
-	/// Vertex format descriptor for this struct
-	static VertexFormat*		Format;
+  /// Vertex format descriptor for this struct
+  static VertexFormat* format;
 };
 
-struct VertexPosNorm
-{
-	Vec3						Position;
-	Vec3						Normal;
+struct VertexPosNorm {
+  Vec3 position;
+  Vec3 normal;
 
-	/// Vertex format descriptor for this struct
-	static VertexFormat*		Format;
+  /// Vertex format descriptor for this struct
+  static VertexFormat* format;
 };
 
-struct VertexPosUVNorm
-{
-	Vec3						Position;
-	Vec2						UV;
-	Vec3						Normal;
+struct VertexPosUVNorm {
+  Vec3 position;
+  Vec2 uv;
+  Vec3 normal;
 
-	/// Vertex format descriptor for this struct
-	static VertexFormat*		Format;
+  /// Vertex format descriptor for this struct
+  static VertexFormat* format;
 };
 
-struct VertexPosUV
-{
-	Vec3						Position;
-	Vec2						UV;
+struct VertexPosUV {
+  Vec3 position;
+  Vec2 uv;
 
-	/// Vertex format descriptor for this struct
-	static VertexFormat*		Format;
+  /// Vertex format descriptor for this struct
+  static VertexFormat* format;
 };
 
 
-class VertexFormat
-{
-	friend class ResourceManager;
+class VertexFormat {
+  friend class ResourceManager;
 
-	VertexFormat(UINT BinaryFormat);
-	~VertexFormat();
+  VertexFormat(UINT binaryFormat);
+  ~VertexFormat();
 
 public:
-	void						Set();
-	//void						SetAttributeDefines(ShaderDefines& Defines);
+  void Set();
+  //void SetAttributeDefines(ShaderDefines& Defines);
 
-	bool						HasAttribute(VertexAttributeUsage Attrib);
+  bool HasAttribute(VertexAttributeUsage attrib);
 
-	//VertexDeclaration			Declaration;
-	int							Stride;
-	UINT						BinaryFormat;
-	vector<VertexAttribute>		Attributes;
+  //VertexDeclaration			Declaration;
+  int mStride;
+  UINT mBinaryFormat;
+  vector<VertexAttribute> mAttributes;
 
-	VertexAttribute*			AttributesArray[(UINT)VertexAttributeUsage::COUNT];
+  VertexAttribute* mAttributesArray[(UINT)VertexAttributeUsage::COUNT];
 };
 
 
-class Mesh
-{
-	friend class ResourceManager;
+class Mesh {
+  friend class ResourceManager;
 
-	Mesh();
-	~Mesh();
+  Mesh();
+  ~Mesh();
 
 public:
-	void						AllocateVertices(VertexFormat* Format, UINT VertexCount);
-	void						AllocateIndices(UINT IndexCount);
-	void						AllocateWireframeIndices(UINT IndexCount);
+  void AllocateVertices(VertexFormat* format, UINT vertexCount);
+  void AllocateIndices(UINT indexCount);
+  void AllocateWireframeIndices(UINT indexCount);
 
-	/// Uploads all vertices
-	void						UploadVertices(void* Vertices);
+  /// Uploads all vertices
+  void UploadVertices(void* vertices);
 
-	/// Uploads only the first VertexCount vertices, doessn't reallocate
-	void						UploadVertices(void* Vertices, int VertexCount);
+  /// Uploads only the first VertexCount vertices, doessn't reallocate
+  void UploadVertices(void* vertices, int vertexCount);
 
-	/// Uploads all indices
-	void						UploadIndices(const IndexEntry* Indices);
+  /// Uploads all indices
+  void UploadIndices(const IndexEntry* indices);
 
-	template<typename T, int N>	void SetVertices(const T (&StaticVertices)[N]);
-	template<int N>				void SetIndices(const IndexEntry (&StaticIndices)[N]);
+  template<typename T, int N>	void SetVertices(const T(&staticVertices)[N]);
+  template<int N> void SetIndices(const IndexEntry(&staticIndices)[N]);
 
-	UINT						VertexCount;
-	UINT						VertexBufferSize;
-	VertexBufferHandle			VertexHandle;
+  UINT mVertexCount;
+  UINT mVertexBufferSize;
+  VertexBufferHandle mVertexHandle;
 
-	UINT						IndexCount;
-	IndexBufferHandle			IndexHandle;
+  UINT mIndexCount;
+  IndexBufferHandle mIndexHandle;
 
-	UINT						WireframeIndexCount;
-	IndexBufferHandle			WireframeIndexHandle;
+  UINT mWireframeIndexCount;
+  IndexBufferHandle	mWireframeIndexHandle;
 
-	VertexFormat*				Format;
+  VertexFormat* mFormat;
 };
 
 template<typename T, int N>
-void Mesh::SetVertices(const T (&StaticVertices)[N])
-{
-	AllocateVertices(T::Format, N);
-	UploadVertices((void*)StaticVertices);
+void Mesh::SetVertices(const T(&staticVertices)[N]) {
+  AllocateVertices(T::format, N);
+  UploadVertices((void*)staticVertices);
 }
 
 template<int N>
-void Mesh::SetIndices(const IndexEntry (&StaticIndices)[N])
-{
-	AllocateIndices(N);
-	UploadIndices(StaticIndices);
+void Mesh::SetIndices(const IndexEntry(&staticIndices)[N]) {
+  AllocateIndices(N);
+  UploadIndices(staticIndices);
 }

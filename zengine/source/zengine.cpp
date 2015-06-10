@@ -5,20 +5,18 @@
 ResourceManager* TheResourceManager = NULL;
 DrawingAPI* TheDrawingAPI = NULL;
 
-Event<> EventZengineInitDone;
+Event<> OnZengineInitDone;
 
 /// Inits Zengine. Returns true if everything went okay.
-bool InitZengine()
-{
-	TheDrawingAPI = new DrawingOpenGL(); 
-	TheResourceManager = new ResourceManager();
-	EventZengineInitDone();
-	return true;
+bool InitZengine() {
+  TheDrawingAPI = new DrawingOpenGL();
+  TheResourceManager = new ResourceManager();
+  OnZengineInitDone();
+  return true;
 }
 
 /// Closes Zengine, frees up resources
-void CloseZengine()
-{
-	SafeDelete(TheResourceManager);
-	SafeDelete(TheDrawingAPI);
+void CloseZengine() {
+  SafeDelete(TheResourceManager);
+  SafeDelete(TheDrawingAPI);
 }

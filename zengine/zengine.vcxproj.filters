@@ -146,6 +146,9 @@
     <ClInclude Include="include\shader\drawable.h">
       <Filter>include\shader2</Filter>
     </ClInclude>
+    <ClInclude Include="source\shader\shadersourcebuilder.h">
+      <Filter>source\shader2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -218,6 +221,9 @@
       <Filter>source\shader2</Filter>
     </ClCompile>
     <ClCompile Include="source\shader\drawable.cpp">
+      <Filter>source\shader2</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shader\shadersourcebuilder.cpp">
       <Filter>source\shader2</Filter>
     </ClCompile>
   </ItemGroup>

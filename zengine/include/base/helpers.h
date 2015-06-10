@@ -22,98 +22,102 @@ extern Logger* TheLogger;
 
 #define MAGIC(x) MAGIC2(x)
 #define MAGIC2(x) #x
-#define LOGHEADER L"[" _STR2WSTR(__FUNCTION__) L"():" _STR2WSTR(MAGIC(__LINE__)) L"]: "
-//#define LOGHEADER L"[" _STR2WSTR(__FILE__) L":" _STR2WSTR(MAGIC(__LINE__)) L"] " _STR2WSTR(__FUNCTION__) L"(): "
+#define LOGHEADER \
+	  L"[" _STR2WSTR(__FUNCTION__) L"():" _STR2WSTR(MAGIC(__LINE__)) L"]: "
+
+//#define LOGHEADER L"[" _STR2WSTR(__FILE__) L":" _STR2WSTR(MAGIC(__LINE__)) \
+//	L"] " _STR2WSTR(__FUNCTION__) L"(): "
 //#define LOGHEADER _STR2WSTR(__FUNCTION__) L"(): "
 
-#define LOG(severity, message, ...) TheLogger->LogFunc2(severity, LOGHEADER, message, __VA_ARGS__)
-#define INFO(message, ...) TheLogger->LogFunc2(LOG_INFO, LOGHEADER, message, __VA_ARGS__)
-#define WARN(message, ...) TheLogger->LogFunc2(LOG_WARNING, LOGHEADER, message, __VA_ARGS__)
-#define ERR(message, ...) TheLogger->LogFunc2(LOG_ERROR, LOGHEADER, message, __VA_ARGS__)
+#define LOG(severity, message, ...) \
+    TheLogger->LogFunc2(severity, LOGHEADER, message, __VA_ARGS__)
+#define INFO(message, ...) \
+    TheLogger->LogFunc2(LOG_INFO, LOGHEADER, message, __VA_ARGS__)
+#define WARN(message, ...) \
+    TheLogger->LogFunc2(LOG_WARNING, LOGHEADER, message, __VA_ARGS__)
+#define ERR(message, ...) \
+    TheLogger->LogFunc2(LOG_ERROR, LOGHEADER, message, __VA_ARGS__)
 
-enum LogSeverity 
-{
-	LOG_INFO,
-	LOG_WARNING,
-	LOG_ERROR
+enum LogSeverity {
+  LOG_INFO,
+  LOG_WARNING,
+  LOG_ERROR
 };
 
-struct LogMessage
-{
-	LogMessage(LogSeverity Severity, const wchar_t* Message);
+struct LogMessage {
+  LogMessage(LogSeverity severity, const wchar_t* message);
 
-	LogSeverity				Severity;
-	const wchar_t*			Message;
+  LogSeverity	severity;
+  const wchar_t* message;
 };
 
-class Logger
-{
+class Logger {
 public:
-	/// Logging
-	void					Log2(LogSeverity Severity, const wchar_t* LogString, ...);
-	void					LogFunc2(LogSeverity Severity, const wchar_t* Function, const wchar_t* LogString, ...);
-	void					LogFunc2(LogSeverity Severity, const wchar_t* Function, const char* LogString, ...);
+  /// Logging
+  void Log2(LogSeverity severity, const wchar_t* logString, ...);
 
-	/// Events
-	Event<LogMessage>		OnLog;
+  void LogFunc2(LogSeverity severity, const wchar_t* function,
+                const wchar_t* logString, ...);
+
+  void LogFunc2(LogSeverity severity, const wchar_t* function,
+                const char* logString, ...);
+
+  /// Events
+  Event<LogMessage> onLog;
 };
 
 
 /// Enum mapping facility 
-
 template<typename CharType>
-struct EnumMapper
-{
-	const CharType*			Name;
-	int						Value;
+struct EnumMapper {
+  const CharType*	name;
+  int	value;
 
-	static const CharType*	GetStringFromEnum(const EnumMapper<CharType>* Mapper, int EnumId);
-	static int				GetEnumFromString(const EnumMapper<CharType>* Mapper, const CharType* Value);
-	static int				GetEnumFromString(const EnumMapper<CharType>* Mapper, const CharType* Value, int StringLength);
+  static const CharType* GetStringFromEnum(const EnumMapper<CharType>* mapper,
+                                           int enumId);
+  static int GetEnumFromString(const EnumMapper<CharType>* mapper,
+                               const CharType* value);
+  static int GetEnumFromString(const EnumMapper<CharType>* mapper,
+                               const CharType* value, int stringLength);
 };
 
-typedef EnumMapper<char>	EnumMapperA;
+typedef EnumMapper<char> EnumMapperA;
 typedef EnumMapper<wchar_t>	EnumMapperW;
 
 
 template<typename CharType>
-const CharType*	EnumMapper<CharType>::GetStringFromEnum(const EnumMapper<CharType>* Mapper, int EnumId)
-{
-	for (const EnumMapper* mapper = Mapper; mapper->Value != -1; mapper++)
-	{
-		if (EnumId == mapper->Value) return mapper->Name;
-	}
-	ERR(L"GetStringFromEnum: Unknown enum: %d.", EnumId);
-	return NULL;
+const CharType*	EnumMapper<CharType>::GetStringFromEnum(
+    const EnumMapper<CharType>* mapper, int enumId) {
+  for (; mapper->value != -1; mapper++) {
+    if (enumId == mapper->value) return mapper->name;
+  }
+  ERR(L"GetStringFromEnum: Unknown enum: %d.", enumId);
+  return NULL;
 }
 
 
 template<typename CharType>
-int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* Mapper, const CharType* Value)
-{
-	for (const EnumMapper* mapper = Mapper; mapper->Value != -1; mapper++)
-	{
-		if (strcmp(Value, mapper->Name) == 0) return mapper->Value;
-	}
-	return -1;
+int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper, 
+                                            const CharType* value) {
+  for (; mapper->value != -1; mapper++) {
+    if (strcmp(value, mapper->name) == 0) return mapper->value;
+  }
+  return -1;
 }
 
 template<typename CharType>
-int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* Mapper, const CharType* Value, int StringLength)
-{
-	for (const EnumMapper* mapper = Mapper; mapper->Value != -1; mapper++)
-	{
-		if (strlen(mapper->Name) == StringLength && 
-			strncmp(Value, mapper->Name, StringLength) == 0)
-		{
-			return mapper->Value;
-		}
-	}
-	return -1;
+int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper, 
+                                            const CharType* value, int stringLength) {
+  for (; mapper->value != -1; mapper++) {
+    if (strlen(mapper->name) == stringLength &&
+        strncmp(value, mapper->name, stringLength) == 0) {
+      return mapper->value;
+    }
+  }
+  return -1;
 }
 
-namespace Convert
-{
-	string			IntToSring(int Value);
-	bool			StringToFloat(const char* S, float& F);
+namespace Convert {
+  string IntToSring(int value);
+  bool StringToFloat(const char* s, float& f);
 }

@@ -23,9 +23,9 @@ ShaderMetadata::ShaderMetadata(	OWNERSHIP const vector<ShaderOption*>& _Options,
 
 ShaderMetadata::~ShaderMetadata()
 {
-	foreach (ShaderOption* option, Options) delete option;
-	foreach (ShaderChoice* choice, Choices) delete choice;
-	foreach (LocalDesc* local, Locals) delete local;
+	for (ShaderOption* option : Options) delete option;
+	for (ShaderChoice* choice : Choices) delete choice;
+	for (LocalDesc* local : Locals) delete local;
 }
 
 CompileSettings::CompileSettings(const ShaderMetadata* _Desc, 

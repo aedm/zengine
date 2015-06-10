@@ -6,35 +6,34 @@
 /// TODO: Remove this.
 using namespace Shaders;
 
-class StubAnalyzer
-{
+class StubAnalyzer {
 public:
-	/// Run analysis for a shader in stub source format.
-	/// Returns user-defined metadata extraced from source.
-	static OWNERSHIP ShaderStubMetadata*	FromText(const char* StubSource);
-	
+  /// Run analysis for a shader in stub source format.
+  /// Returns user-defined metadata extraced from source.
+  static OWNERSHIP ShaderStubMetadata*	FromText(const char* stubSource);
+
 private:
-	StubAnalyzer(const char* StubSource);
+  StubAnalyzer(const char* stubSource);
 
-	void							AnalyzeMetadataLine(SourceLine* line);
-	
-	void							AnalyzeName(SourceLine* line);
-	void							AnalyzeReturns(SourceLine* line);
-	void							AnalyzeParam(SourceLine* line);
-	void							AnalyzeGlobal(SourceLine* line);
-	void							AnalyzeVariable(SourceLine* line, 
-										vector<ShaderStubVariable*>& Storage);
+  void AnalyzeMetadataLine(SourceLine* line);
 
-	NodeType						TokenToType(const SubString& SubStr);
+  void AnalyzeName(SourceLine* line);
+  void AnalyzeReturns(SourceLine* line);
+  void AnalyzeParam(SourceLine* line);
+  void AnalyzeGlobal(SourceLine* line);
+  void AnalyzeVariable(SourceLine* line,
+                       vector<ShaderStubVariable*>& storage);
 
-	int								CurrentLineNumber;
-	
-	/// Builders
-	string*							Name;
-	string							StrippedSource;
-	NodeType						ReturnType;
-	vector<ShaderStubParameter*>	Parameters;
-	vector<ShaderStubGlobal*>		Globals;
-	vector<ShaderStubVariable*>		Inputs;
-	vector<ShaderStubVariable*>		Outputs;
+  NodeType TokenToType(const SubString& subStr);
+
+  int mCurrentLineNumber;
+
+  /// Builders
+  string* mName;
+  string mStrippedSource;
+  NodeType mReturnType;
+  vector<ShaderStubParameter*> mParameters;
+  vector<ShaderStubGlobal*> mGlobals;
+  vector<ShaderStubVariable*> mInputs;
+  vector<ShaderStubVariable*> mOutputs;
 };

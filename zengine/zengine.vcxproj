@@ -120,6 +120,7 @@
     <ClInclude Include="source\render\opengl\drawingopengl.h" />
     <ClInclude Include="source\shaders\analyzer.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />
+    <ClInclude Include="source\shader\shadersourcebuilder.h" />
     <ClInclude Include="source\shader\stubanalyzer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,7 @@
     <ClCompile Include="source\shader\material.cpp" />
     <ClCompile Include="source\shader\pass.cpp" />
     <ClCompile Include="source\shader\shadersource2.cpp" />
+    <ClCompile Include="source\shader\shadersourcebuilder.cpp" />
     <ClCompile Include="source\shader\shaderstub.cpp" />
     <ClCompile Include="source\shader\stubanalyzer.cpp" />
     <ClCompile Include="source\zengine.cpp" />

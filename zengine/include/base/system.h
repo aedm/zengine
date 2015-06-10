@@ -10,45 +10,40 @@
 using namespace std;
 using namespace fastdelegate;
 
-class System
-{
+class System {
 public:
-	static OWNERSHIP char*	ReadFile(const wchar_t* FileName);
+  static OWNERSHIP char* ReadFile(const wchar_t* fileName);
 
-	static void				ReadFilesInFolder(const wchar_t* Folder, const wchar_t* Extension, vector<wstring>& oFileList);
+  static void ReadFilesInFolder(const wchar_t* folder, const wchar_t* extension, 
+                                vector<wstring>& oFileList);
 };
 
 template <class X, class Y, class RetType, typename... Params>
 FastDelegate<RetType(Params...)> Delegate(Y* x, RetType(X::*func)(Params...)) {
-	return FastDelegate<RetType(Params...)>(x, func);
+  return FastDelegate<RetType(Params...)>(x, func);
 }
 
 template <class X, class Y, class RetType, typename... Params>
 FastDelegate<RetType(Params...)> Delegate(Y* x, RetType(X::*func)(Params...) const) {
-	return FastDelegate<RetType(Params...)>(x, func);
+  return FastDelegate<RetType(Params...)>(x, func);
 }
 
 template <typename... Types>
-class Event
-{
+class Event {
 public:
-	void operator += (const FastDelegate<void(Types...)>& Delegate)
-	{
-		Delegates.insert(Delegate);
-	}
+  void operator += (const FastDelegate<void(Types...)>& delegate) {
+    mDelegates.insert(delegate);
+  }
 
-	void operator -= (const FastDelegate<void(Types...)>& Delegate)
-	{
-		Delegates.erase(Delegate);
-	}
+  void operator -= (const FastDelegate<void(Types...)>& delegate) {
+    mDelegates.erase(delegate);
+  }
 
-	void operator () (Types... Message)
-	{
-		for (set<const FastDelegate<void(Types...)>>::iterator it = Delegates.begin(); it != Delegates.end(); ++it)
-		{
-			(*it)(Message...);
-		}
-	}
+  void operator () (Types... message) {
+    for (auto& delegate : mDelegates) {
+      delegate(message...);
+    }
+  }
 
-	set<const FastDelegate<void(Types...)>>	Delegates;
+  set<const FastDelegate<void(Types...)>>	mDelegates;
 };

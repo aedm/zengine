@@ -34,11 +34,11 @@ PropertyEditor::PropertyEditor(Node* Nd, QWidget* _PropertyPanel)
 	nameEditorLayout->addWidget(nameLabel);
 	QLineEdit* nameLineEdit = new QLineEdit(nameEditor);
 	nameEditorLayout->addWidget(nameLineEdit);
-	nameLineEdit->setText(QString::fromStdString(Nd->Name));
+	nameLineEdit->setText(QString::fromStdString(Nd->mName));
 	Layout->addWidget(nameEditor);
 
 	/// Slots
-	for (Slot* slot : Nd->Slots)
+	for (Slot* slot : Nd->mSlots)
 	{
 		QLabel* slotLabel = new QLabel(QString::fromStdString(*slot->GetName()), PropertyPanel);
 		Layout->addWidget(slotLabel);

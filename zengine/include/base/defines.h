@@ -39,10 +39,6 @@ typedef			int							SamplerId;
 #define NOOWNERSHIP
 #define OPTIONAL
 
-#ifndef foreach
-#	define foreach BOOST_FOREACH
-#endif
-
 template<typename T> 
 void SafeDelete(T*& Object) { delete Object; Object = 0; }
 

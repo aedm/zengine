@@ -1,27 +1,25 @@
 #include <include/resources/resourcemanager.h>
 #include <boost/foreach.hpp>
 
-ResourceManager::ResourceManager()
-{
-	VertexPos::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK);
-	VertexPosNorm::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
-	VertexPosUVNorm::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
-	VertexPosUV::Format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
+ResourceManager::ResourceManager() {
+  VertexPos::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK);
+  VertexPosNorm::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
+  VertexPosUVNorm::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
+  VertexPosUV::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
 }
 
-ResourceManager::~ResourceManager()
-{
-	//for (UINT i=0; i<AllTextures.size(); i++) delete AllTextures[i];
-	//for (UINT i=0; i<AllShaderSources.size(); i++) delete AllShaderSources[i];
-	//for (set<Mesh*>::iterator it = Meshes.begin(); it != Meshes.end(); it++) delete *it;
+ResourceManager::~ResourceManager() {
+  //for (UINT i=0; i<AllTextures.size(); i++) delete AllTextures[i];
+  //for (UINT i=0; i<AllShaderSources.size(); i++) delete AllShaderSources[i];
+  //for (set<Mesh*>::iterator it = Meshes.begin(); it != Meshes.end(); it++) delete *it;
 
-	//for (map<TexCategory, TextureList*>::iterator it = FreeTextures.begin(); it != FreeTextures.end(); it++)
-	//{
-	//	delete it->second;
-	//}
+  //for (map<TexCategory, TextureList*>::iterator it = FreeTextures.begin(); it != FreeTextures.end(); it++)
+  //{
+  //	delete it->second;
+  //}
 
-	foreach (Mesh* mesh, Meshes) delete mesh;
-	foreach (auto vertexFormat, VertexFormats) delete vertexFormat.second;
+  for (Mesh* mesh : mMeshes) delete mesh;
+  for (auto vertexFormat : mVertexFormats) delete vertexFormat.second;
 }
 
 //Texture* ResourceManager::CreateTexture(int Width, int Height, TextureType Type, void* PixelData)
@@ -73,48 +71,42 @@ ResourceManager::~ResourceManager()
 //	return shaderSource;
 //}
 
-VertexFormat* ResourceManager::GetVertexFormat( UINT BinaryFormat )
-{
-	map<UINT, VertexFormat*>::iterator it = VertexFormats.find(BinaryFormat);
-	if (it != VertexFormats.end()) return it->second;
+VertexFormat* ResourceManager::GetVertexFormat(UINT binaryFormat) {
+  map<UINT, VertexFormat*>::iterator it = mVertexFormats.find(binaryFormat);
+  if (it != mVertexFormats.end()) return it->second;
 
-	VertexFormat* format = new VertexFormat(BinaryFormat);
-	VertexFormats[BinaryFormat] = format;
+  VertexFormat* format = new VertexFormat(binaryFormat);
+  mVertexFormats[binaryFormat] = format;
 
-	return format;
+  return format;
 }
 
-Mesh* ResourceManager::CreateMesh()
-{
-	Mesh* mesh = new Mesh();
-	Meshes.insert(mesh);
-	return mesh;
+Mesh* ResourceManager::CreateMesh() {
+  Mesh* mesh = new Mesh();
+  mMeshes.insert(mesh);
+  return mesh;
 }
 
-void ResourceManager::DiscardMesh( Mesh* MeshInstance )
-{
-	Meshes.erase(MeshInstance);
-	delete MeshInstance;
+void ResourceManager::DiscardMesh(Mesh* meshInstance) {
+  mMeshes.erase(meshInstance);
+  delete meshInstance;
 }
 
-Texture* ResourceManager::CreateTexture( int Width, int Height, TexelTypeEnum Type, void* TexelData )
-{
-	TextureHandle handle = TheDrawingAPI->CreateTexture(Width, Height, Type);
-	if (TexelData) 
-	{
-		TheDrawingAPI->UploadTextureData(handle, Width, Height, Type, TexelData);
-		// TODO: error handling
-	}
-	Texture* texture = new Texture(Width, Height, Type, handle);
-	return texture;
+Texture* ResourceManager::CreateTexture(int width, int height, TexelTypeEnum type, 
+                                        void* texelData) {
+  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type);
+  if (texelData) {
+    TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
+    // TODO: error handling
+  }
+  Texture* texture = new Texture(width, height, type, handle);
+  return texture;
 }
 
-void ResourceManager::DiscardTexture( Texture* TextureInstance )
-{
-	TheDrawingAPI->DeleteTexture(TextureInstance->Handle);
-	delete TextureInstance;
+void ResourceManager::DiscardTexture(Texture* textureInstance) {
+  TheDrawingAPI->DeleteTexture(textureInstance->mHandle);
+  delete textureInstance;
 }
-
 
 
 //ResourceManager::TexCategory::TexCategory( int Width, int Height, TextureType Type )

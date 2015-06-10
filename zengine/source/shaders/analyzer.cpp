@@ -53,7 +53,7 @@ OWNERSHIP ShaderMetadata* Analysis::FromText(const char* _FileName, OWNERSHIP co
 
 	vector<SourceLine*>* lines = SplitToWords(Source);
 
-	foreach (SourceLine* line, *lines)
+	for (SourceLine* line : *lines)
 	{
 		CurrentLineNumber = line->LineNumber;
 		if (line->SubStrings[0].Token == TOKEN_METADATA)

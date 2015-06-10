@@ -41,7 +41,7 @@ NodeWidget::NodeWidget(Node* Nd)
 	, TitleTexture(NULL)
 {
 	Selected = false;
-	SetTitle(QString::fromStdString(Nd->Name));
+	SetTitle(QString::fromStdString(Nd->mName));
 
 	CreateWidgetSlots();
 }
@@ -53,7 +53,7 @@ void NodeWidget::CreateWidgetSlots()
 	WidgetSlots.clear();
 
 	Node* node = GetNode();
-	for(Slot* slot : node->Slots)
+	for(Slot* slot : node->mSlots)
 	{
 		WidgetSlot* sw = new WidgetSlot();
 		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
@@ -71,19 +71,19 @@ void NodeWidget::CalculateLayout()
 	for(WidgetSlot* sw : WidgetSlots)
 	{
 		sw->Position = Vec2(SlotLeftMargin, slotY);
-		sw->Size = Vec2(SlotWidth, float(sw->Text.TextSize.height()) + SlotPadding.Y * 2.0f);
-		sw->SpotPos = Vec2(ConnectionSpotPadding, slotY + sw->Size.Y / 2.0f);
-		slotY += sw->Size.Y + SlotSpacing;
+		sw->Size = Vec2(SlotWidth, float(sw->Text.TextSize.height()) + SlotPadding.y * 2.0f);
+		sw->SpotPos = Vec2(ConnectionSpotPadding, slotY + sw->Size.y / 2.0f);
+		slotY += sw->Size.y + SlotSpacing;
 	}
 	Size = Vec2(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
-	OutputPosition = Vec2(Size.X - ConnectionSpotPadding - 1.0f, TitleHeight / 2.0f);
+	OutputPosition = Vec2(Size.x - ConnectionSpotPadding - 1.0f, TitleHeight / 2.0f);
 }
 
 
 void NodeWidget::Paint(GraphEditor* Panel)
 {
 	ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
-	ThePainter->DrawBox(Position, Vec2(Size.X, TitleHeight));
+	ThePainter->DrawBox(Position, Vec2(Size.x, TitleHeight));
 
 	ThePainter->Color.Set(Vec4(0, 0, 0, Opacity));
 	ThePainter->DrawBox(Position + Vec2(0, TitleHeight), Size - Vec2(0, TitleHeight));
@@ -92,7 +92,7 @@ void NodeWidget::Paint(GraphEditor* Panel)
 	ThePainter->DrawBox(Position + OutputPosition - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
 	
 	ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
-	float centerX = floor((Size.X - float(TitleTexture->TextSize.width())) * 0.5f);
+	float centerX = floor((Size.x - float(TitleTexture->TextSize.width())) * 0.5f);
 	ThePainter->DrawTextTexture(TitleTexture, Position + Vec2(centerX, TitlePadding + 1));
 
 	for (int i=0; i<WidgetSlots.size(); i++)
