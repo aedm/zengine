@@ -58,14 +58,14 @@ PropertyEditor::~PropertyEditor()
 	delete Layout;
 }
 
-PropertyEditor* PropertyEditor::ForNode(Node* Nd, QWidget* PropertyPanel)
+PropertyEditor* PropertyEditor::ForNode(Node* node, QWidget* PropertyPanel)
 {
-	switch (ThePrototypes->GetNodeClass(Nd))
+	switch (ThePrototypes->GetNodeClass(node))
 	{
 	case NodeClass::STATIC_FLOAT:
-		return new StaticFloatEditor(Nd, PropertyPanel);
+		return new StaticFloatEditor(static_cast<FloatNode*>(node), PropertyPanel);
 	default:
-		return new PropertyEditor(Nd, PropertyPanel);
+		return new PropertyEditor(node, PropertyPanel);
 	}
 
 }

@@ -65,7 +65,7 @@ class FloatSliderWidget : public QWidget
 	Q_OBJECT
 
 public:
-	FloatSliderWidget(QWidget* Parent);
+	FloatSliderWidget(QWidget* Parent, FloatNode* node);
 	virtual ~FloatSliderWidget() {}
 
 private:

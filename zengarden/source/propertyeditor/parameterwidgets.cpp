@@ -21,7 +21,6 @@ Slider::Slider(QWidget* Parent)
 	, Minimum(0)
 	, Maximum(1)
 {
-
 }
 
 void Slider::paintEvent(QPaintEvent *e)
@@ -92,11 +91,12 @@ void Slider::SetValue(float Value)
 }
 
 
-FloatSliderWidget::FloatSliderWidget(QWidget* Parent)
+FloatSliderWidget::FloatSliderWidget(QWidget* Parent, FloatNode* node)
 	: QWidget(Parent)
 	//, Watcher(MakeDelegate(this, &FloatSliderWidget::OnOperatorValueChanges))
 {
 	//this->Op = Op;
+	Op = node;
 
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setSpacing(4);
@@ -108,7 +108,7 @@ FloatSliderWidget::FloatSliderWidget(QWidget* Parent)
 	Slide->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
 	//float val = Op->GetValue();
-	float val = 0.0;
+	float val = node->Get();
 	//if (Desc != NULL)
 	//{
 	//	Slide->Minimum = Desc->UIMinimum;
@@ -146,7 +146,7 @@ void FloatSliderWidget::SpinBoxValueChanged()
 		SilentChange = true;
 		float value = TextBox->text().toFloat();
 		Slide->SetValue(value);
-		//Op->SetValue(value);
+		Op->Set(value);
 		SilentChange = false;
 	}
 }
@@ -172,7 +172,7 @@ void FloatSliderWidget::SliderValueChanged(float Vlaue)
 {
 	float value = Slide->GetValue();
 	SetTextBoxValue(value);
-	//Op->SetValue(value);
+	Op->Set(value);
 }
 
 //IntegerSliderWidget::IntegerSliderWidget( QWidget* Parent, Parameter* Param )

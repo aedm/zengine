@@ -73,7 +73,7 @@ void ZenGarden::InitModules()
 		ThePrototypes->AddPrototype(fragmentStub, NodeClass::SHADER_STUB);
 		TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graphEditor));
 		NodeWidget* ow = graphEditor->GetNodeWidget(fragmentStub);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 150)));
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(150, 150)));
 		delete testShaderStubSource;
 
 		/// vertex shader
@@ -82,7 +82,7 @@ void ZenGarden::InitModules()
 		ThePrototypes->AddPrototype(vertexStub, NodeClass::SHADER_STUB);
 		TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graphEditor));
 		ow = graphEditor->GetNodeWidget(vertexStub);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 250)));
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(150, 250)));
 
 		/// pass
 		auto pass = new Pass();
@@ -90,8 +90,14 @@ void ZenGarden::InitModules()
 		pass->mVertexStub.Connect(vertexStub);
 		TheCommandStack->Execute(new CreateNodeCommand(pass, graphEditor));
 		ow = graphEditor->GetNodeWidget(pass);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(180, 200)));
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(280, 200)));
 
+		/// float
+		auto floatNode = new FloatNode();
+		fragmentStub->mSlots[0]->Connect(floatNode); /// hack
+		TheCommandStack->Execute(new CreateNodeCommand(floatNode, graphEditor));
+		ow = graphEditor->GetNodeWidget(floatNode);
+		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 150)));
 	}
 
 

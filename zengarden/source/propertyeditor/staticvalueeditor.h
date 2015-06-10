@@ -5,7 +5,7 @@
 class StaticFloatEditor : public PropertyEditor
 {
 public:
-	StaticFloatEditor(Node* Nd, QWidget* PropertyPanel);
+	StaticFloatEditor(FloatNode* node, QWidget* PropertyPanel);
 
 
 };

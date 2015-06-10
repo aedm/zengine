@@ -3,10 +3,10 @@
 #include <QtWidgets/QLabel>
 
 
-StaticFloatEditor::StaticFloatEditor(Node* Nd, QWidget* PropertyPanel)
-	: PropertyEditor(Nd, PropertyPanel)
+StaticFloatEditor::StaticFloatEditor(FloatNode* node, QWidget* PropertyPanel)
+	: PropertyEditor(node, PropertyPanel)
 {
-	FloatSliderWidget* fsw = new FloatSliderWidget(PropertyPanel);
+	FloatSliderWidget* fsw = new FloatSliderWidget(PropertyPanel, node);
 	Layout->addWidget(fsw);
 }
 
