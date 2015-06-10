@@ -3,60 +3,56 @@
 #include "shaderstub.h"
 #include "../dom/node.h"
 
-struct ShaderSourceVariable
-{
-	ShaderSourceVariable(NodeType Type, const string& Name);
+struct ShaderSourceVariable {
+  ShaderSourceVariable(NodeType type, const string& name);
 
-	NodeType			Type;
-	string				Name;
-	/// TODO: layout, vertexformat usage etc.
+  NodeType type;
+  string name;
+  /// TODO: layout, vertexformat usage etc.
 };
 
-struct ShaderSourceUniform
-{
-	ShaderSourceUniform(NodeType Type, const string& Name, Node* Nd,
-		ShaderGlobalType GlobalType);
+struct ShaderSourceUniform {
+  ShaderSourceUniform(NodeType type, const string& name, Node* node,
+                      ShaderGlobalType globalType);
 
-	NodeType			Type;
-	string				Name;
-	Node*				TheNode;
-	ShaderGlobalType	GlobalType;
+  NodeType type;
+  string name;
+  Node* node;
+  ShaderGlobalType globalType;
 };
 
 
 /// All metadata collected from a shader source.
-struct ShaderSourceMetadata 
-{
-	ShaderSourceMetadata(
-		const vector<OWNERSHIP ShaderSourceVariable*>& Inputs,
-		const vector<OWNERSHIP ShaderSourceVariable*>& Outputs,
-		const vector<OWNERSHIP ShaderSourceUniform*>& Uniforms);
-	~ShaderSourceMetadata();
+struct ShaderSourceMetadata {
+  ShaderSourceMetadata(
+    const vector<OWNERSHIP ShaderSourceVariable*>& inputs,
+    const vector<OWNERSHIP ShaderSourceVariable*>& outputs,
+    const vector<OWNERSHIP ShaderSourceUniform*>& uniforms);
+  ~ShaderSourceMetadata();
 
-	const vector<ShaderSourceVariable*>	Inputs;
-	const vector<ShaderSourceVariable*>	Outputs;
-	const vector<ShaderSourceUniform*>	Uniforms;
+  const vector<ShaderSourceVariable*>	inputs;
+  const vector<ShaderSourceVariable*>	outputs;
+  const vector<ShaderSourceUniform*>	uniforms;
 };
 
 
-class ShaderSource2 : public Node
-{
+class ShaderSource2: public Node {
 public:
-	ShaderSource2();
-	virtual ~ShaderSource2();
+  ShaderSource2();
+  virtual ~ShaderSource2();
 
-	virtual Node*				Clone() const override;
-	const string&				GetSource() const;
-	const ShaderSourceMetadata* GetMetadata() const;
-	Slot						Stub;
+  virtual Node* Clone() const override;
+  const string& GetSource() const;
+  const ShaderSourceMetadata* GetMetadata() const;
+  Slot mStub;
 
 protected:
-	friend class ShaderSourceBuilder;
+  friend class ShaderSourceBuilder;
 
-	virtual void				HandleMessage(Slot* S, NodeMessage Message,
-									const void* Payload) override;
+  virtual void HandleMessage(Slot* slot, NodeMessage message, 
+                             const void* payload) override;
 
-	ShaderSourceMetadata*		Metadata;
-	string						Source;
+  ShaderSourceMetadata* metadata;
+  string mSource;
 };
 

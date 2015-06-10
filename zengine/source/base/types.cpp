@@ -4,7 +4,7 @@
 const char* gVariableNames[] = {
 #undef ITEM
 #define ITEM(name, type, token) token,
-	VALUETYPE_LIST
+  VALUETYPE_LIST
 };
 
 
@@ -12,7 +12,7 @@ const char* gVariableNames[] = {
 const int gVariableByteSizes[] = {
 #undef ITEM
 #define ITEM(name, type, token) sizeof(type),
-	VALUETYPE_LIST
+  VALUETYPE_LIST
 };
 
 
@@ -20,7 +20,7 @@ const int gVariableByteSizes[] = {
 const NodeType gVertexAttributeType[] = {
 #undef ITEM
 #define ITEM(name, type, token) type,
-	VERTEXATTRIBUTE_LIST
+  VERTEXATTRIBUTE_LIST
 };
 
 
@@ -28,5 +28,5 @@ const NodeType gVertexAttributeType[] = {
 const char* gVertexAttributeName[] = {
 #undef ITEM
 #define ITEM(name, type, token) token,
-	VERTEXATTRIBUTE_LIST
+  VERTEXATTRIBUTE_LIST
 };

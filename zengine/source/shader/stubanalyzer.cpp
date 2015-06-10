@@ -98,8 +98,8 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line)
 	}
 
 	ShaderStubParameter* parameter = new ShaderStubParameter();
-	parameter->Type = TokenToType(line->SubStrings[2]);
-	parameter->Name = line->SubStrings[3].ToString();
+	parameter->type = TokenToType(line->SubStrings[2]);
+	parameter->name = line->SubStrings[3].ToString();
 	Parameters.push_back(parameter);
 }
 
@@ -112,8 +112,8 @@ void StubAnalyzer::AnalyzeVariable(SourceLine* line, vector<ShaderStubVariable*>
 	}
 
 	ShaderStubVariable* parameter = new ShaderStubVariable();
-	parameter->Type = TokenToType(line->SubStrings[2]);
-	parameter->Name = line->SubStrings[3].ToString();
+	parameter->type = TokenToType(line->SubStrings[2]);
+	parameter->name = line->SubStrings[3].ToString();
 	Storage.push_back(parameter);
 }
 
@@ -145,9 +145,9 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line)
 	}
 
 	ShaderStubGlobal* global = new ShaderStubGlobal();
-	global->Name = name.ToString();
-	global->Type = declaredType;
-	global->Usage = (ShaderGlobalType)usage;
+	global->name = name.ToString();
+	global->type = declaredType;
+	global->usage = (ShaderGlobalType)usage;
 	Globals.push_back(global);
 }
 

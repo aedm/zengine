@@ -6,65 +6,60 @@
 
 Logger* TheLogger = new Logger();
 
-void Logger::Log2( LogSeverity Severity, const wchar_t* LogString, ... )
-{
-	wchar_t tmp[4096];
-	va_list args;
-	va_start(args, LogString);
-	vswprintf(tmp, 4096, LogString, args);
-	va_end(args);
-	onLog(LogMessage(Severity, tmp));
+void Logger::Log2(LogSeverity severity, const wchar_t* logString, ...) {
+  wchar_t tmp[4096];
+  va_list args;
+  va_start(args, logString);
+  vswprintf(tmp, 4096, logString, args);
+  va_end(args);
+  onLog(LogMessage(severity, tmp));
 }
 
-void Logger::LogFunc2(LogSeverity Severity, const wchar_t* Function, const wchar_t* LogString, ...)
-{
-	wchar_t tmp[4096];
-	int funlen = swprintf(tmp, 4096, Function);
+void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
+                      const wchar_t* logString, ...) {
+  wchar_t tmp[4096];
+  int funlen = swprintf(tmp, 4096, function);
 
-	va_list args;
-	va_start(args, LogString);
-	vswprintf(tmp + funlen, 4096 - funlen, LogString, args);
-	va_end(args);
+  va_list args;
+  va_start(args, logString);
+  vswprintf(tmp + funlen, 4096 - funlen, logString, args);
+  va_end(args);
 
-	onLog(LogMessage(Severity, tmp));
+  onLog(LogMessage(severity, tmp));
 }
 
-void Logger::LogFunc2(LogSeverity Severity, const wchar_t* Function, const char* LogString, ...)
-{
-	/// God, this is bad.
-	char tmp_ascii[4096];
+void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
+                      const char* logString, ...) {
+  /// God, this is bad.
+  char tmp_ascii[4096];
 
-	va_list args;
-	va_start(args, LogString);
-	_vsnprintf(tmp_ascii, 4096, LogString, args);
-	va_end(args);
+  va_list args;
+  va_start(args, logString);
+  _vsnprintf(tmp_ascii, 4096, logString, args);
+  va_end(args);
 
-	string tmp_string(tmp_ascii);
-	wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
+  string tmp_string(tmp_ascii);
+  wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
 
-	wchar_t tmp[4096]; 
-	swprintf(tmp, 4096, L"%s%s", Function, tmp_wstring.c_str());
+  wchar_t tmp[4096];
+  swprintf(tmp, 4096, L"%s%s", function, tmp_wstring.c_str());
 
-	onLog(LogMessage(Severity, tmp));
+  onLog(LogMessage(severity, tmp));
 }
 
-LogMessage::LogMessage( LogSeverity Severity, const wchar_t* Message )
-{
-	this->severity = Severity;
-	this->message = Message;
+LogMessage::LogMessage(LogSeverity severity, const wchar_t* message) {
+  this->severity = severity;
+  this->message = message;
 }
 
-namespace Convert
-{
-	string IntToSring( int Value )
-	{
-		char tmp[64];
-		sprintf_s(tmp, 64, "%d", Value);
-		return string(tmp);	
-	}
+namespace Convert {
+  string IntToSring(int Value) {
+    char tmp[64];
+    sprintf_s(tmp, 64, "%d", Value);
+    return string(tmp);
+  }
 
-	bool StringToFloat( const char* S, float& F )
-	{
-		return sscanf(S, "%f", &F) != 1;
-	}
+  bool StringToFloat(const char* S, float& F) {
+    return sscanf(S, "%f", &F) != 1;
+  }
 }

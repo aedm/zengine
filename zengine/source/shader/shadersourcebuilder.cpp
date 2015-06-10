@@ -10,12 +10,12 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* _Stub, ShaderSource2* _Sour
 	: Source(_Source)
 {
 	INFO("Building shader source...");
-	SafeDelete(Source->Metadata);
+	SafeDelete(Source->metadata);
 	for (Slot* slot : Source->mSlots) {
-		if (slot != &Source->Stub) delete slot;
+		if (slot != &Source->mStub) delete slot;
 	}
 	Source->mSlots.clear();
-	Source->mSlots.push_back(&Source->Stub);
+	Source->mSlots.push_back(&Source->mStub);
 
 	if (_Stub == nullptr) return;
 
@@ -35,7 +35,7 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* _Stub, ShaderSource2* _Sour
 		}
 		GenerateSlots();
 		GenerateSource();
-		_Source->Metadata = new ShaderSourceMetadata(Inputs, Outputs, Uniforms);
+		_Source->metadata = new ShaderSourceMetadata(Inputs, Outputs, Uniforms);
 	} catch (...) {
 	}
 }
@@ -51,32 +51,32 @@ void ShaderSourceBuilder::CollectStubMetadata(Node* Nd)
 
 	ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
 	NodeData* data = DataMap.at(Nd);
-	data->ReturnType = stubMeta->ReturnType;
+	data->ReturnType = stubMeta->returnType;
 	
 	const map<ShaderStubParameter*, Slot*>& paramSlotMap = stub->GetParameterSlotMap();
 
 	/// Globals
-	for (auto global : stubMeta->Globals)
+	for (auto global : stubMeta->globals)
 	{
 		Uniforms.push_back(new ShaderSourceUniform(
-			global->Type, global->Name, nullptr, global->Usage));
+			global->type, global->name, nullptr, global->usage));
 	}
 
 	/// Inputs
-	for (auto input : stubMeta->Inputs)
+	for (auto input : stubMeta->inputs)
 	{
 		/// TODO: check whether input types match
-		if (InputsMap.find(input->Name) == InputsMap.end())
+		if (InputsMap.find(input->name) == InputsMap.end())
 		{
-			InputsMap[input->Name] = 
-				new ShaderSourceVariable(input->Type, input->Name);
+			InputsMap[input->name] = 
+				new ShaderSourceVariable(input->type, input->name);
 		}
 	}
 
 	/// Outputs
-	for (auto output : stubMeta->Outputs)
+	for (auto output : stubMeta->outputs)
 	{
-		Outputs.push_back(new ShaderSourceVariable(output->Type, output->Name));
+		Outputs.push_back(new ShaderSourceVariable(output->type, output->name));
 	}
 }
 
@@ -137,7 +137,7 @@ void ShaderSourceBuilder::GenerateSourceMetadata()
 	{
 		inputs.push_back(input.second);
 	}
-	Source->Metadata = new ShaderSourceMetadata(inputs, Outputs, Uniforms);
+	Source->metadata = new ShaderSourceMetadata(inputs, Outputs, Uniforms);
 }
 
 void ShaderSourceBuilder::GenerateSlots()
@@ -159,7 +159,7 @@ void ShaderSourceBuilder::GenerateSlots()
 
 void ShaderSourceBuilder::GenerateSource()
 {
-	Source->Source.clear();
+	Source->mSource.clear();
 	stringstream stream;
 	stream << "#version 150" << endl;
 
@@ -167,7 +167,7 @@ void ShaderSourceBuilder::GenerateSource()
 	GenerateSourceFunctions(stream);
 	GenerateSourceMain(stream);
 
-	Source->Source = stream.str();
+	Source->mSource = stream.str();
 }
 
 void ShaderSourceBuilder::GenerateSourceHeader(stringstream& stream)
@@ -175,23 +175,23 @@ void ShaderSourceBuilder::GenerateSourceHeader(stringstream& stream)
 	/// Inputs
 	for (auto var : InputsMap)
 	{
-		stream << "in " << GetTypeString(var.second->Type) << ' ' << 
-			var.second->Name << ';' << endl;
+		stream << "in " << GetTypeString(var.second->type) << ' ' << 
+			var.second->name << ';' << endl;
 		Inputs.push_back(var.second);
 	}
 
 	/// Outputs
 	for (auto var : Outputs)
 	{
-		stream << "out " << GetTypeString(var->Type) << ' ' << 
-			var->Name << ';' << endl;
+		stream << "out " << GetTypeString(var->type) << ' ' << 
+			var->name << ';' << endl;
 	}
 
 	/// Uniforms
 	for (auto uniform : Uniforms)
 	{
-		stream << "uniform " << GetTypeString(uniform->Type) << ' ' << 
-			uniform->Name << ';' << endl;
+		stream << "uniform " << GetTypeString(uniform->type) << ' ' << 
+			uniform->name << ';' << endl;
 	}
 }
 
@@ -206,15 +206,15 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream)
 			ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
 
 			stream << endl;
-			stream << "#define SHADER " << GetTypeString(stubMeta->ReturnType) << 
+			stream << "#define SHADER " << GetTypeString(stubMeta->returnType) << 
 				' ' << data->FunctionName << "(";
-			for (UINT i = 0; i < stubMeta->Parameters.size(); i++) {
-				ShaderStubParameter* param = stubMeta->Parameters[i];
-				stream << GetTypeString(param->Type) << ' ' << param->Name;
-				if (i < stubMeta->Parameters.size() - 1) stream << ", ";
+			for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
+				ShaderStubParameter* param = stubMeta->parameters[i];
+				stream << GetTypeString(param->type) << ' ' << param->name;
+				if (i < stubMeta->parameters.size() - 1) stream << ", ";
 			}
 			stream << ')' << endl;
-			stream << stubMeta->StrippedSource;
+			stream << stubMeta->strippedSource;
 			stream << "#undef SHADER" << endl;
 		}
 	}
@@ -240,9 +240,9 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream)
 					data->VariableName << " = ";
 			}
 			stream << data->FunctionName << "(";
-			for (UINT i = 0; i < stubMeta->Parameters.size(); i++) 
+			for (UINT i = 0; i < stubMeta->parameters.size(); i++) 
 			{
-				ShaderStubParameter* param = stubMeta->Parameters[i];
+				ShaderStubParameter* param = stubMeta->parameters[i];
 				Slot* slot = stub->GetParameterSlotMap().at(param);
 				Node* paramNode = slot->GetNode();
 				if (paramNode == nullptr) {
@@ -252,7 +252,7 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream)
 				}
 				NodeData* paramData = DataMap.at(paramNode);
 				stream << paramData->VariableName;
-				if (i < stubMeta->Parameters.size() - 1) stream << ", ";
+				if (i < stubMeta->parameters.size() - 1) stream << ", ";
 			}
 			stream << ");" << endl;
 		}

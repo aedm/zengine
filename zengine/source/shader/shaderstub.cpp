@@ -4,64 +4,64 @@
 
 ShaderStub::ShaderStub(const string& _Source)
 	: Node(NodeType::SHADER_STUB, "ShaderStub")
-	, Metadata(nullptr)
-	, ShaderSrc(nullptr)
+	, mMetadata(nullptr)
+	, mShaderSrc(nullptr)
 {
 	SetStubSource(_Source);
 }
 
 ShaderStub::ShaderStub(const ShaderStub& Original)
 	: Node(Original)
-	, Metadata(nullptr)
-	, ShaderSrc(nullptr)
+	, mMetadata(nullptr)
+	, mShaderSrc(nullptr)
 {
 	SetStubSource(Original.GetStubSource());
 }
 
 ShaderStub::~ShaderStub()
 {
-	SafeDelete(Metadata);
+	SafeDelete(mMetadata);
 }
 
 void ShaderStub::SetStubSource(const string& _Source)
 {
-	Source = _Source;
+	mSource = _Source;
 
 	/// TODO: dont do this
 	for (Slot* slot : mSlots) delete slot;
 	mSlots.clear();
-	ParameterSlotMap.clear();
+	mParameterSlotMap.clear();
 	
-	SafeDelete(Metadata);
-	Metadata = StubAnalyzer::FromText(Source.c_str());
+	SafeDelete(mMetadata);
+	mMetadata = StubAnalyzer::FromText(mSource.c_str());
 
-	if (Metadata == nullptr) return;
+	if (mMetadata == nullptr) return;
 
-	for (auto param : Metadata->Parameters)
+	for (auto param : mMetadata->parameters)
 	{
-		Slot* slot = new Slot(param->Type, this, make_shared<string>(param->Name), false);
-		ParameterSlotMap[param] = slot;
+		Slot* slot = new Slot(param->type, this, make_shared<string>(param->name), false);
+		mParameterSlotMap[param] = slot;
 	}
 }
 
 ShaderSource2* ShaderStub::GetShaderSource()
 {
-	if (ShaderSrc == nullptr)
+	if (mShaderSrc == nullptr)
 	{
-		ShaderSrc = new ShaderSource2();
-		ShaderSrc->Stub.Connect(this);
+		mShaderSrc = new ShaderSource2();
+		mShaderSrc->mStub.Connect(this);
 	}
-	return ShaderSrc;
+	return mShaderSrc;
 }
 
 ShaderStubMetadata* ShaderStub::GetStubMetadata() const
 {
-	return Metadata;
+	return mMetadata;
 }
 
 const map<ShaderStubParameter*, Slot*>& ShaderStub::GetParameterSlotMap()
 {
-	return ParameterSlotMap;
+	return mParameterSlotMap;
 }
 
 Node* ShaderStub::Clone() const
@@ -71,7 +71,7 @@ Node* ShaderStub::Clone() const
 
 const string& ShaderStub::GetStubSource() const
 {
-	return Source;
+	return mSource;
 }
 
 void ShaderStub::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
@@ -95,16 +95,16 @@ ShaderStubMetadata::ShaderStubMetadata(const string& _Name, NodeType _ReturnType
 	const vector<ShaderStubGlobal*>& _Globals,
 	const vector<ShaderStubVariable*>& _Inputs,
 	const vector<ShaderStubVariable*>& _Outputs)
-	: Name(_Name)
-	, ReturnType(_ReturnType)
-	, Parameters(_Parameters)
-	, Globals(_Globals)
-	, StrippedSource(_StrippedSource)
-	, Inputs(_Inputs)
-	, Outputs(_Outputs)
+	: name(_Name)
+	, returnType(_ReturnType)
+	, parameters(_Parameters)
+	, globals(_Globals)
+	, strippedSource(_StrippedSource)
+	, inputs(_Inputs)
+	, outputs(_Outputs)
 {}
 
 ShaderStubMetadata::~ShaderStubMetadata()
 {
-	for (auto x : Parameters) delete(x);
+	for (auto x : parameters) delete(x);
 }

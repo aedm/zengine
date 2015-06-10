@@ -35,13 +35,13 @@ ShaderNode::ShaderNode( const ShaderNode& Original )
 void ShaderNode::Init()
 {
 	UniformArrays.reserve(ShaderProgram->UniformBlocks.size());
-	foreach(UniformBlock* block, ShaderProgram->UniformBlocks)
+	for (UniformBlock* block : ShaderProgram->UniformBlocks)
 	{
 		UniformArray* uniformArray = new UniformArray(block);
 		uniformArray->CreateSlotsAndMappings(this, Uniforms);
 		UniformArrays.push_back(uniformArray);
 	}
-	foreach(Sampler* sampler, ShaderProgram->Samplers)
+	for (Sampler* sampler : ShaderProgram->Samplers)
 	{
 		TextureSlot* textureSlot = new TextureSlot(this, sampler->Desc->UniformName);
 		Samplers.push_back(SamplerMapping(sampler, textureSlot));
@@ -60,7 +60,7 @@ void ShaderNode::Set()
 	Evaluate();
 
 	/// Upload uniforms
-	foreach(UniformArray* uniformArray, UniformArrays)
+	for (UniformArray* uniformArray : UniformArrays)
 	{
 		uniformArray->Set();
 	}
@@ -94,14 +94,14 @@ void ShaderNode::HandleMessage(Slot* S, NodeMessage Message, const void* Payload
 void ShaderNode::RegenerateCopyItems()
 {
 	/// Reset copy items
-	foreach(UniformArray* uniformArray, UniformArrays)
+	for (UniformArray* uniformArray : UniformArrays)
 	{
 		uniformArray->CopyItems.clear();
 	}
 
 	/// Check whether everything is connected
 	bool allConnected = true;
-	foreach(UniformMapping& item, Uniforms)
+	for (UniformMapping& item : Uniforms)
 	{
 		if (item.TargetUniform->IsLocal && item.SourceSlot->GetNode() == NULL)
 		{
@@ -114,13 +114,13 @@ void ShaderNode::RegenerateCopyItems()
 	if (!allConnected) return;
 
 	/// Reserve space for copy items
-	foreach(UniformArray* uniformArray, UniformArrays)
+	for (UniformArray* uniformArray : UniformArrays)
 	{
 		uniformArray->CopyItems.reserve(uniformArray->Block->ByteSize / sizeof(float));
 	}
 	
 	/// Regenerate copy items
-	foreach(UniformMapping& item, Uniforms)
+	for (UniformMapping& item : Uniforms)
 	{
 		if (item.TargetUniform->IsLocal)
 		{
@@ -164,7 +164,7 @@ void ShaderNode::RegenerateCopyItems()
 
 void UniformArray::CreateSlotsAndMappings( Node* Owner, vector<UniformMapping>& oUniformMap )
 {
-	foreach(Uniform* uniform, Block->Uniforms)
+	for (Uniform* uniform : Block->Uniforms)
 	{
 		if (uniform->IsLocal)
 		{
@@ -211,7 +211,7 @@ UniformArray::~UniformArray()
 void UniformArray::Set()
 {
 	/// Collect values
-	foreach (CopyItem& copyItem, CopyItems) 
+	for (CopyItem& copyItem : CopyItems) 
 	{
 		if (copyItem.IsGlobal) 
 		{ 
@@ -223,7 +223,7 @@ void UniformArray::Set()
 	}
 
 	/// Upload values
-	foreach(Uniform* uniform, Block->Uniforms)
+	for (Uniform* uniform : Block->Uniforms)
 	{
 		TheDrawingAPI->SetUniform(uniform->Handle, uniform->Type, 
 			reinterpret_cast<char*>(Values) + uniform->ByteOffset);
@@ -245,7 +245,7 @@ SamplerMapping::SamplerMapping( Sampler* _TargetSampler, TextureSlot* _SourceSlo
 
 TextureSlot* ShaderNode::GetSamplerSlotByName( const char* Name )
 {
-	foreach (SamplerMapping& p, Samplers)
+	for (SamplerMapping& p : Samplers)
 	{
 		if (p.TargetSampler->Desc != NULL && 
 			p.TargetSampler->Desc->UniformName->compare(Name) == 0) 
@@ -265,7 +265,7 @@ void ShaderNode::AttachToSampler(const char* Name, Node* Op)
 		return;
 	}
 
-	foreach (SamplerMapping& p, Samplers)
+	for (SamplerMapping& p : Samplers)
 	{
 		if (p.TargetSampler->Desc != NULL && p.TargetSampler->Desc->UniformName->compare(Name) == 0) 
 		{
@@ -284,12 +284,12 @@ const vector<UniformMapping>& ShaderNode::GetUniforms()
 
 ShaderNode::~ShaderNode()
 {
-	foreach (SamplerMapping& item, Samplers)
+	for (SamplerMapping& item : Samplers)
 	{
 		SafeDelete(item.SourceSlot);
 	}
 
-	foreach(UniformMapping& item, Uniforms)
+	for (UniformMapping& item : Uniforms)
 	{
 		SafeDelete(item.SourceSlot);
 	}
@@ -314,7 +314,7 @@ void ShaderNode::AttachToUniform(const char* Name, Node* Op, int FloatIndex)
 		return;
 	}
 
-	foreach (UniformMapping& p, Uniforms)
+	for (UniformMapping& p : Uniforms)
 	{
 		if (!p.TargetUniform->IsLocal) continue;
 

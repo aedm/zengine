@@ -81,14 +81,14 @@ void Pass::BuildRenderPipeline()
 
 	/// Collect uniforms from shader stage sources
 	map<string, ShaderSourceUniform*> uniformMap;
-	for (auto uniform : vertex->GetMetadata()->Uniforms)
+	for (auto uniform : vertex->GetMetadata()->uniforms)
 	{
-		uniformMap[uniform->Name] = uniform;
+		uniformMap[uniform->name] = uniform;
 	}
 
-	for (auto uniform : fragment->GetMetadata()->Uniforms)
+	for (auto uniform : fragment->GetMetadata()->uniforms)
 	{
-		uniformMap[uniform->Name] = uniform;
+		uniformMap[uniform->name] = uniform;
 	}
 
 	/// Merge uniform info
@@ -97,9 +97,9 @@ void Pass::BuildRenderPipeline()
 		ShaderSourceUniform* sourceUniform = uniformMap.at(uniformDesc.Name);
 		PassUniform passUniform;
 		passUniform.handle = uniformDesc.Handle;
-		passUniform.node = sourceUniform->TheNode;
-		passUniform.globalType = sourceUniform->GlobalType;
-		passUniform.type = sourceUniform->Type;
+		passUniform.node = sourceUniform->node;
+		passUniform.globalType = sourceUniform->globalType;
+		passUniform.type = sourceUniform->type;
 		mUniforms.push_back(passUniform);
 	}
 	

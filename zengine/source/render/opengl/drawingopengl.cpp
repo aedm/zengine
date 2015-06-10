@@ -385,10 +385,10 @@ AttributeMapper* DrawingOpenGL::CreateAttributeMapper( const vector<VertexAttrib
 	AttributeMapperOpenGL* mapper = new AttributeMapperOpenGL();
 	mapper->Stride = Stride;
 
-	foreach(const ShaderAttributeDesc& shaderAttr, ShaderAttribs)
+	for (const ShaderAttributeDesc& shaderAttr : ShaderAttribs)
 	{
 		bool found = false;
-		foreach(const VertexAttribute& bufferAttr, BufferAttribs)
+		for (const VertexAttribute& bufferAttr : BufferAttribs)
 		{
 			if (bufferAttr.Usage == shaderAttr.Usage)
 			{
@@ -699,7 +699,7 @@ AttributeMapperOpenGL::AttributeMapperOpenGL()
 
 void AttributeMapperOpenGL::Set() const
 {
-	foreach(const MappedAttributeOpenGL& attr, MappedAttributes)
+	for (const MappedAttributeOpenGL& attr : MappedAttributes)
 	{
 		glEnableVertexAttribArray(attr.Index);
 		glVertexAttribPointer(attr.Index, attr.Size, attr.Type, GL_FALSE, Stride, (void*)attr.Offset);

@@ -20,8 +20,8 @@ ResourceManager::~ResourceManager()
 	//	delete it->second;
 	//}
 
-	foreach (Mesh* mesh, mMeshes) delete mesh;
-	foreach (auto vertexFormat, mVertexFormats) delete vertexFormat.second;
+	for (Mesh* mesh : mMeshes) delete mesh;
+	for (auto vertexFormat : mVertexFormats) delete vertexFormat.second;
 }
 
 //Texture* ResourceManager::CreateTexture(int Width, int Height, TextureType Type, void* PixelData)
