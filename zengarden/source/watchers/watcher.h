@@ -14,11 +14,23 @@ public:
 
   Node*	GetNode();
 
+  /// Change the displayed node to another
+  void ChangeNode(Node* node);
+
 protected:
+  /// This method will be called when the watched node was changed
+  virtual void HandleChangedNode(Node* node);
+
+  /// This method will be callen when the watched node receives an internal message
   virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, const void* payload);
+
+  /// The node beign watched
   Slot mWatchedNode;
+  
+  /// The watcher widget that contains this watcher
   WatcherWidget* mWatcherWidget;
 
 private:
+  /// Helper function for forwaring internal messages of the watched node
   void SniffMessage(Slot* slot, NodeMessage message, const void* payload);
 };

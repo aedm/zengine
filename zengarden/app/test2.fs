@@ -6,5 +6,5 @@
 
 SHADER
 {
-	Color = vec4(0.0, 1.0, Green, 1.0);
+	Color = vec4(0.0, Green, 0.0, 1.0);
 }

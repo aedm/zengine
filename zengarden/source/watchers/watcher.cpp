@@ -26,4 +26,21 @@ Node* Watcher::GetNode() {
   return mWatchedNode.GetNode();
 }
 
+void Watcher::ChangeNode(Node* node) {
+  if (mWatchedNode.GetNode()) {
+    mWatchedNode.GetNode()->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+    mWatchedNode.DisconnectAll(false);
+  }
+  if (node) {
+    mWatchedNode.Connect(node);
+    node->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
+  }
+  HandleChangedNode(node);
+}
+
+void Watcher::HandleChangedNode(Node* node) {
+  /// Overload this method if your watcher supports changing nodes.
+  SHOULDNT_HAPPEN;
+}
+
 

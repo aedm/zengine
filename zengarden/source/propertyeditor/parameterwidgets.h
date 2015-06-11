@@ -20,7 +20,10 @@ public:
 
   Event<float> onValueChange;
 
-  void Set(float Value);
+  /// Enable/disable editing
+  void SetReadOnly(bool readOnly);
+
+  void Set(float value);
   float Get();
 
 private:
@@ -34,6 +37,7 @@ private:
   float mMinimum;
   float	mMaximum;
   float mValue;
+  bool mIsReadOnly;
 };
 
 
@@ -54,12 +58,24 @@ public:
 /// A parameter panel item for FloatNodes
 class FloatWatcher: public Watcher {
 public:
-  FloatWatcher(FloatNode* node, WatcherWidget* widget);
+  FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, QString name);
   virtual ~FloatWatcher() {}
+
+  /// Enable/disable editing
+  void SetReadOnly(bool readOnly);
+
+
+protected:
+  /// This method will be called when the watched node was changed
+  virtual void HandleChangedNode(Node* node) override;
+
 
 private:
   virtual void HandleMessage(Slot* slot, NodeMessage message, 
                              const void* payload) override;
+
+  /// Allow editing
+  bool mIsReadOnly;
 
   TextBox* mTextBox;
   Slider* mSlider;

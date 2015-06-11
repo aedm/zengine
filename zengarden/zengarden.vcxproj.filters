@@ -107,9 +107,6 @@
     <ClCompile Include="source\watchers\watcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
-    <ClCompile Include="source\propertyeditor\staticvalueeditor.cpp">
-      <Filter>source\propertyeditor</Filter>
-    </ClCompile>
     <ClCompile Include="source\propertyeditor\parameterwidgets.cpp">
       <Filter>source\propertyeditor</Filter>
     </ClCompile>
@@ -236,9 +233,6 @@
     </ClInclude>
     <ClInclude Include="source\watchers\watcher.h">
       <Filter>source\watchers</Filter>
-    </ClInclude>
-    <ClInclude Include="source\propertyeditor\staticvalueeditor.h">
-      <Filter>source\propertyeditor</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\passwatcher.h">
       <Filter>source\watchers</Filter>

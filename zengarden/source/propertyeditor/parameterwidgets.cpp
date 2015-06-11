@@ -18,7 +18,9 @@ Slider::Slider(QWidget* Parent, QString text, float value, float minimum, float 
   , mValue(value)
   , mMinimum(minimum)
   , mMaximum(maximum)
-  , mText(text) {}
+  , mText(text) 
+  , mIsReadOnly(false)
+{}
 
 void Slider::paintEvent(QPaintEvent *e) {
   QPainter painter(this);
@@ -29,7 +31,9 @@ void Slider::paintEvent(QPaintEvent *e) {
 
   if (mMaximum > mMinimum) {
     painter.setPen(Qt::NoPen);
-    painter.setBrush(palette().highlight().color());
+    if (mIsReadOnly) painter.setBrush(palette().highlight().color().darker());
+    else painter.setBrush(palette().highlight().color());
+
     int widthPx = widgetSize.width() - 2;
     int full = float(widthPx) * mValue / (mMaximum - mMinimum);
     if (full > widthPx) full = widthPx;
@@ -57,9 +61,7 @@ void Slider::HandleMouse(QMouseEvent * event) {
   if (mMaximum > mMinimum) {
     float newValue = float(event->x() + 1) * (mMaximum - mMinimum) / float(width());
     if (mValue != newValue) {
-      mValue = newValue;
-      onValueChange(mValue);
-      this->repaint();
+      onValueChange(newValue);
     }
   }
 }
@@ -68,9 +70,18 @@ float Slider::Get() {
   return mValue;
 }
 
-void Slider::Set(float Value) {
-  this->mValue = Value;
-  repaint();
+void Slider::Set(float value) {
+  if (value != mValue) {
+    this->mValue = value;
+    repaint();
+  }
+}
+
+void Slider::SetReadOnly(bool readOnly) {
+  if (mIsReadOnly != readOnly) {
+    mIsReadOnly = readOnly;
+    repaint();
+  }
 }
 
 
@@ -85,15 +96,18 @@ void TextBox::HandleEditingFinished() {
 }
 
 
-FloatWatcher::FloatWatcher(FloatNode* node, WatcherWidget* widget)
-  : Watcher(node, widget) {
+FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, 
+                           QString name)
+  : Watcher(node, widget)
+  , mIsReadOnly(false)
+{
   float value = node->Get();
 
   QHBoxLayout* layout = new QHBoxLayout(widget);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mSlider = new Slider(widget, QString("*"), node->Get(), 0, 1);
+  mSlider = new Slider(widget, name, node->Get(), 0, 1);
   mSlider->setMinimumHeight(20);
   mSlider->setMinimumWidth(70);
   mSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -122,19 +136,33 @@ void FloatWatcher::SetTextBoxValue(float value) {
   mTextBox->setText(QString::number(value, 'g', 3));
 }
 
-void FloatWatcher::SliderValueChanged(float Vlaue) {
-  float value = mSlider->Get();
+void FloatWatcher::SliderValueChanged(float value) {
+  if (mIsReadOnly) return;
   static_cast<FloatNode*>(GetNode())->Set(value);
 }
 
 void FloatWatcher::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED: {
-      float value = static_cast<FloatNode*>(slot->GetNode())->Get();
+      float value = static_cast<ValueNode<NodeType::FLOAT>*>(slot->GetNode())->Get();
       mSlider->Set(value);
       if (mAllowTextboxValueChanges) SetTextBoxValue(value);
       break;
     }
     default: break;
   }
+}
+
+void FloatWatcher::SetReadOnly(bool readOnly) {
+  if (mIsReadOnly != readOnly) {
+    mIsReadOnly = readOnly;
+    mTextBox->setEnabled(!readOnly);
+    mSlider->SetReadOnly(readOnly);
+  }
+}
+
+void FloatWatcher::HandleChangedNode(Node* node) {
+  float value = static_cast<ValueNode<NodeType::FLOAT>*>(node)->Get();
+  mSlider->Set(value);
+  SetTextBoxValue(value);
 }

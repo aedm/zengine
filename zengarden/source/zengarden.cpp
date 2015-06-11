@@ -5,7 +5,7 @@
 #include "commands/graphCommands.h"
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
-#include "propertyeditor/staticvalueeditor.h"
+#include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
@@ -168,7 +168,7 @@ void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
         new StaticFloatEditor(static_cast<FloatNode*>(Nd), mPropertyWatcher);
         break;
       default:
-        new PropertyEditor(Nd, mPropertyWatcher);
+        new DefaultPropertyEditor(Nd, mPropertyWatcher);
         break;
     }
 	}
@@ -198,10 +198,4 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 
 	int index = tabWidget->addTab(watcherWidget, QString::fromStdString(Nd->mName));
 	tabWidget->setCurrentIndex(index);
-
-	//GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);
-	//graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	//tabWidget->addTab(graphEditor, "graph");
-
-	//graphEditor->SetGraph(Graph);
 }

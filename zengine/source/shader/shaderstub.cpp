@@ -1,6 +1,7 @@
 #include "stubanalyzer.h"
 #include <include/shader/shaderstub.h>
 #include <include/shader/shadersource2.h>
+#include <include/nodes/valuenodes.h>
 
 ShaderStub::ShaderStub(const string& source)
   : Node(NodeType::SHADER_STUB, "ShaderStub")
@@ -34,7 +35,15 @@ void ShaderStub::SetStubSource(const string& source) {
   if (mMetadata == nullptr) return;
 
   for (auto param : mMetadata->parameters) {
-    Slot* slot = new Slot(param->type, this, make_shared<string>(param->name), false);
+    Slot* slot = nullptr;
+    switch (param->type) {
+      case NodeType::FLOAT:
+        slot = new FloatSlot(this, make_shared<string>(param->name));
+        break;
+      default:
+        SHOULDNT_HAPPEN;
+        break;
+    }
     mParameterSlotMap[param] = slot;
   }
 }
