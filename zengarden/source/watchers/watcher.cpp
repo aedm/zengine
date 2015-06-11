@@ -1,37 +1,29 @@
 #include "watcher.h"
 #include "watcherwidget.h"
 
-Watcher::Watcher(Node* Nd, WatcherWidget* _Widget, NodeType Type)
-	: Node(Type, "")
-	, WatcherSlot(NodeType::ALLOW_ALL, this, nullptr)
-	, Widget(_Widget)
-{
-	if (_Widget) _Widget->Watcher = this;
-	WatcherSlot.Connect(Nd);
-	Nd->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
+Watcher::Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type)
+    : Node(type, "")
+    , mWatchedNode(NodeType::ALLOW_ALL, this, nullptr)
+    , mWatcherWidget(watcherWidget) {
+  if (watcherWidget) watcherWidget->mWatcher = this;
+  mWatchedNode.Connect(node);
+  node->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
 }
 
-void Watcher::HandleMessage(Slot* S, NodeMessage Message, const void* Payload)
-{}
-
-void Watcher::SniffMessage(Slot* S, NodeMessage Message, const void* Payload)
-{
-	HandleSniffedMessage(S, Message, Payload);
+void Watcher::SniffMessage(Slot* slot, NodeMessage message, const void* payload) {
+  HandleSniffedMessage(slot, message, payload);
 }
 
-Watcher::~Watcher()
-{
-	if (WatcherSlot.GetNode()) {
-		WatcherSlot.GetNode()->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
-	}
+Watcher::~Watcher() {
+  if (mWatchedNode.GetNode()) {
+    mWatchedNode.GetNode()->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+  }
 }
 
-void Watcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
-{}
+void Watcher::HandleSniffedMessage(Slot*, NodeMessage, const void*) {}
 
-Node* Watcher::GetNode()
-{
-	return WatcherSlot.GetNode();
+Node* Watcher::GetNode() {
+  return mWatchedNode.GetNode();
 }
 
 

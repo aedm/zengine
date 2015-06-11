@@ -1,24 +1,19 @@
 #pragma once
 
 #include <zengine.h>
+#include "../watchers/watcher.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QBoxLayout>
 
-/// Widget that displays node parameters
-class PropertyEditor : public Node
-{
+/// General node editor, displays name and type of the Node
+class PropertyEditor: public Watcher {
 public:
-	virtual ~PropertyEditor();
-
-	static PropertyEditor*	ForNode(Node* Nd, QWidget* PropertyPanel);
+  PropertyEditor(Node* node, WatcherWidget* panel);
+  virtual ~PropertyEditor();
 
 protected:
-	PropertyEditor(Node* Nd, QWidget* PropertyPanel);
-
-	QWidget*				PropertyPanel;
-	QBoxLayout*				Layout;
-
-	Slot					WatchedNode;
-
-	
+  QBoxLayout*	mLayout;
 };
+
+
+/// Widget that displays node parameters

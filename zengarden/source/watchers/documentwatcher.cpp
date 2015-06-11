@@ -24,7 +24,7 @@ DocumentWatcher::~DocumentWatcher()
 
 void DocumentWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
 {
-	Document* doc = static_cast<Document*>(WatcherSlot.GetNode());
+	Document* doc = static_cast<Document*>(mWatchedNode.GetNode());
 	switch (Message)
 	{
 	case NodeMessage::SLOT_CONNECTION_CHANGED:

@@ -1,133 +1,73 @@
 #pragma once
 
 #include <zengine.h>
+#include "../watchers/watcher.h"
 #include <QtWidgets/QWidget>
-//#include <QtWidgets/qbuttongroup.h>
+#include <QtWidgets/qlineedit.h>
 
 class QSpinBox;
-//class QDoubleSpinBox;
 class QLineEdit;
 class QSlider;
 
-static const float	Magnification = 200.0f;
-
-class Slider : public QWidget
-{
-	Q_OBJECT
-
-public:
-	Slider(QWidget* Parent);
-	virtual ~Slider() {}
-
-	QString				Text;
-	float				Minimum;
-	float				Maximum;
-	Event<float>		EventValueChange;
-
-	void				SetValue(float Value);
-	float				GetValue();
-
-private:
-	void				paintEvent(QPaintEvent *e);
-	virtual void		mousePressEvent(QMouseEvent * event) override;
-	virtual void		mouseMoveEvent(QMouseEvent * event) override;
-
-	void				HandleMouse(QMouseEvent * event);
-
-	float				Value;
-};
-
-//template<OpTypeEnum T>
-//class WatcherOperator : public Operator
-//{
-//public:
-//	WatcherOperator(FastDelegate0<void>& DirtyCallback);
-//	virtual void				OnSlotValueChanged(Slot* DirtySlot) override;
-//	FastDelegate0<void>			DirtyCallback;
-//	TypedSlot<T>				TheSlot;
-//};
-
-//template<OpTypeEnum T>
-//void WatcherOperator<T>::OnSlotValueChanged(Slot* DirtySlot)
-//{
-//	DirtyCallback();
-//}
-//
-//template<OpTypeEnum T>
-//WatcherOperator<T>::WatcherOperator(FastDelegate0<void>& _DirtyCallback)
-//	: Operator("watcher")
-//	, TheSlot(this, SharedString(new string("client")))
-//	, DirtyCallback(_DirtyCallback)
-//{}
-
-class FloatSliderWidget : public QWidget
-{
-	Q_OBJECT
+/// A widget that displays a float value as a semi-filled horizontal bar.
+/// Upon clicking into the bar, the value changes.
+class Slider: public QWidget {
+  Q_OBJECT
 
 public:
-	FloatSliderWidget(QWidget* Parent, FloatNode* node);
-	virtual ~FloatSliderWidget() {}
+  Slider(QWidget* parent, QString text, float value, float minimum, float maximum);
+  virtual ~Slider() {}
+
+  Event<float> onValueChange;
+
+  void Set(float Value);
+  float Get();
 
 private:
-	FloatNode*					Op;
+  void paintEvent(QPaintEvent *e);
+  virtual void mousePressEvent(QMouseEvent * event) override;
+  virtual void mouseMoveEvent(QMouseEvent * event) override;
 
-	//QDoubleSpinBox*			SpinBox;
-	QLineEdit*					TextBox;
-	//QSlider*					Slider;
-	//WatcherOperator<OP_FLOAT>	Watcher;
-	Slider*						Slide;
+  void HandleMouse(QMouseEvent * event);
 
-	bool						SilentChange;			/// Do not attempt to modify Parameter in silent change mode.
-
-	void						OnOperatorValueChanges();
-	void						SetTextBoxValue(float value);
-
-	void						SliderValueChanged(float Vlaue);
-
-public slots:
-	//void						SliderValueChanged();
-	void						SpinBoxValueChanged();
-
+  QString mText;
+  float mMinimum;
+  float	mMaximum;
+  float mValue;
 };
 
 
-//class IntegerSliderWidget : public QWidget
-//{
-//	Q_OBJECT
-//
-//public:
-//	IntegerSliderWidget(QWidget* Parent, Parameter* Param);
-//	virtual ~IntegerSliderWidget() {}
-//
-//private:
-//	Int*			IntParameter;
-//
-//	QSpinBox*			SpinBox;
-//	QSlider*			Slider;
-//
-//	bool				SilentChange;				/// Do not attempt to modify Parameter in silent change mode.
-//
-//public slots:
-//	void				SliderValueChanged();
-//	void				SpinBoxValueChanged();
-//
-//};
+/// A simple one-line text editor with an Event instead of a fckn Qt signal.
+class TextBox: public QLineEdit {
+  Q_OBJECT
+
+public:
+  TextBox(QWidget* parent);
+
+  Event<> onEditingFinished;
+
+  private slots:
+  void HandleEditingFinished();
+};
 
 
-//class EnumSelectorWidget : public QWidget
-//{
-//	Q_OBJECT
-//
-//public:
-//	EnumSelectorWidget(QWidget* Parent, Parameter* Param);
-//	virtual ~EnumSelectorWidget() {}
-//
-//private:
-//	Parameter*			EnumParameter;
-//
-//	QButtonGroup*		ButtonGroup;
-//
-//public slots:
-//	void				EnumChanged(bool On);
-//
-//};
+/// A parameter panel item for FloatNodes
+class FloatWatcher: public Watcher {
+public:
+  FloatWatcher(FloatNode* node, WatcherWidget* widget);
+  virtual ~FloatWatcher() {}
+
+private:
+  virtual void HandleMessage(Slot* slot, NodeMessage message, 
+                             const void* payload) override;
+
+  TextBox* mTextBox;
+  Slider* mSlider;
+
+  /// Do not attempt to modify textbox when the new value is originated from there.
+  bool mAllowTextboxValueChanges;
+
+  void SetTextBoxValue(float value);
+  void SliderValueChanged(float Vlaue);
+  void SpinBoxValueChanged();
+};

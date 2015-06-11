@@ -241,7 +241,7 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 					DeselectAll();
 					HoveredWidget->Selected = true;
 					SelectedNodes.insert(HoveredWidget);
-					ParentWidget->OnSelectNode(HoveredWidget->GetNode());
+					ParentWidget->onSelectNode(HoveredWidget->GetNode());
 				}
 				StorePositionOfSelectedNodes();
 				NodesMoved = false;
@@ -255,7 +255,7 @@ void GraphEditor::OnMouseLeftDown( QMouseEvent* event )
 			/// No widget was pressed, start rectangular selection
 			CurrentState = State::SELECT_RECTANGLE;
 			DeselectAll();
-			ParentWidget->OnSelectNode(nullptr);
+			ParentWidget->onSelectNode(nullptr);
 		}
 		break;
 	case State::CONNECT_TO_NODE:
@@ -443,7 +443,7 @@ void GraphEditor::OnKeyPress( QKeyEvent* event )
 	/// Space opens watcher
 	case Qt::Key_Space:
 		if (SelectedNodes.size() == 1) {
-			ParentWidget->OnWatchNode((*SelectedNodes.begin())->GetNode(), ParentWidget);
+			ParentWidget->onWatchNode((*SelectedNodes.begin())->GetNode(), ParentWidget);
 		}
 		break;
 

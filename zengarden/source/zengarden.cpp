@@ -5,15 +5,17 @@
 #include "commands/graphCommands.h"
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
+#include "propertyeditor/staticvalueeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
 
 
 ZenGarden::ZenGarden(QWidget *parent)
-	: QMainWindow(parent)
-	, NextGraphIndex(0)
-	, PropEditor(nullptr)
+  : QMainWindow(parent)
+  , NextGraphIndex(0)
+  , mPropertyWatcher(nullptr)
+  , mPropertyLayout(nullptr)
 {
 	ui.setupUi(this);
 
@@ -32,6 +34,7 @@ void ZenGarden::InitModules()
 {
 	TheLogWatcher = new LogWatcher(this);
 	ui.leftPanel->addTab(TheLogWatcher, "Log");
+  mPropertyLayout = new QVBoxLayout(ui.propertyPanel);
 
 	/// Set palette
 	QPalette pal = ui.dummy->palette();
@@ -133,9 +136,9 @@ GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 	QTabWidget* tabWidget = LeftPanel ? ui.leftPanel : ui.rightPanel;
 	WatcherPosition position = LeftPanel 
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
-	WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position, true);
-	watcherWidget->OnSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
-	watcherWidget->OnWatchNode += Delegate(this, &ZenGarden::Watch);
+	WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
+	watcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
+	watcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
 
 	GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);
 	graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -154,17 +157,28 @@ void ZenGarden::NewGraph()
 
 void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
 {
-	SafeDelete(PropEditor);
+  SafeDelete(mPropertyWatcher);
 	if (Nd != nullptr) {
-		PropEditor = PropertyEditor::ForNode(Nd, ui.propertyPanel);
+    mPropertyWatcher = 
+      new WatcherWidget(ui.propertyPanel, WatcherPosition::PROPERTY_PANEL);
+    mPropertyLayout->addWidget(mPropertyWatcher);
+
+    switch (ThePrototypes->GetNodeClass(Nd)) {
+      case NodeClass::STATIC_FLOAT:
+        new StaticFloatEditor(static_cast<FloatNode*>(Nd), mPropertyWatcher);
+        break;
+      default:
+        new PropertyEditor(Nd, mPropertyWatcher);
+        break;
+    }
 	}
 }
 
 void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 {
-	QTabWidget* tabWidget = Widget->Position == WatcherPosition::RIGHT_TAB 
+	QTabWidget* tabWidget = Widget->mPosition == WatcherPosition::RIGHT_TAB 
 		? ui.leftPanel : ui.rightPanel;
-	WatcherPosition position = Widget->Position == WatcherPosition::RIGHT_TAB 
+	WatcherPosition position = Widget->mPosition == WatcherPosition::RIGHT_TAB 
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 
 	WatcherWidget* watcherWidget = nullptr;

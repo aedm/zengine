@@ -38,7 +38,9 @@ private:
 	Ui::zengardenClass ui;
 	LogWatcher*					TheLogWatcher;
 
-	PropertyEditor*				PropEditor;
+	//PropertyEditor*				PropEditor;
+  WatcherWidget* mPropertyWatcher;
+  QBoxLayout* mPropertyLayout;
 
 private slots:
 	void						InitModules();

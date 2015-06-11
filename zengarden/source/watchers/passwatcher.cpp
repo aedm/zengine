@@ -58,7 +58,7 @@ void PassWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void*
 	case NodeMessage::VALUE_CHANGED:
 		Pass* pass = static_cast<Pass*>(GetNode());
 		if (S == &pass->mFragmentSource || S == &pass->mVertexSource) {
-			GLWidget* glWidget = static_cast<GLWatcherWidget*>(Widget)->TheGLWidget;
+			GLWidget* glWidget = static_cast<GLWatcherWidget*>(mWatcherWidget)->TheGLWidget;
 			glWidget->updateGL();
 		}
 		break;

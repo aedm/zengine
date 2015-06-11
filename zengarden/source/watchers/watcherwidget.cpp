@@ -1,23 +1,21 @@
 #include "watcherwidget.h"
+#include "watcher.h"
 #include <QtWidgets/QBoxLayout>
 
-WatcherWidget::WatcherWidget(QWidget* Parent, WatcherPosition _Position, bool _CanBeClosed)
+WatcherWidget::WatcherWidget(QWidget* Parent, WatcherPosition _Position)
 	: QWidget(Parent)
-	, Position(_Position)
-	, Watcher(nullptr)
-	, CanBeClosed(_CanBeClosed)
-{
-}
+	, mPosition(_Position)
+	, mWatcher(nullptr)
+{}
 
 WatcherWidget::~WatcherWidget()
 {
-	SafeDelete(Watcher);
+	SafeDelete(mWatcher);
 }
 
 
-
 GLWatcherWidget::GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position)
-	: WatcherWidget(Parent, Position, true)
+	: WatcherWidget(Parent, Position)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setContentsMargins(4, 4, 4, 4);

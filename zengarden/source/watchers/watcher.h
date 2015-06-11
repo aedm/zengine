@@ -4,21 +4,21 @@
 
 class WatcherWidget;
 
-class Watcher : public Node
-{
+/// A node that displays another node. The display can be a tab on the ui, or a property
+/// panel item, etc. Watchers belong to their WatcherWidgets, and are destroyed by
+/// them.
+class Watcher: public Node {
 public:
-	Watcher(Node* Nd, WatcherWidget* Widget, NodeType Type = NodeType::UI);
-	virtual ~Watcher();
+  Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type = NodeType::UI);
+  virtual ~Watcher();
 
-	Node*				GetNode();
+  Node*	GetNode();
 
 protected:
-	virtual void		HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload);
-	Slot				WatcherSlot;
-	WatcherWidget*		Widget;
+  virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, const void* payload);
+  Slot mWatchedNode;
+  WatcherWidget* mWatcherWidget;
 
 private:
-	void				SniffMessage(Slot* S, NodeMessage Message, const void* Payload);
-
-	virtual void		HandleMessage(Slot* S, NodeMessage Message, const void* Payload) override;
+  void SniffMessage(Slot* slot, NodeMessage message, const void* payload);
 };
