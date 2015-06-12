@@ -182,7 +182,7 @@ void Node::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
     case NodeMessage::VALUE_CHANGED:
       if (!mIsDirty) {
         mIsDirty = true;
-        SendMessage(NodeMessage::VALUE_CHANGED);
+        SendMsg(NodeMessage::VALUE_CHANGED);
       }
       break;
     default:
@@ -191,7 +191,7 @@ void Node::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
 }
 
 
-void Node::SendMessage(NodeMessage message, const void* payload) {
+void Node::SendMsg(NodeMessage message, const void* payload) {
   for (Slot* slot : mDependants) {
     slot->mOwner->ReceiveMessage(slot, message, payload);
   }

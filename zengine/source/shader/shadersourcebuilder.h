@@ -56,5 +56,6 @@ private:
 	map<string, ShaderSourceVariable*> mInputsMap;
 	vector<ShaderSourceVariable*>	mInputs;
 	vector<ShaderSourceVariable*>	mOutputs;
-	vector<ShaderSourceUniform*> mUniforms;
+  vector<ShaderSourceUniform*> mUniforms;
+  vector<ShaderSourceUniform*> mSamplers;
 };

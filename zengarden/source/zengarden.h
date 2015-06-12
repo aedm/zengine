@@ -1,5 +1,4 @@
-#ifndef ZENGARDEN_H
-#define ZENGARDEN_H
+#pragma once
 
 #include <QtWidgets/QMainWindow>
 #include <QtOpenGL/QGLWidget>
@@ -11,41 +10,40 @@
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 
-class ZenGarden : public QMainWindow
-{
-	Q_OBJECT
+class ZenGarden: public QMainWindow {
+  Q_OBJECT
 
 public:
-	ZenGarden(QWidget *parent = 0);
-	~ZenGarden();
+  ZenGarden(QWidget *parent = 0);
+  ~ZenGarden();
 
 private:
 
-	/// Open viewers
-	GraphEditor*				OpenGraphViewer(bool LeftPanel, GraphNode* Graph);
-	void						Watch(Node* Nd, WatcherWidget* Widget);
-	void						SetNodeForPropertyEditor(Node* Nd);
+  /// Open viewers
+  GraphEditor* OpenGraphViewer(bool leftPanel, GraphNode* graph);
+  void Watch(Node* node, WatcherWidget* widget);
+  void SetNodeForPropertyEditor(Node* node);
 
-	/// The GL widget used for initializing OpenGL and sharing context
-	QGLWidget*					CommonGLWidget;
+  /// Test code
+  Texture* CreateSampleTexture();
 
-	//GraphEditor*				TheGraphEditor;
-	Document*					Doc;
-	DocumentWatcher*			DocWatcher;
-	UINT						NextGraphIndex;
+  /// The GL widget used for initializing OpenGL and sharing context
+  QGLWidget* mCommonGLWidget;
 
-	/// App UI
-	Ui::zengardenClass ui;
-	LogWatcher*					TheLogWatcher;
+  Document*	mDocument;
+  DocumentWatcher* mDocumentWatcher;
+  UINT mNextGraphIndex;
 
-	//PropertyEditor*				PropEditor;
+  /// App UI
+  Ui::zengardenClass mUI;
+  LogWatcher*	mLogWatcher;
+
+  //PropertyEditor*				PropEditor;
   WatcherWidget* mPropertyWatcher;
   QBoxLayout* mPropertyLayout;
 
 private slots:
-	void						InitModules();
-	void						DisposeModules();
-	void						NewGraph();
+  void InitModules();
+  void DisposeModules();
+  void NewGraph();
 };
-
-#endif // ZENGARDEN_H

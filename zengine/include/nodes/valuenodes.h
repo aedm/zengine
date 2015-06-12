@@ -2,6 +2,7 @@
 
 #include "../dom/node.h"
 #include "../base/types.h"
+#include "../resources/texture.h"
 
 /// Nodes holding primitive values.
 template<NodeType T>
@@ -83,7 +84,7 @@ const typename StaticValueNode<T>::ValueType& StaticValueNode<T>::Get() {
 template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
   mValue = newValue;
-  SendMessage(NodeMessage::VALUE_CHANGED);
+  SendMsg(NodeMessage::VALUE_CHANGED);
 }
 
 
@@ -214,3 +215,4 @@ typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
 //template class StaticValueNode < NodeType::FLOAT >;
 //template class StaticValueNode < NodeType::VEC4 >;
 //template class StaticValueNode < NodeType::MATRIX44 >;
+//template class StaticValueNode<NodeType::TEXTURE>;

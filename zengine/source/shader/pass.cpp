@@ -76,30 +76,48 @@ void Pass::BuildRenderPipeline() {
 
   /// Collect uniforms from shader stage sources
   map<string, ShaderSourceUniform*> uniformMap;
-  for (auto uniform : vertex->GetMetadata()->uniforms) {
-    uniformMap[uniform->name] = uniform;
+  for (auto sampler : vertex->GetMetadata()->uniforms) {
+    uniformMap[sampler->name] = sampler;
+  }
+  for (auto sampler : fragment->GetMetadata()->uniforms) {
+    uniformMap[sampler->name] = sampler;
   }
 
-  for (auto uniform : fragment->GetMetadata()->uniforms) {
-    uniformMap[uniform->name] = uniform;
+  /// Collect samplers
+  map<string, ShaderSourceUniform*> samplerMap;
+  for (auto sampler : vertex->GetMetadata()->samplers) {
+    samplerMap[sampler->name] = sampler;
+  }
+  for (auto sampler : fragment->GetMetadata()->samplers) {
+    samplerMap[sampler->name] = sampler;
   }
 
   /// Merge uniform info
-  for (auto uniformDesc : shaderCompileDesc->Uniforms) {
-    ShaderSourceUniform* sourceUniform = uniformMap.at(uniformDesc.Name);
+  for (auto samplerDesc : shaderCompileDesc->Uniforms) {
+    ShaderSourceUniform* sourceUniform = uniformMap.at(samplerDesc.Name);
     PassUniform passUniform;
-    passUniform.handle = uniformDesc.Handle;
+    passUniform.handle = samplerDesc.Handle;
     passUniform.node = sourceUniform->node;
     passUniform.globalType = sourceUniform->globalType;
     passUniform.type = sourceUniform->type;
     mUniforms.push_back(passUniform);
   }
 
+  /// Merge sampler info
+  for (auto samplerDesc : shaderCompileDesc->Samplers) {
+    ShaderSourceUniform* sourceUniform = samplerMap.at(samplerDesc.Name);
+    PassUniform passUniform;
+    passUniform.handle = samplerDesc.Handle;
+    passUniform.node = sourceUniform->node;
+    passUniform.globalType = sourceUniform->globalType;
+    passUniform.type = sourceUniform->type;
+    mSamplers.push_back(passUniform);
+  }
+
   /// Collect required attributes
   for (auto attributeDesc : shaderCompileDesc->Attributes) {
     mAttributes.push_back(attributeDesc);
   }
-
 }
 
 void Pass::Set(Globals* globals) {
@@ -129,6 +147,14 @@ void Pass::Set(Globals* globals) {
       void* source = reinterpret_cast<char*>(globals)+offset;
       TheDrawingAPI->SetUniform(uniform.handle, uniform.type, source);
     }
+  }
+
+  /// Set samplers
+  UINT i = 0;
+  for (PassUniform& sampler : mSamplers) {
+    ASSERT(sampler.node != nullptr);
+    Texture* tex = static_cast<TextureNode*>(sampler.node)->Get();
+    TheDrawingAPI->SetTexture(sampler.handle, tex ? tex->mHandle : 0, i++);
   }
 }
 

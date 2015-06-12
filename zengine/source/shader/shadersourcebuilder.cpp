@@ -30,7 +30,8 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source
     }
     GenerateSlots();
     GenerateSource();
-    source->metadata = new ShaderSourceMetadata(mInputs, mOutputs, mUniforms);
+    source->metadata = 
+      new ShaderSourceMetadata(mInputs, mOutputs, mUniforms, mSamplers);
   } catch (...) {
   }
 }
@@ -117,7 +118,7 @@ void ShaderSourceBuilder::GenerateSourceMetadata() {
   for (auto input : mInputsMap) {
     inputs.push_back(input.second);
   }
-  mSource->metadata = new ShaderSourceMetadata(inputs, mOutputs, mUniforms);
+  mSource->metadata = new ShaderSourceMetadata(inputs, mOutputs, mUniforms, mSamplers);
 }
 
 void ShaderSourceBuilder::GenerateSlots() {
@@ -126,8 +127,15 @@ void ShaderSourceBuilder::GenerateSlots() {
       NodeData* data = mDataMap.at(node);
       Slot* slot = new Slot(node->GetType(), mSource, nullptr, false, true);
       slot->Connect(node);
-      mUniforms.push_back(new ShaderSourceUniform(
-        node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
+
+      /// TODO: move this into a separate function
+      if (node->GetType() == NodeType::TEXTURE) {
+        mSamplers.push_back(new ShaderSourceUniform(
+          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
+      } else {
+        mUniforms.push_back(new ShaderSourceUniform(
+          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
+      }
     }
   }
 
@@ -165,6 +173,12 @@ void ShaderSourceBuilder::GenerateSourceHeader(stringstream& stream) {
     stream << "uniform " << GetTypeString(uniform->type) << ' ' <<
       uniform->name << ';' << endl;
   }
+
+  /// Smplers
+  for (auto uniform : mSamplers) {
+    stream << "uniform " << GetTypeString(uniform->type) << ' ' <<
+      uniform->name << ';' << endl;
+  }
 }
 
 void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
@@ -174,17 +188,48 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
       ShaderStub* stub = static_cast<ShaderStub*>(node);
       ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
 
+      /// Define samplers
       stream << endl;
-      stream << "#define SHADER " << GetTypeString(stubMeta->returnType) <<
-        ' ' << data->FunctionName << "(";
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
         ShaderStubParameter* param = stubMeta->parameters[i];
-        stream << GetTypeString(param->type) << ' ' << param->name;
-        if (i < stubMeta->parameters.size() - 1) stream << ", ";
+        if (param->type == NodeType::TEXTURE) {
+          Slot* slot = stub->GetParameterSlotMap().at(param);
+          Node* paramNode = slot->GetNode();
+          if (paramNode == nullptr) {
+            /// Node not connected to param
+            ERR("Sampler not connected");
+            throw exception();
+          }
+          NodeData* samplerData = mDataMap.at(paramNode);
+          stream << "#define " << param->name << ' ' << 
+            samplerData->VariableName << endl;
+        }
+      }
+
+      /// Define SHADER function signature
+      stream << "#define SHADER " << GetTypeString(stubMeta->returnType) <<
+        ' ' << data->FunctionName << "(";
+      bool isFirstParameter = true;
+      for (ShaderStubParameter* param : stubMeta->parameters) {
+        if (param->type != NodeType::TEXTURE) {
+          if (!isFirstParameter) stream << ", ";
+          stream << GetTypeString(param->type) << ' ' << param->name;
+          isFirstParameter = false;
+        }
       }
       stream << ')' << endl;
+
+      /// Main shader code
       stream << stubMeta->strippedSource;
+
+      /// Undefine SHADER macro and samplers
       stream << "#undef SHADER" << endl;
+      for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
+        ShaderStubParameter* param = stubMeta->parameters[i];
+        if (param->type == NodeType::TEXTURE) {
+          stream << "#undef " << param->name << endl;
+        }
+      }
     }
   }
 }
@@ -205,18 +250,21 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream) {
           data->VariableName << " = ";
       }
       stream << data->FunctionName << "(";
-      for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
-        ShaderStubParameter* param = stubMeta->parameters[i];
-        Slot* slot = stub->GetParameterSlotMap().at(param);
-        Node* paramNode = slot->GetNode();
-        if (paramNode == nullptr) {
-          /// Node not connected to param
-          ERR("Parameter not connected");
-          throw exception();
+      bool isFirstParameter = true;
+      for (ShaderStubParameter* param : stubMeta->parameters) {
+        if (param->type != NodeType::TEXTURE) {
+          Slot* slot = stub->GetParameterSlotMap().at(param);
+          Node* paramNode = slot->GetNode();
+          if (paramNode == nullptr) {
+            /// Node not connected to param
+            ERR("Parameter not connected");
+            throw exception();
+          }
+          NodeData* paramData = mDataMap.at(paramNode);
+          if (!isFirstParameter) stream << ", ";
+          stream << paramData->VariableName;
+          isFirstParameter = false;
         }
-        NodeData* paramData = mDataMap.at(paramNode);
-        stream << paramData->VariableName;
-        if (i < stubMeta->parameters.size() - 1) stream << ", ";
       }
       stream << ");" << endl;
     }
@@ -232,19 +280,19 @@ const string& ShaderSourceBuilder::GetTypeString(NodeType type) {
   static const string svec4("vec4");
   static const string suint("uint");
   static const string smatrix44("mat4");
-  static const string ssampler2d("sampler2d");
+  static const string ssampler2d("sampler2D");
   static const string svoid("void");
   static const string serror("UNKNOWN_TYPE");
 
   switch (type) {
-    case NodeType::FLOAT:		return sfloat;
-    case NodeType::VEC2:		return svec2;
-    case NodeType::VEC3:		return svec3;
-    case NodeType::VEC4:		return svec4;
-    case NodeType::UINT:		return suint;
+    case NodeType::FLOAT:		  return sfloat;
+    case NodeType::VEC2:		  return svec2;
+    case NodeType::VEC3:		  return svec3;
+    case NodeType::VEC4:		  return svec4;
+    case NodeType::UINT:		  return suint;
     case NodeType::MATRIX44:	return smatrix44;
     case NodeType::TEXTURE:		return ssampler2d;
-    case NodeType::NONE:		return svoid;
+    case NodeType::NONE:		  return svoid;
     default:
       ERR("Unhandled type: %d", type);
       return serror;

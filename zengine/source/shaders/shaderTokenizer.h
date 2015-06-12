@@ -30,8 +30,6 @@ namespace Shaders
 	ITEM(uniform)			\
 	ITEM(input)				\
 	ITEM(output)			\
-	ITEM(sampler)			\
-	ITEM(sampler2d)			\
 	ITEM(param)				\
 	ITEM(global)				\
 	ITEM(using)				\

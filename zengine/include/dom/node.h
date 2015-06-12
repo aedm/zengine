@@ -134,8 +134,8 @@ protected:
   /// Main operation
   virtual void Operate() {}
 
-  /// Sends a message to dependants
-  void SendMessage(NodeMessage message, const void* payload = nullptr);
+  /// Sends a message to dependants. ('SendMessage' is already defined in WinUser.h)
+  void SendMsg(NodeMessage message, const void* payload = nullptr);
 
   /// Handle received messages
   virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);

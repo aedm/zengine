@@ -45,5 +45,6 @@ protected:
 
   ShaderHandle mHandle;
   vector<PassUniform>	mUniforms;
+  vector<PassUniform>	mSamplers;
   vector<ShaderAttributeDesc> mAttributes;
 };

@@ -13,15 +13,15 @@
 
 ZenGarden::ZenGarden(QWidget *parent)
   : QMainWindow(parent)
-  , NextGraphIndex(0)
+  , mNextGraphIndex(0)
   , mPropertyWatcher(nullptr)
   , mPropertyLayout(nullptr)
 {
-	ui.setupUi(this);
+	mUI.setupUi(this);
 
 	//TheLogger->OnLog += Delegate(this, &ZenGarden::Log);
 
-	connect(ui.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
+	connect(mUI.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
 	QTimer::singleShot(0, this, SLOT(InitModules()));
 }
 
@@ -32,40 +32,40 @@ ZenGarden::~ZenGarden()
 
 void ZenGarden::InitModules()
 {
-	TheLogWatcher = new LogWatcher(this);
-	ui.leftPanel->addTab(TheLogWatcher, "Log");
-  mPropertyLayout = new QVBoxLayout(ui.propertyPanel);
+	mLogWatcher = new LogWatcher(this);
+	mUI.leftPanel->addTab(mLogWatcher, "Log");
+  mPropertyLayout = new QVBoxLayout(mUI.propertyPanel);
 
 	/// Set palette
-	QPalette pal = ui.dummy->palette();
-	QPalette pal2 = ui.dummy3->palette();
+	QPalette pal = mUI.dummy->palette();
+	QPalette pal2 = mUI.dummy3->palette();
 	pal.setColor(QPalette::Background, pal.background().color().light(125));
 	pal.setColor(QPalette::WindowText, pal.background().color().light(135));
-	ui.dummy->setPalette(pal);
+	mUI.dummy->setPalette(pal);
 	pal.setColor(QPalette::WindowText, pal.background().color().dark());
-	ui.dummy2->setPalette(pal);
+	mUI.dummy2->setPalette(pal);
 	pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
-	ui.dummy3->setPalette(pal2);
-	ui.dummy->repaint();
+	mUI.dummy3->setPalette(pal2);
+	mUI.dummy->repaint();
 
 	/// Initialize OpenGL and its dependencies
-	CommonGLWidget = new QGLWidget();
-	if (!CommonGLWidget->isValid())
+	mCommonGLWidget = new QGLWidget();
+	if (!mCommonGLWidget->isValid())
 	{
 		ERR("No GL context!");
 	}
-	CommonGLWidget->makeCurrent();
+	mCommonGLWidget->makeCurrent();
 	InitZengine();
 	InitPainter();
 	Prototypes::Init();
 
 	/// Create blank document
-	Doc = new Document();
-	DocWatcher = new DocumentWatcher(ui.graphsListView, Doc);
+	mDocument = new Document();
+	mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
 
 	GraphNode* graph = new GraphNode();
 
-	Doc->Graphs.Connect(graph);
+	mDocument->Graphs.Connect(graph);
 	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
 
 	/// TEST
@@ -101,7 +101,15 @@ void ZenGarden::InitModules()
 		TheCommandStack->Execute(new CreateNodeCommand(floatNode, graphEditor));
 		ow = graphEditor->GetNodeWidget(floatNode);
 		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 150)));
-	}
+
+    /// texture
+    TextureNode* textureNode = new TextureNode();
+    Texture* sampleTexture = CreateSampleTexture();
+    textureNode->Set(sampleTexture);
+    TheCommandStack->Execute(new CreateNodeCommand(textureNode, graphEditor));
+    ow = graphEditor->GetNodeWidget(textureNode);
+    TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 250)));
+  }
 
 
 	/// Add some dummy nodes
@@ -133,14 +141,14 @@ void ZenGarden::DisposeModules()
 
 GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 {
-	QTabWidget* tabWidget = LeftPanel ? ui.leftPanel : ui.rightPanel;
+	QTabWidget* tabWidget = LeftPanel ? mUI.leftPanel : mUI.rightPanel;
 	WatcherPosition position = LeftPanel 
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 	WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
 	watcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
 	watcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
 
-	GraphEditor* graphEditor = new GraphEditor(watcherWidget, CommonGLWidget);
+	GraphEditor* graphEditor = new GraphEditor(watcherWidget, mCommonGLWidget);
 	graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tabWidget->addTab(graphEditor, "graph");
 
@@ -151,8 +159,8 @@ GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 void ZenGarden::NewGraph()
 {
 	GraphNode* graph = new GraphNode();
-	graph->mName = string("Graph ") + to_string(++NextGraphIndex);
-	Doc->Graphs.Connect(graph);
+	graph->mName = string("Graph ") + to_string(++mNextGraphIndex);
+	mDocument->Graphs.Connect(graph);
 }
 
 void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
@@ -160,7 +168,7 @@ void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
   SafeDelete(mPropertyWatcher);
 	if (Nd != nullptr) {
     mPropertyWatcher = 
-      new WatcherWidget(ui.propertyPanel, WatcherPosition::PROPERTY_PANEL);
+      new WatcherWidget(mUI.propertyPanel, WatcherPosition::PROPERTY_PANEL);
     mPropertyLayout->addWidget(mPropertyWatcher);
 
     switch (ThePrototypes->GetNodeClass(Nd)) {
@@ -177,7 +185,7 @@ void ZenGarden::SetNodeForPropertyEditor(Node* Nd)
 void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 {
 	QTabWidget* tabWidget = Widget->mPosition == WatcherPosition::RIGHT_TAB 
-		? ui.leftPanel : ui.rightPanel;
+		? mUI.leftPanel : mUI.rightPanel;
 	WatcherPosition position = Widget->mPosition == WatcherPosition::RIGHT_TAB 
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 
@@ -187,7 +195,7 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 	case NodeType::PASS:
 	{
 		GLWatcherWidget* glWatcherWidget =
-			new GLWatcherWidget(tabWidget, CommonGLWidget, position);
+			new GLWatcherWidget(tabWidget, mCommonGLWidget, position);
 		PassWatcher* passWatcher = 
 			new PassWatcher(static_cast<Pass*>(Nd), glWatcherWidget);
 		watcherWidget = glWatcherWidget;
@@ -198,4 +206,14 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 
 	int index = tabWidget->addTab(watcherWidget, QString::fromStdString(Nd->mName));
 	tabWidget->setCurrentIndex(index);
+}
+
+Texture* ZenGarden::CreateSampleTexture() {
+  UINT tmp[256 * 256];
+  for (UINT i = 0; i < 256; i++)
+    for (UINT o = 0; o < 256; o++) {
+      UINT c = i^o;
+      tmp[i * 256 + o] = c | (c << 8) | (c << 16);
+    }
+  return TheResourceManager->CreateTexture(256, 256, TEXELTYPE_RGBA_UINT8, tmp);
 }

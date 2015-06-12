@@ -40,6 +40,9 @@ void ShaderStub::SetStubSource(const string& source) {
       case NodeType::FLOAT:
         slot = new FloatSlot(this, make_shared<string>(param->name));
         break;
+      case NodeType::TEXTURE:
+        slot = new TextureSlot(this, make_shared<string>(param->name));
+        break;
       default:
         SHOULDNT_HAPPEN;
         break;
@@ -78,7 +81,7 @@ void ShaderStub::HandleMessage(Slot* slot, NodeMessage message, const void* payl
       CheckConnections();
       /// Fall through:
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-      SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+      SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
       break;
     default:
       break;

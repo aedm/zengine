@@ -9,7 +9,8 @@ OWNERSHIP ShaderStubMetadata* StubAnalyzer::FromText(const char* stubSource) {
   }
 
   return new ShaderStubMetadata(*analyzer.mName, analyzer.mReturnType,
-                                analyzer.mStrippedSource, analyzer.mParameters, analyzer.mGlobals,
+                                analyzer.mStrippedSource, analyzer.mParameters, 
+                                analyzer.mGlobals,
                                 analyzer.mInputs, analyzer.mOutputs);
 }
 
@@ -147,7 +148,7 @@ NodeType StubAnalyzer::TokenToType(const SubString& subStr) {
     case TOKEN_vec3:		return NodeType::VEC3;
     case TOKEN_vec4:		return NodeType::VEC4;
     case TOKEN_mat4:		return NodeType::MATRIX44;
-    case TOKEN_sampler2d:	return NodeType::TEXTURE;
+    case TOKEN_sampler2D:	return NodeType::TEXTURE;
     default:
       ERR("line %d: Wrong type '%s'",
           mCurrentLineNumber, subStr.ToString().c_str());

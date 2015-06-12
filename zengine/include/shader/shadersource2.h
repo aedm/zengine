@@ -27,12 +27,14 @@ struct ShaderSourceMetadata {
   ShaderSourceMetadata(
     const vector<OWNERSHIP ShaderSourceVariable*>& inputs,
     const vector<OWNERSHIP ShaderSourceVariable*>& outputs,
-    const vector<OWNERSHIP ShaderSourceUniform*>& uniforms);
+    const vector<OWNERSHIP ShaderSourceUniform*>& uniforms,
+    const vector<OWNERSHIP ShaderSourceUniform*>& samplers);
   ~ShaderSourceMetadata();
 
   const vector<ShaderSourceVariable*>	inputs;
   const vector<ShaderSourceVariable*>	outputs;
   const vector<ShaderSourceUniform*>	uniforms;
+  const vector<ShaderSourceUniform*>	samplers;
 };
 
 

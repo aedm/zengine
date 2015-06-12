@@ -30,11 +30,11 @@ void ShaderSource2::HandleMessage(Slot* slot, NodeMessage message, const void* p
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
       if (slot == &mStub) {
         ShaderSourceBuilder::FromStub(static_cast<ShaderStub*>(mStub.GetNode()), this);
-        SendMessage(NodeMessage::VALUE_CHANGED, nullptr);
+        SendMsg(NodeMessage::VALUE_CHANGED, nullptr);
       }
       break;
     case NodeMessage::VALUE_CHANGED:
-      SendMessage(NodeMessage::NEEDS_REDRAW, nullptr);
+      SendMsg(NodeMessage::NEEDS_REDRAW, nullptr);
       break;
     default:
       break;
@@ -53,10 +53,13 @@ const ShaderSourceMetadata* ShaderSource2::GetMetadata() const {
 ShaderSourceMetadata::ShaderSourceMetadata(
   const vector<OWNERSHIP ShaderSourceVariable*>& _Inputs,
   const vector<OWNERSHIP ShaderSourceVariable*>& _Outputs,
-  const vector<OWNERSHIP ShaderSourceUniform*>& _Uniforms)
+  const vector<OWNERSHIP ShaderSourceUniform*>& _Uniforms,
+  const vector<OWNERSHIP ShaderSourceUniform*>& _samplers)
   : inputs(_Inputs)
   , outputs(_Outputs)
-  , uniforms(_Uniforms) {}
+  , uniforms(_Uniforms)
+  , samplers(_samplers)
+{}
 
 ShaderSourceMetadata::~ShaderSourceMetadata() {
   for (auto x : inputs) delete x;
