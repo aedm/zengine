@@ -1,12 +1,27 @@
 #pragma once
 
 #include "../dom/node.h"
-#include "../shaders/shaders.h"
 #include <vector>
 #include <map>
 
 using namespace std;
 class ShaderSource2;
+
+/// Macrolist for global uniforms (name, type, variable/token)
+#define GLOBALUSAGE_LIST \
+  ITEM(USAGE_TIME,					          FLOAT,			Time)					          \
+  ITEM(USAGE_MATRIX_VIEW,				      MATRIX44,		View)					          \
+  ITEM(USAGE_MATRIX_PROJECTION,		    MATRIX44,		Projection)				      \
+  ITEM(USAGE_MATRIX_TRANSFORMATION,	  MATRIX44,		Transformation)			    \
+  ITEM(USAGE_NOISEMAP_SIZE,			      VEC2,			  NoiseMapSize)			      \
+  ITEM(USAGE_NOISEMAP_SIZE_RECIP,		  VEC2,			  NoiseMapSizeRecip)		  \
+  ITEM(USAGE_RENDERTARGET_SIZE,		    VEC2,			  RenderTargetSize)		    \
+  ITEM(USAGE_RENDERTARGET_SIZE_RECIP,	VEC2,			  RenderTargetSizeRecip)	\
+  ITEM(USAGE_VIEWPORT_SIZE,			      VEC2,			  ViewportSize)			      \
+  ITEM(USAGE_PIXEL_SIZE,				      VEC2,			  PixelSize)				      \
+  ITEM(USAGE_DIFFUSE_COLOR,			      VEC4,			  DiffuseColor)			      \
+  ITEM(USAGE_AMBIENT_COLOR,			      VEC4,			  AmbientColor)			      \
+  ITEM(USAGE_DEPTH_BIAS,				      FLOAT,			DepthBias)				      \
 
 enum class ShaderGlobalType {
 #undef ITEM
@@ -14,6 +29,16 @@ enum class ShaderGlobalType {
   GLOBALUSAGE_LIST
 
   LOCAL,	/// For non-global uniforms
+};
+
+extern const EnumMapperA GlobalUniformMapper[];
+extern const NodeType GlobalUniformTypes[];
+extern const int GlobalUniformOffsets[];
+
+struct Globals {
+#undef ITEM
+#define ITEM(name, type, token) type##_TYPE token;
+  GLOBALUSAGE_LIST
 };
 
 /// Shader parameter, becomes a slot
@@ -75,14 +100,14 @@ public:
   ShaderStubMetadata* GetStubMetadata() const;
 
   ShaderSource2* GetShaderSource();
-  
+
   /// Get slot by shader parameter name
   Slot* GetSlotByParameter(ShaderStubParameter*);
   Slot* GetSlotByParameterName(const string& name);
 
 protected:
   /// Handle received messages
-  virtual void HandleMessage(Slot* slot, NodeMessage message, 
+  virtual void HandleMessage(Slot* slot, NodeMessage message,
                              const void* payload) override;
 
   /// Metadata

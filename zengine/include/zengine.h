@@ -10,21 +10,14 @@
 #include "resources/mesh.h"
 #include "resources/texture.h"
 
-#include "shader/shaderstub.h"
-#include "shader/shadersource2.h"
-#include "shader/pass.h"
-#include "shader/material.h"
-#include "shader/drawable.h"
-
-#include "shaders/shaders.h"
+#include "shaders/shaderstub.h"
+#include "shaders/shadersource2.h"
+#include "shaders/pass.h"
+#include "shaders/material.h"
+#include "shaders/drawable.h"
 
 #include "nodes/valuenodes.h"
-#include "nodes/shadernode.h"
 #include "nodes/meshnode.h"
-#include "nodes/renderablenode.h"
-
-#include "shaders/shadermetadata.h"
-#include "shaders/shaderbuilder.h"
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();

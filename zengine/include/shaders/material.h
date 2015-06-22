@@ -1,7 +1,6 @@
 #pragma once
 
 #include "pass.h"
-#include "../shaders/shaders.h"
 
 class Material: public Node {
 public:

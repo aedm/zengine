@@ -1,6 +1,6 @@
 #pragma once
 
-#include <include/shader/shadersource2.h>
+#include <include/shaders/shadersource2.h>
 #include <sstream>
 
 class ShaderSourceBuilder

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <include/shader/shaderstub.h>
+#include <include/shaders/shaderstub.h>
 #include "../shaders/shaderTokenizer.h"
 
 /// TODO: Remove this.

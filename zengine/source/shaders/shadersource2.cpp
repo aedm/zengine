@@ -1,6 +1,6 @@
-#include <include/shader/shadersource2.h>
+#include <include/shaders/shadersource2.h>
 #include "shadersourcebuilder.h"
-#include <include/shader/shaderstub.h>
+#include <include/shaders/shaderstub.h>
 
 ShaderSource2::ShaderSource2()
   : Node(NodeType::SHADER_SOURCE, "ShaderSource")

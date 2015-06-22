@@ -100,28 +100,20 @@
     <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\node.h" />
-    <ClInclude Include="include\nodes\renderablenode.h" />
-    <ClInclude Include="include\nodes\shadernode.h" />
     <ClInclude Include="include\nodes\meshnode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
     <ClInclude Include="include\render\drawingapi.h" />
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\resourcemanager.h" />
     <ClInclude Include="include\resources\texture.h" />
-    <ClInclude Include="include\shaders\shaderbuilder.h" />
-    <ClInclude Include="include\shaders\shadermetadata.h" />
-    <ClInclude Include="include\shaders\shaders.h" />
-    <ClInclude Include="include\shader\drawable.h" />
-    <ClInclude Include="include\shader\material.h" />
-    <ClInclude Include="include\shader\pass.h" />
-    <ClInclude Include="include\shader\shadersource2.h" />
-    <ClInclude Include="include\shader\shaderstub.h" />
+    <ClInclude Include="include\shaders\drawable.h" />
+    <ClInclude Include="include\shaders\material.h" />
+    <ClInclude Include="include\shaders\pass.h" />
+    <ClInclude Include="include\shaders\shadersource2.h" />
+    <ClInclude Include="include\shaders\shaderstub.h" />
     <ClInclude Include="include\zengine.h" />
     <ClInclude Include="source\render\opengl\drawingopengl.h" />
-    <ClInclude Include="source\shaders\analyzer.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />
-    <ClInclude Include="source\shader\shadersourcebuilder.h" />
-    <ClInclude Include="source\shader\stubanalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp" />
@@ -129,25 +121,19 @@
     <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
-    <ClCompile Include="source\nodes\renderablenode.cpp" />
-    <ClCompile Include="source\nodes\shadernode.cpp" />
     <ClCompile Include="source\nodes\meshnode.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />
     <ClCompile Include="source\resources\texture.cpp" />
-    <ClCompile Include="source\shaders\analyzer.cpp" />
-    <ClCompile Include="source\shaders\shaderBuilder.cpp" />
-    <ClCompile Include="source\shaders\shaderMetadata.cpp" />
-    <ClCompile Include="source\shaders\shaders.cpp" />
+    <ClCompile Include="source\shaders\drawable.cpp" />
+    <ClCompile Include="source\shaders\material.cpp" />
+    <ClCompile Include="source\shaders\pass.cpp" />
+    <ClCompile Include="source\shaders\shadersource2.cpp" />
+    <ClCompile Include="source\shaders\shadersourcebuilder.cpp" />
+    <ClCompile Include="source\shaders\shaderstub.cpp" />
     <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
-    <ClCompile Include="source\shader\drawable.cpp" />
-    <ClCompile Include="source\shader\material.cpp" />
-    <ClCompile Include="source\shader\pass.cpp" />
-    <ClCompile Include="source\shader\shadersource2.cpp" />
-    <ClCompile Include="source\shader\shadersourcebuilder.cpp" />
-    <ClCompile Include="source\shader\shaderstub.cpp" />
-    <ClCompile Include="source\shader\stubanalyzer.cpp" />
+    <ClCompile Include="source\shaders\stubanalyzer.cpp" />
     <ClCompile Include="source\zengine.cpp" />
   </ItemGroup>
   <ItemGroup>

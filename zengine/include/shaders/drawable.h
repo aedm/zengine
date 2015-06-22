@@ -2,7 +2,6 @@
 
 #include "material.h"
 #include "../nodes/meshnode.h"
-#include "../shaders/shaders.h"
 
 class Drawable: public Node {
 public:

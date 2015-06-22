@@ -1,7 +1,27 @@
 #include "stubanalyzer.h"
-#include <include/shader/shaderstub.h>
-#include <include/shader/shadersource2.h>
+#include <include/shaders/shaderstub.h>
+#include <include/shaders/shadersource2.h>
 #include <include/nodes/valuenodes.h>
+
+const EnumMapperA GlobalUniformMapper[] = {
+#undef ITEM
+#define ITEM(name, type, token) { "g" MAGIC(token), (UINT)ShaderGlobalType::name },
+  GLOBALUSAGE_LIST
+  {"", -1}
+};
+
+/// Array for global uniform types
+const NodeType GlobalUniformTypes[] = {
+#undef ITEM
+#define ITEM(name, type, token) NodeType::type,
+  GLOBALUSAGE_LIST
+};
+
+const int GlobalUniformOffsets[] = {
+#undef ITEM
+#define ITEM(name, type, token) offsetof(Globals, token),
+  GLOBALUSAGE_LIST
+};
 
 ShaderStub::ShaderStub(const string& source)
   : Node(NodeType::SHADER_STUB, "ShaderStub")

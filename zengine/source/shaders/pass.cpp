@@ -1,5 +1,5 @@
-#include <include/shader/pass.h>
-#include <include/shader/shaderstub.h>
+#include <include/shaders/pass.h>
+#include <include/shaders/shaderstub.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
