@@ -34,9 +34,9 @@ public:
 	QFont					TitleFont;
 
 private:
-	ShaderNode*				SolidColorOp;
-	ShaderNode*				SolidTextureOp;
-	ShaderNode*				TextTextureOp;
+	Material SolidColorOp;
+  Material SolidTextureOp;
+  Material TextTextureOp;
 
 	Texture*				SomeTexture;
 
@@ -45,13 +45,13 @@ private:
 	StaticMeshNode*			BoxMeshOp;
 	StaticMeshNode*			TexturedBoxMeshOp;
 
-	RenderableNode*			SolidLineModel;
-	RenderableNode*			SolidRectModel;
-	RenderableNode*			SolidBoxModel;
-	RenderableNode*			TexturedBoxModel;
-	RenderableNode*			TextBoxModel;
+	Drawable*			SolidLineModel;
+  Drawable*			SolidRectModel;
+  Drawable*			SolidBoxModel;
+  Drawable*			TexturedBoxModel;
+  Drawable*			TextBoxModel;
 
 	RenderState				CanvasRenderstate;
-			
+  Globals mGlobals;
 };
 

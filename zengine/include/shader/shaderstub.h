@@ -75,7 +75,10 @@ public:
   ShaderStubMetadata* GetStubMetadata() const;
 
   ShaderSource2* GetShaderSource();
-  const map<ShaderStubParameter*, Slot*>& GetParameterSlotMap();
+  
+  /// Get slot by shader parameter name
+  Slot* GetSlotByParameter(ShaderStubParameter*);
+  Slot* GetSlotByParameterName(const string& name);
 
 protected:
   /// Handle received messages
@@ -91,6 +94,7 @@ protected:
 
   /// Maps stub parameters to stub slots
   map<ShaderStubParameter*, Slot*> mParameterSlotMap;
+  map<string, Slot*> mParameterNameSlotMap;
 };
 
 

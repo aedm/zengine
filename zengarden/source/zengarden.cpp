@@ -113,18 +113,18 @@ void ZenGarden::InitModules()
 
 
 	/// Add some dummy nodes
-	ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
-	if (shaderOp)
-	{
-		TheCommandStack->Execute(new CreateNodeCommand(shaderOp, graphEditor));
-		NodeWidget* ow = graphEditor->GetNodeWidget(shaderOp);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 50)));
-	}
+	//ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
+	//if (shaderOp)
+	//{
+	//	TheCommandStack->Execute(new CreateNodeCommand(shaderOp, graphEditor));
+	//	NodeWidget* ow = graphEditor->GetNodeWidget(shaderOp);
+	//	TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 50)));
+	//}
 
-	RenderableNode* model = new RenderableNode();
-	TheCommandStack->Execute(new CreateNodeCommand(model, graphEditor));
-	NodeWidget* ow = graphEditor->GetNodeWidget(model);
-	TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(ADJUST(250), 70)));
+	//RenderableNode* model = new RenderableNode();
+	//TheCommandStack->Execute(new CreateNodeCommand(model, graphEditor));
+	//NodeWidget* ow = graphEditor->GetNodeWidget(model);
+	//TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(ADJUST(250), 70)));
 
 	//model->TheShader.Connect(shaderOp);
 

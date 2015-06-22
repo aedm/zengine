@@ -1,7 +1,8 @@
-uniform vec4 uColor;
-//! section="Color" 
+:name "SolidColor.fs"
 
-void main()
+:param vec4 uColor
+
+SHADER
 {
 	gl_FragColor = uColor;
 }

@@ -26,18 +26,23 @@ public:
   Slot mFragmentStub;
   Slot mVertexStub;
 
-  /// Hidden, automatic slots
-  Slot mFragmentSource;
-  Slot mVertexSource;
-
   void Set(Globals* globals);
 
   /// Returns true if pass can be used
   bool isComplete();
 
+  /// List of attributes used by the program
   const vector<ShaderAttributeDesc>& GetUsedAttributes();
 
+  /// Getter for automatic slots
+  const Slot* GetFragmentSourceSlot();
+  const Slot* GetVertexSourceSlot();
+
 protected:
+  /// automatic slots
+  Slot mFragmentSource;
+  Slot mVertexSource;
+
   virtual void HandleMessage(Slot* slot, NodeMessage message, 
                              const void* payload) override;
 

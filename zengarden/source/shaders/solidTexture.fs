@@ -1,8 +1,9 @@
-uniform sampler2D uTexture;
+:name "SolidTexture.fs"
 
-varying vec2 vTexCoord;
+:param sampler2D uTexture
+:input vec2 vTexCoord
 
-void main()
+SHADER
 {
 	gl_FragColor = texture2D(uTexture, vTexCoord);
 }

@@ -5,6 +5,7 @@ OWNERSHIP ShaderStubMetadata* StubAnalyzer::FromText(const char* stubSource) {
 
   if (analyzer.mName == nullptr) {
     ERR("Shader stub has no name.");
+    WARN("source:\n%s", stubSource);
     return nullptr;
   }
 

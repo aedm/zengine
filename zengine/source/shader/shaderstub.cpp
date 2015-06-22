@@ -28,6 +28,7 @@ void ShaderStub::SetStubSource(const string& source) {
   for (Slot* slot : mSlots) delete slot;
   mSlots.clear();
   mParameterSlotMap.clear();
+  mParameterNameSlotMap.clear();
 
   SafeDelete(mMetadata);
   mMetadata = StubAnalyzer::FromText(mSource.c_str());
@@ -40,6 +41,9 @@ void ShaderStub::SetStubSource(const string& source) {
       case NodeType::FLOAT:
         slot = new FloatSlot(this, make_shared<string>(param->name));
         break;
+      case NodeType::VEC4:
+        slot = new Vec4Slot(this, make_shared<string>(param->name));
+        break;
       case NodeType::TEXTURE:
         slot = new TextureSlot(this, make_shared<string>(param->name));
         break;
@@ -48,6 +52,7 @@ void ShaderStub::SetStubSource(const string& source) {
         break;
     }
     mParameterSlotMap[param] = slot;
+    mParameterNameSlotMap[param->name] = slot;
   }
 }
 
@@ -63,8 +68,12 @@ ShaderStubMetadata* ShaderStub::GetStubMetadata() const {
   return mMetadata;
 }
 
-const map<ShaderStubParameter*, Slot*>& ShaderStub::GetParameterSlotMap() {
-  return mParameterSlotMap;
+Slot* ShaderStub::GetSlotByParameter(ShaderStubParameter* parameter) {
+  return mParameterSlotMap.at(parameter);
+}
+
+Slot* ShaderStub::GetSlotByParameterName(const string& name) {
+  return mParameterNameSlotMap.at(name);
 }
 
 Node* ShaderStub::Clone() const {

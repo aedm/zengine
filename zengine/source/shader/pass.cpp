@@ -32,6 +32,8 @@ void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
           mFragmentSource.Connect(static_cast<ShaderStub*>(
             mFragmentStub.GetNode())->GetShaderSource());
         }
+      } else if (slot == &mVertexSource || slot == &mFragmentSource) {
+        BuildRenderPipeline();
       }
       break;
     case NodeMessage::VALUE_CHANGED:
@@ -63,14 +65,20 @@ void Pass::BuildRenderPipeline() {
   ShaderSource2* vertex = static_cast<ShaderSource2*>(mVertexSource.GetNode());
   ShaderSource2* fragment = static_cast<ShaderSource2*>(mFragmentSource.GetNode());
   if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
-      fragment == nullptr || fragment->GetMetadata() == nullptr) return;
+      fragment == nullptr || fragment->GetMetadata() == nullptr) {
+    ERR("Missing stub metadata.");
+    return;
+  }
 
   const string& vertexSource = vertex->GetSource();
   const string& fragmentSource = fragment->GetSource();
 
   ShaderCompileDesc* shaderCompileDesc = TheDrawingAPI->CreateShaderFromSource(
     vertexSource.c_str(), fragmentSource.c_str());
-  if (shaderCompileDesc == nullptr) return;
+  if (shaderCompileDesc == nullptr) {
+    ERR("Missing shader compilation result.");
+    return;
+  }
 
   mHandle = shaderCompileDesc->Handle;
 
@@ -168,5 +176,13 @@ Node* Pass::Clone() const {
 
 bool Pass::isComplete() {
   return mHandle != -1;
+}
+
+const Slot* Pass::GetFragmentSourceSlot() {
+  return &mFragmentSource;
+}
+
+const Slot* Pass::GetVertexSourceSlot() {
+  return &mVertexSource;
 }
 

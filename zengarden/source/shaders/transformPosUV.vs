@@ -1,11 +1,13 @@
-attribute vec3 aPosition;
-attribute vec2 aTexCoord;
+:name "TransformPosUv.vs"
 
-uniform mat4 gTransformation;
+:input vec3 aPosition
+:input vec2 aTexCoord
 
-varying vec2 vTexCoord;
+:global mat4 gTransformation
 
-void main()
+:output vec2 vTexCoord
+
+SHADER
 {
 	gl_Position = vec4(aPosition, 1) * gTransformation;
 	vTexCoord = aTexCoord;

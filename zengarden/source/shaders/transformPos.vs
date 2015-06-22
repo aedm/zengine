@@ -1,8 +1,10 @@
-attribute vec3 aPosition;
+:name "TransformPos.vs"
 
-uniform mat4 gTransformation;
+:input vec3 aPosition
 
-void main()
+:global mat4 gTransformation
+
+SHADER
 {
 	gl_Position =  vec4(aPosition, 1) * gTransformation;
 }

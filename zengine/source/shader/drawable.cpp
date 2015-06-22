@@ -8,14 +8,14 @@ Drawable::Drawable()
 
 Drawable::~Drawable() {}
 
-void Drawable::Draw(Globals* globals) {
+void Drawable::Draw(Globals* globals, PrimitiveTypeEnum Primitive) {
   if (!mIsProperlyConnected) return;
   Material* material = static_cast<Material*>(mMaterial.GetNode());
   const Mesh* mesh = mMesh.GetMesh();
 
   /// Set pass (pipeline state)
   Pass* pass = material->GetPass();
-  if (!pass->isComplete()) return;
+  if (!pass || !pass->isComplete()) return;
   pass->Set(globals);
 
   /// Set vertex buffer and attributes
@@ -33,8 +33,8 @@ void Drawable::Draw(Globals* globals) {
 
   /// Render mesh
   if (mesh->mIndexHandle) {
-    TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, PRIMITIVE_TRIANGLES);
+    TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, Primitive);
   } else {
-    TheDrawingAPI->Render(0, mesh->mVertexCount, PRIMITIVE_TRIANGLES);
+    TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive);
   }
 }

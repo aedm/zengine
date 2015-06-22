@@ -15,7 +15,10 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source
   mSource->mSlots.clear();
   mSource->mSlots.push_back(&mSource->mStub);
 
-  if (stub == nullptr) return;
+  if (stub == nullptr) {
+    ERR("stub is nullptr");
+    return;
+  }
 
   try {
     CollectDependencies(stub);
@@ -33,6 +36,7 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source
     source->metadata = 
       new ShaderSourceMetadata(mInputs, mOutputs, mUniforms, mSamplers);
   } catch (...) {
+    ERR("Shader source creation failed");
   }
 }
 
@@ -44,10 +48,13 @@ void ShaderSourceBuilder::CollectStubMetadata(Node* node) {
   ShaderStub* stub = static_cast<ShaderStub*>(node);
 
   ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
+  if (stubMeta == nullptr) {
+    ERR("Can't build shader source.");
+    throw exception();
+  }
+
   NodeData* data = mDataMap.at(node);
   data->ReturnType = stubMeta->returnType;
-
-  const map<ShaderStubParameter*, Slot*>& paramSlotMap = stub->GetParameterSlotMap();
 
   /// Globals
   for (auto global : stubMeta->globals) {
@@ -193,7 +200,7 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
         ShaderStubParameter* param = stubMeta->parameters[i];
         if (param->type == NodeType::TEXTURE) {
-          Slot* slot = stub->GetParameterSlotMap().at(param);
+          Slot* slot = stub->GetSlotByParameter(param);
           Node* paramNode = slot->GetNode();
           if (paramNode == nullptr) {
             /// Node not connected to param
@@ -253,7 +260,7 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream) {
       bool isFirstParameter = true;
       for (ShaderStubParameter* param : stubMeta->parameters) {
         if (param->type != NodeType::TEXTURE) {
-          Slot* slot = stub->GetParameterSlotMap().at(param);
+          Slot* slot = stub->GetSlotByParameter(param);
           Node* paramNode = slot->GetNode();
           if (paramNode == nullptr) {
             /// Node not connected to param

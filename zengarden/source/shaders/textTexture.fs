@@ -1,9 +1,11 @@
-uniform sampler2D uTexture;
-uniform vec4 uColor;
+:name "TextTexture"
 
-varying vec2 vTexCoord;
+:param sampler2D uTexture
+:param vec4 uColor
 
-void main()
+:input vec2 vTexCoord
+
+SHADER
 {
 	vec4 c = texture2D(uTexture, vTexCoord);
 	gl_FragColor = vec4(uColor.rgb, uColor.a * c.a);

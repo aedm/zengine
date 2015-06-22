@@ -12,5 +12,5 @@ public:
   MeshSlot mMesh;
   Slot mMaterial;
 
-  void Draw(Globals* globals);
+  void Draw(Globals* globals, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
 };
