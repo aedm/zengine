@@ -66,8 +66,7 @@ public:
   const vector<Node*>& GetMultiNodes() const;
 
   /// Type of object this slot accepts
-  /// TODO: get rid of this
-  NodeType GetType() const;
+  virtual bool DoesAcceptType(NodeType type) const;
 
   /// Returns the name of the slot
   SharedString GetName();

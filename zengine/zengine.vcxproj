@@ -111,6 +111,7 @@
     <ClInclude Include="include\shaders\pass.h" />
     <ClInclude Include="include\shaders\shadersource2.h" />
     <ClInclude Include="include\shaders\shaderstub.h" />
+    <ClInclude Include="include\shaders\valuestubslot.h" />
     <ClInclude Include="include\zengine.h" />
     <ClInclude Include="source\render\opengl\drawingopengl.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />

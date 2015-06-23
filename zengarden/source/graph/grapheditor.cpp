@@ -379,9 +379,9 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		ConnectionValid = false;
 		UpdateHoveredWidget(mousePos);
 		if (HoveredWidget && HoveredWidget != ClickedWidget) {
-			if (HoveredWidget->GetNode()->GetType() 
-				== ClickedWidget->GetNode()->mSlots[ClickedSlot]->GetType()) {
-					ConnectionValid = true;
+			if (ClickedWidget->GetNode()->mSlots[ClickedSlot]->DoesAcceptType(
+          HoveredWidget->GetNode()->GetType())) {
+				ConnectionValid = true;
 			}
 		}
 		update();
@@ -390,9 +390,9 @@ void GraphEditor::OnMouseMove( QMouseEvent* event )
 		ConnectionValid = false;
 		UpdateHoveredWidget(mousePos); 
 		if (HoveredSlot >= 0 && HoveredWidget != ClickedWidget) {
-			if (ClickedWidget->GetNode()->GetType() 
-				== HoveredWidget->GetNode()->mSlots[HoveredSlot]->GetType()) {
-					ConnectionValid = true;
+			if (HoveredWidget->GetNode()->mSlots[HoveredSlot]->DoesAcceptType(
+          ClickedWidget->GetNode()->GetType())) {
+			  ConnectionValid = true;
 			}
 		}
 		update();

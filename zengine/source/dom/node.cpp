@@ -105,10 +105,6 @@ SharedString Slot::GetName() {
 }
 
 
-NodeType Slot::GetType() const {
-  return mType;
-}
-
 void Slot::ChangeNodeIndex(Node* node, UINT targetIndex) {
   ASSERT(mIsMultiSlot);
   ASSERT(targetIndex < mMultiNodes.size());
@@ -135,6 +131,10 @@ Node* Slot::operator[](UINT index) {
   ASSERT(mIsMultiSlot);
   ASSERT(index < mMultiNodes.size());
   return mMultiNodes[index];
+}
+
+bool Slot::DoesAcceptType(NodeType type) const {
+  return mType == NodeType::ALLOW_ALL || type == mType;
 }
 
 

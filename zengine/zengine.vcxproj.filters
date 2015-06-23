@@ -119,6 +119,9 @@
     <ClInclude Include="include\shaders\shaderstub.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
+    <ClInclude Include="include\shaders\valuestubslot.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">

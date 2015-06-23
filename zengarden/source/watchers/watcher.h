@@ -4,6 +4,7 @@
 
 class WatcherWidget;
 
+
 /// A node that displays another node. The display can be a tab on the ui, or a property
 /// panel item, etc. Watchers belong to their WatcherWidgets, and are destroyed by
 /// them.

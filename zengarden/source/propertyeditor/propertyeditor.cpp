@@ -41,28 +41,24 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
 {
     /// Slots
     for (Slot* slot : GetNode()->mSlots) {
-      switch (slot->GetType()) {
+      if (slot->DoesAcceptType(NodeType::FLOAT)) {
+        /// Float slots
+        WatcherWidget* widget =
+          new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+        FloatWatcher* watcher = new FloatWatcher(
+          static_cast<ValueNode<NodeType::FLOAT>*>(slot->GetNode()), widget,
+          QString::fromStdString(*slot->GetName()));
 
-        case NodeType::FLOAT: {
-          WatcherWidget* widget =  
-            new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-          FloatWatcher* watcher = new FloatWatcher(
-            static_cast<ValueNode<NodeType::FLOAT>*>(slot->GetNode()), widget, 
-            QString::fromStdString(*slot->GetName()));
-
-          if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
-            watcher->SetReadOnly(true);
-          }
-          mLayout->addWidget(widget);
-          mSlotWatchers[slot] = watcher;
-          break;
+        if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
+          watcher->SetReadOnly(true);
         }
-
-        default:
-          QLabel* slotLabel =
-            new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
-          mLayout->addWidget(slotLabel);
-          break;
+        mLayout->addWidget(widget);
+        mSlotWatchers[slot] = watcher;
+      } else {
+        /// General slots, just add a label
+        QLabel* slotLabel =
+          new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
+        mLayout->addWidget(slotLabel);
       }
     }
 }
@@ -76,7 +72,7 @@ void DefaultPropertyEditor::HandleSniffedMessage(Slot* slot, NodeMessage message
       if (it != mSlotWatchers.end()) {
         Watcher* watcher = it->second;
         watcher->ChangeNode(slot->GetNode());
-        if (slot->GetType() == NodeType::FLOAT) {
+        if (slot->DoesAcceptType(NodeType::FLOAT)) {
           bool defaulted = static_cast<FloatSlot*>(slot)->IsDefaulted();
           static_cast<FloatWatcher*>(watcher)->SetReadOnly(!defaulted);
         }

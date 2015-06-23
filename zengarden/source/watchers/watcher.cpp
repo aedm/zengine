@@ -42,5 +42,3 @@ void Watcher::HandleChangedNode(Node* node) {
   /// Overload this method if your watcher supports changing nodes.
   SHOULDNT_HAPPEN;
 }
-
-
