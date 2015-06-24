@@ -46,29 +46,20 @@ void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
 }
 
 void Pass::BuildRenderPipeline() {
-  INFO("Building render pipeline...");
   mUniforms.clear();
+  mSamplers.clear();
   mAttributes.clear();
+  /// TODO: delete previous handle
   mHandle = -1;
-
-  //ShaderSource2* vertex = static_cast<ShaderSource2*>(VertexShader.GetNode());
-  //ShaderSource2* fragment = static_cast<ShaderSource2*>(FragmentShader.GetNode());
-  //ShaderStub* vStub = static_cast<ShaderStub*>(vertexStub.GetNode());
-  //ShaderStub* fStub = static_cast<ShaderStub*>(fragmentStub.GetNode());
-  //if (vStub == nullptr || fStub == nullptr) return;
-
-  //ShaderSource2* vertex = vStub->GetShaderSource();
-  //ShaderSource2* fragment = fStub->GetShaderSource();
-  //if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
-  //	fragment == nullptr || fragment->GetMetadata() == nullptr) return;
 
   ShaderSource2* vertex = static_cast<ShaderSource2*>(mVertexSource.GetNode());
   ShaderSource2* fragment = static_cast<ShaderSource2*>(mFragmentSource.GetNode());
   if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
       fragment == nullptr || fragment->GetMetadata() == nullptr) {
-    ERR("Missing stub metadata.");
     return;
   }
+
+  INFO("Building render pipeline...");
 
   const string& vertexSource = vertex->GetSource();
   const string& fragmentSource = fragment->GetSource();

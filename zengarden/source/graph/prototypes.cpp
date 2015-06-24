@@ -27,43 +27,55 @@ Prototypes::Prototypes()
 
 void Prototypes::AddPrototype(Node* node, NodeClass nodeClass)
 {
-	PrototypeNodes.push_back(node);
-	NodeIndexMap[type_index(typeid(*node))] = nodeClass;
+	mPrototypeNodes.push_back(node);
+	mNodeIndexMap[type_index(typeid(*node))] = nodeClass;
+}
+
+void Prototypes::AddStub(ShaderStub* stub) {
+  mPrototypeNodes.push_back(stub);
 }
 
 Prototypes::~Prototypes()
 {
-	foreach(Node* nd, PrototypeNodes)
+	foreach(Node* nd, mPrototypeNodes)
 	{
 		delete nd;
 	}
-	PrototypeNodes.clear();
+	mPrototypeNodes.clear();
 }
 
 Node* Prototypes::AskUser(QWidget* Parent, QPoint Position)
 {
 	QDialog dialog(Parent, Qt::FramelessWindowHint);
-	Dialog = &dialog;
+	mDialog = &dialog;
 	Ui::OperatorSelector selector;
 	selector.setupUi(&dialog);
-	for (int i = 0; i<PrototypeNodes.size(); i++)
+	for (int i = 0; i<mPrototypeNodes.size(); i++)
 	{
-		selector.treeWidget->addTopLevelItem(
-			new SelectorItem(NULL, QString::fromStdString(PrototypeNodes[i]->mName), i + 1));
-	}
-	dialog.setModal(true);
+    Node* node = mPrototypeNodes[i];
+    QString name;
+    if (node->GetType() == NodeType::SHADER_STUB) {
+      name = QString::fromStdString(
+        static_cast<ShaderStub*>(node)->GetStubMetadata()->name);
+    } else {
+      name = QString::fromStdString(node->mName);
+    }
+    selector.treeWidget->addTopLevelItem(new SelectorItem(NULL, name, i + 1));
+  }
+  dialog.setModal(true);
 	dialog.resize(150, 300);
 	dialog.move(Position);
-	connect(selector.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this, SLOT(OnItemSelected(QTreeWidgetItem*, int)));
+	connect(selector.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), 
+          this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
 	//dialog.connect(SIGNAL(itemClicked()), this, SLOT(OnItemSelected()));
 	int ret = dialog.exec();
-	return (ret > 0) ? PrototypeNodes[ret-1]->Clone() : NULL;
+	return (ret > 0) ? mPrototypeNodes[ret-1]->Clone() : NULL;
 }
 
-void Prototypes::OnItemSelected(QTreeWidgetItem* Item, int)
+void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int)
 {
 	SelectorItem* item = static_cast<SelectorItem*>(Item);
-	if (item->NodeIndex >= 0) Dialog->done(item->NodeIndex);
+	if (item->NodeIndex >= 0) mDialog->done(item->NodeIndex);
 }
 
 void Prototypes::Init()
@@ -96,7 +108,7 @@ NodeClass Prototypes::GetNodeClass(Node* Nd)
 	try {
 		const type_info& tid = typeid(*Nd);
 		auto tin = type_index(tid);
-		return NodeIndexMap.at(type_index(typeid(*Nd)));
+		return mNodeIndexMap.at(type_index(typeid(*Nd)));
 	}
 	catch (out_of_range ex) {
 		return NodeClass::UNKNOWN;

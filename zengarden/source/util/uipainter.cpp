@@ -41,22 +41,15 @@ UiPainter::UiPainter() {
   TitleFont.setPixelSize(ADJUST(11));
 
   /// Shaders
-  //SolidColorOp = LoadShader(":/transformPos.vs", ":/solidColor.fs");
-  //SolidColorOp->AttachToUniform("uColor", &Color);
-  Pass* pass = LoadShader(":/transformPos.vs", ":/solidColor.fs");
+  Pass* pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
   ConnectToStubParameter(pass, false, "uColor", &Color);
   SolidColorOp.mSolidPass.Connect(pass);
   
-  //SolidTextureOp = LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
-  //SolidTextureOp->AttachToSampler("uTexture", &TexOp);
-  pass = LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
+  pass = Util::LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
   ConnectToStubParameter(pass, false, "uTexture", &TexOp);
   SolidTextureOp.mSolidPass.Connect(pass);
 
-  //TextTextureOp = LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
-  //TextTextureOp->AttachToUniform("uColor", &Color);
-  //TextTextureOp->AttachToSampler("uTexture", &TexOp);
-  pass = LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
+  pass = Util::LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
   ConnectToStubParameter(pass, false, "uColor", &Color);
   ConnectToStubParameter(pass, false, "uTexture", &TexOp);
   TextTextureOp.mSolidPass.Connect(pass);
@@ -196,8 +189,6 @@ void UiPainter::Set(int Width, int Height) {
   TheDrawingAPI->SetRenderState(&CanvasRenderstate);
   Color.Set(Vec4(1, 1, 1, 1));
 
-  //this->Width = Width;
-  //this->Height = Height;
   mGlobals.RenderTargetSize = Vec2(Width, Height);
   mGlobals.RenderTargetSizeRecip = Vec2(1.0f / float(Width), 1.0f / float(Height));
 

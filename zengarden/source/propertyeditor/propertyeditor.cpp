@@ -41,7 +41,8 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
 {
     /// Slots
     for (Slot* slot : GetNode()->mSlots) {
-      if (slot->DoesAcceptType(NodeType::FLOAT)) {
+      if (slot->DoesAcceptType(NodeType::FLOAT) && 
+          slot->GetNode()->GetType() != NodeType::SHADER_STUB) {
         /// Float slots
         WatcherWidget* widget =
           new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
@@ -71,10 +72,14 @@ void DefaultPropertyEditor::HandleSniffedMessage(Slot* slot, NodeMessage message
       auto it = mSlotWatchers.find(slot);
       if (it != mSlotWatchers.end()) {
         Watcher* watcher = it->second;
-        watcher->ChangeNode(slot->GetNode());
-        if (slot->DoesAcceptType(NodeType::FLOAT)) {
-          bool defaulted = static_cast<FloatSlot*>(slot)->IsDefaulted();
-          static_cast<FloatWatcher*>(watcher)->SetReadOnly(!defaulted);
+        if (slot->GetNode()->GetType() == NodeType::SHADER_STUB) {
+          watcher->ChangeNode(nullptr);
+        } else {
+          watcher->ChangeNode(slot->GetNode());
+          if (slot->DoesAcceptType(NodeType::FLOAT)) {
+            bool defaulted = static_cast<FloatSlot*>(slot)->IsDefaulted();
+            static_cast<FloatWatcher*>(watcher)->SetReadOnly(!defaulted);
+          }
         }
       }
       break;

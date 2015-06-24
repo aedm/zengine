@@ -1,7 +1,7 @@
 #pragma once
 
-#include "material.h"
-#include "../nodes/meshnode.h"
+#include "meshnode.h"
+#include "../shaders/material.h"
 
 class Drawable: public Node {
 public:

@@ -6,6 +6,7 @@
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
 #include "propertyeditor/propertyeditor.h"
+#include "nodes/stubloader.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
@@ -59,6 +60,9 @@ void ZenGarden::InitModules()
 	InitPainter();
 	Prototypes::Init();
 
+  /// Initialize engine parts
+  StubLoader::LoadStubs();
+
 	/// Create blank document
 	mDocument = new Document();
 	mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
@@ -71,7 +75,7 @@ void ZenGarden::InitModules()
 	/// TEST
 	{
 		/// fragment shader
-		char* testShaderStubSource = ReadFileQt("test2.fs");
+		char* testShaderStubSource = Util::ReadFileQt("test2.fs");
 		auto fragmentStub = new ShaderStub(testShaderStubSource);
 		ThePrototypes->AddPrototype(fragmentStub, NodeClass::SHADER_STUB);
 		TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graphEditor));
@@ -80,7 +84,7 @@ void ZenGarden::InitModules()
 		delete testShaderStubSource;
 
 		/// vertex shader
-		testShaderStubSource = ReadFileQt("test2.vs");
+    testShaderStubSource = Util::ReadFileQt("test2.vs");
 		auto vertexStub = new ShaderStub(testShaderStubSource);
 		ThePrototypes->AddPrototype(vertexStub, NodeClass::SHADER_STUB);
 		TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graphEditor));
@@ -97,7 +101,7 @@ void ZenGarden::InitModules()
 
 		/// float
 		auto floatNode = new FloatNode();
-		fragmentStub->mSlots[0]->Connect(floatNode); /// hack
+		//fragmentStub->mSlots[0]->Connect(floatNode); /// hack
 		TheCommandStack->Execute(new CreateNodeCommand(floatNode, graphEditor));
 		ow = graphEditor->GetNodeWidget(floatNode);
 		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 150)));

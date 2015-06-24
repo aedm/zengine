@@ -4,9 +4,10 @@
 :param vec4 uColor
 
 :input vec2 vTexCoord
+:output vec4 FragColor;
 
 SHADER
 {
 	vec4 c = texture2D(uTexture, vTexCoord);
-	gl_FragColor = vec4(uColor.rgb, uColor.a * c.a);
+	FragColor = vec4(uColor.rgb, uColor.a * c.a);
 }

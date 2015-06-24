@@ -169,7 +169,10 @@ string SubString::ToString() const
 
 OWNERSHIP string* SubString::ToStringPtr() const
 {
-	return new string(Begin, Length);
+  if (Token == TOKEN_STRING) {
+    return new string(Begin + 1, Length - 2);
+  }
+  return new string(Begin, Length);
 }
 
 SourceLine::SourceLine(int _LineNumber, const char* LineBegin)

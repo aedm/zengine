@@ -14,8 +14,8 @@
 #include "shaders/shadersource2.h"
 #include "shaders/pass.h"
 #include "shaders/material.h"
-#include "shaders/drawable.h"
 
+#include "nodes/drawable.h"
 #include "nodes/valuenodes.h"
 #include "nodes/meshnode.h"
 

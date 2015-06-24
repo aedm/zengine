@@ -147,7 +147,7 @@ void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
 template<NodeType T>
 bool ValueSlot<T>::Connect(Node* target) {
   if (mNode == target || (target == nullptr && mNode == &mDefault)) return true;
-  if (target && target->GetType() != mType) {
+  if (target && !DoesAcceptType(target->GetType())) {
     /// TODO: use ASSERT only
     ERR("Slot and operator type mismatch");
     ASSERT(false);

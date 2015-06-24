@@ -137,7 +137,7 @@ void FloatWatcher::SetTextBoxValue(float value) {
 }
 
 void FloatWatcher::SliderValueChanged(float value) {
-  if (mIsReadOnly) return;
+  if (mIsReadOnly || !GetNode()) return;
   static_cast<FloatNode*>(GetNode())->Set(value);
 }
 
@@ -162,7 +162,7 @@ void FloatWatcher::SetReadOnly(bool readOnly) {
 }
 
 void FloatWatcher::HandleChangedNode(Node* node) {
-  float value = static_cast<ValueNode<NodeType::FLOAT>*>(node)->Get();
+  float value = node ? static_cast<ValueNode<NodeType::FLOAT>*>(node)->Get() : 0.0f;
   mSlider->Set(value);
   SetTextBoxValue(value);
 }

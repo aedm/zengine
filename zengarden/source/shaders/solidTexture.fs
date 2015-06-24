@@ -2,8 +2,9 @@
 
 :param sampler2D uTexture
 :input vec2 vTexCoord
+:output vec4 FragColor;
 
 SHADER
 {
-	gl_FragColor = texture2D(uTexture, vTexCoord);
+	FragColor = texture2D(uTexture, vTexCoord);
 }

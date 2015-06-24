@@ -104,9 +104,6 @@
     <ClInclude Include="source\shaders\shaderTokenizer.h">
       <Filter>source\shaders</Filter>
     </ClInclude>
-    <ClInclude Include="include\shaders\drawable.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
     <ClInclude Include="include\shaders\material.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
@@ -121,6 +118,9 @@
     </ClInclude>
     <ClInclude Include="include\shaders\valuestubslot.h">
       <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nodes\drawable.h">
+      <Filter>include\nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,9 +160,6 @@
     <ClCompile Include="source\shaders\shaderTokenizer.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="source\shaders\drawable.cpp">
-      <Filter>source\shaders</Filter>
-    </ClCompile>
     <ClCompile Include="source\shaders\material.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
@@ -180,6 +177,9 @@
     </ClCompile>
     <ClCompile Include="source\shaders\stubanalyzer.cpp">
       <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\drawable.cpp">
+      <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

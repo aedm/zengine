@@ -7,7 +7,6 @@ void ShaderSourceBuilder::FromStub(ShaderStub* stub, ShaderSource2* source) {
 
 ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source)
   : mSource(source) {
-  INFO("Building shader source...");
   SafeDelete(mSource->metadata);
   for (Slot* slot : mSource->mSlots) {
     if (slot != &mSource->mStub) delete slot;
@@ -19,6 +18,14 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source
     ERR("stub is nullptr");
     return;
   }
+
+  ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
+  if (stubMeta == nullptr) {
+    ERR("stub has no metadata.");
+    return;
+  }
+
+  INFO("Building shader source for '%s'...", stubMeta->name.c_str());
 
   try {
     CollectDependencies(stub);

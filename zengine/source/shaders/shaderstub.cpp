@@ -1,4 +1,5 @@
 #include "stubanalyzer.h"
+#include <include/shaders/valuestubslot.h>
 #include <include/shaders/shaderstub.h>
 #include <include/shaders/shadersource2.h>
 #include <include/nodes/valuenodes.h>
@@ -59,10 +60,16 @@ void ShaderStub::SetStubSource(const string& source) {
     Slot* slot = nullptr;
     switch (param->type) {
       case NodeType::FLOAT:
-        slot = new FloatSlot(this, make_shared<string>(param->name));
+        slot = new ValueStubSlot<NodeType::FLOAT>(this, make_shared<string>(param->name));
+        break;
+      case NodeType::VEC2:
+        slot = new ValueStubSlot<NodeType::VEC2>(this, make_shared<string>(param->name));
+        break;
+      case NodeType::VEC3:
+        slot = new ValueStubSlot<NodeType::VEC3>(this, make_shared<string>(param->name));
         break;
       case NodeType::VEC4:
-        slot = new Vec4Slot(this, make_shared<string>(param->name));
+        slot = new ValueStubSlot<NodeType::VEC4>(this, make_shared<string>(param->name));
         break;
       case NodeType::TEXTURE:
         slot = new TextureSlot(this, make_shared<string>(param->name));
