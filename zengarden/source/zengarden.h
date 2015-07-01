@@ -3,7 +3,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtOpenGL/QGLWidget>
 #include "ui_zengarden.h"
-#include "graph/grapheditor.h"
+#include "graph/graphwatcher.h"
 #include "document.h"
 #include "watchers/documentwatcher.h"
 #include "watchers/logwatcher.h"
@@ -20,7 +20,7 @@ public:
 private:
 
   /// Open viewers
-  GraphEditor* OpenGraphViewer(bool leftPanel, GraphNode* graph);
+  GraphWatcher* OpenGraphViewer(bool leftPanel, GraphNode* graph);
   void Watch(Node* node, WatcherWidget* widget);
   void SetNodeForPropertyEditor(Node* node);
 

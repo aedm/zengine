@@ -70,7 +70,7 @@ void ZenGarden::InitModules()
 	GraphNode* graph = new GraphNode();
 
 	mDocument->Graphs.Connect(graph);
-	GraphEditor* graphEditor = OpenGraphViewer(false, graph);
+	GraphWatcher* graphEditor = OpenGraphViewer(false, graph);
 
 	/// TEST
 	{
@@ -143,20 +143,22 @@ void ZenGarden::DisposeModules()
 	CloseZengine();
 }
 
-GraphEditor* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
+GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 {
 	QTabWidget* tabWidget = LeftPanel ? mUI.leftPanel : mUI.rightPanel;
 	WatcherPosition position = LeftPanel 
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
-	WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
-	watcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
-	watcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
 
-	GraphEditor* graphEditor = new GraphEditor(watcherWidget, mCommonGLWidget);
-	graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	tabWidget->addTab(graphEditor, "graph");
+  GLWatcherWidget* glWatcherWidget =
+    new GLWatcherWidget(tabWidget, mCommonGLWidget, position);
+	//WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
+	glWatcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
+  glWatcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
 
-	graphEditor->SetGraph(Graph);
+  GraphWatcher* graphEditor = new GraphWatcher(Graph, glWatcherWidget);
+	//graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tabWidget->addTab(glWatcherWidget, "graph");
+
 	return graphEditor;
 }
 

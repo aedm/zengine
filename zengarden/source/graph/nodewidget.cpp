@@ -80,7 +80,7 @@ void NodeWidget::CalculateLayout()
 }
 
 
-void NodeWidget::Paint(GraphEditor* Panel)
+void NodeWidget::Paint(GraphWatcher* Panel)
 {
 	ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
 	ThePainter->DrawBox(Position, Vec2(Size.x, TitleHeight));
@@ -98,13 +98,13 @@ void NodeWidget::Paint(GraphEditor* Panel)
 	for (int i=0; i<WidgetSlots.size(); i++)
 	{
 		Vec4 slotFrameColor(1, 1, 1, 0.1);
-		if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_NODE) {
-			if (Panel->ClickedWidget == this && Panel->ClickedSlot == i) {
+		if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
+			if (Panel->mClickedWidget == this && Panel->mClickedSlotIndex == i) {
 				slotFrameColor = ConnectionColor;
 			}
-		} else if (Panel->HoveredWidget == this && Panel->HoveredSlot == i) {
-			if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_SLOT) {
-				slotFrameColor = Panel->ConnectionValid 
+		} else if (Panel->mHoveredWidget == this && Panel->mHoveredSlotIndex == i) {
+			if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT) {
+				slotFrameColor = Panel->mIsConnectionValid 
 					? ConnectionColorValid : ConnectionColorInvalid;
 			} else slotFrameColor = Vec4(1, 1, 1, 0.2);
 		}
@@ -124,13 +124,13 @@ void NodeWidget::Paint(GraphEditor* Panel)
 	Vec4 frameColor(1, 1, 1, 0.1);
 	if (Selected) {
 		frameColor = Vec4(1, 1, 1, 1);
-	} else if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_SLOT 
-		&& Panel->ClickedWidget == this) {
+	} else if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT 
+		&& Panel->mClickedWidget == this) {
 			frameColor = ConnectionColor;
-	} else if (Panel->HoveredWidget == this) {
-		if (Panel->CurrentState == GraphEditor::State::CONNECT_TO_NODE) {
-			if (Panel->ClickedWidget != this) {
-				frameColor = Panel->ConnectionValid ? ConnectionColorValid : ConnectionColorInvalid;
+	} else if (Panel->mHoveredWidget == this) {
+		if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
+			if (Panel->mClickedWidget != this) {
+				frameColor = Panel->mIsConnectionValid ? ConnectionColorValid : ConnectionColorInvalid;
 			}
 		} else frameColor = Vec4(1, 1, 1, 0.3);
 	} 

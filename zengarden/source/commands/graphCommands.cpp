@@ -1,7 +1,7 @@
 #include "graphCommands.h"
 #include "../graph/nodewidget.h"
 
-CreateNodeCommand::CreateNodeCommand( Node* _Nd, GraphEditor* _Panel )
+CreateNodeCommand::CreateNodeCommand( Node* _Nd, GraphWatcher* _Panel )
 	: Nd(_Nd)
 	, Panel(_Panel)
 {}

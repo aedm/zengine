@@ -1,19 +1,19 @@
 #pragma once
 
 #include "../util/textTexture.h"
-#include "grapheditor.h"
+#include "graphwatcher.h"
 #include "../watchers/watcher.h"
 #include <zengine.h>
 
 class NodeWidget: public Watcher {
 	friend class MoveNodeCommand;
-	friend class GraphEditor;
+	friend class GraphWatcher;
 
 public:
 	NodeWidget(Node* Nd);
 	~NodeWidget();
 
-	void				Paint(GraphEditor* Panel);
+	void				Paint(GraphWatcher* Panel);
 	void				SetTitle(const QString& Title);
 	Vec2				GetOutputPosition();
 	Vec2				GetInputPosition(int SlotIndex);

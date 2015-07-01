@@ -5,6 +5,7 @@
 #include <QtOpenGL/QGLWidget>
 
 class Watcher;
+class GLWidget;
 
 enum class WatcherPosition {
   LEFT_TAB,
@@ -25,6 +26,9 @@ public:
   /// Triggered when a node is selected (eg. in graph editor)
   Event<Node*> onSelectNode;
   
+  /// Get the OpenGL widget, if any
+  virtual GLWidget* GetGLWidget();
+
   const WatcherPosition	mPosition;
 
 protected:
@@ -38,20 +42,20 @@ public:
   GLWidget(QWidget* Parent, QGLWidget* ShareWidget);
   virtual ~GLWidget();
 
-  Event<GLWidget*, QMouseEvent*>	OnMouseMove;
-  Event<GLWidget*, QMouseEvent*>	OnMousePress;
-  Event<GLWidget*, QMouseEvent*>	OnMouseRelease;
-  Event<GLWidget*, QKeyEvent*>	OnKeyPress;
-  Event<GLWidget*, QKeyEvent*>	OnKeyRelease;
-  Event<GLWidget*>				OnPaint;
+  Event<GLWidget*, QMouseEvent*> OnMouseMove;
+  Event<GLWidget*, QMouseEvent*> OnMousePress;
+  Event<GLWidget*, QMouseEvent*> OnMouseRelease;
+  Event<GLWidget*, QKeyEvent*> OnKeyPress;
+  Event<GLWidget*, QKeyEvent*> OnKeyRelease;
+  Event<GLWidget*> OnPaint;
 
 protected:
-  virtual void					mouseMoveEvent(QMouseEvent* event) override;
-  virtual void					mousePressEvent(QMouseEvent* event) override;
-  virtual void					mouseReleaseEvent(QMouseEvent* event) override;
-  virtual void					keyPressEvent(QKeyEvent* event) override;
-  virtual void					keyReleaseEvent(QKeyEvent* event) override;
-  virtual void					paintGL() override;
+  virtual void mouseMoveEvent(QMouseEvent* event) override;
+  virtual void mousePressEvent(QMouseEvent* event) override;
+  virtual void mouseReleaseEvent(QMouseEvent* event) override;
+  virtual void keyPressEvent(QKeyEvent* event) override;
+  virtual void keyReleaseEvent(QKeyEvent* event) override;
+  virtual void paintGL() override;
 };
 
 
@@ -60,5 +64,8 @@ public:
   GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position);
   virtual ~GLWatcherWidget();
 
-  GLWidget*						TheGLWidget;
+  virtual GLWidget* GetGLWidget() override;
+
+protected:
+  GLWidget* mGLWidget;
 };

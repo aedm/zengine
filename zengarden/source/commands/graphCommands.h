@@ -1,12 +1,12 @@
 #pragma once
 
 #include "command.h"
-#include "../graph/grapheditor.h"
+#include "../graph/graphwatcher.h"
 
 class CreateNodeCommand: public Command
 {
 public:
-	CreateNodeCommand(Node* Nd, GraphEditor* Panel);
+	CreateNodeCommand(Node* Nd, GraphWatcher* Panel);
 	~CreateNodeCommand();
 
 	virtual bool			Do() override;
@@ -14,7 +14,7 @@ public:
 
 private:
 	Node*					Nd;
-	GraphEditor*			Panel;
+	GraphWatcher*			Panel;
 };
 
 

@@ -11,11 +11,12 @@ public:
 	virtual ~PassWatcher();
 
 protected:
-	void			Paint(GLWidget* Widget);
-	virtual void	HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload) override;
+	void Paint(GLWidget* widget);
+	virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+                                    const void* payload) override;
 
-	Drawable*		TheDrawable;
-	Material*		TheMaterial;
-	MeshNode*		TheMesh;
-	Globals			TheGlobals;
+	Drawable* mDrawable;
+	Material* mMaterial;
+	MeshNode* mMesh;
+	Globals mGlobals;
 };

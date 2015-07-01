@@ -3,7 +3,7 @@
 #include <zengine.h>
 
 class WatcherWidget;
-
+class GLWidget;
 
 /// A node that displays another node. The display can be a tab on the ui, or a property
 /// panel item, etc. Watchers belong to their WatcherWidgets, and are destroyed by
@@ -17,6 +17,9 @@ public:
 
   /// Change the displayed node to another
   void ChangeNode(Node* node);
+
+  /// Get the OpenGL widget, if any
+  GLWidget* GetGLWidget();
 
 protected:
   /// This method will be called when the watched node was changed

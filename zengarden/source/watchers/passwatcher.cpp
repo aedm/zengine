@@ -3,12 +3,10 @@
 PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
 	: Watcher(PassNode, WatchWidget)
 {
-	GLWidget* glWidget = WatchWidget->TheGLWidget;
+  GetGLWidget()->OnPaint += Delegate(this, &PassWatcher::Paint);
 
-	glWidget->OnPaint += Delegate(this, &PassWatcher::Paint);
-
-	TheMaterial = new Material();
-	TheMaterial->mSolidPass.Connect(PassNode);
+	mMaterial = new Material();
+	mMaterial->mSolidPass.Connect(PassNode);
 
 	/// Mesh
 	Vec2 Position(10, 10);
@@ -24,17 +22,17 @@ PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
 	Mesh* boxMesh = TheResourceManager->CreateMesh();
 	boxMesh->SetIndices(boxIndices);
 	boxMesh->SetVertices(vertices);
-	TheMesh = StaticMeshNode::Create(boxMesh);
+	mMesh = StaticMeshNode::Create(boxMesh);
 
-	TheDrawable = new Drawable();
-	TheDrawable->mMaterial.Connect(TheMaterial);
-	TheDrawable->mMesh.Connect(TheMesh);
+	mDrawable = new Drawable();
+	mDrawable->mMaterial.Connect(mMaterial);
+	mDrawable->mMesh.Connect(mMesh);
 }
 
 PassWatcher::~PassWatcher() 
 {
-	SafeDelete(TheDrawable);
-	SafeDelete(TheMaterial);
+	SafeDelete(mDrawable);
+	SafeDelete(mMaterial);
 }
 
 void PassWatcher::Paint(GLWidget* Widget)
@@ -42,14 +40,14 @@ void PassWatcher::Paint(GLWidget* Widget)
 	TheDrawingAPI->Clear(true, true, 0x80a080a0);
 
 	Vec2 size = Vec2(Widget->width(), Widget->height());
-	TheGlobals.RenderTargetSize = size;
-	TheGlobals.RenderTargetSizeRecip = Vec2(1.0f / size.x, 1.0f / size.y);
+	mGlobals.RenderTargetSize = size;
+	mGlobals.RenderTargetSizeRecip = Vec2(1.0f / size.x, 1.0f / size.y);
 
-	TheGlobals.View.LoadIdentity();
-	TheGlobals.Projection = Matrix::Ortho(0, 0, size.x, size.y);
-	TheGlobals.Transformation = TheGlobals.View * TheGlobals.Projection;
+	mGlobals.View.LoadIdentity();
+	mGlobals.Projection = Matrix::Ortho(0, 0, size.x, size.y);
+	mGlobals.Transformation = mGlobals.View * mGlobals.Projection;
 
-	TheDrawable->Draw(&TheGlobals);
+	mDrawable->Draw(&mGlobals);
 }
 
 void PassWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
@@ -60,8 +58,7 @@ void PassWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const void*
 	case NodeMessage::VALUE_CHANGED:
 		Pass* pass = static_cast<Pass*>(GetNode());
 		if (S == pass->GetFragmentSourceSlot() || S == pass->GetVertexSourceSlot()) {
-			GLWidget* glWidget = static_cast<GLWatcherWidget*>(mWatcherWidget)->TheGLWidget;
-			glWidget->updateGL();
+			GetGLWidget()->updateGL();
 		}
 		break;
 	}
