@@ -16,9 +16,6 @@
     <Filter Include="include\base">
       <UniqueIdentifier>{8c2d18f5-a263-4556-b824-d78639740c34}</UniqueIdentifier>
     </Filter>
-    <Filter Include="include\dom">
-      <UniqueIdentifier>{5e682bea-3e34-4a64-acc7-e6a3100869dd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\base">
       <UniqueIdentifier>{ae5d5113-4091-4b5d-be7f-1768cd2c7a1b}</UniqueIdentifier>
     </Filter>
@@ -49,6 +46,9 @@
     <Filter Include="include\shaders">
       <UniqueIdentifier>{22a5743a-e08c-408c-a761-ec21c9f462da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\dom">
+      <UniqueIdentifier>{bf1df60c-f0f1-4c16-a66d-75ab49cc7e57}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\shader2.txt">
@@ -64,9 +64,6 @@
     </ClInclude>
     <ClInclude Include="include\base\helpers.h">
       <Filter>include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="include\dom\node.h">
-      <Filter>include\dom</Filter>
     </ClInclude>
     <ClInclude Include="source\render\opengl\drawingopengl.h">
       <Filter>source\render\opengl</Filter>
@@ -121,6 +118,12 @@
     </ClInclude>
     <ClInclude Include="include\nodes\drawable.h">
       <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\node.h">
+      <Filter>include\dom</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\uidata.h">
+      <Filter>include\dom</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="source\nodes\drawable.cpp">
       <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\uidata.cpp">
+      <Filter>source\dom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

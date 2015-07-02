@@ -25,7 +25,7 @@ const int GlobalUniformOffsets[] = {
 };
 
 ShaderStub::ShaderStub(const string& source)
-  : Node(NodeType::SHADER_STUB, "ShaderStub")
+  : Node(NodeType::SHADER_STUB)
   , mMetadata(nullptr)
   , mShaderSrc(nullptr) {
   SetStubSource(source);

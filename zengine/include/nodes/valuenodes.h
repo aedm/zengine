@@ -11,7 +11,7 @@ protected:
   typedef typename NodeTypes<T>::Type ValueType;
 
 public:
-  ValueNode(const string& name);
+  ValueNode();
 
   /// For cloning
   ValueNode(const ValueNode<T>& original);
@@ -22,8 +22,8 @@ public:
 
 
 template<NodeType T>
-ValueNode<T>::ValueNode(const string& name)
-  : Node(T, name) {}
+ValueNode<T>::ValueNode()
+  : Node(T) {}
 
 
 template<NodeType T>
@@ -57,7 +57,7 @@ protected:
 
 template<NodeType T>
 StaticValueNode<T>::StaticValueNode()
-  : ValueNode(gVariableNames[(UINT)T]) {
+  : ValueNode() {
   mValue = ValueType();
 }
 

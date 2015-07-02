@@ -2,7 +2,7 @@
 #include "watcherwidget.h"
 
 Watcher::Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type)
-    : Node(type, "")
+    : Node(type)
     , mWatchedNode(NodeType::ALLOW_ALL, this, nullptr)
     , mWatcherWidget(watcherWidget) {
   if (watcherWidget) watcherWidget->mWatcher = this;

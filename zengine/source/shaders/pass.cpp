@@ -4,7 +4,7 @@
 #include <include/nodes/valuenodes.h>
 
 Pass::Pass()
-  : Node(NodeType::PASS, "Pass")
+  : Node(NodeType::PASS)
   , mVertexStub(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
   , mFragmentStub(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
   , mVertexSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)

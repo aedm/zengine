@@ -138,17 +138,17 @@ bool Slot::DoesAcceptType(NodeType type) const {
 }
 
 
-Node::Node(NodeType type, const string& name)
-  : mName(name)
-  , mType(type) {
+Node::Node(NodeType type)
+  : mType(type) 
+{
   mIsDirty = true;
   mIsProperlyConnected = true;
 }
 
 
 Node::Node(const Node& original)
-  : mName(original.mName)
-  , mType(original.mType) {}
+  : mType(original.mType) 
+{}
 
 
 void Node::ConnectToSlot(Slot* slot) {

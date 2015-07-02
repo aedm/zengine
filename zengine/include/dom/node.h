@@ -103,9 +103,6 @@ public:
   /// Parameters of this node.
   vector<Slot*>	mSlots;
 
-  /// Name of the node
-  string mName;
-
   /// Returns object type.
   NodeType GetType() const;
 
@@ -122,7 +119,7 @@ public:
   Event<Slot*, NodeMessage, const void*> onMessageReceived;
 
 protected:
-  Node(NodeType type, const string& name);
+  Node(NodeType type);
 
   /// For cloning
   Node(const Node& original);

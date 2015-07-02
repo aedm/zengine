@@ -56,7 +56,7 @@ enum class NodeType
 extern const int gVariableByteSizes[];
 
 /// Variable names, indexed by NodeType (only VALUETYPE_LIST names)
-extern const char* gVariableNames[];
+//extern const char* gVariableNames[];
 
 
 /// Type helpers

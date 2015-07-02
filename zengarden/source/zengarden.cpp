@@ -165,7 +165,7 @@ GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 void ZenGarden::NewGraph()
 {
 	GraphNode* graph = new GraphNode();
-	graph->mName = string("Graph ") + to_string(++mNextGraphIndex);
+	//graph->mName = string("Graph ") + to_string(++mNextGraphIndex);
 	mDocument->Graphs.Connect(graph);
 }
 
@@ -210,7 +210,7 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 	default: return;
 	}
 
-	int index = tabWidget->addTab(watcherWidget, QString::fromStdString(Nd->mName));
+	int index = tabWidget->addTab(watcherWidget, QString("[node]"));
 	tabWidget->setCurrentIndex(index);
 }
 

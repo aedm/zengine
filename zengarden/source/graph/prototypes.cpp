@@ -58,7 +58,7 @@ Node* Prototypes::AskUser(QWidget* Parent, QPoint Position)
       name = QString::fromStdString(
         static_cast<ShaderStub*>(node)->GetStubMetadata()->name);
     } else {
-      name = QString::fromStdString(node->mName);
+      name = GetNodeClassString(node);
     }
     selector.treeWidget->addTopLevelItem(new SelectorItem(NULL, name, i + 1));
   }

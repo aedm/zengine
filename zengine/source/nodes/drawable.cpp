@@ -2,7 +2,7 @@
 
 
 Drawable::Drawable()
-  : Node(NodeType::PASS, "Drawable")
+  : Node(NodeType::PASS)
   , mMesh(this, make_shared<string>("Mesh"))
   , mMaterial(NodeType::MATERIAL, this, make_shared<string>("Material")) {}
 

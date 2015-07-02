@@ -3,7 +3,7 @@
 
 
 MeshNode::MeshNode()
-  : Node(NodeType::MESH, "Meshzzz") {}
+  : Node(NodeType::MESH) {}
 
 
 StaticMeshNode::StaticMeshNode()

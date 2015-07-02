@@ -3,7 +3,7 @@
 #include <include/shaders/shaderstub.h>
 
 ShaderSource2::ShaderSource2()
-  : Node(NodeType::SHADER_SOURCE, "ShaderSource")
+  : Node(NodeType::SHADER_SOURCE)
   , mStub(NodeType::SHADER_STUB, this, make_shared<string>("Stub"))
   , metadata(nullptr) {}
 

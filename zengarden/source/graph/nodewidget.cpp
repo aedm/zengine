@@ -1,4 +1,5 @@
 #include "nodewidget.h"
+#include "prototypes.h"
 #include "../util/uipainter.h"
 #include <zengine.h>
 #include <QImage>
@@ -36,13 +37,13 @@ static const Vec4 ConnectionColorValid(0, 1, 0, 1);
 static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
-NodeWidget::NodeWidget(Node* Nd)
-	: Watcher(Nd, nullptr, NodeType::WIDGET)
+NodeWidget::NodeWidget(Node* node)
+	: Watcher(node, nullptr, NodeType::WIDGET)
 	, TitleTexture(NULL)
 {
 	Selected = false;
-	SetTitle(QString::fromStdString(Nd->mName));
-
+  SetTitle(ThePrototypes->GetNodeClassString(node));
+  
 	CreateWidgetSlots();
 }
 

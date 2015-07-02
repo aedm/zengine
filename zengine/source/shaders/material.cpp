@@ -2,7 +2,7 @@
 
 
 Material::Material()
-  : Node(NodeType::MATERIAL, "Material")
+  : Node(NodeType::MATERIAL)
   , mSolidPass(NodeType::PASS, this, make_shared<string>("Solid pass")) {}
 
 

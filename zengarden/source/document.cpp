@@ -2,14 +2,14 @@
 
 
 Document::Document()
-	: Node(NodeType::DOCUMENT, "Document")
+	: Node(NodeType::DOCUMENT)
 	, Graphs(NodeType::GRAPH, this, nullptr, true)
 {
 
 }
 
 GraphNode::GraphNode()
-	: Node(NodeType::GRAPH, "Graph")
+	: Node(NodeType::GRAPH)
 	, Widgets(NodeType::WIDGET, this, nullptr, true)
 {
 

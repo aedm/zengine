@@ -31,7 +31,7 @@ PropertyEditor::PropertyEditor(Node* node, WatcherWidget* panel)
 	nameEditorLayout->addWidget(nameLabel);
 	QLineEdit* nameLineEdit = new QLineEdit(nameEditor);
 	nameEditorLayout->addWidget(nameLineEdit);
-	nameLineEdit->setText(QString::fromStdString(node->mName));
+	//nameLineEdit->setText(QString::fromStdString(node->mName));
 	mLayout->addWidget(nameEditor);
 }
 
