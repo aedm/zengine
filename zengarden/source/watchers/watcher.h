@@ -1,6 +1,7 @@
 #pragma once
 
 #include <zengine.h>
+#include <QtCore/QString>
 
 class WatcherWidget;
 class GLWidget;
@@ -21,6 +22,9 @@ public:
   /// Get the OpenGL widget, if any
   GLWidget* GetGLWidget();
 
+  /// Get displayed name
+  const QString& GetDisplayedName();
+
 protected:
   /// This method will be called when the watched node was changed
   virtual void HandleChangedNode(Node* node);
@@ -34,7 +38,14 @@ protected:
   /// The watcher widget that contains this watcher
   WatcherWidget* mWatcherWidget;
 
+  /// The name of the node. Can be something else if the node has no name.
+  QString mDisplayedName;
+
 private:
   /// Helper function for forwaring internal messages of the watched node
   void SniffMessage(Slot* slot, NodeMessage message, const void* payload);
+
+  /// Generate the name displayed for the node. If the node has no name, it shows
+  /// the node type or the shader stub name.
+  void MakeDisplayedName();
 };

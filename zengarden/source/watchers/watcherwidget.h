@@ -6,6 +6,7 @@
 
 class Watcher;
 class GLWidget;
+class QTabWidget;
 
 enum class WatcherPosition {
   LEFT_TAB,
@@ -17,7 +18,8 @@ class WatcherWidget: public QWidget {
   friend class Watcher;
 
 public:
-  WatcherWidget(QWidget* parent, WatcherPosition position);
+  WatcherWidget(QWidget* parent, WatcherPosition position, 
+                QTabWidget* tabWidget = nullptr);
   virtual ~WatcherWidget();
 
   /// Triggered when a new node needs to be watched (eg. pressed space in graph editor)
@@ -33,6 +35,11 @@ public:
 
 protected:
   Watcher* mWatcher;
+
+  void SetTabLabel(const QString& text);
+
+private:
+  QTabWidget* mTabWidget;
 };
 
 
@@ -61,7 +68,8 @@ protected:
 
 class GLWatcherWidget: public WatcherWidget {
 public:
-  GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position);
+  GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position,
+                  QTabWidget* tabWidget = nullptr);
   virtual ~GLWatcherWidget();
 
   virtual GLWidget* GetGLWidget() override;

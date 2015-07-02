@@ -1,11 +1,15 @@
 #include "watcherwidget.h"
 #include "watcher.h"
 #include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QTabWidget>
 
-WatcherWidget::WatcherWidget(QWidget* Parent, WatcherPosition _Position)
-  : QWidget(Parent)
-  , mPosition(_Position)
-  , mWatcher(nullptr) {}
+WatcherWidget::WatcherWidget(QWidget* parent, WatcherPosition position, 
+                             QTabWidget* tabWidget)
+  : QWidget(parent)
+  , mPosition(position)
+  , mWatcher(nullptr)
+  , mTabWidget(tabWidget)
+{}
 
 WatcherWidget::~WatcherWidget() {
   SafeDelete(mWatcher);
@@ -16,13 +20,22 @@ GLWidget* WatcherWidget::GetGLWidget() {
   return nullptr;
 }
 
+void WatcherWidget::SetTabLabel(const QString& text) {
+  if (mTabWidget != nullptr) {
+    int index = mTabWidget->indexOf(this);
+    if (index >= 0) mTabWidget->setTabText(index, text);
+  }
+}
 
-GLWatcherWidget::GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position)
-  : WatcherWidget(Parent, Position) {
+
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget, 
+                                 WatcherPosition position, QTabWidget* tabWidget)
+  : WatcherWidget(parent, position, tabWidget) 
+{
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(4, 4, 4, 4);
 
-  mGLWidget = new GLWidget(this, ShareWidget);
+  mGLWidget = new GLWidget(this, shareWidget);
   layout->addWidget(mGLWidget);
 }
 

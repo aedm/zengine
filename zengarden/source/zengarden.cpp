@@ -150,7 +150,7 @@ GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 
   GLWatcherWidget* glWatcherWidget =
-    new GLWatcherWidget(tabWidget, mCommonGLWidget, position);
+    new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
 	//WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
 	glWatcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
   glWatcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
@@ -196,21 +196,21 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget)
 		? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 
 	WatcherWidget* watcherWidget = nullptr;
+  Watcher* watcher = nullptr;
 
 	switch (Nd->GetType()) {
 	case NodeType::PASS:
 	{
 		GLWatcherWidget* glWatcherWidget =
-			new GLWatcherWidget(tabWidget, mCommonGLWidget, position);
-		PassWatcher* passWatcher = 
-			new PassWatcher(static_cast<Pass*>(Nd), glWatcherWidget);
+			new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
+		watcher = new PassWatcher(static_cast<Pass*>(Nd), glWatcherWidget);
 		watcherWidget = glWatcherWidget;
 		break;
 	}
 	default: return;
 	}
 
-	int index = tabWidget->addTab(watcherWidget, QString("[node]"));
+	int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
 	tabWidget->setCurrentIndex(index);
 }
 
