@@ -100,7 +100,6 @@
     <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\node.h" />
-    <ClInclude Include="include\dom\uidata.h" />
     <ClInclude Include="include\nodes\drawable.h" />
     <ClInclude Include="include\nodes\meshnode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
@@ -123,7 +122,6 @@
     <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
-    <ClCompile Include="source\dom\uidata.cpp" />
     <ClCompile Include="source\nodes\drawable.cpp" />
     <ClCompile Include="source\nodes\meshnode.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />

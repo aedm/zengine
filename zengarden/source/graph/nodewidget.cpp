@@ -39,10 +39,10 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 NodeWidget::NodeWidget(Node* node)
 	: Watcher(node, nullptr, NodeType::WIDGET)
-	, TitleTexture(NULL)
+	, mTitleTexture(NULL)
 {
-	Selected = false;
-  SetTitle(ThePrototypes->GetNodeClassString(node));
+	mIsSelected = false;
+  HandleTitleChange();
   
 	CreateWidgetSlots();
 }
@@ -50,16 +50,16 @@ NodeWidget::NodeWidget(Node* node)
 
 void NodeWidget::CreateWidgetSlots()
 {
-	for (auto x : WidgetSlots) delete x;
-	WidgetSlots.clear();
+	for (auto x : mWidgetSlots) delete x;
+	mWidgetSlots.clear();
 
 	Node* node = GetNode();
 	for(Slot* slot : node->mSlots)
 	{
 		WidgetSlot* sw = new WidgetSlot();
-		sw->Text.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
-		sw->TheSlot = slot;
-		WidgetSlots.push_back(sw);
+		sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
+		sw->mSlot = slot;
+		mWidgetSlots.push_back(sw);
 	}
 	CalculateLayout();
 }
@@ -67,36 +67,36 @@ void NodeWidget::CreateWidgetSlots()
 
 void NodeWidget::CalculateLayout()
 {
-	TitleHeight = TitleTexture->TextSize.height() + TitlePadding * 2.0f + 1.0f;
-	float slotY = TitleHeight + SlotSpacing;
-	for(WidgetSlot* sw : WidgetSlots)
+	mTitleHeight = mTitleTexture->TextSize.height() + TitlePadding * 2.0f + 1.0f;
+	float slotY = mTitleHeight + SlotSpacing;
+	for(WidgetSlot* sw : mWidgetSlots)
 	{
-		sw->Position = Vec2(SlotLeftMargin, slotY);
-		sw->Size = Vec2(SlotWidth, float(sw->Text.TextSize.height()) + SlotPadding.y * 2.0f);
-		sw->SpotPos = Vec2(ConnectionSpotPadding, slotY + sw->Size.y / 2.0f);
-		slotY += sw->Size.y + SlotSpacing;
+		sw->mPosition = Vec2(SlotLeftMargin, slotY);
+		sw->mSize = Vec2(SlotWidth, float(sw->mTexture.TextSize.height()) + SlotPadding.y * 2.0f);
+		sw->mSpotPos = Vec2(ConnectionSpotPadding, slotY + sw->mSize.y / 2.0f);
+		slotY += sw->mSize.y + SlotSpacing;
 	}
-	Size = Vec2(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
-	OutputPosition = Vec2(Size.x - ConnectionSpotPadding - 1.0f, TitleHeight / 2.0f);
+	mSize = Vec2(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
+	mOutputPosition = Vec2(mSize.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
 }
 
 
 void NodeWidget::Paint(GraphWatcher* Panel)
 {
 	ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
-	ThePainter->DrawBox(Position, Vec2(Size.x, TitleHeight));
+	ThePainter->DrawBox(mPosition, Vec2(mSize.x, mTitleHeight));
 
 	ThePainter->Color.Set(Vec4(0, 0, 0, Opacity));
-	ThePainter->DrawBox(Position + Vec2(0, TitleHeight), Size - Vec2(0, TitleHeight));
+	ThePainter->DrawBox(mPosition + Vec2(0, mTitleHeight), mSize - Vec2(0, mTitleHeight));
 	
 	ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
-	ThePainter->DrawBox(Position + OutputPosition - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
+	ThePainter->DrawBox(mPosition + mOutputPosition - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
 	
 	ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
-	float centerX = floor((Size.x - float(TitleTexture->TextSize.width())) * 0.5f);
-	ThePainter->DrawTextTexture(TitleTexture, Position + Vec2(centerX, TitlePadding + 1));
+	float centerX = floor((mSize.x - float(mTitleTexture->TextSize.width())) * 0.5f);
+	ThePainter->DrawTextTexture(mTitleTexture, mPosition + Vec2(centerX, TitlePadding + 1));
 
-	for (int i=0; i<WidgetSlots.size(); i++)
+	for (int i=0; i<mWidgetSlots.size(); i++)
 	{
 		Vec4 slotFrameColor(1, 1, 1, 0.1);
 		if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
@@ -110,20 +110,20 @@ void NodeWidget::Paint(GraphWatcher* Panel)
 			} else slotFrameColor = Vec4(1, 1, 1, 0.2);
 		}
 
-		WidgetSlot* sw = WidgetSlots[i];
+		WidgetSlot* sw = mWidgetSlots[i];
 		ThePainter->Color.Set(slotFrameColor);
 		//ThePainter->DrawRect(Position.X+2, slotY, Position.X + Size.X - 40, slotY + sw->Text.TextSize.height());
-		ThePainter->DrawRect(Position + sw->Position, sw->Size);
+		ThePainter->DrawRect(mPosition + sw->mPosition, sw->mSize);
 
 		ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
-		ThePainter->DrawTextTexture(&sw->Text, Position + sw->Position + SlotPadding);
+		ThePainter->DrawTextTexture(&sw->mTexture, mPosition + sw->mPosition + SlotPadding);
 
 		ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
-		ThePainter->DrawBox(Position + sw->SpotPos - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
+		ThePainter->DrawBox(mPosition + sw->mSpotPos - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
 	}
 	
 	Vec4 frameColor(1, 1, 1, 0.1);
-	if (Selected) {
+	if (mIsSelected) {
 		frameColor = Vec4(1, 1, 1, 1);
 	} else if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT 
 		&& Panel->mClickedWidget == this) {
@@ -136,36 +136,55 @@ void NodeWidget::Paint(GraphWatcher* Panel)
 		} else frameColor = Vec4(1, 1, 1, 0.3);
 	} 
 	ThePainter->Color.Set(frameColor);
-	ThePainter->DrawRect(Position, Size);
+	ThePainter->DrawRect(mPosition, mSize);
 }
 
-void NodeWidget::SetTitle( const QString& Title )
+void NodeWidget::HandleTitleChange()
 {
-	TitleTexture = new TextTexture();
-	TitleTexture->SetText(Title, ThePainter->TitleFont);
-	EventRepaint();
+  static const QString stubLabel(" [stub]");
+
+  Node* node = GetNode();
+  QString text;
+  if (!node->GetName().empty()) {
+    /// Node has a name, use that.
+    text = QString::fromStdString(node->GetName());
+  } else {
+    /// Just use the type as a name by default
+    text = ThePrototypes->GetNodeClassString(GetNode());
+    if (node->GetType() == NodeType::SHADER_STUB) {
+      ShaderStub* stub = static_cast<ShaderStub*>(node);
+      ShaderStubMetadata* metaData = stub->GetStubMetadata();
+      if (metaData != nullptr && !metaData->name.empty()) {
+        /// For shader stubs, use the stub name by default
+        text = QString::fromStdString(metaData->name);
+      }
+    }
+  } 
+	mTitleTexture = new TextTexture();
+	mTitleTexture->SetText(text, ThePainter->TitleFont);
+	OnRepaint();
 }
 
 NodeWidget::~NodeWidget()
 {
-	SafeDelete(TitleTexture);
+	SafeDelete(mTitleTexture);
 }
 
 void NodeWidget::SetPosition( Vec2 Position )
 {
-	this->Position = Position;
-	EventRepaint();
+	this->mPosition = Position;
+	OnRepaint();
 }
 
 Vec2 NodeWidget::GetOutputPosition()
 {
-	return Position + OutputPosition;
+	return mPosition + mOutputPosition;
 }
 
 Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 {
-	WidgetSlot* sw = WidgetSlots[SlotIndex];
-	return Position + sw->SpotPos;
+	WidgetSlot* sw = mWidgetSlots[SlotIndex];
+	return mPosition + sw->mSpotPos;
 }
 
 void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
@@ -178,6 +197,9 @@ void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* 
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
 		/// TODO: redraw using this
 		break;
+  case NodeMessage::NODE_NAME_CHANGED:
+    HandleTitleChange();
+    break;
 	default: break;
 	}
 }

@@ -5,55 +5,59 @@
 #include "../watchers/watcher.h"
 #include <zengine.h>
 
+/// NodeWidget is a Watcher for a Node on a Graph. Every Node has a NodeWidget associated
+/// to it.
+
 class NodeWidget: public Watcher {
-	friend class MoveNodeCommand;
-	friend class GraphWatcher;
+  friend class MoveNodeCommand;
+  friend class GraphWatcher;
 
 public:
-	NodeWidget(Node* Nd);
-	~NodeWidget();
+  NodeWidget(Node* Nd);
+  ~NodeWidget();
 
-	void				Paint(GraphWatcher* Panel);
-	void				SetTitle(const QString& Title);
-	Vec2				GetOutputPosition();
-	Vec2				GetInputPosition(int SlotIndex);
+  void Paint(GraphWatcher* panel);
+  Vec2 GetOutputPosition();
+  Vec2 GetInputPosition(int slotIndex);
 
-	Event<>				EventRepaint;
+  Event<> OnRepaint;
 
 private:
-	virtual void		HandleSniffedMessage(Slot* S, NodeMessage Message, 
-							const void* Payload) override;
+  virtual void HandleSniffedMessage(Slot* S, NodeMessage Message,
+                                    const void* Payload) override;
 
-	/// Command-accessible
-	void				SetPosition(Vec2 Position);
+  /// Handles node title change
+  void HandleTitleChange();
 
-	/// Layout
-	void				CalculateLayout();
+  /// Command-accessible
+  void SetPosition(Vec2 position);
 
-	Vec2				Position;
-	Vec2				Size;
-	Vec2				OutputPosition;
+  /// Layout
+  void CalculateLayout();
 
-	/// Viewer states
-	bool				Selected;
-	Vec2				OriginalPosition;
-	Vec2				OriginalSize;
+  Vec2 mPosition;
+  Vec2 mSize;
+  Vec2 mOutputPosition;
 
-	/// Height of the titlebar
-	float				TitleHeight;
+  /// Viewer states
+  bool mIsSelected;
+  Vec2 mOriginalPosition;
+  Vec2 mOriginalSize;
 
-	struct WidgetSlot
-	{
-		TextTexture		Text;
-		Vec2			Position;
-		Vec2			Size;
-		Vec2			SpotPos;
-		Slot*			TheSlot;
-	};
+  /// Height of the titlebar
+  float mTitleHeight;
 
-	vector<WidgetSlot*>	WidgetSlots;
-	void				CreateWidgetSlots();
+  struct WidgetSlot {
+    TextTexture mTexture;
+    Vec2 mPosition;
+    Vec2 mSize;
+    Vec2 mSpotPos;
+    Slot* mSlot;
+  };
 
-	TextTexture*		TitleTexture;
+  vector<WidgetSlot*>	mWidgetSlots;
+  void CreateWidgetSlots();
+
+  TextTexture* mTitleTexture;
 };
 

@@ -28,6 +28,9 @@ enum class NodeMessage {
 
   /// Node looks changed, watchers need to redraw it.
   NEEDS_REDRAW,
+
+  /// Name of the node changed
+  NODE_NAME_CHANGED,
 };
 
 class Node;
@@ -155,6 +158,16 @@ private:
   /// Add or remove slot to/from notification list
   void ConnectToSlot(Slot* slot);
   void DisconnectFromSlot(Slot* slot);
+
+
+/// ------------- UI data -------------
+/// This section can be disabled without hurting the engine.
+public: 
+  void SetName(const string& name);
+  const string& GetName() const;
+
+private:
+  string mName;
 };
 
 

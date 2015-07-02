@@ -29,7 +29,7 @@ MoveNodeCommand::MoveNodeCommand( NodeWidget* _NdWidget, const Vec2& _Position )
 	: NdWidget(_NdWidget)
 	, NewPosition(_Position)
 {
-	OldPosition = NdWidget->Position;
+	OldPosition = NdWidget->mPosition;
 }
 
 bool MoveNodeCommand::Do()

@@ -48,8 +48,8 @@ void GraphWatcher::Paint(GLWidget*) {
   for (int i = nodes.size() - 1; i >= 0; i--) {
     NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
     Node* node = ndWidget->GetNode();
-    for (int i = 0; i < ndWidget->WidgetSlots.size(); i++) {
-      Slot* slot = ndWidget->WidgetSlots[i]->TheSlot;
+    for (int i = 0; i < ndWidget->mWidgetSlots.size(); i++) {
+      Slot* slot = ndWidget->mWidgetSlots[i]->mSlot;
       Node* connectedOp = slot->GetNode();
       if (connectedOp) {
         NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);
@@ -117,7 +117,7 @@ void GraphWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
 
 NodeWidget* GraphWatcher::AddNode(Node* node) {
   NodeWidget* widget = new NodeWidget(node);
-  widget->EventRepaint += Delegate(this, &GraphWatcher::HandleWidgetRepaint);
+  widget->OnRepaint += Delegate(this, &GraphWatcher::HandleWidgetRepaint);
   mWidgetMap[node] = widget;
   GetGraph()->Widgets.Connect(widget);
   GetGLWidget()->update();
@@ -169,7 +169,7 @@ bool HasIntersection(Vec2 pos1, Vec2 size1, Vec2 pos2, Vec2 size2) {
 
 void GraphWatcher::DeselectAll() {
   foreach(NodeWidget* ow, mSelectedNodes) {
-    ow->Selected = false;
+    ow->mIsSelected = false;
   }
   mSelectedNodes.clear();
 }
@@ -177,8 +177,8 @@ void GraphWatcher::DeselectAll() {
 
 void GraphWatcher::StorePositionOfSelectedNodes() {
   foreach(NodeWidget* ow, mSelectedNodes) {
-    ow->OriginalPosition = ow->Position;
-    ow->OriginalSize = ow->Size;
+    ow->mOriginalPosition = ow->mPosition;
+    ow->mOriginalSize = ow->mSize;
   }
 }
 
@@ -208,10 +208,10 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
             DeselectAll();
           }
         } else {
-          if (!mHoveredWidget->Selected) {
+          if (!mHoveredWidget->mIsSelected) {
             /// Select node
             DeselectAll();
-            mHoveredWidget->Selected = true;
+            mHoveredWidget->mIsSelected = true;
             mSelectedNodes.insert(mHoveredWidget);
             mWatcherWidget->onSelectNode(mHoveredWidget->GetNode());
           }
@@ -245,13 +245,13 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::MOVE_NODES:
       if (mAreNodesMoved) {
         foreach(NodeWidget* ow, mSelectedNodes) {
-          Vec2 pos = ow->Position;
-          ow->Position = ow->OriginalPosition;
+          Vec2 pos = ow->mPosition;
+          ow->mPosition = ow->mOriginalPosition;
           TheCommandStack->Execute(new MoveNodeCommand(ow, pos));
         }
       } else {
         DeselectAll();
-        mClickedWidget->Selected = true;
+        mClickedWidget->mIsSelected = true;
         mSelectedNodes.insert(mClickedWidget);
         GetGLWidget()->update();
       }
@@ -260,7 +260,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::SELECT_RECTANGLE:
       for (Node* node : GetGraph()->Widgets.GetMultiNodes()) {
         NodeWidget* widget = static_cast<NodeWidget*>(node);
-        if (widget->Selected) mSelectedNodes.insert(widget);
+        if (widget->mIsSelected) mSelectedNodes.insert(widget);
       }
       mCurrentState = State::DEFAULT;
       GetGLWidget()->update();
@@ -324,7 +324,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       mAreNodesMoved = true;
       Vec2 mouseDiff = mousePos - mOriginalMousePos;
       foreach(NodeWidget* ow, mSelectedNodes) {
-        ow->Position = ow->OriginalPosition + mouseDiff;
+        ow->mPosition = ow->mOriginalPosition + mouseDiff;
       }
       GetGLWidget()->update();
     }
@@ -332,8 +332,8 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
     case State::SELECT_RECTANGLE:
       for (Node* node : GetGraph()->Widgets.GetMultiNodes()) {
         NodeWidget* widget = static_cast<NodeWidget*>(node);
-        widget->Selected = HasIntersection(mOriginalMousePos,
-                                           mCurrentMousePos - mOriginalMousePos, widget->Position, widget->Size);
+        widget->mIsSelected = HasIntersection(mOriginalMousePos,
+                                           mCurrentMousePos - mOriginalMousePos, widget->mPosition, widget->mSize);
       }
       GetGLWidget()->update();
       break;
@@ -371,11 +371,11 @@ bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
   int slot = -1;
   for (Node* node : GetGraph()->Widgets.GetMultiNodes()) {
     NodeWidget* widget = static_cast<NodeWidget*>(node);
-    if (IsInsideRect(mousePos, widget->Position, widget->Size)) {
+    if (IsInsideRect(mousePos, widget->mPosition, widget->mSize)) {
       hovered = widget;
-      for (int o = 0; o < widget->WidgetSlots.size(); o++) {
-        NodeWidget::WidgetSlot* sw = widget->WidgetSlots[o];
-        if (IsInsideRect(mousePos, widget->Position + sw->Position, sw->Size)) {
+      for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
+        NodeWidget::WidgetSlot* sw = widget->mWidgetSlots[o];
+        if (IsInsideRect(mousePos, widget->mPosition + sw->mPosition, sw->mSize)) {
           slot = o;
           break;
         }
