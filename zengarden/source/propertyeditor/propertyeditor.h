@@ -6,6 +6,8 @@
 #include <QtWidgets/QBoxLayout>
 #include <map>
 
+class TextBox;
+
 /// General node editor, displays name and type of the Node
 class PropertyEditor: public Watcher {
 public:
@@ -13,7 +15,10 @@ public:
   virtual ~PropertyEditor() {}
 
 protected:
+  void HandleNameTexBoxChanged();
+
   QBoxLayout*	mLayout;
+  TextBox* mNameTextBox;
 };
 
 

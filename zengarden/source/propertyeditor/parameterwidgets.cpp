@@ -92,6 +92,7 @@ TextBox::TextBox(QWidget* parent)
 
 
 void TextBox::HandleEditingFinished() {
+  clearFocus();
   onEditingFinished();
 }
 

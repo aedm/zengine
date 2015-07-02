@@ -242,7 +242,7 @@ Node* Node::Clone() const {
 
 void Node::SetName(const string& name) {
   mName = name;
-  SendMsg(NodeMessage::NODE_NAME_CHANGED);
+  ReceiveMessage(nullptr, NodeMessage::NODE_NAME_CHANGED);
 }
 
 const string& Node::GetName() const {

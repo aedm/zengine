@@ -27,12 +27,21 @@ PropertyEditor::PropertyEditor(Node* node, WatcherWidget* panel)
 	QHBoxLayout* nameEditorLayout = new QHBoxLayout(nameEditor);
 	nameEditorLayout->setSpacing(6);
 	nameEditorLayout->setContentsMargins(0, 0, 0, 0);
-	QLabel* nameLabel = new QLabel("Name:", nameEditor);
-	nameEditorLayout->addWidget(nameLabel);
-	QLineEdit* nameLineEdit = new QLineEdit(nameEditor);
-	nameEditorLayout->addWidget(nameLineEdit);
-	//nameLineEdit->setText(QString::fromStdString(node->mName));
+	//QLabel* nameLabel = new QLabel("Name:", nameEditor);
+	//nameEditorLayout->addWidget(nameLabel);
+	mNameTextBox = new TextBox(nameEditor);
+  mNameTextBox->setPlaceholderText(QString("noname"));
+  if (!node->GetName().empty()) {
+    mNameTextBox->setText(QString::fromStdString(node->GetName()));
+  }
+  mNameTextBox->onEditingFinished += 
+    Delegate(this, &PropertyEditor::HandleNameTexBoxChanged);
+  nameEditorLayout->addWidget(mNameTextBox);
 	mLayout->addWidget(nameEditor);
+}
+
+void PropertyEditor::HandleNameTexBoxChanged() {
+  GetNode()->SetName(mNameTextBox->text().toStdString());
 }
 
 
