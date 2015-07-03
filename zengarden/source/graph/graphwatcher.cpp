@@ -297,7 +297,6 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
       if (slot->GetNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
-      GetGLWidget()->update();
     }
     return;
   }
@@ -305,8 +304,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
   Node* node = ThePrototypes->AskUser(mWatcherWidget, event->globalPos());
   if (node) {
     TheCommandStack->Execute(new CreateNodeCommand(node, this));
-    NodeWidget* nodeWidget = GetNodeWidget(node);
-    TheCommandStack->Execute(new MoveNodeCommand(nodeWidget, Vec2(event->x(), event->y())));
+    TheCommandStack->Execute(new MoveNodeCommand(node, Vec2(event->x(), event->y())));
   }
 }
 

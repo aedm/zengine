@@ -194,9 +194,10 @@ void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* 
 	{
 	case NodeMessage::SLOT_STRUCTURE_CHANGED:
 		CreateWidgetSlots();
-		break;
+    OnRepaint();
+    break;
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
-		/// TODO: redraw using this
+    OnRepaint();
 		break;
   case NodeMessage::NODE_NAME_CHANGED:
     HandleTitleChange();
