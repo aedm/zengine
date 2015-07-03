@@ -4,46 +4,37 @@ CommandStack* TheCommandStack = new CommandStack();
 
 Command::~Command() {}
 
-Command::Command()
-{
-	Active = false;
+Command::Command() {
+  mIsActive = false;
 }
 
 CommandStack::CommandStack() {}
 
-CommandStack::~CommandStack()
-{
-	for (int i = CommandList.size(); i>0;)
-	{
-		delete CommandList[--i];
-	}
+CommandStack::~CommandStack() {
+  for (int i = mCommandList.size(); i > 0;) {
+    delete mCommandList[--i];
+  }
 }
 
 
-bool CommandStack::Execute(Command *Com)
-{
-	if (Com->Do())
-	{
-		Com->Active = true;
-		CommandList.push_back(Com);
-		Com->OnCommand(Com);
-		return true;
-	}
-	else
-	{
-		delete Com;
-		return false;
-	}
+bool CommandStack::Execute(Command* command) {
+  if (command->Do()) {
+    command->mIsActive = true;
+    mCommandList.push_back(command);
+    command->OnCommand(command);
+    return true;
+  } else {
+    delete command;
+    return false;
+  }
 }
 
-bool CommandStack::Redo()
-{
-	NOT_IMPLEMENTED;
-	return true;
+bool CommandStack::Redo() {
+  NOT_IMPLEMENTED;
+  return true;
 }
 
-bool CommandStack::Undo()
-{
-	NOT_IMPLEMENTED;
-	return true;
+bool CommandStack::Undo() {
+  NOT_IMPLEMENTED;
+  return true;
 }

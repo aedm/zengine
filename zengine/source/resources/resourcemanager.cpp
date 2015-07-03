@@ -1,5 +1,4 @@
 #include <include/resources/resourcemanager.h>
-#include <boost/foreach.hpp>
 
 ResourceManager::ResourceManager() {
   VertexPos::format = GetVertexFormat(VERTEXATTRIB_POSITION_MASK);

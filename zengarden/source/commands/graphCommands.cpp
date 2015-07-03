@@ -1,93 +1,86 @@
 #include "graphCommands.h"
 #include "../graph/nodewidget.h"
 
-CreateNodeCommand::CreateNodeCommand( Node* _Nd, GraphWatcher* _Panel )
-	: Nd(_Nd)
-	, Panel(_Panel)
+CreateNodeCommand::CreateNodeCommand(Node* node, GraphWatcher* graphWatcher)
+  : mNode(node)
+  , mGraphWatcher(graphWatcher) {}
+
+CreateNodeCommand::~CreateNodeCommand() {
+  if (!mIsActive) {
+    SafeDelete(mNode);
+  }
+}
+
+bool CreateNodeCommand::Do() {
+  mGraphWatcher->AddNode(mNode);
+  return true;
+}
+
+bool CreateNodeCommand::Undo() {
+  NOT_IMPLEMENTED;
+  return true;
+}
+
+MoveNodeCommand::MoveNodeCommand(Node* node, const Vec2& position)
+  : mNode(node)
+  , mNewPosition(position) {
+  mOldPosition = mNode->GetPosition();
+}
+
+MoveNodeCommand::MoveNodeCommand(Node* node, const Vec2& position, 
+                                 const Vec2& oldPosition) 
+  : mNode(node)
+  , mNewPosition(position)
+  , mOldPosition(oldPosition)
 {}
 
-CreateNodeCommand::~CreateNodeCommand()
-{
-	if (!Active) {
-		SafeDelete(Nd);
-	}
+bool MoveNodeCommand::Do() {
+  mNode->SetPosition(mNewPosition);
+  return true;
 }
 
-bool CreateNodeCommand::Do()
-{
-	Panel->AddNode(Nd);
-	return true;
-}
-
-bool CreateNodeCommand::Undo()
-{
-	NOT_IMPLEMENTED;
-	return true;
-}
-
-MoveNodeCommand::MoveNodeCommand( NodeWidget* _NdWidget, const Vec2& _Position )
-	: NdWidget(_NdWidget)
-	, NewPosition(_Position)
-{
-	OldPosition = NdWidget->mPosition;
-}
-
-bool MoveNodeCommand::Do()
-{
-	NdWidget->SetPosition(NewPosition);
-	return true;
-}
-
-bool MoveNodeCommand::Undo()
-{
-	NdWidget->SetPosition(OldPosition);
-	return true;
+bool MoveNodeCommand::Undo() {
+  mNode->SetPosition(mOldPosition);
+  return true;
 }
 
 
-ConnectNodeToSlotCommand::ConnectNodeToSlotCommand( Node* _FromNode, Slot* _ToSlot )
-	: NewNode(_FromNode)
-	, ToSlot(_ToSlot)
-{
-	OldNode = ToSlot->GetNode();
+ConnectNodeToSlotCommand::ConnectNodeToSlotCommand(Node* fromNode, Slot* slot)
+  : mNewNode(fromNode)
+  , mSlot(slot) {
+  mOldNode = mSlot->GetNode();
 }
 
-bool ConnectNodeToSlotCommand::Do()
-{
-	return ToSlot->Connect(NewNode);
+bool ConnectNodeToSlotCommand::Do() {
+  return mSlot->Connect(mNewNode);
 }
 
-bool ConnectNodeToSlotCommand::Undo()
-{
-	return ToSlot->Connect(OldNode);
+bool ConnectNodeToSlotCommand::Undo() {
+  return mSlot->Connect(mOldNode);
 }
 
-DeleteNodeCommand::DeleteNodeCommand( const set<NodeWidget*>& _NodeWidgets )
-	: NodeWidgets(_NodeWidgets)
-{}
+DeleteNodeCommand::DeleteNodeCommand(const set<NodeWidget*>& nodeWidgets)
+  : mNodeWidgets(nodeWidgets) {}
 
-DeleteNodeCommand::~DeleteNodeCommand()
-{
-	if (Active) {
-		foreach (NodeWidget* nw, NodeWidgets) {
-			delete nw;
-		}
-	}
+DeleteNodeCommand::~DeleteNodeCommand() {
+  if (mIsActive) {
+    foreach(NodeWidget* nw, mNodeWidgets) {
+      delete nw;
+    }
+  }
 }
 
-bool DeleteNodeCommand::Do()
-{
-	NOT_IMPLEMENTED
-	foreach(NodeWidget* nw, NodeWidgets) {
-		foreach (Slot* slot, nw->GetNode()->mSlots) {
-			slot->Connect(NULL);
-		}
-	}
-	return true;
+bool DeleteNodeCommand::Do() {
+  NOT_IMPLEMENTED
+    foreach(NodeWidget* nw, mNodeWidgets) {
+    foreach(Slot* slot, nw->GetNode()->mSlots) {
+      slot->Connect(NULL);
+    }
+  }
+  return true;
 }
 
-bool DeleteNodeCommand::Undo()
-{
-	NOT_IMPLEMENTED
-	return false;
+bool DeleteNodeCommand::Undo() {
+  NOT_IMPLEMENTED
+    return false;
 }

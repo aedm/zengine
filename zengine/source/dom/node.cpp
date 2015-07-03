@@ -249,3 +249,21 @@ const string& Node::GetName() const {
   return mName;
 }
 
+void Node::SetPosition(const Vec2 position) {
+  mPosition = position;
+  ReceiveMessage(nullptr, NodeMessage::NODE_POSITION_CHANGED);
+}
+
+const Vec2 Node::GetPosition() const {
+  return mPosition;
+}
+
+void Node::SetSize(const Vec2 size) {
+  mSize = size;
+  ReceiveMessage(nullptr, NodeMessage::NODE_POSITION_CHANGED);
+}
+
+const Vec2 Node::GetSize() const {
+  return mSize;
+}
+

@@ -41,6 +41,14 @@ protected:
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;
 
+  /// For safety reasons, all these functions are disabled.
+  virtual void SetName(const string& name) override;
+  virtual const string& GetName() const override;
+  virtual void SetPosition(const Vec2 position) override;
+  virtual const Vec2 GetPosition() const override;
+  virtual void SetSize(const Vec2 size) override;
+  virtual const Vec2 GetSize() const override;
+
 private:
   /// Helper function for forwaring internal messages of the watched node
   void SniffMessage(Slot* slot, NodeMessage message, const void* payload);

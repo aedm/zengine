@@ -9,42 +9,40 @@ class CommandStack;
 extern CommandStack* TheCommandStack;
 
 /// Command design pattern, abstract ancestor
-class Command
-{
-	friend class CommandStack;
+class Command {
+  friend class CommandStack;
 
 public:
-	Command();
-	virtual ~Command();
+  Command();
+  virtual ~Command();
 
-	virtual bool			Do() = NULL;
-	virtual bool			Undo() = NULL;
+  virtual bool Do() = 0;
+  virtual bool Undo() = 0;
 
-	/// Fired after Do() and Undo()
-	Event<Command*>			OnCommand;
+  /// Fired after Do() and Undo()
+  Event<Command*> OnCommand;
 
 protected:
-	/// True if last action was Do(), false if Undo()
-	bool					Active;
+  /// True if last action was Do(), false if Undo()
+  bool mIsActive;
 };
 
 
 /// Stack of commands, for undoing
-class CommandStack
-{
+class CommandStack {
 public:
-	CommandStack();
-	~CommandStack();
+  CommandStack();
+  ~CommandStack();
 
-	/// Adds the command to the stack if it can be executed
-	bool Execute(Command* Com);
+  /// Adds the command to the stack if it can be executed
+  bool Execute(Command* command);
 
-	/// Undo command
-	bool Undo();
+  /// Undo command
+  bool Undo();
 
-	/// Redo command
-	bool Redo();
+  /// Redo command
+  bool Redo();
 
 private:
-	vector<Command*>		CommandList;
+  vector<Command*> mCommandList;
 };

@@ -6,7 +6,6 @@
 #include "../base/helpers.h"
 #include <vector>
 #include <memory>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace fastdelegate;
@@ -31,6 +30,9 @@ enum class NodeMessage {
 
   /// Name of the node changed
   NODE_NAME_CHANGED,
+
+  /// Position of the node changed
+  NODE_POSITION_CHANGED,
 };
 
 class Node;
@@ -163,11 +165,17 @@ private:
 /// ------------- UI data -------------
 /// This section can be disabled without hurting the engine.
 public: 
-  void SetName(const string& name);
-  const string& GetName() const;
+  virtual void SetName(const string& name);
+  virtual const string& GetName() const;
+  virtual void SetPosition(const Vec2 position);
+  virtual const Vec2 GetPosition() const;
+  virtual void SetSize(const Vec2 size);
+  virtual const Vec2 GetSize() const;
 
 private:
   string mName;
+  Vec2 mPosition;
+  Vec2 mSize;
 };
 
 

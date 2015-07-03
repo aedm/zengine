@@ -3,60 +3,57 @@
 #include "command.h"
 #include "../graph/graphwatcher.h"
 
-class CreateNodeCommand: public Command
-{
+class CreateNodeCommand: public Command {
 public:
-	CreateNodeCommand(Node* Nd, GraphWatcher* Panel);
-	~CreateNodeCommand();
+  CreateNodeCommand(Node* node, GraphWatcher* graphWatcher);
+  ~CreateNodeCommand();
 
-	virtual bool			Do() override;
-	virtual bool			Undo() override;
+  virtual bool Do() override;
+  virtual bool Undo() override;
 
 private:
-	Node*					Nd;
-	GraphWatcher*			Panel;
+  Node* mNode;
+  GraphWatcher* mGraphWatcher;
 };
 
 
-class MoveNodeCommand: public Command
-{
+class MoveNodeCommand: public Command {
 public:
-	MoveNodeCommand(NodeWidget* OpWidget, const Vec2& Position);
+  MoveNodeCommand(Node* node, const Vec2& position);
+  MoveNodeCommand(Node* node, const Vec2& position, const Vec2& oldPosition);
 
-	virtual bool			Do() override;
-	virtual bool			Undo() override;
+  virtual bool Do() override;
+  virtual bool Undo() override;
 
 private:
-	NodeWidget*				NdWidget;
-	Vec2					NewPosition;
-	Vec2					OldPosition;
+  Node* mNode;
+  Vec2 mNewPosition;
+  Vec2 mOldPosition;
 };
 
 
-class ConnectNodeToSlotCommand: public Command
-{
+class ConnectNodeToSlotCommand: public Command {
 public:
-	ConnectNodeToSlotCommand(Node* FromNode, Slot* ToSlot);
+  ConnectNodeToSlotCommand(Node* fromNode, Slot* toSlot);
 
-	virtual bool			Do() override;
-	virtual bool			Undo() override;
+  virtual bool Do() override;
+  virtual bool Undo() override;
 
 private:
-	Node*					NewNode;
-	Node*					OldNode;
-	Slot*					ToSlot;
+  Node* mNewNode;
+  Node* mOldNode;
+  Slot* mSlot;
 };
 
 
-class DeleteNodeCommand: public Command
-{
+class DeleteNodeCommand: public Command {
 public:
-	DeleteNodeCommand(const set<NodeWidget*>& NodeWidgets);
-	virtual ~DeleteNodeCommand();
+  DeleteNodeCommand(const set<NodeWidget*>& nodeWidgets);
+  virtual ~DeleteNodeCommand();
 
-	virtual bool			Do() override;
-	virtual bool			Undo() override;
+  virtual bool Do() override;
+  virtual bool Undo() override;
 
 private:
-	set<NodeWidget*>		NodeWidgets;
+  set<NodeWidget*> mNodeWidgets;
 };

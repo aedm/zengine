@@ -76,3 +76,30 @@ void Watcher::MakeDisplayedName() {
 const QString& Watcher::GetDisplayedName() {
   return mDisplayedName;
 }
+
+void Watcher::SetName(const string& name) {
+  SHOULDNT_HAPPEN;
+}
+
+const string& Watcher::GetName() const {
+  SHOULDNT_HAPPEN;
+  return string();
+}
+
+void Watcher::SetPosition(const Vec2 position) {
+  SHOULDNT_HAPPEN;
+}
+
+const Vec2 Watcher::GetPosition() const {
+  SHOULDNT_HAPPEN;
+  return Vec2(0, 0);
+}
+
+void Watcher::SetSize(const Vec2 size) {
+  SHOULDNT_HAPPEN;
+}
+
+const Vec2 Watcher::GetSize() const {
+  SHOULDNT_HAPPEN;
+  return Vec2(0, 0);
+}

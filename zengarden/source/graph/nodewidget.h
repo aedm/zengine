@@ -30,13 +30,13 @@ private:
   void HandleTitleChange();
 
   /// Command-accessible
-  void SetPosition(Vec2 position);
+  //void SetPosition(Vec2 position);
 
   /// Layout
   void CalculateLayout();
 
-  Vec2 mPosition;
-  Vec2 mSize;
+  //Vec2 mPosition;
+  //Vec2 mSize;
   Vec2 mOutputPosition;
 
   /// Viewer states

@@ -72,29 +72,35 @@ void NodeWidget::CalculateLayout()
 	for(WidgetSlot* sw : mWidgetSlots)
 	{
 		sw->mPosition = Vec2(SlotLeftMargin, slotY);
-		sw->mSize = Vec2(SlotWidth, float(sw->mTexture.TextSize.height()) + SlotPadding.y * 2.0f);
+		sw->mSize = 
+      Vec2(SlotWidth, float(sw->mTexture.TextSize.height()) + SlotPadding.y * 2.0f);
 		sw->mSpotPos = Vec2(ConnectionSpotPadding, slotY + sw->mSize.y / 2.0f);
 		slotY += sw->mSize.y + SlotSpacing;
 	}
-	mSize = Vec2(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
-	mOutputPosition = Vec2(mSize.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
+	Vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
+	mOutputPosition = Vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
+  GetNode()->SetSize(size);
 }
 
 
 void NodeWidget::Paint(GraphWatcher* Panel)
 {
-	ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
-	ThePainter->DrawBox(mPosition, Vec2(mSize.x, mTitleHeight));
+  Vec2 position = GetNode()->GetPosition();
+  Vec2 size = GetNode()->GetSize();
+
+  ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
+	ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
 
 	ThePainter->Color.Set(Vec4(0, 0, 0, Opacity));
-	ThePainter->DrawBox(mPosition + Vec2(0, mTitleHeight), mSize - Vec2(0, mTitleHeight));
+	ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
 	
 	ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
-	ThePainter->DrawBox(mPosition + mOutputPosition - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
+	ThePainter->DrawBox(position + mOutputPosition - ConnectionSpotSize * 0.5f, 
+                      ConnectionSpotSize);
 	
 	ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
-	float centerX = floor((mSize.x - float(mTitleTexture->TextSize.width())) * 0.5f);
-	ThePainter->DrawTextTexture(mTitleTexture, mPosition + Vec2(centerX, TitlePadding + 1));
+	float centerX = floor((size.x - float(mTitleTexture->TextSize.width())) * 0.5f);
+	ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
 
 	for (int i=0; i<mWidgetSlots.size(); i++)
 	{
@@ -112,14 +118,14 @@ void NodeWidget::Paint(GraphWatcher* Panel)
 
 		WidgetSlot* sw = mWidgetSlots[i];
 		ThePainter->Color.Set(slotFrameColor);
-		//ThePainter->DrawRect(Position.X+2, slotY, Position.X + Size.X - 40, slotY + sw->Text.TextSize.height());
-		ThePainter->DrawRect(mPosition + sw->mPosition, sw->mSize);
+		ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
 
 		ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
-		ThePainter->DrawTextTexture(&sw->mTexture, mPosition + sw->mPosition + SlotPadding);
+		ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
 
 		ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
-		ThePainter->DrawBox(mPosition + sw->mSpotPos - ConnectionSpotSize * 0.5f, ConnectionSpotSize);
+		ThePainter->DrawBox(position + sw->mSpotPos - ConnectionSpotSize * 0.5f, 
+                        ConnectionSpotSize);
 	}
 	
 	Vec4 frameColor(1, 1, 1, 0.1);
@@ -131,12 +137,13 @@ void NodeWidget::Paint(GraphWatcher* Panel)
 	} else if (Panel->mHoveredWidget == this) {
 		if (Panel->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
 			if (Panel->mClickedWidget != this) {
-				frameColor = Panel->mIsConnectionValid ? ConnectionColorValid : ConnectionColorInvalid;
+				frameColor = Panel->mIsConnectionValid 
+          ? ConnectionColorValid : ConnectionColorInvalid;
 			}
 		} else frameColor = Vec4(1, 1, 1, 0.3);
 	} 
 	ThePainter->Color.Set(frameColor);
-	ThePainter->DrawRect(mPosition, mSize);
+	ThePainter->DrawRect(position, size);
 }
 
 void NodeWidget::HandleTitleChange()
@@ -170,21 +177,15 @@ NodeWidget::~NodeWidget()
 	SafeDelete(mTitleTexture);
 }
 
-void NodeWidget::SetPosition( Vec2 Position )
-{
-	this->mPosition = Position;
-	OnRepaint();
-}
-
 Vec2 NodeWidget::GetOutputPosition()
 {
-	return mPosition + mOutputPosition;
+	return GetNode()->GetPosition() + mOutputPosition;
 }
 
 Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 {
 	WidgetSlot* sw = mWidgetSlots[SlotIndex];
-	return mPosition + sw->mSpotPos;
+  return GetNode()->GetPosition() + sw->mSpotPos;
 }
 
 void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
@@ -199,6 +200,9 @@ void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* 
 		break;
   case NodeMessage::NODE_NAME_CHANGED:
     HandleTitleChange();
+    break;
+  case NodeMessage::NODE_POSITION_CHANGED:
+    OnRepaint();
     break;
 	default: break;
 	}

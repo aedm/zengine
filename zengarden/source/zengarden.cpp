@@ -79,8 +79,7 @@ void ZenGarden::InitModules()
 		auto fragmentStub = new ShaderStub(testShaderStubSource);
 		ThePrototypes->AddPrototype(fragmentStub, NodeClass::SHADER_STUB);
 		TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graphEditor));
-		NodeWidget* ow = graphEditor->GetNodeWidget(fragmentStub);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(150, 150)));
+		TheCommandStack->Execute(new MoveNodeCommand(fragmentStub, Vec2(150, 150)));
 		delete testShaderStubSource;
 
 		/// vertex shader
@@ -88,52 +87,28 @@ void ZenGarden::InitModules()
 		auto vertexStub = new ShaderStub(testShaderStubSource);
 		ThePrototypes->AddPrototype(vertexStub, NodeClass::SHADER_STUB);
 		TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graphEditor));
-		ow = graphEditor->GetNodeWidget(vertexStub);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(150, 250)));
+		TheCommandStack->Execute(new MoveNodeCommand(vertexStub, Vec2(150, 250)));
 
 		/// pass
 		auto pass = new Pass();
 		pass->mFragmentStub.Connect(fragmentStub);
 		pass->mVertexStub.Connect(vertexStub);
 		TheCommandStack->Execute(new CreateNodeCommand(pass, graphEditor));
-		ow = graphEditor->GetNodeWidget(pass);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(280, 200)));
+    TheCommandStack->Execute(new MoveNodeCommand(pass, Vec2(280, 200)));
 
 		/// float
 		auto floatNode = new FloatNode();
 		//fragmentStub->mSlots[0]->Connect(floatNode); /// hack
 		TheCommandStack->Execute(new CreateNodeCommand(floatNode, graphEditor));
-		ow = graphEditor->GetNodeWidget(floatNode);
-		TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 150)));
+    TheCommandStack->Execute(new MoveNodeCommand(floatNode, Vec2(20, 150)));
 
     /// texture
     TextureNode* textureNode = new TextureNode();
     Texture* sampleTexture = CreateSampleTexture();
     textureNode->Set(sampleTexture);
     TheCommandStack->Execute(new CreateNodeCommand(textureNode, graphEditor));
-    ow = graphEditor->GetNodeWidget(textureNode);
-    TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 250)));
+    TheCommandStack->Execute(new MoveNodeCommand(textureNode, Vec2(20, 250)));
   }
-
-
-	/// Add some dummy nodes
-	//ShaderNode* shaderOp = LoadShader("test.vs", "test.fs");
-	//if (shaderOp)
-	//{
-	//	TheCommandStack->Execute(new CreateNodeCommand(shaderOp, graphEditor));
-	//	NodeWidget* ow = graphEditor->GetNodeWidget(shaderOp);
-	//	TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(20, 50)));
-	//}
-
-	//RenderableNode* model = new RenderableNode();
-	//TheCommandStack->Execute(new CreateNodeCommand(model, graphEditor));
-	//NodeWidget* ow = graphEditor->GetNodeWidget(model);
-	//TheCommandStack->Execute(new MoveNodeCommand(ow, Vec2(ADJUST(250), 70)));
-
-	//model->TheShader.Connect(shaderOp);
-
-	/// Build main screen
-	//TheGraphEditor->update();
 }
 
 void ZenGarden::DisposeModules()

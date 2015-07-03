@@ -1,6 +1,5 @@
 ﻿#include "drawingopengl.h"
 #include <include/base/helpers.h>
-#include <boost/foreach.hpp>
 #include <Windows.h>
 
 #ifdef _DEBUG
