@@ -168,15 +168,15 @@ bool HasIntersection(Vec2 pos1, Vec2 size1, Vec2 pos2, Vec2 size2) {
 
 
 void GraphWatcher::DeselectAll() {
-  for (NodeWidget* ow : mSelectedNodes) {
-    ow->mIsSelected = false;
+  for (NodeWidget* widget : mSelectedNodeWidgets) {
+    widget->mIsSelected = false;
   }
-  mSelectedNodes.clear();
+  mSelectedNodeWidgets.clear();
 }
 
 
 void GraphWatcher::StorePositionOfSelectedNodes() {
-  for (NodeWidget* nodeWidget : mSelectedNodes) {
+  for (NodeWidget* nodeWidget : mSelectedNodeWidgets) {
     nodeWidget->mOriginalPosition = nodeWidget->GetNode()->GetPosition();
     nodeWidget->mOriginalSize = nodeWidget->GetNode()->GetSize();
   }
@@ -212,7 +212,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
             /// Select node
             DeselectAll();
             mHoveredWidget->mIsSelected = true;
-            mSelectedNodes.insert(mHoveredWidget);
+            mSelectedNodeWidgets.insert(mHoveredWidget);
             mWatcherWidget->onSelectNode(mHoveredWidget->GetNode());
           }
           StorePositionOfSelectedNodes();
@@ -244,15 +244,15 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   switch (mCurrentState) {
     case State::MOVE_NODES:
       if (mAreNodesMoved) {
-        for (NodeWidget* ow : mSelectedNodes) {
-          Vec2 pos = ow->GetNode()->GetPosition();
+        for (NodeWidget* widget : mSelectedNodeWidgets) {
+          Vec2 pos = widget->GetNode()->GetPosition();
           TheCommandStack->Execute(
-            new MoveNodeCommand(ow->GetNode(), pos, ow->mOriginalPosition));
+            new MoveNodeCommand(widget->GetNode(), pos, widget->mOriginalPosition));
         }
       } else {
         DeselectAll();
         mClickedWidget->mIsSelected = true;
-        mSelectedNodes.insert(mClickedWidget);
+        mSelectedNodeWidgets.insert(mClickedWidget);
         GetGLWidget()->update();
       }
       mCurrentState = State::DEFAULT;
@@ -260,7 +260,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::SELECT_RECTANGLE:
       for (Node* node : GetGraph()->Widgets.GetMultiNodes()) {
         NodeWidget* widget = static_cast<NodeWidget*>(node);
-        if (widget->mIsSelected) mSelectedNodes.insert(widget);
+        if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
       }
       mCurrentState = State::DEFAULT;
       GetGLWidget()->update();
@@ -321,8 +321,8 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
     {
       mAreNodesMoved = true;
       Vec2 mouseDiff = mousePos - mOriginalMousePos;
-      for (NodeWidget* ow : mSelectedNodes) {
-        ow->GetNode()->SetPosition(ow->mOriginalPosition + mouseDiff);
+      for (NodeWidget* widget : mSelectedNodeWidgets) {
+        widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
       }
     }
     break;
@@ -400,8 +400,8 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
 
       /// Space opens watcher
     case Qt::Key_Space:
-      if (mSelectedNodes.size() == 1) {
-        mWatcherWidget->onWatchNode((*mSelectedNodes.begin())->GetNode(), mWatcherWidget);
+      if (mSelectedNodeWidgets.size() == 1) {
+        mWatcherWidget->onWatchNode((*mSelectedNodeWidgets.begin())->GetNode(), mWatcherWidget);
       }
       break;
 

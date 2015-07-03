@@ -47,7 +47,7 @@ private:
   map<Node*, NodeWidget*> mWidgetMap;
 
   /// Operators currectly selected
-  set<NodeWidget*> mSelectedNodes;
+  set<NodeWidget*> mSelectedNodeWidgets;
 
   /// State machine
   enum class State {

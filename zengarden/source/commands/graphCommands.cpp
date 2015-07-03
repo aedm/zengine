@@ -64,16 +64,16 @@ DeleteNodeCommand::DeleteNodeCommand(const set<NodeWidget*>& nodeWidgets)
 
 DeleteNodeCommand::~DeleteNodeCommand() {
   if (mIsActive) {
-    foreach(NodeWidget* nw, mNodeWidgets) {
-      delete nw;
+    for(NodeWidget* widget : mNodeWidgets) {
+      delete widget;
     }
   }
 }
 
 bool DeleteNodeCommand::Do() {
-  NOT_IMPLEMENTED
-    foreach(NodeWidget* nw, mNodeWidgets) {
-    foreach(Slot* slot, nw->GetNode()->mSlots) {
+  NOT_IMPLEMENTED;
+  for (NodeWidget* widget : mNodeWidgets) {
+    for (Slot* slot : widget->GetNode()->mSlots) {
       slot->Connect(NULL);
     }
   }
@@ -81,6 +81,6 @@ bool DeleteNodeCommand::Do() {
 }
 
 bool DeleteNodeCommand::Undo() {
-  NOT_IMPLEMENTED
-    return false;
+  NOT_IMPLEMENTED;
+  return false;
 }
