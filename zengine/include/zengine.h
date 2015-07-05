@@ -6,6 +6,8 @@
 #include "base/helpers.h"
 
 #include "dom/node.h"
+#include "dom/graph.h"
+#include "dom/document.h"
 
 #include "resources/mesh.h"
 #include "resources/texture.h"

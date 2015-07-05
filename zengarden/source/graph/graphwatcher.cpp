@@ -2,7 +2,6 @@
 #include "nodewidget.h"
 #include "../util/uipainter.h"
 #include "../commands/graphcommands.h"
-#include "../document.h"
 #include "prototypes.h"
 #include <zengine.h>
 #include <QBoxLayout>
@@ -13,7 +12,7 @@
 #include <QMouseEvent>
 
 
-GraphWatcher::GraphWatcher(GraphNode* graph, GLWatcherWidget* parent)
+GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
   : Watcher(graph, parent) 
 {
   GetGLWidget()->setMouseTracking(true);
@@ -44,10 +43,12 @@ void GraphWatcher::Paint(GLWidget*) {
 
   /// Draw connections
   ThePainter->Color.Set(Vec4(1, 1, 1, 1));
-  const vector<Node*>& nodes = GetGraph()->Widgets.GetMultiNodes();
-  for (int i = nodes.size() - 1; i >= 0; i--) {
-    NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
-    Node* node = ndWidget->GetNode();
+  //const vector<Node*>& nodes = GetGraph()->Widgets.GetMultiNodes();
+  //for (int i = nodes.size() - 1; i >= 0; i--) {
+  //  NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
+  //  Node* node = ndWidget->GetNode();
+  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+    NodeWidget* ndWidget = mWidgetMap.at(node);
     for (int i = 0; i < ndWidget->mWidgetSlots.size(); i++) {
       Slot* slot = ndWidget->mWidgetSlots[i]->mSlot;
       Node* connectedOp = slot->GetNode();
@@ -78,8 +79,11 @@ void GraphWatcher::Paint(GLWidget*) {
   }
 
   /// Draw nodes
-  for (int i = nodes.size() - 1; i >= 0; i--) {
-    static_cast<NodeWidget*>(GetGraph()->Widgets[i])->Paint(this);
+  //for (int i = nodes.size() - 1; i >= 0; i--) {
+    //static_cast<NodeWidget*>(GetGraph()->Widgets[i])->Paint(this);
+  //}
+  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+    mWidgetMap.at(node)->Paint(this);
   }
 
   /// Draw selection rectangle
@@ -119,7 +123,7 @@ NodeWidget* GraphWatcher::AddNode(Node* node) {
   NodeWidget* widget = new NodeWidget(node);
   widget->OnRepaint += Delegate(this, &GraphWatcher::HandleWidgetRepaint);
   mWidgetMap[node] = widget;
-  GetGraph()->Widgets.Connect(widget);
+  GetGraph()->mNodes.Connect(node);
   GetGLWidget()->update();
   return widget;
 }
@@ -221,7 +225,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
           mCurrentState = State::MOVE_NODES;
 
           /// Put node on top
-          GetGraph()->Widgets.ChangeNodeIndex(mHoveredWidget, 0);
+          GetGraph()->mNodes.ChangeNodeIndex(mHoveredWidget->GetNode(), 0);
         }
       } else {
         /// No widget was pressed, start rectangular selection
@@ -258,8 +262,8 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
       mCurrentState = State::DEFAULT;
       break;
     case State::SELECT_RECTANGLE:
-      for (Node* node : GetGraph()->Widgets.GetMultiNodes()) {
-        NodeWidget* widget = static_cast<NodeWidget*>(node);
+      for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+        NodeWidget* widget = mWidgetMap.at(node);
         if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
       }
       mCurrentState = State::DEFAULT;
@@ -327,9 +331,8 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
     }
     break;
     case State::SELECT_RECTANGLE:
-      for (Node* w : GetGraph()->Widgets.GetMultiNodes()) {
-        NodeWidget* widget = static_cast<NodeWidget*>(w);
-        Node* node = widget->GetNode();
+      for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+        NodeWidget* widget = mWidgetMap.at(node);
         widget->mIsSelected = HasIntersection(mOriginalMousePos,
             mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
       }
@@ -367,9 +370,8 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
 bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
   NodeWidget* hovered = nullptr;
   int slot = -1;
-  for (Node* w : GetGraph()->Widgets.GetMultiNodes()) {
-    NodeWidget* widget = static_cast<NodeWidget*>(w);
-    Node* node = widget->GetNode();
+  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+    NodeWidget* widget = mWidgetMap.at(node);
     if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
       hovered = widget;
       for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
@@ -410,6 +412,6 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
 }
 
 
-GraphNode* GraphWatcher::GetGraph() {
-  return static_cast<GraphNode*>(GetNode());
+Graph* GraphWatcher::GetGraph() {
+  return static_cast<Graph*>(GetNode());
 }

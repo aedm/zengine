@@ -122,6 +122,12 @@
     <ClInclude Include="include\dom\node.h">
       <Filter>include\dom</Filter>
     </ClInclude>
+    <ClInclude Include="include\dom\graph.h">
+      <Filter>include\dom</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\document.h">
+      <Filter>include\dom</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -180,6 +186,12 @@
     </ClCompile>
     <ClCompile Include="source\nodes\drawable.cpp">
       <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\graph.cpp">
+      <Filter>source\dom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\document.cpp">
+      <Filter>source\dom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

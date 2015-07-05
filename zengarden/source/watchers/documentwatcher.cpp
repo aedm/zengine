@@ -1,6 +1,6 @@
 #include "documentwatcher.h"
 
-Q_DECLARE_METATYPE(GraphNode*)
+Q_DECLARE_METATYPE(Graph*)
 
 enum MyRoles {
 	GraphNodeRole = Qt::UserRole + 1
@@ -30,9 +30,9 @@ void DocumentWatcher::HandleSniffedMessage(Slot* S, NodeMessage Message, const v
 	case NodeMessage::SLOT_CONNECTION_CHANGED:
 	{
 		Model->clear();
-		for (Node* node : doc->Graphs.GetMultiNodes())
+		for (Node* node : doc->mGraphs.GetMultiNodes())
 		{
-			GraphNode* graph = static_cast<GraphNode*>(node);
+			Graph* graph = static_cast<Graph*>(node);
 			QStandardItem* item = new QStandardItem(QString("graph"));
 			item->setData(QVariant::fromValue(graph), GraphNodeRole);
 			Model->appendRow(item);

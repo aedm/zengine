@@ -101,7 +101,6 @@
     </ClCompile>
     <ClCompile Include="source\commands\command.cpp" />
     <ClCompile Include="source\commands\graphcommands.cpp" />
-    <ClCompile Include="source\document.cpp" />
     <ClCompile Include="source\graph\graphwatcher.cpp" />
     <ClCompile Include="source\graph\nodewidget.cpp" />
     <ClCompile Include="source\graph\prototypes.cpp" />
@@ -165,7 +164,6 @@
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_zengarden.h" />
     <ClInclude Include="source\commands\command.h" />
     <ClInclude Include="source\commands\graphcommands.h" />
-    <ClInclude Include="source\document.h" />
     <ClInclude Include="source\graph\nodewidget.h" />
     <CustomBuild Include="source\propertyeditor\parameterwidgets.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing parameterwidgets.h...</Message>

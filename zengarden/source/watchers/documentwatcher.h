@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../document.h"
 #include "watcher.h"
 #include <zengine.h>
 #include <QtWidgets/QListView>

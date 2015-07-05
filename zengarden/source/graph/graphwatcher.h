@@ -7,14 +7,14 @@
 
 using namespace std;
 class NodeWidget;
-class GraphNode;
+class Graph;
 
 class GraphWatcher: public Watcher {
   friend class CreateNodeCommand;
   friend class NodeWidget;
 
 public:
-  GraphWatcher(GraphNode* graph, GLWatcherWidget* Parent);
+  GraphWatcher(Graph* graph, GLWatcherWidget* Parent);
 
   NodeWidget* GetNodeWidget(Node* node);
 
@@ -41,7 +41,7 @@ private:
   NodeWidget* AddNode(Node* node);
 
   /// All wigdets on the graph
-  GraphNode* GetGraph();
+  Graph* GetGraph();
 
   /// Mapping from node to widget
   map<Node*, NodeWidget*> mWidgetMap;

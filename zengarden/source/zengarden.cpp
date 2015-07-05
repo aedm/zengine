@@ -67,9 +67,9 @@ void ZenGarden::InitModules()
 	mDocument = new Document();
 	mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
 
-	GraphNode* graph = new GraphNode();
+	Graph* graph = new Graph();
 
-	mDocument->Graphs.Connect(graph);
+	mDocument->mGraphs.Connect(graph);
 	GraphWatcher* graphEditor = OpenGraphViewer(false, graph);
 
 	/// TEST
@@ -118,7 +118,7 @@ void ZenGarden::DisposeModules()
 	CloseZengine();
 }
 
-GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
+GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, Graph* Graph)
 {
 	QTabWidget* tabWidget = LeftPanel ? mUI.leftPanel : mUI.rightPanel;
 	WatcherPosition position = LeftPanel 
@@ -139,9 +139,8 @@ GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, GraphNode* Graph)
 
 void ZenGarden::NewGraph()
 {
-	GraphNode* graph = new GraphNode();
-	//graph->mName = string("Graph ") + to_string(++mNextGraphIndex);
-	mDocument->Graphs.Connect(graph);
+	Graph* graph = new Graph();
+	mDocument->mGraphs.Connect(graph);
 }
 
 void ZenGarden::SetNodeForPropertyEditor(Node* Nd)

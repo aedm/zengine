@@ -80,9 +80,6 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_ui_shaders.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\document.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\graph\nodewidget.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
@@ -203,9 +200,6 @@
     </ClInclude>
     <ClInclude Include="source\util\textTexture.h">
       <Filter>source\util</Filter>
-    </ClInclude>
-    <ClInclude Include="source\document.h">
-      <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\graph\nodewidget.h">
       <Filter>source\graph</Filter>
