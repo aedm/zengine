@@ -9,7 +9,8 @@ void StubLoader::LoadStubs() {
   for (QFileInfo& fileInfo : dir.entryInfoList()) {
     INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
     char* stubSource = Util::ReadFileQt(fileInfo.absoluteFilePath());
-    ShaderStub* stub = new ShaderStub(stubSource);
+    ShaderStub* stub = new ShaderStub();
+    stub->SetStubSource(stubSource);
     ThePrototypes->AddStub(stub);
   }
 }

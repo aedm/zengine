@@ -45,4 +45,6 @@ private slots:
   void InitModules();
   void DisposeModules();
   void NewGraph();
+
+  void SaveAs();
 };

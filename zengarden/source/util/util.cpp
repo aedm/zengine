@@ -34,8 +34,10 @@ namespace Util {
       return nullptr;
     }
 
-    ShaderStub* vertexStub = new ShaderStub(string(vertexContent.get()));
-    ShaderStub* fragmentStub = new ShaderStub(string(fragmentContent.get()));
+    ShaderStub* vertexStub = new ShaderStub();
+    vertexStub->SetStubSource(string(vertexContent.get()));
+    ShaderStub* fragmentStub = new ShaderStub();
+    fragmentStub->SetStubSource(string(fragmentContent.get()));
 
     Pass* pass = new Pass();
     pass->mVertexStub.Connect(vertexStub);

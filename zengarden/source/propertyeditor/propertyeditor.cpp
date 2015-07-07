@@ -15,7 +15,8 @@ PropertyEditor::PropertyEditor(Node* node, WatcherWidget* panel)
   mLayout->setContentsMargins(0, 0, 0, 0);
 
 	/// Node type
-	QLabel* typeLabel = new QLabel(ThePrototypes->GetNodeClassString(node), panel);
+  string& typeString = NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName;
+  QLabel* typeLabel = new QLabel(QString::fromStdString(typeString), panel);
 	typeLabel->setAlignment(Qt::AlignHCenter);
 	QFont font = typeLabel->font();
 	font.setBold(true);

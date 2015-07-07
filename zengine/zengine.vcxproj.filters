@@ -49,6 +49,12 @@
     <Filter Include="include\dom">
       <UniqueIdentifier>{bf1df60c-f0f1-4c16-a66d-75ab49cc7e57}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\serialize">
+      <UniqueIdentifier>{e77cd999-e36b-46af-9ad0-24fec5d9d254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\serialize\json">
+      <UniqueIdentifier>{34a15164-4fca-4b8a-9cac-5615b13662f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\shader2.txt">
@@ -128,6 +134,12 @@
     <ClInclude Include="include\dom\document.h">
       <Filter>include\dom</Filter>
     </ClInclude>
+    <ClInclude Include="source\serialize\json\jsonserializer.h">
+      <Filter>source\serialize\json</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\nodetype.h">
+      <Filter>include\dom</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -191,6 +203,12 @@
       <Filter>source\dom</Filter>
     </ClCompile>
     <ClCompile Include="source\dom\document.cpp">
+      <Filter>source\dom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\serialize\json\jsonserializer.cpp">
+      <Filter>source\serialize\json</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\nodetype.cpp">
       <Filter>source\dom</Filter>
     </ClCompile>
   </ItemGroup>

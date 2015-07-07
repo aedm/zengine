@@ -1,3 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
+
+#include "../serialize/json/jsonserializer.h"
 #include <include/base/helpers.h>
 #include <include/base/vectormath.h>
 #include <include/base/types.h>
@@ -63,3 +66,9 @@ namespace Convert {
     return sscanf(S, "%f", &F) != 1;
   }
 }
+
+string ToJSON(Document* document) {
+  JSONSerializer serialzer(document);
+  return serialzer.GetJSON();
+}
+

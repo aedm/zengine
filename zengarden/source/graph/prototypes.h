@@ -13,16 +13,16 @@ extern Prototypes* ThePrototypes;
 using namespace std;
 
 /// Unique identifier for all possible node types
-enum class NodeClass {
-  STATIC_FLOAT,
-  STATIC_VEC4,
-  STATIC_TEXTURE,
-  SHADER_STUB,
-  SHADER_SOURCE,
-  PASS,
-
-  UNKNOWN,
-};
+//enum class NodeClass {
+//  STATIC_FLOAT,
+//  STATIC_VEC4,
+//  STATIC_TEXTURE,
+//  SHADER_STUB,
+//  SHADER_SOURCE,
+//  PASS,
+//
+//  UNKNOWN,
+//};
 
 class Prototypes: public QObject {
   Q_OBJECT
@@ -36,16 +36,21 @@ public:
 
   Node* AskUser(QWidget* parent, QPoint position);
 
-  QString GetNodeClassString(Node* Nd);
-  NodeClass GetNodeClass(Node* Nd);
+  //QString GetNodeClassString(Node* Nd);
 
-  void AddPrototype(Node* node, NodeClass nodeClass);
-  void AddStub(ShaderStub* stub);
+  void AddPrototype(NodeClass* nodeClass);
+  void AddStub(OWNERSHIP ShaderStub* stub);
 
 private:
-  vector<Node*> mPrototypeNodes;
+  //vector<Node*> mPrototypeNodes;
+  struct Prototype {
+    NodeClass* mNodeClass;
+    Node* mNode;
+    string mName;
+  };
+  vector<Prototype> mPrototypes;
 
-  unordered_map<type_index, NodeClass> mNodeIndexMap;
+  unordered_map<type_index, NodeClass*> mNodeIndexMap;
 
   QDialog* mDialog;
 

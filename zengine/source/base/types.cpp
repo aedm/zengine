@@ -16,14 +16,6 @@ const int gVariableByteSizes[] = {
 };
 
 
-/// Array for attribute types
-const NodeType gVertexAttributeType[] = {
-#undef ITEM
-#define ITEM(name, type, token) type,
-  VERTEXATTRIBUTE_LIST
-};
-
-
 /// Array for attribute names
 const char* gVertexAttributeName[] = {
 #undef ITEM

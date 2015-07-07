@@ -61,7 +61,8 @@ void Watcher::MakeDisplayedName() {
     mDisplayedName = QString::fromStdString(node->GetName());
   } else {
     /// Just use the type as a name by default
-    mDisplayedName = ThePrototypes->GetNodeClassString(GetNode());
+    mDisplayedName = QString::fromStdString(
+      NodeRegistry::GetInstance()->GetNodeClass(GetNode())->mClassName);
     if (node->GetType() == NodeType::SHADER_STUB) {
       ShaderStub* stub = static_cast<ShaderStub*>(node);
       ShaderStubMetadata* metaData = stub->GetStubMetadata();
@@ -83,7 +84,7 @@ void Watcher::SetName(const string& name) {
 
 const string& Watcher::GetName() const {
   SHOULDNT_HAPPEN;
-  return string();
+  return Node::GetName();
 }
 
 void Watcher::SetPosition(const Vec2 position) {

@@ -18,54 +18,11 @@ class Texture;
 	ITEM(TEXTURE,		Texture*,	"texture"	) \
 
 
-/// Possible node types
-enum class NodeType
-{
-	/// Node types holding a value type
-	#undef ITEM
-	#define ITEM(name, type, token) name,
-	VALUETYPE_LIST
-
-	/// Other node types 
-	SHADER,
-	SHADER_SOURCE,
-	SHADER_STUB,
-	PASS,
-	MATERIAL,
-	MODEL,
-	MESH,
-	DRAWABLE,
-
-	/// Empty stub value type
-	NONE,
-
-	/// Editor nodes
-	UI,
-	WIDGET,
-	GRAPH,
-	DOCUMENT,
-
-	/// Slot type that allows all node connections
-	ALLOW_ALL,
-
-	/// Undefined behavior
-	UNDEFINED
-};
-
 /// Variable sizes in bytes, indexed by NodeType (only VALUETYPE_LIST names)
 extern const int gVariableByteSizes[];
 
-/// Variable names, indexed by NodeType (only VALUETYPE_LIST names)
-//extern const char* gVariableNames[];
-
 
 /// Type helpers
-template<NodeType T> struct NodeTypes;
-#undef ITEM
-#define ITEM(name, type, token) \
-  template<> struct NodeTypes<NodeType::name> { typedef type Type; };
-VALUETYPE_LIST
-
 #undef ITEM
 #define ITEM(name, type, token) typedef type name##_TYPE;
 VALUETYPE_LIST
@@ -89,9 +46,6 @@ enum class VertexAttributeUsage
 	/// Number of possible vertex attributes
 	COUNT
 };
-
-/// Array for attribute types, index by VertexAttributeEnum
-extern const NodeType gVertexAttributeType[];
 
 /// Array for attribute names, index by VertexAttributeEnum
 extern const char* gVertexAttributeName[];

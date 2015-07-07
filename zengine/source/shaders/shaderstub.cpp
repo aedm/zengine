@@ -4,6 +4,8 @@
 #include <include/shaders/shadersource2.h>
 #include <include/nodes/valuenodes.h>
 
+REGISTER_NODECLASS(ShaderStub);
+
 const EnumMapperA GlobalUniformMapper[] = {
 #undef ITEM
 #define ITEM(name, type, token) { "g" MAGIC(token), (UINT)ShaderGlobalType::name },
@@ -24,11 +26,10 @@ const int GlobalUniformOffsets[] = {
   GLOBALUSAGE_LIST
 };
 
-ShaderStub::ShaderStub(const string& source)
+ShaderStub::ShaderStub()
   : Node(NodeType::SHADER_STUB)
   , mMetadata(nullptr)
   , mShaderSrc(nullptr) {
-  SetStubSource(source);
 }
 
 ShaderStub::ShaderStub(const ShaderStub& original)

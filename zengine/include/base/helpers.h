@@ -17,6 +17,7 @@
 
 /// Logging facility 
 
+class Document;
 class Logger;
 extern Logger* TheLogger;
 
@@ -121,3 +122,5 @@ namespace Convert {
   string IntToSring(int value);
   bool StringToFloat(const char* s, float& f);
 }
+
+string ToJSON(Document* document);

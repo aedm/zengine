@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../base/types.h"
+#include "nodetype.h"
 #include "../base/vectormath.h"
 #include "../base/fastdelegate.h"
 #include "../base/helpers.h"

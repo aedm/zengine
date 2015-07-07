@@ -89,7 +89,7 @@ struct ShaderStubMetadata {
 
 class ShaderStub: public Node {
 public:
-  ShaderStub(const string& source);
+  ShaderStub();
   ShaderStub(const ShaderStub& original);
   virtual ~ShaderStub();
 

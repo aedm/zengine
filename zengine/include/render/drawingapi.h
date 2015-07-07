@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../base/defines.h"
-#include "../base/types.h"
+#include "../dom/nodetype.h"
 #include <vector>
 #include <string>
 

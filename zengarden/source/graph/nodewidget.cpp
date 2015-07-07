@@ -157,7 +157,8 @@ void NodeWidget::HandleTitleChange()
     text = QString::fromStdString(node->GetName());
   } else {
     /// Just use the type as a name by default
-    text = ThePrototypes->GetNodeClassString(GetNode());
+    text = QString::fromStdString(
+      NodeRegistry::GetInstance()->GetNodeClass(GetNode())->mClassName);
     if (node->GetType() == NodeType::SHADER_STUB) {
       ShaderStub* stub = static_cast<ShaderStub*>(node);
       ShaderStubMetadata* metaData = stub->GetStubMetadata();

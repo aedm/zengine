@@ -5,6 +5,7 @@
 
 #include "base/helpers.h"
 
+#include "dom/nodetype.h"
 #include "dom/node.h"
 #include "dom/graph.h"
 #include "dom/document.h"

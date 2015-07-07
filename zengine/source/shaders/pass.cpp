@@ -3,6 +3,8 @@
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
+REGISTER_NODECLASS(Pass);
+
 Pass::Pass()
   : Node(NodeType::PASS)
   , mVertexStub(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
