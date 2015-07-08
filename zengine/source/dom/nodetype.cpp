@@ -23,25 +23,15 @@ NodeRegistry* NodeRegistry::GetInstance() {
   return sInstance;
 }
 
+
 NodeClass* NodeRegistry::GetNodeClass(const string& name) {
-  return mNodeClassesByName.at(name);
-}
-
-
-NodeClass* NodeRegistry::TryGetNodeClass(const string& name) {
   auto it = mNodeClassesByName.find(name);
   return it == mNodeClassesByName.end() ? nullptr : it->second;
 }
 
 
 NodeClass* NodeRegistry::GetNodeClass(Node* node) {
+  /// If this breaks, you forgot to REGISTER_NODECLASS.
   return mNodeIndexMap.at(type_index(typeid(*node)));
-  //try {
-  //  //const type_info& tid = typeid(*node);
-  //  //auto tin = type_index(tid);
-  //  return mNodeIndexMap.at(type_index(typeid(*node)));
-  //} catch (out_of_range ex) {
-  //  return nullptr;
-  //}
 }
 

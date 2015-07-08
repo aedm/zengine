@@ -104,6 +104,9 @@ public:
   /// Sets the value of the built-in Node.
   void SetDefaultValue(const ValueType& value);
 
+  /// Gets the default value
+  const ValueType& GetDefaultValue();
+
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
   virtual bool Connect(Node* node) override;
@@ -114,13 +117,12 @@ public:
   virtual void DisconnectAll(bool notifyOwner) override;
 
   /// Returns true if slot is connected to its own default node
-  bool IsDefaulted();
+  virtual bool IsDefaulted() override;
 
 protected:
   /// Default value
   StaticValueNode<T> mDefault;
 };
-
 
 template<NodeType T>
 ValueSlot<T>::ValueSlot(Node* owner, SharedString name)
@@ -141,6 +143,12 @@ void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
   ASSERT(IsDefaulted());
   mDefault.Set(value);
   mOwner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
+}
+
+
+template<NodeType T>
+const typename ValueSlot<T>::ValueType& ValueSlot<T>::GetDefaultValue() {
+  return mDefault.Get();
 }
 
 

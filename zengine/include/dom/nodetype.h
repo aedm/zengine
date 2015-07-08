@@ -7,6 +7,7 @@
 
 using namespace std;
 class Node;
+class Slot;
 
 /// Possible node types
 enum class NodeType {
@@ -60,6 +61,11 @@ bool IsInstanceOf(Node* node) {
   return typeid(T) == typeid(*node);
 }
 
+template<class T>
+bool IsInstanceOf(Slot* slot) {
+  return typeid(T) == typeid(*slot);
+}
+
 
 /// Exact type of the node. Poor man's reflection.
 struct NodeClass {
@@ -96,11 +102,8 @@ public:
 
   template<class T> void Register(NodeClass* nodeClass);
 
-  /// Returns NodeClass by name, node name must be registered
-  NodeClass* GetNodeClass(const string& name);
-
   /// Returns NodeClass by name, node name doesn't have to be registered
-  NodeClass* TryGetNodeClass(const string& name);
+  NodeClass* GetNodeClass(const string& name);
 
   /// Returns NodeClass by node instance. Node must be registered
   NodeClass* GetNodeClass(Node* node);
@@ -124,6 +127,7 @@ void NodeRegistry::Register(NodeClass* nodeClass) {
 
 template<class T>
 NodeClass* NodeRegistry::GetNodeClass() {
+  /// If this breaks, you forgot to REGISTER_NODECLASS.
   return mNodeIndexMap.at(type_index(typeid(T)));
 }
 

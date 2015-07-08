@@ -137,6 +137,11 @@ bool Slot::DoesAcceptType(NodeType type) const {
   return mType == NodeType::ALLOW_ALL || type == mType;
 }
 
+bool Slot::IsDefaulted() {
+  /// Plain slots don't have default values, only ValueSlots
+  return false;
+}
+
 
 Node::Node(NodeType type)
   : mType(type) 

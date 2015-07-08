@@ -82,6 +82,9 @@ public:
   /// Return the Nth connected node from a multislot
   Node* operator[] (UINT index);
 
+  /// Returns true if slot is connected to its own default node (if it has one)
+  virtual bool IsDefaulted();
+
 protected:
   /// The slot is connected to this node (nullptr if multislot)
   Node* mNode;

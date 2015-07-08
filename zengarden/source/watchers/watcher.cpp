@@ -56,7 +56,9 @@ GLWidget* Watcher::GetGLWidget() {
 
 void Watcher::MakeDisplayedName() {
   Node* node = GetNode();
-  if (!node->GetName().empty()) {
+  if (node == nullptr) {
+    mDisplayedName = QString();
+  } else if (!node->GetName().empty()) {
     /// Node has a name, use that.
     mDisplayedName = QString::fromStdString(node->GetName());
   } else {

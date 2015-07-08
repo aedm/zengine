@@ -58,6 +58,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\components\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RAPIDJSON_HAS_STDSTRING;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

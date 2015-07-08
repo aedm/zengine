@@ -191,8 +191,14 @@ Texture* ZenGarden::CreateSampleTexture() {
 }
 
 void ZenGarden::SaveAs() {
+  INFO("Saving document...");
+  QTime myTimer;
+  myTimer.start();
   string json = ToJSON(mDocument);
   QFile file("sample.zen");
   file.open(QIODevice::WriteOnly);
   file.write(json.c_str());
+
+  int milliseconds = myTimer.elapsed();
+  INFO("Document saved in %.3f seconds.", float(milliseconds) / 1000.0f);
 }
