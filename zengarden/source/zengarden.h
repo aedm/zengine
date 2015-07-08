@@ -8,6 +8,8 @@
 #include "watchers/logwatcher.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
+#include <QtCore/QTime>
+
 
 class ZenGarden: public QMainWindow {
   Q_OBJECT
@@ -41,10 +43,14 @@ private:
   WatcherWidget* mPropertyWatcher;
   QBoxLayout* mPropertyLayout;
 
+  QTime mTime;
+
 private slots:
   void InitModules();
   void DisposeModules();
   void NewGraph();
+
+  void UpdateTimeNode();
 
   void SaveAs();
 };

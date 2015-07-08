@@ -9,7 +9,6 @@
 #include "nodes/stubloader.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
-#include <QtCore/QTime>
 #include <QtCore/QDir>
 
 
@@ -35,6 +34,9 @@ void ZenGarden::InitModules() {
   mLogWatcher = new LogWatcher(this);
   mUI.leftPanel->addTab(mLogWatcher, "Log");
   mPropertyLayout = new QVBoxLayout(mUI.propertyPanel);
+
+  mTime.start();
+  QTimer::singleShot(0, this, SLOT(UpdateTimeNode()));
 
   /// Set palette
   QPalette pal = mUI.dummy->palette();
@@ -201,4 +203,9 @@ void ZenGarden::SaveAs() {
 
   int milliseconds = myTimer.elapsed();
   INFO("Document saved in %.3f seconds.", float(milliseconds) / 1000.0f);
+}
+
+void ZenGarden::UpdateTimeNode() {
+  TimeNode::OnTimeChanged(float(mTime.elapsed()) / 1000.0f);
+  QTimer::singleShot(10, this, SLOT(UpdateTimeNode()));
 }

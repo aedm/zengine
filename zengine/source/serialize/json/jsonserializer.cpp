@@ -20,8 +20,9 @@ JSONSerializer::JSONSerializer(Node* root) {
 
 string JSONSerializer::GetJSON() {
   rapidjson::StringBuffer buffer;
-  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-  writer.SetIndent(' ', 2);
+  //rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+  //writer.SetIndent(' ', 2);
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   mJsonDocument.Accept(writer);
   return buffer.GetString();
 }

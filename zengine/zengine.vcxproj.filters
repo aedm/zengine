@@ -140,6 +140,9 @@
     <ClInclude Include="include\dom\nodetype.h">
       <Filter>include\dom</Filter>
     </ClInclude>
+    <ClInclude Include="include\nodes\timenode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -210,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="source\dom\nodetype.cpp">
       <Filter>source\dom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\timenode.cpp">
+      <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

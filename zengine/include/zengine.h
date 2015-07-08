@@ -21,6 +21,7 @@
 #include "nodes/drawable.h"
 #include "nodes/valuenodes.h"
 #include "nodes/meshnode.h"
+#include "nodes/timenode.h"
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();
