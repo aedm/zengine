@@ -1,1 +1,96 @@
-{"nodes":[{"node":"Document","id":1,"slots":{"graphs":[2]}},{"node":"Graph","id":2,"slots":{"nodes":[3,4,7,5,6,8,9]}},{"node":"ShaderStub","id":3,"slots":{}},{"node":"Pass","id":4,"slots":{"Fragment shader":5,"Vertex shader":6}},{"node":"ShaderStub","id":5,"slots":{"Color":3}},{"node":"ShaderStub","id":6},{"node":"TimeNode","id":7},{"node":"FloatNode","id":8},{"node":"TextureNode","id":9}]}
+{
+  "nodes": [
+    {
+      "node": "Document",
+      "id": 1,
+      "slots": {
+        "graphs": [
+          2
+        ]
+      }
+    },
+    {
+      "node": "Graph",
+      "id": 2,
+      "slots": {
+        "nodes": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "node": "FloatNode",
+      "id": 3,
+      "position": {
+        "x": 10.0,
+        "y": 146.0
+      },
+      "value": -0.8712121248245239
+    },
+    {
+      "node": "ShaderStub",
+      "id": 4,
+      "position": {
+        "x": 200.0,
+        "y": 370.0
+      },
+      "slots": {
+        "R": {
+          "default": 0.0,
+          "id": 3
+        },
+        "G": {
+          "default": 0.5151515007019043
+        },
+        "B": {
+          "default": 0.7878788113594055
+        },
+        "A": {
+          "default": 0.0
+        }
+      }
+    },
+    {
+      "node": "ShaderStub",
+      "id": 5,
+      "position": {
+        "x": 150.0,
+        "y": 150.0
+      },
+      "slots": {}
+    },
+    {
+      "node": "ShaderStub",
+      "id": 6,
+      "position": {
+        "x": 150.0,
+        "y": 250.0
+      }
+    },
+    {
+      "node": "Pass",
+      "id": 7,
+      "position": {
+        "x": 280.0,
+        "y": 200.0
+      },
+      "slots": {
+        "Fragment shader": 5,
+        "Vertex shader": 6
+      }
+    },
+    {
+      "node": "TextureNode",
+      "id": 8,
+      "position": {
+        "x": 20.0,
+        "y": 250.0
+      }
+    }
+  ]
+}
