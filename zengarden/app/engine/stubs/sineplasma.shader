@@ -1,4 +1,4 @@
-:name "Sine plasma"
+:name "sine plasma"
 :returns float
 
 :param float FreqX

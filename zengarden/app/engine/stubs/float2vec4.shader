@@ -1,4 +1,4 @@
-:name "float -> vec4"
+:name "float to vec4"
 :returns vec4
 
 :param float A

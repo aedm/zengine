@@ -1,4 +1,4 @@
-:name "Multiply"
+:name "multiply"
 :returns float
 
 :param float A

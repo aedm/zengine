@@ -1,4 +1,4 @@
-:name "Custom Sampler"
+:name "sampler"
 :returns vec4
 
 :param sampler2D Texture

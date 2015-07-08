@@ -1,4 +1,4 @@
-:name "Sine Distort"
+:name "sine distort"
 :returns vec2
 
 :param float FreqX

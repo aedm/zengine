@@ -1,4 +1,4 @@
-:name "Default Sampler"
+:name "sampler (def)"
 :returns vec4
 
 :param sampler2D Texture

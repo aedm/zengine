@@ -1,4 +1,4 @@
-:name "Add float"
+:name "add"
 :returns float
 
 :param float A

@@ -1,4 +1,4 @@
-:name "Sine"
+:name "sine"
 :returns float
 
 :param float Angle
