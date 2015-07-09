@@ -145,7 +145,7 @@ void FloatWatcher::SliderValueChanged(float value) {
 void FloatWatcher::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED: {
-      float value = static_cast<ValueNode<NodeType::FLOAT>*>(slot->GetNode())->Get();
+      float value = static_cast<FloatSlot*>(slot)->Get();
       mSlider->Set(value);
       if (mAllowTextboxValueChanges) SetTextBoxValue(value);
       break;

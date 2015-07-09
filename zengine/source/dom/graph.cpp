@@ -1,6 +1,6 @@
 #include <include/dom/graph.h>
 
-REGISTER_NODECLASS(Graph);
+REGISTER_NODECLASS(Graph, "Graph");
 
 static SharedString NodesSlotName = make_shared<string>("nodes");
 

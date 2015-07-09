@@ -65,7 +65,8 @@ public:
   void ChangeNodeIndex(Node* node, UINT targetIndex);
 
   /// Returns connected node (errorlog & nullptr if multislot)
-  Node* GetNode() const;
+  /// Subclasses of Slot have a properly typed GetNode() method.
+  Node* GetAbstractNode() const;
 
   /// Returns all connected nodes (only for multislot)
   const vector<Node*>& GetMultiNodes() const;
@@ -183,3 +184,15 @@ private:
 
 
 
+/// Typed slot macro, syntactic sugar. Unfortunately template parameters can't
+/// be used as method name parts, so this is a macro instead.
+/// Use it like: typedef TypedSlot<NodeType::MESH, MeshNode> MeshSlot;
+/// Then: MeshNode* node = meshSlot->GetMeshNode();
+template<NodeType T, class N>
+class TypedSlot: public Slot {
+public:
+  TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,          
+            bool autoAddToSlotList = true)                                    
+            : Slot(T, owner, name, isMultiSlot, autoAddToSlotList) {}     
+  N* GetNode() { return static_cast<N*>(GetAbstractNode()); } 
+};

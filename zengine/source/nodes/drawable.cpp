@@ -1,17 +1,20 @@
 #include <include/nodes/drawable.h>
 
+static SharedString MaterialSlotName = make_shared<string>("Material");
+static SharedString MeshSlotName = make_shared<string>("Mesh");
 
 Drawable::Drawable()
   : Node(NodeType::PASS)
-  , mMesh(this, make_shared<string>("Mesh"))
-  , mMaterial(NodeType::MATERIAL, this, make_shared<string>("Material")) {}
+  , mMesh(this, MeshSlotName)
+  , mMaterial(this, MaterialSlotName) 
+{}
 
 Drawable::~Drawable() {}
 
 void Drawable::Draw(Globals* globals, PrimitiveTypeEnum Primitive) {
   if (!mIsProperlyConnected) return;
-  Material* material = static_cast<Material*>(mMaterial.GetNode());
-  const Mesh* mesh = mMesh.GetMesh();
+  Material* material = mMaterial.GetNode();
+  const Mesh* mesh = mMesh.GetNode()->GetMesh();
 
   /// Set pass (pipeline state)
   Pass* pass = material->GetPass();

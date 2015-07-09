@@ -3,14 +3,17 @@
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
-REGISTER_NODECLASS(Pass);
+REGISTER_NODECLASS(Pass, "Pass");
+
+static SharedString VertesStubSlotName = make_shared<string>("Vertex shader");
+static SharedString FragmentStubSlotName = make_shared<string>("Fragment shader");
 
 Pass::Pass()
   : Node(NodeType::PASS)
-  , mVertexStub(NodeType::SHADER_STUB, this, make_shared<string>("Vertex shader"))
-  , mFragmentStub(NodeType::SHADER_STUB, this, make_shared<string>("Fragment shader"))
-  , mVertexSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
-  , mFragmentSource(NodeType::SHADER_SOURCE, this, nullptr, false, false)
+  , mVertexStub(this, VertesStubSlotName)
+  , mFragmentStub(this, FragmentStubSlotName)
+  , mVertexSource(this, nullptr, false, false)
+  , mFragmentSource(this, nullptr, false, false)
   , mHandle(-1) 
 {}
 
@@ -24,15 +27,13 @@ void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
         if (mVertexStub.GetNode() == nullptr) {
           mVertexSource.Connect(nullptr);
         } else {
-          mVertexSource.Connect(static_cast<ShaderStub*>(
-            mVertexStub.GetNode())->GetShaderSource());
+          mVertexSource.Connect(mVertexStub.GetNode()->GetShaderSource());
         }
       } else if (slot == &mFragmentStub) {
         if (mFragmentStub.GetNode() == nullptr) {
           mFragmentSource.Connect(nullptr);
         } else {
-          mFragmentSource.Connect(static_cast<ShaderStub*>(
-            mFragmentStub.GetNode())->GetShaderSource());
+          mFragmentSource.Connect(mFragmentStub.GetNode()->GetShaderSource());
         }
       } else if (slot == &mVertexSource || slot == &mFragmentSource) {
         BuildRenderPipeline();
@@ -54,8 +55,8 @@ void Pass::BuildRenderPipeline() {
   /// TODO: delete previous handle
   mHandle = -1;
 
-  ShaderSource2* vertex = static_cast<ShaderSource2*>(mVertexSource.GetNode());
-  ShaderSource2* fragment = static_cast<ShaderSource2*>(mFragmentSource.GetNode());
+  ShaderSource2* vertex = mVertexSource.GetNode();
+  ShaderSource2* fragment = mFragmentSource.GetNode();
   if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
       fragment == nullptr || fragment->GetMetadata() == nullptr) {
     return;

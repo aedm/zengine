@@ -6,6 +6,11 @@ MeshNode::MeshNode()
   : Node(NodeType::MESH) {}
 
 
+Mesh* MeshNode::GetMesh() const {
+  return mMesh;
+}
+
+
 StaticMeshNode::StaticMeshNode()
   : MeshNode() {}
 
@@ -22,16 +27,3 @@ StaticMeshNode* StaticMeshNode::Create(OWNERSHIP Mesh* mesh) {
 }
 
 
-MeshSlot::MeshSlot(Node* owner, SharedString name)
-  : Slot(NodeType::MESH, owner, name) {}
-
-
-const Mesh* MeshSlot::GetMesh() const {
-  MeshNode* node = static_cast<MeshNode*>(GetNode());
-  return node == nullptr ? nullptr : node->GetMesh();
-}
-
-
-Mesh* MeshNode::GetMesh() const {
-  return mMesh;
-}

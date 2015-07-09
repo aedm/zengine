@@ -2,9 +2,11 @@
 #include "shadersourcebuilder.h"
 #include <include/shaders/shaderstub.h>
 
+static SharedString StubSlotName = make_shared<string>("Stub");
+
 ShaderSource2::ShaderSource2()
   : Node(NodeType::SHADER_SOURCE)
-  , mStub(NodeType::SHADER_STUB, this, make_shared<string>("Stub"))
+  , mStub(this, StubSlotName)
   , metadata(nullptr) {}
 
 
@@ -29,7 +31,7 @@ void ShaderSource2::HandleMessage(Slot* slot, NodeMessage message, const void* p
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
       if (slot == &mStub) {
-        ShaderSourceBuilder::FromStub(static_cast<ShaderStub*>(mStub.GetNode()), this);
+        ShaderSourceBuilder::FromStub(mStub.GetNode(), this);
         SendMsg(NodeMessage::VALUE_CHANGED, nullptr);
       }
       break;

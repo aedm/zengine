@@ -23,8 +23,8 @@ public:
 
   virtual Node* Clone() const override;
 
-  Slot mFragmentStub;
-  Slot mVertexStub;
+  StubSlot mFragmentStub;
+  StubSlot mVertexStub;
 
   void Set(Globals* globals);
 
@@ -40,8 +40,8 @@ public:
 
 protected:
   /// automatic slots
-  Slot mFragmentSource;
-  Slot mVertexSource;
+  ShaderSourceSlot mFragmentSource;
+  ShaderSourceSlot mVertexSource;
 
   virtual void HandleMessage(Slot* slot, NodeMessage message, 
                              const void* payload) override;
@@ -53,3 +53,5 @@ protected:
   vector<PassUniform>	mSamplers;
   vector<ShaderAttributeDesc> mAttributes;
 };
+
+typedef TypedSlot<NodeType::PASS, Pass> PassSlot;

@@ -1,6 +1,6 @@
 #include <include/nodes/timenode.h>
 
-REGISTER_NODECLASS(TimeNode);
+REGISTER_NODECLASS(TimeNode, "Time");
 
 Event<float> TimeNode::OnTimeChanged;
 

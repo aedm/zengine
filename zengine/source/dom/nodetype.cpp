@@ -1,10 +1,10 @@
 #include <include/dom/nodetype.h>
 #include <include/nodes/valuenodes.h>
 
-REGISTER_NODECLASS(FloatNode);
-REGISTER_NODECLASS(Vec4Node);
-REGISTER_NODECLASS(Matrix4Node);
-REGISTER_NODECLASS(TextureNode);
+REGISTER_NODECLASS(FloatNode, "Float");
+REGISTER_NODECLASS(Vec4Node, "Vec4");
+REGISTER_NODECLASS(Matrix4Node, "Matrix4");
+REGISTER_NODECLASS(TextureNode, "Texture");
 
 
 /// Array for attribute types

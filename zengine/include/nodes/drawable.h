@@ -9,7 +9,7 @@ public:
   virtual ~Drawable();
 
   MeshSlot mMesh;
-  Slot mMaterial;
+  MaterialSlot mMaterial;
 
   void Draw(Globals* globals, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
 };

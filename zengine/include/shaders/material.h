@@ -7,10 +7,12 @@ public:
   Material();
   virtual ~Material();
 
-  Slot mSolidPass;
+  PassSlot mSolidPass;
 
   Pass* GetPass();
 
 protected:
   virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);
 };
+
+typedef TypedSlot<NodeType::MATERIAL, Material> MaterialSlot;

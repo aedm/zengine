@@ -46,7 +46,7 @@ public:
   virtual Node* Clone() const override;
   const string& GetSource() const;
   const ShaderSourceMetadata* GetMetadata() const;
-  Slot mStub;
+  StubSlot mStub;
 
 protected:
   friend class ShaderSourceBuilder;
@@ -57,4 +57,6 @@ protected:
   ShaderSourceMetadata* metadata;
   string mSource;
 };
+
+typedef TypedSlot<NodeType::SHADER_SOURCE, ShaderSource2> ShaderSourceSlot;
 

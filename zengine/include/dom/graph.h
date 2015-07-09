@@ -8,3 +8,5 @@ public:
 
   Slot mNodes;
 };
+
+typedef TypedSlot<NodeType::GRAPH, Graph> GraphSlot;

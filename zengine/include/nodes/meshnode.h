@@ -4,14 +4,6 @@
 #include "../resources/mesh.h"
 #include "../nodes/valuenodes.h"
 
-class MeshSlot: public Slot {
-public:
-  MeshSlot(Node* owner, SharedString name);
-
-  const Mesh*	GetMesh() const;
-};
-
-
 /// Abstract Mesh node.
 class MeshNode: public Node {
 public:
@@ -22,6 +14,8 @@ public:
 protected:
   Mesh*	mMesh;
 };
+
+typedef TypedSlot<NodeType::MESH, MeshNode> MeshSlot;
 
 
 /// A simple static mesh container.

@@ -4,7 +4,7 @@
 #include <include/shaders/shadersource2.h>
 #include <include/nodes/valuenodes.h>
 
-REGISTER_NODECLASS(ShaderStub);
+REGISTER_NODECLASS(ShaderStub, "Stub");
 
 const EnumMapperA GlobalUniformMapper[] = {
 #undef ITEM

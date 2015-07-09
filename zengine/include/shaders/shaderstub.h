@@ -122,4 +122,5 @@ protected:
   map<string, Slot*> mParameterNameSlotMap;
 };
 
+typedef TypedSlot<NodeType::SHADER_STUB, ShaderStub> StubSlot;
 

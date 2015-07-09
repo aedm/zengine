@@ -17,80 +17,200 @@
           3,
           4,
           5,
-          6,
+          9,
+          10,
+          8,
+          11,
+          12,
           7,
-          8
+          6,
+          15,
+          13,
+          14
         ]
       }
     },
     {
-      "node": "FloatNode",
+      "node": "ShaderStub",
       "id": 3,
       "position": {
-        "x": 10.0,
-        "y": 146.0
-      },
-      "value": -0.8712121248245239
-    },
-    {
-      "node": "ShaderStub",
-      "id": 4,
-      "position": {
-        "x": 200.0,
-        "y": 370.0
+        "x": 155.0,
+        "y": 211.0
       },
       "slots": {
-        "R": {
+        "A": {
           "default": 0.0,
-          "id": 3
-        },
-        "G": {
-          "default": 0.5151515007019043
+          "id": 4
         },
         "B": {
-          "default": 0.7878788113594055
-        },
-        "A": {
-          "default": 0.0
+          "default": 0.3787878751754761
         }
+      }
+    },
+    {
+      "node": "TimeNode",
+      "id": 4,
+      "position": {
+        "x": 31.0,
+        "y": 193.0
       }
     },
     {
       "node": "ShaderStub",
       "id": 5,
       "position": {
-        "x": 150.0,
-        "y": 150.0
+        "x": 521.0,
+        "y": 85.0
       },
-      "slots": {}
+      "slots": {
+        "R": {
+          "default": 1.3484848737716675,
+          "id": 6
+        },
+        "G": {
+          "default": 0.39393940567970278
+        },
+        "B": {
+          "default": 0.469696968793869
+        },
+        "A": {
+          "default": 0.7121211886405945
+        }
+      }
     },
     {
       "node": "ShaderStub",
       "id": 6,
       "position": {
-        "x": 150.0,
-        "y": 250.0
-      }
-    },
-    {
-      "node": "Pass",
-      "id": 7,
-      "position": {
-        "x": 280.0,
-        "y": 200.0
+        "x": 367.0,
+        "y": 235.0
       },
       "slots": {
-        "Fragment shader": 5,
-        "Vertex shader": 6
+        "Texture": 7,
+        "TexCoord": 8
       }
     },
     {
       "node": "TextureNode",
+      "id": 7,
+      "position": {
+        "x": 318.0,
+        "y": 154.0
+      }
+    },
+    {
+      "node": "ShaderStub",
       "id": 8,
       "position": {
-        "x": 20.0,
-        "y": 250.0
+        "x": 375.0,
+        "y": 359.0
+      },
+      "slots": {
+        "FreqX": {
+          "default": 1.0
+        },
+        "FreqY": {
+          "default": 1.0
+        },
+        "PhaseX": {
+          "default": 0.0,
+          "id": 9
+        },
+        "PhaseY": {
+          "default": 0.0
+        },
+        "AmpX": {
+          "default": 0.6060000061988831,
+          "id": 9
+        },
+        "AmpY": {
+          "default": 0.3636363744735718,
+          "id": 9
+        },
+        "Coord": 11
       }
+    },
+    {
+      "node": "ShaderStub",
+      "id": 9,
+      "position": {
+        "x": 213.0,
+        "y": 421.0
+      },
+      "slots": {
+        "X": {
+          "default": 0.0,
+          "id": 10
+        },
+        "Multiply": {
+          "default": 0.4545454680919647
+        },
+        "Add": {
+          "default": 0.0
+        }
+      }
+    },
+    {
+      "node": "ShaderStub",
+      "id": 10,
+      "position": {
+        "x": 85.0,
+        "y": 373.0
+      },
+      "slots": {
+        "Angle": {
+          "default": 0.5303030014038086,
+          "id": 3
+        }
+      }
+    },
+    {
+      "node": "ShaderStub",
+      "id": 11,
+      "position": {
+        "x": 317.0,
+        "y": 563.0
+      }
+    },
+    {
+      "node": "Pass",
+      "id": 12,
+      "position": {
+        "x": 650.0,
+        "y": 338.0
+      },
+      "slots": {
+        "Fragment shader": 13,
+        "Vertex shader": 14
+      }
+    },
+    {
+      "node": "ShaderStub",
+      "id": 13,
+      "position": {
+        "x": 522.0,
+        "y": 290.0
+      },
+      "slots": {
+        "Color": 5
+      }
+    },
+    {
+      "node": "ShaderStub",
+      "id": 14,
+      "position": {
+        "x": 522.0,
+        "y": 390.0
+      }
+    },
+    {
+      "node": "FloatNode",
+      "id": 15,
+      "position": {
+        "x": 26.0,
+        "y": 62.0
+      },
+      "value": 0.0
     }
   ]
 }

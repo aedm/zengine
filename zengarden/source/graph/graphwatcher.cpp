@@ -51,7 +51,7 @@ void GraphWatcher::Paint(GLWidget*) {
     NodeWidget* ndWidget = mWidgetMap.at(node);
     for (int i = 0; i < ndWidget->mWidgetSlots.size(); i++) {
       Slot* slot = ndWidget->mWidgetSlots[i]->mSlot;
-      Node* connectedOp = slot->GetNode();
+      Node* connectedOp = slot->GetAbstractNode();
       if (connectedOp) {
         NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);
         if (connectedOpWidget != NULL) {
@@ -298,7 +298,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
     if (mHoveredSlotIndex >= 0) {
       /// Remove connection
       Slot* slot = mHoveredWidget->GetNode()->mSlots[mHoveredSlotIndex];
-      if (slot->GetNode()) {
+      if (slot->GetAbstractNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
     }

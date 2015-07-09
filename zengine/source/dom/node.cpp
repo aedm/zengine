@@ -88,7 +88,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
 }
 
 
-Node* Slot::GetNode() const {
+Node* Slot::GetAbstractNode() const {
   ASSERT(!mIsMultiSlot);
   return mNode;
 }
@@ -212,7 +212,7 @@ void Node::ReceiveMessage(Slot* slot, NodeMessage message, const void* payload) 
 void Node::CheckConnections() {
   for(Slot* slot : mSlots) {
     /// TODO: handle multislots
-    if (!slot->mIsMultiSlot && slot->GetNode() == NULL) {
+    if (!slot->mIsMultiSlot && slot->GetAbstractNode() == NULL) {
       mIsProperlyConnected = false;
       return;
     }
@@ -224,7 +224,7 @@ void Node::CheckConnections() {
 void Node::Evaluate() {
   if (mIsDirty && mIsProperlyConnected) {
     for(Slot* slot : mSlots) {
-      slot->GetNode()->Evaluate();
+      slot->GetAbstractNode()->Evaluate();
     }
     Operate();
     mIsDirty = false;

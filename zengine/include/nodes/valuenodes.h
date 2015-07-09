@@ -124,6 +124,7 @@ protected:
   StaticValueNode<T> mDefault;
 };
 
+
 template<NodeType T>
 ValueSlot<T>::ValueSlot(Node* owner, SharedString name)
   : Slot(T, owner, name) {
@@ -134,7 +135,8 @@ ValueSlot<T>::ValueSlot(Node* owner, SharedString name)
 
 template<NodeType T>
 const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const {
-  return static_cast<ValueNode<T>*>(GetNode())->Get();
+  ASSERT(GetAbstractNode()->GetType() == T)
+  return static_cast<ValueNode<T>*>(GetAbstractNode())->Get();
 }
 
 
@@ -196,7 +198,7 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
 
 template<NodeType T>
 bool ValueSlot<T>::IsDefaulted() {
-  return GetNode() == &mDefault;
+  return GetAbstractNode() == &mDefault;
 }
 
 

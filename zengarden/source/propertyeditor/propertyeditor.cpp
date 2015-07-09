@@ -51,13 +51,14 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
 {
     /// Slots
     for (Slot* slot : GetNode()->mSlots) {
+      /// TODO: use dynamic_cast
       if (slot->DoesAcceptType(NodeType::FLOAT) && 
-          slot->GetNode()->GetType() != NodeType::SHADER_STUB) {
+          slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
         /// Float slots
         WatcherWidget* widget =
           new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
         FloatWatcher* watcher = new FloatWatcher(
-          static_cast<ValueNode<NodeType::FLOAT>*>(slot->GetNode()), widget,
+          static_cast<FloatNode*>(slot->GetAbstractNode()), widget,
           QString::fromStdString(*slot->GetName()));
 
         if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
@@ -82,10 +83,10 @@ void DefaultPropertyEditor::HandleSniffedMessage(Slot* slot, NodeMessage message
       auto it = mSlotWatchers.find(slot);
       if (it != mSlotWatchers.end()) {
         Watcher* watcher = it->second;
-        if (slot->GetNode()->GetType() == NodeType::SHADER_STUB) {
+        if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
           watcher->ChangeNode(nullptr);
         } else {
-          watcher->ChangeNode(slot->GetNode());
+          watcher->ChangeNode(slot->GetAbstractNode());
           if (slot->DoesAcceptType(NodeType::FLOAT)) {
             bool defaulted = static_cast<FloatSlot*>(slot)->IsDefaulted();
             static_cast<FloatWatcher*>(watcher)->SetReadOnly(!defaulted);

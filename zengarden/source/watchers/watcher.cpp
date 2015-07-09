@@ -21,20 +21,22 @@ void Watcher::SniffMessage(Slot* slot, NodeMessage message, const void* payload)
 }
 
 Watcher::~Watcher() {
-  if (mWatchedNode.GetNode()) {
-    mWatchedNode.GetNode()->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+  if (mWatchedNode.GetAbstractNode()) {
+    mWatchedNode.GetAbstractNode()->onMessageReceived -= 
+      Delegate(this, &Watcher::SniffMessage);
   }
 }
 
 void Watcher::HandleSniffedMessage(Slot*, NodeMessage, const void*) {}
 
 Node* Watcher::GetNode() {
-  return mWatchedNode.GetNode();
+  return mWatchedNode.GetAbstractNode();
 }
 
 void Watcher::ChangeNode(Node* node) {
-  if (mWatchedNode.GetNode()) {
-    mWatchedNode.GetNode()->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+  if (mWatchedNode.GetAbstractNode()) {
+    mWatchedNode.GetAbstractNode()->onMessageReceived -= 
+      Delegate(this, &Watcher::SniffMessage);
     mWatchedNode.DisconnectAll(false);
   }
   if (node) {

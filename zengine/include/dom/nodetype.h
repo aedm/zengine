@@ -79,10 +79,10 @@ struct NodeClass {
 /// Registers a Node type in the engine. This makes the engine know about
 /// all the Node types that can be utilised, and it also enables serialization
 /// and deserialization of objects;
-#define REGISTER_NODECLASS(nodeClass)                         \
+#define REGISTER_NODECLASS(nodeClass, nodeClassName)          \
   struct NodeClass_##nodeClass: public NodeClass {            \
     NodeClass_##nodeClass() {                                 \
-      mClassName = string(MAGIC2(nodeClass));                 \
+      mClassName = string(nodeClassName);                     \
       NodeRegistry::GetInstance()->Register<nodeClass>(this); \
     }                                                         \
     virtual Node* Manufacture() override {                    \

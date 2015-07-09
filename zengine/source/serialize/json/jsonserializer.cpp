@@ -43,7 +43,7 @@ void JSONSerializer::Traverse(Node* root) {
       }
     } else {
       if (slot->IsDefaulted()) continue;
-      Node* node = slot->GetNode();
+      Node* node = slot->GetAbstractNode();
       auto it = mNodes.find(node);
       if (it == mNodes.end()) {
         Traverse(node);
@@ -121,7 +121,7 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
           connections, *mAllocator);
       }
       else {
-        Node* connectedNode = slot->GetNode();
+        Node* connectedNode = slot->GetAbstractNode();
         rapidjson::Value slotValue(rapidjson::kObjectType);
 
         /// Save FloatSlot

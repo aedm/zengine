@@ -1,9 +1,12 @@
 #include <include/shaders/material.h>
 
+REGISTER_NODECLASS(Material, "Material");
+
+static SharedString SolidPassSlotName = make_shared<string>("Solid Pass");
 
 Material::Material()
   : Node(NodeType::MATERIAL)
-  , mSolidPass(NodeType::PASS, this, make_shared<string>("Solid pass")) {}
+  , mSolidPass(this, SolidPassSlotName) {}
 
 
 Material::~Material() {}
@@ -11,5 +14,5 @@ Material::~Material() {}
 void Material::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {}
 
 Pass* Material::GetPass() {
-  return static_cast<Pass*>(mSolidPass.GetNode());
+  return mSolidPass.GetNode();
 }
