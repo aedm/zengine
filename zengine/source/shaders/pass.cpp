@@ -23,25 +23,21 @@ Pass::~Pass()
 void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
-      if (slot == &mVertexStub) {
-        if (mVertexStub.GetNode() == nullptr) {
-          mVertexSource.Connect(nullptr);
-        } else {
-          mVertexSource.Connect(mVertexStub.GetNode()->GetShaderSource());
-        }
-      } else if (slot == &mFragmentStub) {
-        if (mFragmentStub.GetNode() == nullptr) {
-          mFragmentSource.Connect(nullptr);
-        } else {
-          mFragmentSource.Connect(mFragmentStub.GetNode()->GetShaderSource());
-        }
-      } else if (slot == &mVertexSource || slot == &mFragmentSource) {
+      if (slot == &mVertexStub || slot == &mFragmentStub) {
+        /// Stub slots changed, reconnect source slots
+        ShaderStub* stub = static_cast<ShaderStub*>(slot->GetAbstractNode());
+        ShaderSourceSlot* sourceSlot = 
+          (slot == &mVertexStub) ? &mVertexSource : &mFragmentSource;
+        sourceSlot->Connect(stub == nullptr ? nullptr : stub->GetShaderSource());
         BuildRenderPipeline();
-      }
+        ReceiveMessage(nullptr, NodeMessage::NEEDS_REDRAW);
+      } 
       break;
     case NodeMessage::VALUE_CHANGED:
       if (slot == &mVertexSource || slot == &mFragmentSource) {
+        /// Shader sources changed, rebuild pipeline
         BuildRenderPipeline();
+        ReceiveMessage(nullptr, NodeMessage::NEEDS_REDRAW);
       }
       break;
     default: break;

@@ -15,7 +15,6 @@ ShaderSource2::~ShaderSource2() {
   /// There are dynamically created slots that won't be automatically 
   /// disconencted.
   for (Slot* slot : GetPublicSlots()) {
-    //slot->DisconnectAll(false);
     delete slot;
   }
 }
