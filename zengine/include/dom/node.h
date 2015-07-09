@@ -40,8 +40,8 @@ class Node;
 /// Nodes can have multiple input slots, which connects it to other slots.
 class Slot {
 public:
-  Slot(NodeType Type, Node* Owner, SharedString Name, bool IsMultiSlot = false,
-       bool AutoAddToSlotList = true);
+  Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot = false,
+       bool isPublic = true, bool isSerializable = true);
   virtual ~Slot();
 
   /// The operator which this slot is a member of
@@ -109,9 +109,6 @@ class Node {
 public:
   virtual ~Node();
 
-  /// Parameters of this node.
-  vector<Slot*>	mSlots;
-
   /// Returns object type.
   NodeType GetType() const;
 
@@ -166,7 +163,7 @@ private:
   void DisconnectFromSlot(Slot* slot);
 
 
-/// ------------- UI data -------------
+/// ---------------- Editor-specific parts ----------------
 /// This section can be disabled without hurting the engine.
 public: 
   virtual void SetName(const string& name);
@@ -176,10 +173,32 @@ public:
   virtual void SetSize(const Vec2 size);
   virtual const Vec2 GetSize() const;
 
+  /// Returns the list of publicly editable slots
+  const vector<Slot*>& GetPublicSlots();
+
+  /// Returns the slots that need to be serialized when saving / loading
+  const unordered_map<SharedString, Slot*>& GetSerializableSlots();
+
+protected:
+  /// Registers a new slot
+  void AddSlot(Slot* slot, bool isPublic, bool isSerializable);
+  
+  /// Removes public and serializable slots
+  void ClearSlots();
+
 private:
+  /// Custom name of the node
   string mName;
+
+  /// Position and size on the Graph
   Vec2 mPosition;
   Vec2 mSize;
+
+  /// Public slots of this node. The user may
+  vector<Slot*>	mPublicSlots;
+
+  /// Slots that need to be serialized when saving / loading.
+  unordered_map<SharedString, Slot*> mSerializableSlotsByName;
 };
 
 
@@ -192,7 +211,10 @@ template<NodeType T, class N>
 class TypedSlot: public Slot {
 public:
   TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,          
-            bool autoAddToSlotList = true)                                    
-            : Slot(T, owner, name, isMultiSlot, autoAddToSlotList) {}     
-  N* GetNode() { return static_cast<N*>(GetAbstractNode()); } 
+            bool isPublic = true, bool isSerializable = true)
+            : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}     
+
+  N* GetNode() { 
+    return static_cast<N*>(GetAbstractNode()); 
+  } 
 };

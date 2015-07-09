@@ -12,8 +12,8 @@ Pass::Pass()
   : Node(NodeType::PASS)
   , mVertexStub(this, VertesStubSlotName)
   , mFragmentStub(this, FragmentStubSlotName)
-  , mVertexSource(this, nullptr, false, false)
-  , mFragmentSource(this, nullptr, false, false)
+  , mVertexSource(this, nullptr, false, false, false)
+  , mFragmentSource(this, nullptr, false, false, false)
   , mHandle(-1) 
 {}
 

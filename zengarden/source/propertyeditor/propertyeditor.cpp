@@ -50,7 +50,7 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
   : PropertyEditor(node, panel)
 {
     /// Slots
-    for (Slot* slot : GetNode()->mSlots) {
+    for (Slot* slot : GetNode()->GetPublicSlots()) {
       /// TODO: use dynamic_cast
       if (slot->DoesAcceptType(NodeType::FLOAT) && 
           slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {

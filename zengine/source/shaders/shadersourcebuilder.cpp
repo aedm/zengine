@@ -8,11 +8,11 @@ void ShaderSourceBuilder::FromStub(ShaderStub* stub, ShaderSource2* source) {
 ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source)
   : mSource(source) {
   SafeDelete(mSource->metadata);
-  for (Slot* slot : mSource->mSlots) {
+  for (Slot* slot : mSource->GetPublicSlots()) {
     if (slot != &mSource->mStub) delete slot;
   }
-  mSource->mSlots.clear();
-  mSource->mSlots.push_back(&mSource->mStub);
+  mSource->ClearSlots();
+  //mSource->mSlots.push_back(&mSource->mStub);
 
   if (stub == nullptr) {
     ERR("stub is nullptr");
@@ -90,7 +90,7 @@ void ShaderSourceBuilder::CollectDependencies(Node* root) {
   mDataMap[root] = data;
 
   if (root->GetType() == NodeType::SHADER_STUB) {
-    for (Slot* slot : root->mSlots) {
+    for (Slot* slot : root->GetPublicSlots()) {
       Node* node = slot->GetAbstractNode();
       if (node == nullptr) {
         WARN("Incomplete shader graph.");

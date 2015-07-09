@@ -54,7 +54,7 @@ void NodeWidget::CreateWidgetSlots()
 	mWidgetSlots.clear();
 
 	Node* node = GetNode();
-	for(Slot* slot : node->mSlots)
+	for(Slot* slot : node->GetPublicSlots())
 	{
 		WidgetSlot* sw = new WidgetSlot();
 		sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);

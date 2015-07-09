@@ -3,15 +3,15 @@
 #include <algorithm>
 
 Slot::Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot,
-           bool AutoAddToSlotList)
+           bool isPublic, bool isSerializable)
            : mOwner(owner)
            , mType(type)
            , mIsMultiSlot(isMultiSlot) {
   ASSERT(mOwner != nullptr);
-  mNode = NULL;
+  mNode = nullptr;
   mName = name;
-  if (AutoAddToSlotList) {
-    mOwner->mSlots.push_back(this);
+  mOwner->AddSlot(this, isPublic, isSerializable);
+  if (isPublic) {
     mOwner->ReceiveMessage(this, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
   }
 }
@@ -210,7 +210,7 @@ void Node::ReceiveMessage(Slot* slot, NodeMessage message, const void* payload) 
 
 
 void Node::CheckConnections() {
-  for(Slot* slot : mSlots) {
+  for (Slot* slot : mPublicSlots) {
     /// TODO: handle multislots
     if (!slot->mIsMultiSlot && slot->GetAbstractNode() == NULL) {
       mIsProperlyConnected = false;
@@ -223,7 +223,7 @@ void Node::CheckConnections() {
 
 void Node::Evaluate() {
   if (mIsDirty && mIsProperlyConnected) {
-    for(Slot* slot : mSlots) {
+    for(Slot* slot : mPublicSlots) {
       slot->GetAbstractNode()->Evaluate();
     }
     Operate();
@@ -270,5 +270,31 @@ void Node::SetSize(const Vec2 size) {
 
 const Vec2 Node::GetSize() const {
   return mSize;
+}
+
+void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable) {
+  /// All public slots need to be serializable
+  ASSERT(!isPublic || isSerializable);
+
+  if (isPublic) {
+    ASSERT(find(mPublicSlots.begin(), mPublicSlots.end(), slot) == mPublicSlots.end());
+    mPublicSlots.push_back(slot);
+  }
+  if (isSerializable) {
+    mSerializableSlotsByName[slot->GetName()] = slot;
+  }
+}
+
+void Node::ClearSlots() {
+  mPublicSlots.clear();
+  mSerializableSlotsByName.clear();
+}
+
+const vector<Slot*>& Node::GetPublicSlots() {
+  return mPublicSlots;
+}
+
+const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
+  return mSerializableSlotsByName;
 }
 

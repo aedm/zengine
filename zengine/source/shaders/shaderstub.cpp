@@ -46,9 +46,9 @@ ShaderStub::~ShaderStub() {
 void ShaderStub::SetStubSource(const string& source) {
   mSource = source;
 
-  /// TODO: dont do this
-  for (Slot* slot : mSlots) delete slot;
-  mSlots.clear();
+  for (Slot* slot : GetPublicSlots()) delete slot;
+  ClearSlots();
+
   mParameterSlotMap.clear();
   mParameterNameSlotMap.clear();
 

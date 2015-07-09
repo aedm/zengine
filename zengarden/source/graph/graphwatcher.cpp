@@ -272,7 +272,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::CONNECT_TO_NODE:
       if (mIsConnectionValid) {
         Node* node = mHoveredWidget->GetNode();
-        Slot* slot = mClickedWidget->GetNode()->mSlots[mClickedSlotIndex];
+        Slot* slot = mClickedWidget->GetNode()->GetPublicSlots()[mClickedSlotIndex];
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
       }
       GetGLWidget()->update();
@@ -281,7 +281,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::CONNECT_TO_SLOT:
       if (mIsConnectionValid) {
         Node* node = mClickedWidget->GetNode();
-        Slot* slot = mHoveredWidget->GetNode()->mSlots[mHoveredSlotIndex];
+        Slot* slot = mHoveredWidget->GetNode()->GetPublicSlots()[mHoveredSlotIndex];
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
       }
       GetGLWidget()->update();
@@ -297,7 +297,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
   if ((event->modifiers() & Qt::AltModifier) > 0) {
     if (mHoveredSlotIndex >= 0) {
       /// Remove connection
-      Slot* slot = mHoveredWidget->GetNode()->mSlots[mHoveredSlotIndex];
+      Slot* slot = mHoveredWidget->GetNode()->GetPublicSlots()[mHoveredSlotIndex];
       if (slot->GetAbstractNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
@@ -342,7 +342,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       mIsConnectionValid = false;
       UpdateHoveredWidget(mousePos);
       if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
-        if (mClickedWidget->GetNode()->mSlots[mClickedSlotIndex]->DoesAcceptType(
+        if (mClickedWidget->GetNode()->GetPublicSlots()[mClickedSlotIndex]->DoesAcceptType(
           mHoveredWidget->GetNode()->GetType())) {
           mIsConnectionValid = true;
         }
@@ -353,7 +353,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       mIsConnectionValid = false;
       UpdateHoveredWidget(mousePos);
       if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
-        if (mHoveredWidget->GetNode()->mSlots[mHoveredSlotIndex]->DoesAcceptType(
+        if (mHoveredWidget->GetNode()->GetPublicSlots()[mHoveredSlotIndex]->DoesAcceptType(
           mClickedWidget->GetNode()->GetType())) {
           mIsConnectionValid = true;
         }

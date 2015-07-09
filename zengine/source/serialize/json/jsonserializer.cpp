@@ -33,7 +33,9 @@ void JSONSerializer::Traverse(Node* root) {
   mNodesList.push_back(root);
 
   /// Traverse slots
-  for (Slot* slot : root->mSlots) {
+  //for (Slot* slot : root->mSlots) {
+  for (auto slotPair : root->GetSerializableSlots()) {
+    Slot* slot = slotPair.second;
     if (slot->mIsMultiSlot) {
       for (Node* node : slot->GetMultiNodes()) {
         auto it = mNodes.find(node);
@@ -42,8 +44,8 @@ void JSONSerializer::Traverse(Node* root) {
         }
       }
     } else {
-      if (slot->IsDefaulted()) continue;
       Node* node = slot->GetAbstractNode();
+      if (node == nullptr || slot->IsDefaulted()) continue;
       auto it = mNodes.find(node);
       if (it == mNodes.end()) {
         Traverse(node);
@@ -105,9 +107,10 @@ rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec)
 void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node)
 {
   /// Save slots
-  if (node->mSlots.size() > 0) {
+  if (node->GetSerializableSlots().size() > 0) {
     rapidjson::Value slotsObject(rapidjson::kObjectType);
-    for (Slot* slot : node->mSlots) {
+    for (auto slotPair : node->GetSerializableSlots()) {
+      Slot* slot = slotPair.second;
       ASSERT(slot->GetName().get() != nullptr && !slot->GetName()->empty());
 
       /// Save multislot

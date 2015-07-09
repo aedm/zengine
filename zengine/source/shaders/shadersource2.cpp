@@ -14,8 +14,9 @@ ShaderSource2::~ShaderSource2() {
   SafeDelete(metadata);
   /// There are dynamically created slots that won't be automatically 
   /// disconencted.
-  for (Slot* slot : mSlots) {
-    slot->DisconnectAll(false);
+  for (Slot* slot : GetPublicSlots()) {
+    //slot->DisconnectAll(false);
+    delete slot;
   }
 }
 

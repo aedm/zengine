@@ -73,7 +73,7 @@ DeleteNodeCommand::~DeleteNodeCommand() {
 bool DeleteNodeCommand::Do() {
   NOT_IMPLEMENTED;
   for (NodeWidget* widget : mNodeWidgets) {
-    for (Slot* slot : widget->GetNode()->mSlots) {
+    for (Slot* slot : widget->GetNode()->GetPublicSlots()) {
       slot->Connect(NULL);
     }
   }
