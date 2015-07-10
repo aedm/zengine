@@ -84,7 +84,7 @@ void StubNode::SetStubSource(const string& source) {
   }
 }
 
-ShaderNode* StubNode::GetShaderSource() {
+ShaderNode* StubNode::GetShader() {
   if (mShader == nullptr) {
     mShader = new ShaderNode();
     mShader->mStub.Connect(this);

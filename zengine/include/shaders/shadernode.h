@@ -59,5 +59,5 @@ protected:
   string mSource;
 };
 
-typedef TypedSlot<NodeType::SHADER_SOURCE, ShaderNode> ShaderSourceSlot;
+typedef TypedSlot<NodeType::SHADER_SOURCE, ShaderNode> ShaderSlot;
 

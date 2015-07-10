@@ -26,9 +26,9 @@ void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
       if (slot == &mVertexStub || slot == &mFragmentStub) {
         /// Stub slots changed, reconnect source slots
         StubNode* stub = static_cast<StubNode*>(slot->GetAbstractNode());
-        ShaderSourceSlot* sourceSlot = 
+        ShaderSlot* sourceSlot = 
           (slot == &mVertexStub) ? &mVertexSource : &mFragmentSource;
-        sourceSlot->Connect(stub == nullptr ? nullptr : stub->GetShaderSource());
+        sourceSlot->Connect(stub == nullptr ? nullptr : stub->GetShader());
         BuildRenderPipeline();
         ReceiveMessage(nullptr, NodeMessage::NEEDS_REDRAW);
       } 

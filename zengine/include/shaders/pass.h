@@ -38,12 +38,13 @@ public:
 
 protected:
   /// automatic slots
-  ShaderSourceSlot mFragmentSource;
-  ShaderSourceSlot mVertexSource;
+  ShaderSlot mFragmentSource;
+  ShaderSlot mVertexSource;
 
   virtual void HandleMessage(Slot* slot, NodeMessage message, 
                              const void* payload) override;
 
+  /// Creates the shader program
   void BuildRenderPipeline();
 
   ShaderHandle mHandle;

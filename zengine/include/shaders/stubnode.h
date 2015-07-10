@@ -75,29 +75,50 @@ struct StubMetadata {
 
   ~StubMetadata();
 
+  /// Value of the ":name" directive.
   const string name;
+
+  /// Value of the ":returns" directive.
   const NodeType returnType;
 
+  /// The source without any directives.
   const string strippedSource;
 
+  /// Parameters of the stub. These become slots. (":param")
   const vector<StubParameter*> parameters;
+
+  /// List of globals. (":global")
   const vector<StubGlobal*> globals;
+
+  /// List of stage inputs. (":input")
   const vector<StubVariable*>	inputs;
+
+  /// List of stage outputs. (":output")
   const vector<StubVariable*>	outputs;
 };
 
 
+/// A stub is a part of a shader. It contains shader source code annotated
+/// by directives. Using these annotations, stubs can depend on each other and
+/// on other nodes likes textures and floats. A tree of stubs can be turned into
+/// a ShaderNode.
 class StubNode: public Node {
 public:
   StubNode();
   StubNode(const StubNode& original);
   virtual ~StubNode();
 
+  /// Sets new source to the stub and performs metadata analysis.
   void SetStubSource(const string& source);
+  
+  /// Returns the source code of the stub.
   const string& GetStubSource() const;
+  
+  /// Returns the metadata containing information about the stub source.
   StubMetadata* GetStubMetadata() const;
 
-  ShaderNode* GetShaderSource();
+  /// Returns the shader that's made of this stub and its transitive closure.
+  ShaderNode* GetShader();
 
   /// Get slot by shader parameter name
   Slot* GetSlotByParameter(StubParameter*);
@@ -111,14 +132,18 @@ protected:
   /// Metadata
   StubMetadata* mMetadata;
 
+  /// Source of the stub
+  /// TODO: make this a slot
   string mSource;
 
+  /// The shader which is made of this stub and its transitive closure.
   ShaderNode* mShader;
 
   /// Maps stub parameters to stub slots
   map<StubParameter*, Slot*> mParameterSlotMap;
   map<string, Slot*> mParameterNameSlotMap;
 };
+
 
 typedef TypedSlot<NodeType::SHADER_STUB, StubNode> StubSlot;
 
