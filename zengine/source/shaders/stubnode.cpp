@@ -104,10 +104,6 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
-Node* StubNode::Clone() const {
-  return new StubNode(*this);
-}
-
 const string& StubNode::GetStubSource() const {
   return mSource;
 }

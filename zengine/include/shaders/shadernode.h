@@ -45,7 +45,6 @@ public:
   ShaderNode();
   virtual ~ShaderNode();
 
-  virtual Node* Clone() const override;
   const string& GetSource() const;
   const ShaderMetadata* GetMetadata() const;
   StubSlot mStub;

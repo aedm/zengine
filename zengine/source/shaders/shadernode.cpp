@@ -20,12 +20,6 @@ ShaderNode::~ShaderNode() {
 }
 
 
-Node* ShaderNode::Clone() const {
-  /// Shader sources get all their data from the slot, so nothing to do here.
-  return new ShaderNode();
-}
-
-
 void ShaderNode::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:

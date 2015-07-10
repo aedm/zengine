@@ -46,9 +46,6 @@ public:
   /// Sets value of node.
   void Set(const ValueType& newValue);
 
-  /// Clone node
-  virtual Node* Clone() const override;
-
 protected:
   /// Output value of the node
   ValueType mValue;
@@ -66,12 +63,6 @@ template<NodeType T>
 StaticValueNode<T>::StaticValueNode(const StaticValueNode<T>& original)
   : ValueNode(original) {
   mValue = original.mValue;
-}
-
-
-template<NodeType T>
-Node* StaticValueNode<T>::Clone() const {
-  return new StaticValueNode<T>(*this);
 }
 
 

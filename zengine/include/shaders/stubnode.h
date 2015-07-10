@@ -93,8 +93,6 @@ public:
   StubNode(const StubNode& original);
   virtual ~StubNode();
 
-  virtual Node* Clone() const;
-
   void SetStubSource(const string& source);
   const string& GetStubSource() const;
   StubMetadata* GetStubMetadata() const;

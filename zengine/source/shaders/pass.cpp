@@ -160,10 +160,6 @@ const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes() {
   return mAttributes;
 }
 
-Node* Pass::Clone() const {
-  return new Pass();
-}
-
 bool Pass::isComplete() {
   return mHandle != -1;
 }

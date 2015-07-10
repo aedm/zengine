@@ -118,9 +118,6 @@ public:
   /// Reruns Operate() if dirty (on dirty ancestors too)
   void Evaluate();
 
-  /// Clone node
-  virtual Node* Clone() const;
-
   /// Hook for watchers (UI only)
   Event<Slot*, NodeMessage, const void*> onMessageReceived;
 

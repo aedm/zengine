@@ -21,8 +21,6 @@ public:
   Pass();
   virtual ~Pass();
 
-  virtual Node* Clone() const override;
-
   StubSlot mFragmentStub;
   StubSlot mVertexStub;
 

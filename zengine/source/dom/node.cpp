@@ -239,12 +239,6 @@ Node::~Node() {
   }
 }
 
-
-Node* Node::Clone() const {
-  ASSERT(false);
-  return NULL;
-}
-
 void Node::SetName(const string& name) {
   mName = name;
   ReceiveMessage(nullptr, NodeMessage::NODE_NAME_CHANGED);
