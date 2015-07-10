@@ -13,8 +13,8 @@
 #include "resources/mesh.h"
 #include "resources/texture.h"
 
-#include "shaders/shaderstub.h"
-#include "shaders/shadersource2.h"
+#include "shaders/stubnode.h"
+#include "shaders/shadernode.h"
 #include "shaders/pass.h"
 #include "shaders/material.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shadersource2.h"
+#include "shadernode.h"
 #include "../dom/node.h"
 #include "../render/drawingapi.h"
 #include <map>

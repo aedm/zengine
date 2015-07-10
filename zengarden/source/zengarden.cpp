@@ -76,7 +76,7 @@ void ZenGarden::InitModules() {
   {
     /// fragment shader
     char* testShaderStubSource = Util::ReadFileQt("test2.fs");
-    auto fragmentStub = new ShaderStub();
+    auto fragmentStub = new StubNode();
     fragmentStub->SetStubSource(testShaderStubSource);
     ThePrototypes->AddStub(fragmentStub);
     TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graphEditor));
@@ -85,7 +85,7 @@ void ZenGarden::InitModules() {
 
     /// vertex shader
     testShaderStubSource = Util::ReadFileQt("test2.vs");
-    auto vertexStub = new ShaderStub();
+    auto vertexStub = new StubNode();
     vertexStub->SetStubSource(testShaderStubSource);
     ThePrototypes->AddStub(vertexStub);
     TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graphEditor));

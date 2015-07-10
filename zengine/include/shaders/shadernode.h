@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shaderstub.h"
+#include "stubnode.h"
 #include "../dom/node.h"
 
 struct ShaderSourceVariable {
@@ -38,10 +38,10 @@ struct ShaderSourceMetadata {
 };
 
 
-class ShaderSource2: public Node {
+class ShaderNode: public Node {
 public:
-  ShaderSource2();
-  virtual ~ShaderSource2();
+  ShaderNode();
+  virtual ~ShaderNode();
 
   virtual Node* Clone() const override;
   const string& GetSource() const;
@@ -58,5 +58,5 @@ protected:
   string mSource;
 };
 
-typedef TypedSlot<NodeType::SHADER_SOURCE, ShaderSource2> ShaderSourceSlot;
+typedef TypedSlot<NodeType::SHADER_SOURCE, ShaderNode> ShaderSourceSlot;
 

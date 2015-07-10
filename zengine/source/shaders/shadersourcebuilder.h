@@ -1,15 +1,15 @@
 #pragma once
 
-#include <include/shaders/shadersource2.h>
+#include <include/shaders/shadernode.h>
 #include <sstream>
 
 class ShaderSourceBuilder
 {
 public:
-	static void FromStub(ShaderStub* stub, ShaderSource2* source);
+	static void FromStub(StubNode* stub, ShaderNode* shader);
 
 private:
-	ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source);
+  ShaderSourceBuilder(StubNode* stub, ShaderNode* shader);
 	~ShaderSourceBuilder();
 
 	struct NodeData
@@ -50,7 +50,7 @@ private:
 	/// Metadata for analyzing nodes
 	map<Node*, NodeData*> mDataMap;
 
-	ShaderSource2* mSource;
+  ShaderNode* mShader;
 
 	/// Metadata
 	map<string, ShaderSourceVariable*> mInputsMap;

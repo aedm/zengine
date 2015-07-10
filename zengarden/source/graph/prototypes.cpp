@@ -36,7 +36,7 @@ void Prototypes::AddPrototype(NodeClass* nodeClass) {
   mPrototypes.push_back(prototype);
 }
 
-void Prototypes::AddStub(OWNERSHIP ShaderStub* stub) {
+void Prototypes::AddStub(OWNERSHIP StubNode* stub) {
   NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(stub);
   Prototype prototype;
   prototype.mNodeClass = nodeClass;

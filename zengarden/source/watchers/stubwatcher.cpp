@@ -1,6 +1,6 @@
 #include "stubwatcher.h"
 
-StubWatcher::StubWatcher(ShaderStub* Stub, WatcherWidget* Widget)
+StubWatcher::StubWatcher(StubNode* Stub, WatcherWidget* Widget)
 	: Watcher(Stub, Widget)
 {
 	ASSERT(Widget != NULL);

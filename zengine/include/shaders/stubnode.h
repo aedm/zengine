@@ -5,7 +5,7 @@
 #include <map>
 
 using namespace std;
-class ShaderSource2;
+class ShaderNode;
 
 /// Macrolist for global uniforms (name, type, variable/token)
 #define GLOBALUSAGE_LIST \
@@ -87,11 +87,11 @@ struct ShaderStubMetadata {
 };
 
 
-class ShaderStub: public Node {
+class StubNode: public Node {
 public:
-  ShaderStub();
-  ShaderStub(const ShaderStub& original);
-  virtual ~ShaderStub();
+  StubNode();
+  StubNode(const StubNode& original);
+  virtual ~StubNode();
 
   virtual Node* Clone() const;
 
@@ -99,7 +99,7 @@ public:
   const string& GetStubSource() const;
   ShaderStubMetadata* GetStubMetadata() const;
 
-  ShaderSource2* GetShaderSource();
+  ShaderNode* GetShaderSource();
 
   /// Get slot by shader parameter name
   Slot* GetSlotByParameter(ShaderStubParameter*);
@@ -115,12 +115,12 @@ protected:
 
   string mSource;
 
-  ShaderSource2* mShaderSrc;
+  ShaderNode* mShader;
 
   /// Maps stub parameters to stub slots
   map<ShaderStubParameter*, Slot*> mParameterSlotMap;
   map<string, Slot*> mParameterNameSlotMap;
 };
 
-typedef TypedSlot<NodeType::SHADER_STUB, ShaderStub> StubSlot;
+typedef TypedSlot<NodeType::SHADER_STUB, StubNode> StubSlot;
 

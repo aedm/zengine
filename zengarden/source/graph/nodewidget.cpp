@@ -160,7 +160,7 @@ void NodeWidget::HandleTitleChange()
     text = QString::fromStdString(
       NodeRegistry::GetInstance()->GetNodeClass(GetNode())->mClassName);
     if (node->GetType() == NodeType::SHADER_STUB) {
-      ShaderStub* stub = static_cast<ShaderStub*>(node);
+      StubNode* stub = static_cast<StubNode*>(node);
       ShaderStubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {
         /// For shader stubs, use the stub name by default

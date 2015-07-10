@@ -1,10 +1,10 @@
 #include "stubanalyzer.h"
 #include <include/shaders/valuestubslot.h>
-#include <include/shaders/shaderstub.h>
-#include <include/shaders/shadersource2.h>
+#include <include/shaders/stubnode.h>
+#include <include/shaders/shadernode.h>
 #include <include/nodes/valuenodes.h>
 
-REGISTER_NODECLASS(ShaderStub, "Stub");
+REGISTER_NODECLASS(StubNode, "Stub");
 
 const EnumMapperA GlobalUniformMapper[] = {
 #undef ITEM
@@ -26,24 +26,24 @@ const int GlobalUniformOffsets[] = {
   GLOBALUSAGE_LIST
 };
 
-ShaderStub::ShaderStub()
+StubNode::StubNode()
   : Node(NodeType::SHADER_STUB)
   , mMetadata(nullptr)
-  , mShaderSrc(nullptr) {
+  , mShader(nullptr) {
 }
 
-ShaderStub::ShaderStub(const ShaderStub& original)
+StubNode::StubNode(const StubNode& original)
   : Node(original)
   , mMetadata(nullptr)
-  , mShaderSrc(nullptr) {
+  , mShader(nullptr) {
   SetStubSource(original.GetStubSource());
 }
 
-ShaderStub::~ShaderStub() {
+StubNode::~StubNode() {
   SafeDelete(mMetadata);
 }
 
-void ShaderStub::SetStubSource(const string& source) {
+void StubNode::SetStubSource(const string& source) {
   mSource = source;
 
   for (Slot* slot : GetPublicSlots()) delete slot;
@@ -84,35 +84,35 @@ void ShaderStub::SetStubSource(const string& source) {
   }
 }
 
-ShaderSource2* ShaderStub::GetShaderSource() {
-  if (mShaderSrc == nullptr) {
-    mShaderSrc = new ShaderSource2();
-    mShaderSrc->mStub.Connect(this);
+ShaderNode* StubNode::GetShaderSource() {
+  if (mShader == nullptr) {
+    mShader = new ShaderNode();
+    mShader->mStub.Connect(this);
   }
-  return mShaderSrc;
+  return mShader;
 }
 
-ShaderStubMetadata* ShaderStub::GetStubMetadata() const {
+ShaderStubMetadata* StubNode::GetStubMetadata() const {
   return mMetadata;
 }
 
-Slot* ShaderStub::GetSlotByParameter(ShaderStubParameter* parameter) {
+Slot* StubNode::GetSlotByParameter(ShaderStubParameter* parameter) {
   return mParameterSlotMap.at(parameter);
 }
 
-Slot* ShaderStub::GetSlotByParameterName(const string& name) {
+Slot* StubNode::GetSlotByParameterName(const string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
-Node* ShaderStub::Clone() const {
-  return new ShaderStub(*this);
+Node* StubNode::Clone() const {
+  return new StubNode(*this);
 }
 
-const string& ShaderStub::GetStubSource() const {
+const string& StubNode::GetStubSource() const {
   return mSource;
 }
 
-void ShaderStub::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void StubNode::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
       CheckConnections();

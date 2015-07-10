@@ -1,16 +1,16 @@
-#include <include/shaders/shadersource2.h>
+#include <include/shaders/shadernode.h>
 #include "shadersourcebuilder.h"
-#include <include/shaders/shaderstub.h>
+#include <include/shaders/stubnode.h>
 
 static SharedString StubSlotName = make_shared<string>("Stub");
 
-ShaderSource2::ShaderSource2()
+ShaderNode::ShaderNode()
   : Node(NodeType::SHADER_SOURCE)
   , mStub(this, StubSlotName)
   , metadata(nullptr) {}
 
 
-ShaderSource2::~ShaderSource2() {
+ShaderNode::~ShaderNode() {
   SafeDelete(metadata);
   /// There are dynamically created slots that won't be automatically 
   /// disconencted.
@@ -20,13 +20,13 @@ ShaderSource2::~ShaderSource2() {
 }
 
 
-Node* ShaderSource2::Clone() const {
+Node* ShaderNode::Clone() const {
   /// Shader sources get all their data from the slot, so nothing to do here.
-  return new ShaderSource2();
+  return new ShaderNode();
 }
 
 
-void ShaderSource2::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void ShaderNode::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
@@ -43,11 +43,11 @@ void ShaderSource2::HandleMessage(Slot* slot, NodeMessage message, const void* p
   }
 }
 
-const string& ShaderSource2::GetSource() const {
+const string& ShaderNode::GetSource() const {
   return mSource;
 }
 
-const ShaderSourceMetadata* ShaderSource2::GetMetadata() const {
+const ShaderSourceMetadata* ShaderNode::GetMetadata() const {
   return metadata;
 }
 

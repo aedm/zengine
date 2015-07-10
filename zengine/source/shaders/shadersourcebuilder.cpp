@@ -1,17 +1,17 @@
 #include "shadersourcebuilder.h"
 #include <exception>
 
-void ShaderSourceBuilder::FromStub(ShaderStub* stub, ShaderSource2* source) {
+void ShaderSourceBuilder::FromStub(StubNode* stub, ShaderNode* source) {
   ShaderSourceBuilder builder(stub, source);
 }
 
-ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source)
-  : mSource(source) {
-  SafeDelete(mSource->metadata);
-  for (Slot* slot : mSource->GetPublicSlots()) {
-    if (slot != &mSource->mStub) delete slot;
+ShaderSourceBuilder::ShaderSourceBuilder(StubNode* stub, ShaderNode* shader)
+  : mShader(shader) {
+  SafeDelete(mShader->metadata);
+  for (Slot* slot : mShader->GetPublicSlots()) {
+    if (slot != &mShader->mStub) delete slot;
   }
-  mSource->ClearSlots();
+  mShader->ClearSlots();
   //mSource->mSlots.push_back(&mSource->mStub);
 
   if (stub == nullptr) {
@@ -40,7 +40,7 @@ ShaderSourceBuilder::ShaderSourceBuilder(ShaderStub* stub, ShaderSource2* source
     }
     GenerateSlots();
     GenerateSource();
-    source->metadata = 
+    shader->metadata = 
       new ShaderSourceMetadata(mInputs, mOutputs, mUniforms, mSamplers);
   } catch (...) {
     ERR("Shader source creation failed");
@@ -52,7 +52,7 @@ ShaderSourceBuilder::~ShaderSourceBuilder() {
 }
 
 void ShaderSourceBuilder::CollectStubMetadata(Node* node) {
-  ShaderStub* stub = static_cast<ShaderStub*>(node);
+  StubNode* stub = static_cast<StubNode*>(node);
 
   ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
@@ -132,14 +132,14 @@ void ShaderSourceBuilder::GenerateSourceMetadata() {
   for (auto input : mInputsMap) {
     inputs.push_back(input.second);
   }
-  mSource->metadata = new ShaderSourceMetadata(inputs, mOutputs, mUniforms, mSamplers);
+  mShader->metadata = new ShaderSourceMetadata(inputs, mOutputs, mUniforms, mSamplers);
 }
 
 void ShaderSourceBuilder::GenerateSlots() {
   for (Node* node : mDependencies) {
     if (node->GetType() != NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
-      Slot* slot = new Slot(node->GetType(), mSource, nullptr, false, true);
+      Slot* slot = new Slot(node->GetType(), mShader, nullptr, false, true);
       slot->Connect(node);
 
       /// TODO: move this into a separate function
@@ -153,11 +153,11 @@ void ShaderSourceBuilder::GenerateSlots() {
     }
   }
 
-  mSource->ReceiveMessage(nullptr, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
+  mShader->ReceiveMessage(nullptr, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
 }
 
 void ShaderSourceBuilder::GenerateSource() {
-  mSource->mSource.clear();
+  mShader->mSource.clear();
   stringstream stream;
   stream << "#version 150" << endl;
 
@@ -165,7 +165,7 @@ void ShaderSourceBuilder::GenerateSource() {
   GenerateSourceFunctions(stream);
   GenerateSourceMain(stream);
 
-  mSource->mSource = stream.str();
+  mShader->mSource = stream.str();
 }
 
 void ShaderSourceBuilder::GenerateSourceHeader(stringstream& stream) {
@@ -199,7 +199,7 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
   for (Node* node : mDependencies) {
     if (node->GetType() == NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
-      ShaderStub* stub = static_cast<ShaderStub*>(node);
+      StubNode* stub = static_cast<StubNode*>(node);
       ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
 
       /// Define samplers
@@ -255,7 +255,7 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream) {
   for (Node* node : mDependencies) {
     if (node->GetType() == NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
-      ShaderStub* stub = static_cast<ShaderStub*>(node);
+      StubNode* stub = static_cast<StubNode*>(node);
       ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
 
       stream << "  ";

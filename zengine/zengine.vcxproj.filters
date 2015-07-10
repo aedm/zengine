@@ -113,12 +113,6 @@
     <ClInclude Include="include\shaders\pass.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
-    <ClInclude Include="include\shaders\shadersource2.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\shaders\shaderstub.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
     <ClInclude Include="include\shaders\valuestubslot.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
@@ -142,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="include\nodes\timenode.h">
       <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\shadernode.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\stubnode.h">
+      <Filter>include\shaders</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -187,13 +187,7 @@
     <ClCompile Include="source\shaders\pass.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="source\shaders\shadersource2.cpp">
-      <Filter>source\shaders</Filter>
-    </ClCompile>
     <ClCompile Include="source\shaders\shadersourcebuilder.cpp">
-      <Filter>source\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="source\shaders\shaderstub.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
     <ClCompile Include="source\shaders\stubanalyzer.cpp">
@@ -216,6 +210,12 @@
     </ClCompile>
     <ClCompile Include="source\nodes\timenode.cpp">
       <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\shadernode.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\stubnode.cpp">
+      <Filter>source\shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

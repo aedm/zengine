@@ -34,9 +34,9 @@ namespace Util {
       return nullptr;
     }
 
-    ShaderStub* vertexStub = new ShaderStub();
+    StubNode* vertexStub = new StubNode();
     vertexStub->SetStubSource(string(vertexContent.get()));
-    ShaderStub* fragmentStub = new ShaderStub();
+    StubNode* fragmentStub = new StubNode();
     fragmentStub->SetStubSource(string(fragmentContent.get()));
 
     Pass* pass = new Pass();

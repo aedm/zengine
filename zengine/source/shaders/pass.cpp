@@ -1,5 +1,5 @@
 #include <include/shaders/pass.h>
-#include <include/shaders/shaderstub.h>
+#include <include/shaders/stubnode.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
@@ -25,7 +25,7 @@ void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
       if (slot == &mVertexStub || slot == &mFragmentStub) {
         /// Stub slots changed, reconnect source slots
-        ShaderStub* stub = static_cast<ShaderStub*>(slot->GetAbstractNode());
+        StubNode* stub = static_cast<StubNode*>(slot->GetAbstractNode());
         ShaderSourceSlot* sourceSlot = 
           (slot == &mVertexStub) ? &mVertexSource : &mFragmentSource;
         sourceSlot->Connect(stub == nullptr ? nullptr : stub->GetShaderSource());
@@ -51,8 +51,8 @@ void Pass::BuildRenderPipeline() {
   /// TODO: delete previous handle
   mHandle = -1;
 
-  ShaderSource2* vertex = mVertexSource.GetNode();
-  ShaderSource2* fragment = mFragmentSource.GetNode();
+  ShaderNode* vertex = mVertexSource.GetNode();
+  ShaderNode* fragment = mFragmentSource.GetNode();
   if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
       fragment == nullptr || fragment->GetMetadata() == nullptr) {
     return;

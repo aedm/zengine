@@ -23,7 +23,7 @@ void ConnectToStubParameter(Pass* pass, bool vertexShader,
     return;
   }
   StubSlot* slot = vertexShader ? &pass->mVertexStub : &pass->mFragmentStub;
-  ShaderStub* stub = slot->GetNode();
+  StubNode* stub = slot->GetNode();
   if (!stub) {
     ERR("ShaderStub not connected to pass.");
     return;

@@ -6,7 +6,7 @@
 class StubWatcher : public Watcher
 {
 public:
-	StubWatcher(ShaderStub* Stub, WatcherWidget* Widget);
+	StubWatcher(StubNode* Stub, WatcherWidget* Widget);
 	virtual ~StubWatcher();
 
 };

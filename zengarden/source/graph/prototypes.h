@@ -39,7 +39,7 @@ public:
   //QString GetNodeClassString(Node* Nd);
 
   void AddPrototype(NodeClass* nodeClass);
-  void AddStub(OWNERSHIP ShaderStub* stub);
+  void AddStub(OWNERSHIP StubNode* stub);
 
 private:
   //vector<Node*> mPrototypeNodes;
