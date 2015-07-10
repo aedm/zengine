@@ -1,11 +1,11 @@
-#include "shadersourcebuilder.h"
+#include "shaderbuilder.h"
 #include <exception>
 
-void ShaderSourceBuilder::FromStub(StubNode* stub, ShaderNode* source) {
-  ShaderSourceBuilder builder(stub, source);
+void ShaderBuilder::FromStub(StubNode* stub, ShaderNode* source) {
+  ShaderBuilder builder(stub, source);
 }
 
-ShaderSourceBuilder::ShaderSourceBuilder(StubNode* stub, ShaderNode* shader)
+ShaderBuilder::ShaderBuilder(StubNode* stub, ShaderNode* shader)
   : mShader(shader) {
   SafeDelete(mShader->metadata);
   for (Slot* slot : mShader->GetPublicSlots()) {
@@ -19,7 +19,7 @@ ShaderSourceBuilder::ShaderSourceBuilder(StubNode* stub, ShaderNode* shader)
     return;
   }
 
-  ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
+  StubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
     ERR("stub has no metadata.");
     return;
@@ -41,20 +41,20 @@ ShaderSourceBuilder::ShaderSourceBuilder(StubNode* stub, ShaderNode* shader)
     GenerateSlots();
     GenerateSource();
     shader->metadata = 
-      new ShaderSourceMetadata(mInputs, mOutputs, mUniforms, mSamplers);
+      new ShaderMetadata(mInputs, mOutputs, mUniforms, mSamplers);
   } catch (...) {
     ERR("Shader source creation failed");
   }
 }
 
-ShaderSourceBuilder::~ShaderSourceBuilder() {
+ShaderBuilder::~ShaderBuilder() {
 
 }
 
-void ShaderSourceBuilder::CollectStubMetadata(Node* node) {
+void ShaderBuilder::CollectStubMetadata(Node* node) {
   StubNode* stub = static_cast<StubNode*>(node);
 
-  ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
+  StubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
     ERR("Can't build shader source.");
     throw exception();
@@ -65,7 +65,7 @@ void ShaderSourceBuilder::CollectStubMetadata(Node* node) {
 
   /// Globals
   for (auto global : stubMeta->globals) {
-    mUniforms.push_back(new ShaderSourceUniform(
+    mUniforms.push_back(new ShaderUniform(
       global->type, global->name, nullptr, global->usage));
   }
 
@@ -74,18 +74,18 @@ void ShaderSourceBuilder::CollectStubMetadata(Node* node) {
     /// TODO: check whether input types match
     if (mInputsMap.find(input->name) == mInputsMap.end()) {
       mInputsMap[input->name] =
-        new ShaderSourceVariable(input->type, input->name);
+        new ShaderVariable(input->type, input->name);
     }
   }
 
   /// Outputs
   for (auto output : stubMeta->outputs) {
-    mOutputs.push_back(new ShaderSourceVariable(output->type, output->name));
+    mOutputs.push_back(new ShaderVariable(output->type, output->name));
   }
 }
 
 
-void ShaderSourceBuilder::CollectDependencies(Node* root) {
+void ShaderBuilder::CollectDependencies(Node* root) {
   NodeData* data = new NodeData();
   mDataMap[root] = data;
 
@@ -105,7 +105,7 @@ void ShaderSourceBuilder::CollectDependencies(Node* root) {
   mDependencies.push_back(root);
 }
 
-void ShaderSourceBuilder::GenerateNames() {
+void ShaderBuilder::GenerateNames() {
   int uniformIndex = 0;
   int stubIndex = 0;
   char tmp[255]; // Fuk c++
@@ -127,15 +127,15 @@ void ShaderSourceBuilder::GenerateNames() {
   }
 }
 
-void ShaderSourceBuilder::GenerateSourceMetadata() {
-  vector<ShaderSourceVariable*> inputs;
+void ShaderBuilder::GenerateSourceMetadata() {
+  vector<ShaderVariable*> inputs;
   for (auto input : mInputsMap) {
     inputs.push_back(input.second);
   }
-  mShader->metadata = new ShaderSourceMetadata(inputs, mOutputs, mUniforms, mSamplers);
+  mShader->metadata = new ShaderMetadata(inputs, mOutputs, mUniforms, mSamplers);
 }
 
-void ShaderSourceBuilder::GenerateSlots() {
+void ShaderBuilder::GenerateSlots() {
   for (Node* node : mDependencies) {
     if (node->GetType() != NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
@@ -144,10 +144,10 @@ void ShaderSourceBuilder::GenerateSlots() {
 
       /// TODO: move this into a separate function
       if (node->GetType() == NodeType::TEXTURE) {
-        mSamplers.push_back(new ShaderSourceUniform(
+        mSamplers.push_back(new ShaderUniform(
           node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
       } else {
-        mUniforms.push_back(new ShaderSourceUniform(
+        mUniforms.push_back(new ShaderUniform(
           node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
       }
     }
@@ -156,7 +156,7 @@ void ShaderSourceBuilder::GenerateSlots() {
   mShader->ReceiveMessage(nullptr, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
 }
 
-void ShaderSourceBuilder::GenerateSource() {
+void ShaderBuilder::GenerateSource() {
   mShader->mSource.clear();
   stringstream stream;
   stream << "#version 150" << endl;
@@ -168,7 +168,7 @@ void ShaderSourceBuilder::GenerateSource() {
   mShader->mSource = stream.str();
 }
 
-void ShaderSourceBuilder::GenerateSourceHeader(stringstream& stream) {
+void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {
   /// Inputs
   for (auto var : mInputsMap) {
     stream << "in " << GetTypeString(var.second->type) << ' ' <<
@@ -195,17 +195,17 @@ void ShaderSourceBuilder::GenerateSourceHeader(stringstream& stream) {
   }
 }
 
-void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
+void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
   for (Node* node : mDependencies) {
     if (node->GetType() == NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
       StubNode* stub = static_cast<StubNode*>(node);
-      ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
+      StubMetadata* stubMeta = stub->GetStubMetadata();
 
       /// Define samplers
       stream << endl;
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
-        ShaderStubParameter* param = stubMeta->parameters[i];
+        StubParameter* param = stubMeta->parameters[i];
         if (param->type == NodeType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
           Node* paramNode = slot->GetAbstractNode();
@@ -224,7 +224,7 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
       stream << "#define SHADER " << GetTypeString(stubMeta->returnType) <<
         ' ' << data->FunctionName << "(";
       bool isFirstParameter = true;
-      for (ShaderStubParameter* param : stubMeta->parameters) {
+      for (StubParameter* param : stubMeta->parameters) {
         if (param->type != NodeType::TEXTURE) {
           if (!isFirstParameter) stream << ", ";
           stream << GetTypeString(param->type) << ' ' << param->name;
@@ -239,7 +239,7 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
       /// Undefine SHADER macro and samplers
       stream << "#undef SHADER" << endl;
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
-        ShaderStubParameter* param = stubMeta->parameters[i];
+        StubParameter* param = stubMeta->parameters[i];
         if (param->type == NodeType::TEXTURE) {
           stream << "#undef " << param->name << endl;
         }
@@ -249,14 +249,14 @@ void ShaderSourceBuilder::GenerateSourceFunctions(stringstream& stream) {
 }
 
 
-void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream) {
+void ShaderBuilder::GenerateSourceMain(stringstream& stream) {
   stream << endl;
   stream << "void main() {" << endl;
   for (Node* node : mDependencies) {
     if (node->GetType() == NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
       StubNode* stub = static_cast<StubNode*>(node);
-      ShaderStubMetadata* stubMeta = stub->GetStubMetadata();
+      StubMetadata* stubMeta = stub->GetStubMetadata();
 
       stream << "  ";
       if (data->ReturnType != NodeType::NONE) {
@@ -265,7 +265,7 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream) {
       }
       stream << data->FunctionName << "(";
       bool isFirstParameter = true;
-      for (ShaderStubParameter* param : stubMeta->parameters) {
+      for (StubParameter* param : stubMeta->parameters) {
         if (param->type != NodeType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
           Node* paramNode = slot->GetAbstractNode();
@@ -287,7 +287,7 @@ void ShaderSourceBuilder::GenerateSourceMain(stringstream& stream) {
 }
 
 
-const string& ShaderSourceBuilder::GetTypeString(NodeType type) {
+const string& ShaderBuilder::GetTypeString(NodeType type) {
   static const string sfloat("float");
   static const string svec2("vec2");
   static const string svec3("vec3");

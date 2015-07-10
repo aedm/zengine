@@ -73,7 +73,7 @@ void Pass::BuildRenderPipeline() {
   mHandle = shaderCompileDesc->Handle;
 
   /// Collect uniforms from shader stage sources
-  map<string, ShaderSourceUniform*> uniformMap;
+  map<string, ShaderUniform*> uniformMap;
   for (auto sampler : vertex->GetMetadata()->uniforms) {
     uniformMap[sampler->name] = sampler;
   }
@@ -82,7 +82,7 @@ void Pass::BuildRenderPipeline() {
   }
 
   /// Collect samplers
-  map<string, ShaderSourceUniform*> samplerMap;
+  map<string, ShaderUniform*> samplerMap;
   for (auto sampler : vertex->GetMetadata()->samplers) {
     samplerMap[sampler->name] = sampler;
   }
@@ -92,7 +92,7 @@ void Pass::BuildRenderPipeline() {
 
   /// Merge uniform info
   for (auto samplerDesc : shaderCompileDesc->Uniforms) {
-    ShaderSourceUniform* sourceUniform = uniformMap.at(samplerDesc.Name);
+    ShaderUniform* sourceUniform = uniformMap.at(samplerDesc.Name);
     PassUniform passUniform;
     passUniform.handle = samplerDesc.Handle;
     passUniform.node = sourceUniform->node;
@@ -103,7 +103,7 @@ void Pass::BuildRenderPipeline() {
 
   /// Merge sampler info
   for (auto samplerDesc : shaderCompileDesc->Samplers) {
-    ShaderSourceUniform* sourceUniform = samplerMap.at(samplerDesc.Name);
+    ShaderUniform* sourceUniform = samplerMap.at(samplerDesc.Name);
     PassUniform passUniform;
     passUniform.handle = samplerDesc.Handle;
     passUniform.node = sourceUniform->node;

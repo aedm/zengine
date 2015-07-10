@@ -3,14 +3,14 @@
 #include <include/shaders/shadernode.h>
 #include <sstream>
 
-class ShaderSourceBuilder
+class ShaderBuilder
 {
 public:
 	static void FromStub(StubNode* stub, ShaderNode* shader);
 
 private:
-  ShaderSourceBuilder(StubNode* stub, ShaderNode* shader);
-	~ShaderSourceBuilder();
+  ShaderBuilder(StubNode* stub, ShaderNode* shader);
+	~ShaderBuilder();
 
 	struct NodeData
 	{
@@ -53,9 +53,9 @@ private:
   ShaderNode* mShader;
 
 	/// Metadata
-	map<string, ShaderSourceVariable*> mInputsMap;
-	vector<ShaderSourceVariable*>	mInputs;
-	vector<ShaderSourceVariable*>	mOutputs;
-  vector<ShaderSourceUniform*> mUniforms;
-  vector<ShaderSourceUniform*> mSamplers;
+	map<string, ShaderVariable*> mInputsMap;
+	vector<ShaderVariable*>	mInputs;
+	vector<ShaderVariable*>	mOutputs;
+  vector<ShaderUniform*> mUniforms;
+  vector<ShaderUniform*> mSamplers;
 };

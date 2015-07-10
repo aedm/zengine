@@ -120,6 +120,7 @@
     <ClInclude Include="include\zengine.h" />
     <ClInclude Include="source\render\opengl\drawingopengl.h" />
     <ClInclude Include="source\serialize\json\jsonserializer.h" />
+    <ClInclude Include="source\shaders\shaderbuilder.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -142,7 +143,7 @@
     <ClCompile Include="source\shaders\material.cpp" />
     <ClCompile Include="source\shaders\pass.cpp" />
     <ClCompile Include="source\shaders\shadernode.cpp" />
-    <ClCompile Include="source\shaders\shadersourcebuilder.cpp" />
+    <ClCompile Include="source\shaders\shaderbuilder.cpp" />
     <ClCompile Include="source\shaders\stubnode.cpp" />
     <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
     <ClCompile Include="source\shaders\stubanalyzer.cpp" />

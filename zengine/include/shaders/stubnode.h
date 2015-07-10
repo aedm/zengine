@@ -41,49 +41,49 @@ struct Globals {
   GLOBALUSAGE_LIST
 };
 
-/// Shader parameter, becomes a slot
+/// Stub parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
-struct ShaderStubParameter {
+struct StubParameter {
   NodeType type;
   string name;
 };
 
-/// Shader variables are outputs of a shader stage and inputs of the next shader stage.
+/// Stub variables are outputs of a shader stage and inputs of the next shader stage.
 /// ":output vec4 MyColor" -- creates "outMyColor" output variable.
 /// ":input vec4 MyColor" -- creates "inMyColor" input variable.
-struct ShaderStubVariable {
+struct StubVariable {
   NodeType type;
   string name;
 };
 
 /// --
-struct ShaderStubGlobal {
+struct StubGlobal {
   NodeType type;
   string name;
   ShaderGlobalType usage;
 };
 
 
-/// All metadata collected from a shader stub source.
-struct ShaderStubMetadata {
-  ShaderStubMetadata(const string& name, NodeType returnType,
+/// All metadata collected from a stub source.
+struct StubMetadata {
+  StubMetadata(const string& name, NodeType returnType,
                      const string& strippedSource,
-                     const vector<OWNERSHIP ShaderStubParameter*>& parameters,
-                     const vector<ShaderStubGlobal*>& globals,
-                     const vector<ShaderStubVariable*>& inputs,
-                     const vector<ShaderStubVariable*>& outputs);
+                     const vector<OWNERSHIP StubParameter*>& parameters,
+                     const vector<StubGlobal*>& globals,
+                     const vector<StubVariable*>& inputs,
+                     const vector<StubVariable*>& outputs);
 
-  ~ShaderStubMetadata();
+  ~StubMetadata();
 
   const string name;
   const NodeType returnType;
 
   const string strippedSource;
 
-  const vector<ShaderStubParameter*> parameters;
-  const vector<ShaderStubGlobal*> globals;
-  const vector<ShaderStubVariable*>	inputs;
-  const vector<ShaderStubVariable*>	outputs;
+  const vector<StubParameter*> parameters;
+  const vector<StubGlobal*> globals;
+  const vector<StubVariable*>	inputs;
+  const vector<StubVariable*>	outputs;
 };
 
 
@@ -97,12 +97,12 @@ public:
 
   void SetStubSource(const string& source);
   const string& GetStubSource() const;
-  ShaderStubMetadata* GetStubMetadata() const;
+  StubMetadata* GetStubMetadata() const;
 
   ShaderNode* GetShaderSource();
 
   /// Get slot by shader parameter name
-  Slot* GetSlotByParameter(ShaderStubParameter*);
+  Slot* GetSlotByParameter(StubParameter*);
   Slot* GetSlotByParameterName(const string& name);
 
 protected:
@@ -111,14 +111,14 @@ protected:
                              const void* payload) override;
 
   /// Metadata
-  ShaderStubMetadata* mMetadata;
+  StubMetadata* mMetadata;
 
   string mSource;
 
   ShaderNode* mShader;
 
   /// Maps stub parameters to stub slots
-  map<ShaderStubParameter*, Slot*> mParameterSlotMap;
+  map<StubParameter*, Slot*> mParameterSlotMap;
   map<string, Slot*> mParameterNameSlotMap;
 };
 

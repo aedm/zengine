@@ -69,7 +69,7 @@ void Watcher::MakeDisplayedName() {
       NodeRegistry::GetInstance()->GetNodeClass(GetNode())->mClassName);
     if (node->GetType() == NodeType::SHADER_STUB) {
       StubNode* stub = static_cast<StubNode*>(node);
-      ShaderStubMetadata* metaData = stub->GetStubMetadata();
+      StubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {
         /// For shader stubs, use the stub name by default
         mDisplayedName = QString::fromStdString(metaData->name);

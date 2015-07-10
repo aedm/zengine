@@ -92,11 +92,11 @@ ShaderNode* StubNode::GetShaderSource() {
   return mShader;
 }
 
-ShaderStubMetadata* StubNode::GetStubMetadata() const {
+StubMetadata* StubNode::GetStubMetadata() const {
   return mMetadata;
 }
 
-Slot* StubNode::GetSlotByParameter(ShaderStubParameter* parameter) {
+Slot* StubNode::GetSlotByParameter(StubParameter* parameter) {
   return mParameterSlotMap.at(parameter);
 }
 
@@ -125,12 +125,12 @@ void StubNode::HandleMessage(Slot* slot, NodeMessage message, const void* payloa
   }
 }
 
-ShaderStubMetadata::ShaderStubMetadata(const string& _name, NodeType _returnType,
+StubMetadata::StubMetadata(const string& _name, NodeType _returnType,
     const string& _strippedSource, 
-    OWNERSHIP const vector<ShaderStubParameter*>& _parameters,
-    const vector<ShaderStubGlobal*>& _globals,
-    const vector<ShaderStubVariable*>& _inputs,
-    const vector<ShaderStubVariable*>& _outputs)
+    OWNERSHIP const vector<StubParameter*>& _parameters,
+    const vector<StubGlobal*>& _globals,
+    const vector<StubVariable*>& _inputs,
+    const vector<StubVariable*>& _outputs)
   : name(_name)
   , returnType(_returnType)
   , parameters(_parameters)
@@ -139,6 +139,6 @@ ShaderStubMetadata::ShaderStubMetadata(const string& _name, NodeType _returnType
   , inputs(_inputs)
   , outputs(_outputs) {}
 
-ShaderStubMetadata::~ShaderStubMetadata() {
+StubMetadata::~StubMetadata() {
   for (auto x : parameters) delete(x);
 }

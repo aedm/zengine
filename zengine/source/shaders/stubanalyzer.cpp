@@ -1,6 +1,6 @@
 #include "stubanalyzer.h"
 
-OWNERSHIP ShaderStubMetadata* StubAnalyzer::FromText(const char* stubSource) {
+OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
   StubAnalyzer analyzer(stubSource);
 
   if (analyzer.mName == nullptr) {
@@ -9,7 +9,7 @@ OWNERSHIP ShaderStubMetadata* StubAnalyzer::FromText(const char* stubSource) {
     return nullptr;
   }
 
-  return new ShaderStubMetadata(*analyzer.mName, analyzer.mReturnType,
+  return new StubMetadata(*analyzer.mName, analyzer.mReturnType,
                                 analyzer.mStrippedSource, analyzer.mParameters, 
                                 analyzer.mGlobals,
                                 analyzer.mInputs, analyzer.mOutputs);
@@ -90,20 +90,20 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
     return;
   }
 
-  ShaderStubParameter* parameter = new ShaderStubParameter();
+  StubParameter* parameter = new StubParameter();
   parameter->type = TokenToType(line->SubStrings[2]);
   parameter->name = line->SubStrings[3].ToString();
   mParameters.push_back(parameter);
 }
 
 
-void StubAnalyzer::AnalyzeVariable(SourceLine* line, vector<ShaderStubVariable*>& Storage) {
+void StubAnalyzer::AnalyzeVariable(SourceLine* line, vector<StubVariable*>& Storage) {
   if (line->SubStrings.size() < 4) {
     ERR("line %d: Wrong syntax", mCurrentLineNumber);
     return;
   }
 
-  ShaderStubVariable* parameter = new ShaderStubVariable();
+  StubVariable* parameter = new StubVariable();
   parameter->type = TokenToType(line->SubStrings[2]);
   parameter->name = line->SubStrings[3].ToString();
   Storage.push_back(parameter);
@@ -133,7 +133,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  ShaderStubGlobal* global = new ShaderStubGlobal();
+  StubGlobal* global = new StubGlobal();
   global->name = name.ToString();
   global->type = declaredType;
   global->usage = (ShaderGlobalType)usage;
