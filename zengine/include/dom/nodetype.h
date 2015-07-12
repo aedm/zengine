@@ -17,7 +17,8 @@ enum class NodeType {
   VALUETYPE_LIST
 
   /// Other node types 
-  SHADER,
+  TEXTURE,
+  SAMPLER,
   SHADER_SOURCE,
   SHADER_STUB,
   PASS,
@@ -91,8 +92,7 @@ struct NodeClass {
     virtual Node* Manufacture(Node* node) override {          \
       return new nodeClass(*static_cast<nodeClass*>(node));   \
     }                                                         \
-  };                                                          \
-  NodeClass_##nodeClass NodeClassInstance_##nodeClass;        \
+  } NodeClassInstance_##nodeClass;                            \
 
 
 /// Poor man's reflection. This class keeps track of all possilbe Node classes.

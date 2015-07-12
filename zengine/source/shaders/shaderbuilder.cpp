@@ -93,8 +93,9 @@ void ShaderBuilder::CollectDependencies(Node* root) {
     for (Slot* slot : root->GetPublicSlots()) {
       Node* node = slot->GetAbstractNode();
       if (node == nullptr) {
-        WARN("Incomplete shader graph.");
-        throw exception();
+        //WARN("Incomplete shader graph.");
+        //throw exception();
+        continue;
       }
       if (mDataMap.find(node) == mDataMap.end()) {
         CollectDependencies(node);
@@ -188,7 +189,7 @@ void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {
       uniform->name << ';' << endl;
   }
 
-  /// Smplers
+  /// Samplers
   for (auto uniform : mSamplers) {
     stream << "uniform " << GetTypeString(uniform->type) << ' ' <<
       uniform->name << ';' << endl;

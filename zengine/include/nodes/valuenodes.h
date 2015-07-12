@@ -204,12 +204,10 @@ inline static ValueSlot<T>* ToValueSlot(Slot* slot) {
 typedef ValueSlot<NodeType::FLOAT>			FloatSlot;
 typedef ValueSlot<NodeType::VEC4>			  Vec4Slot;
 typedef ValueSlot<NodeType::MATRIX44>		Matrix4Slot;
-typedef ValueSlot<NodeType::TEXTURE>		TextureSlot;
 
 typedef StaticValueNode<NodeType::FLOAT>	  FloatNode;
 typedef StaticValueNode<NodeType::VEC4>		  Vec4Node;
 typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
-typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
 
 
 ///// Explicit template type instantiations
@@ -217,3 +215,10 @@ typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
 //template class StaticValueNode < NodeType::VEC4 >;
 //template class StaticValueNode < NodeType::MATRIX44 >;
 //template class StaticValueNode<NodeType::TEXTURE>;
+
+
+/// Define texture type
+template<> struct NodeTypes < NodeType::TEXTURE > { typedef Texture* Type; };
+typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
+typedef ValueSlot<NodeType::TEXTURE> TextureSlot;
+

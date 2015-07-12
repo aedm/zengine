@@ -13,45 +13,44 @@ extern UiPainter* ThePainter;
 void InitPainter();
 void DisposePainter();
 
-class UiPainter 
-{
+class UiPainter {
 public:
-	UiPainter();
-	~UiPainter();
+  UiPainter();
+  ~UiPainter();
 
-	void					Set(int Width, int Height);
+  void Set(int width, int height);
 
-	void					DrawLine(float x1, float y1, float x2, float y2);
-	void					DrawLine(const Vec2& From, const Vec2& To);
-	void					DrawRect(const Vec2& TopLeft, const Vec2& Size);
-	void					DrawBox(const Vec2& TopLeft, const Vec2& Size);
-	void					DrawTexture(Texture* Tex, float x, float y);
-	void					DrawTextTexture(TextTexture* Tex, const Vec2& Position);
+  void DrawLine(float x1, float y1, float x2, float y2);
+  void DrawLine(const Vec2& from, const Vec2& to);
+  void DrawRect(const Vec2& topLeft, const Vec2& size);
+  void DrawBox(const Vec2& topLeft, const Vec2& size);
+  void DrawTexture(Texture* texture, float x, float y);
+  void DrawTextTexture(TextTexture* texture, const Vec2& position);
 
-	Vec4Node				Color;
-	TextureNode				TexOp;
+  Vec4Node mColor;
+  TextureNode	mTextureNode;
 
-	QFont					TitleFont;
+  QFont mTitleFont;
 
 private:
-	Material SolidColorOp;
-  Material SolidTextureOp;
-  Material TextTextureOp;
+  Material mSolidColorMaterial;
+  Material mSolidTextureMaterial;
+  Material mTextTextureMaterial;
 
-	Texture*				SomeTexture;
+  Texture* mSomeTexture;
 
-	StaticMeshNode*			LineMeshOp;
-	StaticMeshNode*			RectMeshOp;
-	StaticMeshNode*			BoxMeshOp;
-	StaticMeshNode*			TexturedBoxMeshOp;
+  StaticMeshNode* mLineMeshNode;
+  StaticMeshNode* mRectMeshNode;
+  StaticMeshNode* mBoxMeshNode;
+  StaticMeshNode* mTexturedBoxMeshNode;
 
-	Drawable*			SolidLineModel;
-  Drawable*			SolidRectModel;
-  Drawable*			SolidBoxModel;
-  Drawable*			TexturedBoxModel;
-  Drawable*			TextBoxModel;
+  Drawable* mSolidLine;
+  Drawable* mSolidRect;
+  Drawable* mSolidBox;
+  Drawable* mTexturedBox;
+  Drawable* mTextBox;
 
-	RenderState				CanvasRenderstate;
+  RenderState mCanvasRenderstate;
   Globals mGlobals;
 };
 

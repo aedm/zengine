@@ -42,7 +42,7 @@ void GraphWatcher::Paint(GLWidget*) {
   TheDrawingAPI->Clear();
 
   /// Draw connections
-  ThePainter->Color.Set(Vec4(1, 1, 1, 1));
+  ThePainter->mColor.Set(Vec4(1, 1, 1, 1));
   //const vector<Node*>& nodes = GetGraph()->Widgets.GetMultiNodes();
   //for (int i = nodes.size() - 1; i >= 0; i--) {
   //  NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
@@ -67,14 +67,14 @@ void GraphWatcher::Paint(GLWidget*) {
   if (mCurrentState == State::CONNECT_TO_NODE) {
     Vec2 from = mClickedWidget->GetInputPosition(mClickedSlotIndex);
     Vec2 to = mCurrentMousePos;
-    ThePainter->Color.Set(Vec4(1, 1, 1, 0.7));
+    ThePainter->mColor.Set(Vec4(1, 1, 1, 0.7));
     ThePainter->DrawLine(from, to);
   }
 
   if (mCurrentState == State::CONNECT_TO_SLOT) {
     Vec2 from = mClickedWidget->GetOutputPosition();
     Vec2 to = mCurrentMousePos;
-    ThePainter->Color.Set(Vec4(1, 1, 1, 0.7));
+    ThePainter->mColor.Set(Vec4(1, 1, 1, 0.7));
     ThePainter->DrawLine(from, to);
   }
 
@@ -88,9 +88,9 @@ void GraphWatcher::Paint(GLWidget*) {
 
   /// Draw selection rectangle
   if (mCurrentState == State::SELECT_RECTANGLE) {
-    ThePainter->Color.Set(Vec4(0.4, 0.9, 1, 0.1));
+    ThePainter->mColor.Set(Vec4(0.4, 0.9, 1, 0.1));
     ThePainter->DrawBox(mOriginalMousePos, mCurrentMousePos - mOriginalMousePos);
-    ThePainter->Color.Set(Vec4(0.6, 0.9, 1, 0.6));
+    ThePainter->mColor.Set(Vec4(0.6, 0.9, 1, 0.6));
     ThePainter->DrawRect(mOriginalMousePos, mCurrentMousePos - mOriginalMousePos);
   }
 }

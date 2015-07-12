@@ -38,91 +38,91 @@ void ConnectToStubParameter(Pass* pass, bool vertexShader,
 
 UiPainter::UiPainter() {
   /// Fonts
-  TitleFont.setPixelSize(ADJUST(11));
+  mTitleFont.setPixelSize(ADJUST(11));
 
   /// Shaders
   Pass* pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
-  ConnectToStubParameter(pass, false, "uColor", &Color);
-  SolidColorOp.mSolidPass.Connect(pass);
+  ConnectToStubParameter(pass, false, "uColor", &mColor);
+  mSolidColorMaterial.mSolidPass.Connect(pass);
   
   pass = Util::LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
-  ConnectToStubParameter(pass, false, "uTexture", &TexOp);
-  SolidTextureOp.mSolidPass.Connect(pass);
+  ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
+  mSolidTextureMaterial.mSolidPass.Connect(pass);
 
   pass = Util::LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
-  ConnectToStubParameter(pass, false, "uColor", &Color);
-  ConnectToStubParameter(pass, false, "uTexture", &TexOp);
-  TextTextureOp.mSolidPass.Connect(pass);
+  ConnectToStubParameter(pass, false, "uColor", &mColor);
+  ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
+  mTextTextureMaterial.mSolidPass.Connect(pass);
 
   /// Create a texture
   const int m = 256;
   UINT tex[m*m];
   for (UINT y = 0; y < m; y++) for (UINT x = 0; x < m; x++) tex[y*m + x] = (x^y) | 0xff000000;
-  SomeTexture = TheResourceManager->CreateTexture(m, m, TEXELTYPE_RGBA_UINT8, tex);
+  mSomeTexture = TheResourceManager->CreateTexture(m, m, TEXELTYPE_RGBA_UINT8, tex);
 
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
 
   /// Meshes
-  LineMeshOp = StaticMeshNode::Create(TheResourceManager->CreateMesh());
-  RectMeshOp = StaticMeshNode::Create(TheResourceManager->CreateMesh());
+  mLineMeshNode = StaticMeshNode::Create(TheResourceManager->CreateMesh());
+  mRectMeshNode = StaticMeshNode::Create(TheResourceManager->CreateMesh());
 
   Mesh* boxMesh = TheResourceManager->CreateMesh();
   boxMesh->SetIndices(boxIndices);
-  BoxMeshOp = StaticMeshNode::Create(boxMesh);
+  mBoxMeshNode = StaticMeshNode::Create(boxMesh);
 
   Mesh* textureMesh = TheResourceManager->CreateMesh();
   textureMesh->SetIndices(boxIndices);
-  TexturedBoxMeshOp = StaticMeshNode::Create(textureMesh);
+  mTexturedBoxMeshNode = StaticMeshNode::Create(textureMesh);
 
   /// Models
   //SolidLineModel = RenderableNode::Create(SolidColorOp, LineMeshOp);
-  SolidLineModel = new Drawable();
-  SolidLineModel->mMaterial.Connect(&SolidColorOp);
-  SolidLineModel->mMesh.Connect(LineMeshOp);
+  mSolidLine = new Drawable();
+  mSolidLine->mMaterial.Connect(&mSolidColorMaterial);
+  mSolidLine->mMesh.Connect(mLineMeshNode);
 
   //SolidRectModel = RenderableNode::Create(SolidColorOp, RectMeshOp);
-  SolidRectModel = new Drawable();
-  SolidRectModel->mMaterial.Connect(&SolidColorOp);
-  SolidRectModel->mMesh.Connect(RectMeshOp);
+  mSolidRect = new Drawable();
+  mSolidRect->mMaterial.Connect(&mSolidColorMaterial);
+  mSolidRect->mMesh.Connect(mRectMeshNode);
 
   //SolidBoxModel = RenderableNode::Create(SolidColorOp, BoxMeshOp);
-  SolidBoxModel = new Drawable();
-  SolidBoxModel->mMaterial.Connect(&SolidColorOp);
-  SolidBoxModel->mMesh.Connect(BoxMeshOp);
+  mSolidBox = new Drawable();
+  mSolidBox->mMaterial.Connect(&mSolidColorMaterial);
+  mSolidBox->mMesh.Connect(mBoxMeshNode);
 
   //TexturedBoxModel = RenderableNode::Create(SolidTextureOp, TexturedBoxMeshOp);
-  TexturedBoxModel = new Drawable();
-  TexturedBoxModel->mMaterial.Connect(&SolidColorOp);
-  TexturedBoxModel->mMesh.Connect(TexturedBoxMeshOp);
+  mTexturedBox = new Drawable();
+  mTexturedBox->mMaterial.Connect(&mSolidColorMaterial);
+  mTexturedBox->mMesh.Connect(mTexturedBoxMeshNode);
 
   //TextBoxModel = RenderableNode::Create(TextTextureOp, TexturedBoxMeshOp);
-  TextBoxModel = new Drawable();
-  TextBoxModel->mMaterial.Connect(&TextTextureOp);
-  TextBoxModel->mMesh.Connect(TexturedBoxMeshOp);
+  mTextBox = new Drawable();
+  mTextBox->mMaterial.Connect(&mTextTextureMaterial);
+  mTextBox->mMesh.Connect(mTexturedBoxMeshNode);
 
   // Renderstate
-  CanvasRenderstate.DepthTest = false;
-  CanvasRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
-  CanvasRenderstate.BlendMode = RenderState::BLEND_ALPHA;
+  mCanvasRenderstate.DepthTest = false;
+  mCanvasRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  mCanvasRenderstate.BlendMode = RenderState::BLEND_ALPHA;
 }
 
 UiPainter::~UiPainter() {
-  SafeDelete(LineMeshOp);
-  SafeDelete(SolidLineModel);
+  SafeDelete(mLineMeshNode);
+  SafeDelete(mSolidLine);
 }
 
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
   VertexPos vertices[] = {{Vec3(x1 + 0.5f, y1 + 0.5f, 0)}, {Vec3(x2 + 0.5f, y2 + 0.5f, 0)}};
-  LineMeshOp->GetMesh()->SetVertices(vertices);
-  SolidLineModel->Draw(&mGlobals, PRIMITIVE_LINES);
+  mLineMeshNode->GetMesh()->SetVertices(vertices);
+  mSolidLine->Draw(&mGlobals, PRIMITIVE_LINES);
 }
 
 void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
   VertexPos vertices[] = {
     {Vec3(From.x + 0.5f, From.y + 0.5f, 0)},
     {Vec3(To.x + 0.5f, To.y + 0.5f, 0)}};
-  LineMeshOp->GetMesh()->SetVertices(vertices);
-  SolidLineModel->Draw(&mGlobals, PRIMITIVE_LINES);
+  mLineMeshNode->GetMesh()->SetVertices(vertices);
+  mSolidLine->Draw(&mGlobals, PRIMITIVE_LINES);
 }
 
 void UiPainter::DrawRect(const Vec2& TopLeft, const Vec2& Size) {
@@ -134,8 +134,8 @@ void UiPainter::DrawRect(const Vec2& TopLeft, const Vec2& Size) {
     {pos + Vec3(0, Size.y - 1, 0)},
     {pos},
   };
-  RectMeshOp->GetMesh()->SetVertices(vertices);
-  SolidRectModel->Draw(&mGlobals, PRIMITIVE_LINE_STRIP);
+  mRectMeshNode->GetMesh()->SetVertices(vertices);
+  mSolidRect->Draw(&mGlobals, PRIMITIVE_LINE_STRIP);
 }
 
 
@@ -146,8 +146,8 @@ void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
     {Vec3(TopLeft.x, TopLeft.y + Size.y, 0)},
     {Vec3(TopLeft.x + Size.x, TopLeft.y + Size.y, 0)},
   };
-  BoxMeshOp->GetMesh()->SetVertices(vertices);
-  SolidBoxModel->Draw(&mGlobals, PRIMITIVE_TRIANGLES);
+  mBoxMeshNode->GetMesh()->SetVertices(vertices);
+  mSolidBox->Draw(&mGlobals, PRIMITIVE_TRIANGLES);
 }
 
 void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
@@ -160,9 +160,9 @@ void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
     {Vec3(x + w, y + h, 0), Vec2(1, 1)},
   };
 
-  TexOp.Set(Tex);
-  TexturedBoxMeshOp->GetMesh()->SetVertices(vertices);
-  TexturedBoxModel->Draw(&mGlobals);
+  mTextureNode.Set(Tex);
+  mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
+  mTexturedBox->Draw(&mGlobals);
 }
 
 
@@ -178,16 +178,16 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
     {Vec3(Position.x + w, Position.y + h, 0), Vec2(u, v)},
   };
 
-  TexOp.Set(Tex->TheTexture);
-  TexturedBoxMeshOp->GetMesh()->SetVertices(vertices);
-  TextBoxModel->Draw(&mGlobals);
+  mTextureNode.Set(Tex->TheTexture);
+  mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
+  mTextBox->Draw(&mGlobals);
 }
 
 
 void UiPainter::Set(int Width, int Height) {
   TheDrawingAPI->SetViewport(0, 0, Width, Height);
-  TheDrawingAPI->SetRenderState(&CanvasRenderstate);
-  Color.Set(Vec4(1, 1, 1, 1));
+  TheDrawingAPI->SetRenderState(&mCanvasRenderstate);
+  mColor.Set(Vec4(1, 1, 1, 1));
 
   mGlobals.RenderTargetSize = Vec2(Width, Height);
   mGlobals.RenderTargetSizeRecip = Vec2(1.0f / float(Width), 1.0f / float(Height));

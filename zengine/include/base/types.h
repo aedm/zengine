@@ -5,7 +5,7 @@
 #include <string>
 
 //class Mesh;
-class Texture;
+//class Texture;
 
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
@@ -15,7 +15,7 @@ class Texture;
 	ITEM(VEC4,			Vec4		  ) \
 	ITEM(UINT,			UINT		  ) \
 	ITEM(MATRIX44,	Matrix		) \
-	ITEM(TEXTURE,		Texture*	) \
+	//ITEM(TEXTURE,		Texture*	) \
 
 
 /// Variable sizes in bytes, indexed by NodeType (only VALUETYPE_LIST names)

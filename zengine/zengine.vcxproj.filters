@@ -146,6 +146,7 @@
     <ClInclude Include="source\shaders\shaderbuilder.h">
       <Filter>source\shaders</Filter>
     </ClInclude>
+    <ClInclude Include="source\shaders\stubanalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">

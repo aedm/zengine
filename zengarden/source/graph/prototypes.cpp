@@ -23,7 +23,7 @@ Prototypes::Prototypes() {
   NodeRegistry* registry = NodeRegistry::GetInstance();
   AddPrototype(registry->GetNodeClass<FloatNode>());
   AddPrototype(registry->GetNodeClass<Vec4Node>());
-  AddPrototype(registry->GetNodeClass<TextureNode>());
+  //AddPrototype(registry->GetNodeClass<TextureNode>());
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<TimeNode>());
 }

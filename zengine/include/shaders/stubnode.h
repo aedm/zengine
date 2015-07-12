@@ -45,6 +45,8 @@ struct Globals {
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct StubParameter {
   NodeType type;
+  
+  /// TODO: make_shared
   string name;
 };
 

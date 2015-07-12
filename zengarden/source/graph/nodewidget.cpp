@@ -57,7 +57,7 @@ void NodeWidget::CreateWidgetSlots()
 	for(Slot* slot : node->GetPublicSlots())
 	{
 		WidgetSlot* sw = new WidgetSlot();
-		sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->TitleFont);
+		sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->mTitleFont);
 		sw->mSlot = slot;
 		mWidgetSlots.push_back(sw);
 	}
@@ -88,17 +88,17 @@ void NodeWidget::Paint(GraphWatcher* Panel)
   Vec2 position = GetNode()->GetPosition();
   Vec2 size = GetNode()->GetSize();
 
-  ThePainter->Color.Set(Vec4(0, 0.2, 0.4, Opacity));
+  ThePainter->mColor.Set(Vec4(0, 0.2, 0.4, Opacity));
 	ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
 
-	ThePainter->Color.Set(Vec4(0, 0, 0, Opacity));
+	ThePainter->mColor.Set(Vec4(0, 0, 0, Opacity));
 	ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
 	
-	ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
+	ThePainter->mColor.Set(Vec4(0.2, 0.7, 0.9, 1));
 	ThePainter->DrawBox(position + mOutputPosition - ConnectionSpotSize * 0.5f, 
                       ConnectionSpotSize);
 	
-	ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
+	ThePainter->mColor.Set(Vec4(0.9, 0.9, 0.9, 1));
 	float centerX = floor((size.x - float(mTitleTexture->TextSize.width())) * 0.5f);
 	ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
 
@@ -117,13 +117,13 @@ void NodeWidget::Paint(GraphWatcher* Panel)
 		}
 
 		WidgetSlot* sw = mWidgetSlots[i];
-		ThePainter->Color.Set(slotFrameColor);
+		ThePainter->mColor.Set(slotFrameColor);
 		ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
 
-		ThePainter->Color.Set(Vec4(0.9, 0.9, 0.9, 1));
+		ThePainter->mColor.Set(Vec4(0.9, 0.9, 0.9, 1));
 		ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
 
-		ThePainter->Color.Set(Vec4(0.2, 0.7, 0.9, 1));
+		ThePainter->mColor.Set(Vec4(0.2, 0.7, 0.9, 1));
 		ThePainter->DrawBox(position + sw->mSpotPos - ConnectionSpotSize * 0.5f, 
                         ConnectionSpotSize);
 	}
@@ -142,7 +142,7 @@ void NodeWidget::Paint(GraphWatcher* Panel)
 			}
 		} else frameColor = Vec4(1, 1, 1, 0.3);
 	} 
-	ThePainter->Color.Set(frameColor);
+	ThePainter->mColor.Set(frameColor);
 	ThePainter->DrawRect(position, size);
 }
 
@@ -169,7 +169,7 @@ void NodeWidget::HandleTitleChange()
     }
   } 
 	mTitleTexture = new TextTexture();
-	mTitleTexture->SetText(text, ThePainter->TitleFont);
+	mTitleTexture->SetText(text, ThePainter->mTitleFont);
 	OnRepaint();
 }
 

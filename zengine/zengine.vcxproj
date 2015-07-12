@@ -122,6 +122,7 @@
     <ClInclude Include="source\serialize\json\jsonserializer.h" />
     <ClInclude Include="source\shaders\shaderbuilder.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />
+    <ClInclude Include="source\shaders\stubanalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp" />
