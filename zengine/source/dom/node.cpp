@@ -2,6 +2,15 @@
 #include <include/base/helpers.h>
 #include <algorithm>
 
+
+/// Array for variable sizes in bytes
+const int gVariableByteSizes[] = {
+#undef ITEM
+#define ITEM(name, type) sizeof(NodeTypes<NodeType::name>::Type),
+  VALUETYPE_LIST
+};
+
+
 Slot::Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot,
            bool isPublic, bool isSerializable)
            : mOwner(owner)

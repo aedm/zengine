@@ -130,7 +130,7 @@ void Pass::Set(Globals* globals) {
       ASSERT(uniform.node != nullptr);
       switch (uniform.type) {
 #undef ITEM
-#define ITEM(name, type, token) \
+#define ITEM(name, type) \
 				case NodeType::name: \
 					TheDrawingAPI->SetUniform(uniform.handle, NodeType::name, \
 						&static_cast<ValueNode<NodeType::name>*>(uniform.node)->Get()); \

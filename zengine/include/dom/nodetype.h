@@ -13,7 +13,7 @@ class Slot;
 enum class NodeType {
   /// Node types holding a value type
 #undef ITEM
-#define ITEM(name, type, token) name,
+#define ITEM(name, type) name,
   VALUETYPE_LIST
 
   /// Other node types 
@@ -46,7 +46,7 @@ enum class NodeType {
 /// Type helpers
 template<NodeType T> struct NodeTypes;
 #undef ITEM
-#define ITEM(name, type, token) \
+#define ITEM(name, type) \
   template<> struct NodeTypes<NodeType::name> { typedef type Type; };
 VALUETYPE_LIST
 

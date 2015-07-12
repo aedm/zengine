@@ -37,7 +37,7 @@ extern const int GlobalUniformOffsets[];
 
 struct Globals {
 #undef ITEM
-#define ITEM(name, type, token) type##_TYPE token;
+#define ITEM(name, type, token) NodeTypes<NodeType::type>::Type token;
   GLOBALUSAGE_LIST
 };
 
