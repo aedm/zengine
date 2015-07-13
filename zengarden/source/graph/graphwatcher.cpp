@@ -31,9 +31,7 @@ GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
 }
 
 
-void GraphWatcher::Paint(GLWidget*) {
-  GLWidget* glWidget = GetGLWidget();
-
+void GraphWatcher::Paint(GLWidget* glWidget) {
   TheDrawingAPI->OnContextSwitch();
 
   ThePainter->Set(glWidget->width(), glWidget->height());
@@ -48,16 +46,16 @@ void GraphWatcher::Paint(GLWidget*) {
   //  NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
   //  Node* node = ndWidget->GetNode();
   for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
-    NodeWidget* ndWidget = mWidgetMap.at(node);
-    for (int i = 0; i < ndWidget->mWidgetSlots.size(); i++) {
-      Slot* slot = ndWidget->mWidgetSlots[i]->mSlot;
+    NodeWidget* nodeWidget = mWidgetMap.at(node);
+    for (int i = 0; i < nodeWidget->mWidgetSlots.size(); i++) {
+      Slot* slot = nodeWidget->mWidgetSlots[i]->mSlot;
       Node* connectedOp = slot->GetAbstractNode();
       if (connectedOp) {
         NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);
         if (connectedOpWidget != NULL) {
           /// Draw connection
           Vec2 p1 = connectedOpWidget->GetOutputPosition();
-          Vec2 p2 = ndWidget->GetInputPosition(i);
+          Vec2 p2 = nodeWidget->GetInputPosition(i);
           ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
         }
       }
@@ -272,7 +270,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::CONNECT_TO_NODE:
       if (mIsConnectionValid) {
         Node* node = mHoveredWidget->GetNode();
-        Slot* slot = mClickedWidget->GetNode()->GetPublicSlots()[mClickedSlotIndex];
+        Slot* slot = mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot;
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
       }
       GetGLWidget()->update();
@@ -281,7 +279,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     case State::CONNECT_TO_SLOT:
       if (mIsConnectionValid) {
         Node* node = mClickedWidget->GetNode();
-        Slot* slot = mHoveredWidget->GetNode()->GetPublicSlots()[mHoveredSlotIndex];
+        Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
       }
       GetGLWidget()->update();
@@ -297,7 +295,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
   if ((event->modifiers() & Qt::AltModifier) > 0) {
     if (mHoveredSlotIndex >= 0) {
       /// Remove connection
-      Slot* slot = mHoveredWidget->GetNode()->GetPublicSlots()[mHoveredSlotIndex];
+      Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
       if (slot->GetAbstractNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
@@ -342,7 +340,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       mIsConnectionValid = false;
       UpdateHoveredWidget(mousePos);
       if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
-        if (mClickedWidget->GetNode()->GetPublicSlots()[mClickedSlotIndex]->DoesAcceptType(
+        if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptType(
           mHoveredWidget->GetNode()->GetType())) {
           mIsConnectionValid = true;
         }
@@ -353,7 +351,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       mIsConnectionValid = false;
       UpdateHoveredWidget(mousePos);
       if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
-        if (mHoveredWidget->GetNode()->GetPublicSlots()[mHoveredSlotIndex]->DoesAcceptType(
+        if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptType(
           mClickedWidget->GetNode()->GetType())) {
           mIsConnectionValid = true;
         }

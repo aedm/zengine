@@ -22,6 +22,16 @@ public:
 
   Event<> OnRepaint;
 
+  struct WidgetSlot {
+    TextTexture mTexture;
+    Vec2 mPosition;
+    Vec2 mSize;
+    Vec2 mSpotPos;
+    Slot* mSlot;
+  };
+
+  vector<WidgetSlot*>	mWidgetSlots;
+
 private:
   virtual void HandleSniffedMessage(Slot* S, NodeMessage Message,
                                     const void* Payload) override;
@@ -47,15 +57,6 @@ private:
   /// Height of the titlebar
   float mTitleHeight;
 
-  struct WidgetSlot {
-    TextTexture mTexture;
-    Vec2 mPosition;
-    Vec2 mSize;
-    Vec2 mSpotPos;
-    Slot* mSlot;
-  };
-
-  vector<WidgetSlot*>	mWidgetSlots;
   void CreateWidgetSlots();
 
   TextTexture* mTitleTexture;
