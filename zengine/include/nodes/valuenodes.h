@@ -3,6 +3,7 @@
 #include "../dom/node.h"
 #include "../base/types.h"
 #include "../resources/texture.h"
+#include <string>
 
 /// Nodes holding primitive values.
 template<NodeType T>
@@ -135,7 +136,7 @@ template<NodeType T>
 void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
   ASSERT(IsDefaulted());
   mDefault.Set(value);
-  mOwner->HandleMessage(this, NodeMessage::VALUE_CHANGED);
+  mOwner->ReceiveMessage(this, NodeMessage::VALUE_CHANGED);
 }
 
 
@@ -167,11 +168,12 @@ void ValueSlot<T>::Disconnect(Node* target) {
   ASSERT(target == mNode);
   ASSERT(target != nullptr);
   mNode->DisconnectFromSlot(this);
-  mNode = nullptr;
   if (mNode == &mDefault) {
     /// Avoid infinite loop when called by the default node's destructor.
+    mNode = nullptr;
     return;
   }
+  mNode = nullptr;
   mDefault.ConnectToSlot(this);
   mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
 }
@@ -218,7 +220,13 @@ typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
 
 
 /// Define texture type
-template<> struct NodeTypes < NodeType::TEXTURE > { typedef Texture* Type; };
+template<> struct NodeTypes<NodeType::TEXTURE> { typedef Texture* Type; };
 typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
 typedef ValueSlot<NodeType::TEXTURE> TextureSlot;
+
+/// Define text type
+template<> struct NodeTypes<NodeType::STRING> { typedef std::string Type; };
+typedef StaticValueNode<NodeType::STRING>	StringNode;
+typedef ValueSlot<NodeType::STRING> StringSlot;
+
 

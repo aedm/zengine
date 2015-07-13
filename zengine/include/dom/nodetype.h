@@ -17,6 +17,7 @@ enum class NodeType {
   VALUETYPE_LIST
 
   /// Other node types 
+  STRING,
   TEXTURE,
   SAMPLER,
   SHADER_SOURCE,

@@ -2,9 +2,10 @@
 #include <include/shaders/valuestubslot.h>
 #include <include/shaders/stubnode.h>
 #include <include/shaders/shadernode.h>
-#include <include/nodes/valuenodes.h>
 
 REGISTER_NODECLASS(StubNode, "Stub");
+
+static SharedString SourceSlotName = make_shared<string>("Source");
 
 const EnumMapperA GlobalUniformMapper[] = {
 #undef ITEM
@@ -29,31 +30,32 @@ const int GlobalUniformOffsets[] = {
 StubNode::StubNode()
   : Node(NodeType::SHADER_STUB)
   , mMetadata(nullptr)
-  , mShader(nullptr) {
-}
+  , mShader(nullptr)
+  , mSource(this, SourceSlotName)
+{}
 
 StubNode::StubNode(const StubNode& original)
   : Node(original)
   , mMetadata(nullptr)
-  , mShader(nullptr) {
-  SetStubSource(original.GetStubSource());
+  , mShader(nullptr) 
+  , mSource(this, SourceSlotName)
+{
+  SetStubSource(original.mSource.Get());
 }
 
 StubNode::~StubNode() {
   SafeDelete(mMetadata);
+  ResetStubSlots();
 }
 
 void StubNode::SetStubSource(const string& source) {
-  mSource = source;
+  ResetStubSlots();
 
-  for (Slot* slot : GetPublicSlots()) delete slot;
-  ClearSlots();
-
-  mParameterSlotMap.clear();
-  mParameterNameSlotMap.clear();
+  ASSERT(mSource.IsDefaulted());
+  mSource.SetDefaultValue(source);
 
   SafeDelete(mMetadata);
-  mMetadata = StubAnalyzer::FromText(mSource.c_str());
+  mMetadata = StubAnalyzer::FromText(mSource.Get().c_str());
 
   if (mMetadata == nullptr) return;
 
@@ -104,10 +106,6 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
-const string& StubNode::GetStubSource() const {
-  return mSource;
-}
-
 void StubNode::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
@@ -119,6 +117,12 @@ void StubNode::HandleMessage(Slot* slot, NodeMessage message, const void* payloa
     default:
       break;
   }
+}
+
+void StubNode::ResetStubSlots() {
+  for (auto slotPair : mParameterSlotMap) delete(slotPair.second);
+  ClearSlots();
+  AddSlot(&mSource, true, true);
 }
 
 StubMetadata::StubMetadata(const string& _name, NodeType _returnType,

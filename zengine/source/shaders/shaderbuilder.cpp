@@ -90,8 +90,8 @@ void ShaderBuilder::CollectDependencies(Node* root) {
   mDataMap[root] = data;
 
   if (root->GetType() == NodeType::SHADER_STUB) {
-    for (Slot* slot : root->GetPublicSlots()) {
-      Node* node = slot->GetAbstractNode();
+    for (auto slotPair : static_cast<StubNode*>(root)->mParameterSlotMap) {
+      Node* node = slotPair.second->GetAbstractNode();
       if (node == nullptr) {
         //WARN("Incomplete shader graph.");
         //throw exception();

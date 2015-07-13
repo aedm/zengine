@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../dom/node.h"
+#include "../nodes/valuenodes.h"
 #include <vector>
 #include <map>
 
@@ -105,6 +106,8 @@ struct StubMetadata {
 /// on other nodes likes textures and floats. A tree of stubs can be turned into
 /// a ShaderNode.
 class StubNode: public Node {
+  friend class ShaderBuilder;
+
 public:
   StubNode();
   StubNode(const StubNode& original);
@@ -112,9 +115,6 @@ public:
 
   /// Sets new source to the stub and performs metadata analysis.
   void SetStubSource(const string& source);
-  
-  /// Returns the source code of the stub.
-  const string& GetStubSource() const;
   
   /// Returns the metadata containing information about the stub source.
   StubMetadata* GetStubMetadata() const;
@@ -126,6 +126,9 @@ public:
   Slot* GetSlotByParameter(StubParameter*);
   Slot* GetSlotByParameterName(const string& name);
 
+  /// Source of the stub
+  StringSlot mSource;
+
 protected:
   /// Handle received messages
   virtual void HandleMessage(Slot* slot, NodeMessage message,
@@ -134,16 +137,15 @@ protected:
   /// Metadata
   StubMetadata* mMetadata;
 
-  /// Source of the stub
-  /// TODO: make this a slot
-  string mSource;
-
   /// The shader which is made of this stub and its transitive closure.
   ShaderNode* mShader;
 
   /// Maps stub parameters to stub slots
   map<StubParameter*, Slot*> mParameterSlotMap;
   map<string, Slot*> mParameterNameSlotMap;
+
+  /// Deletes stub-related slots
+  void ResetStubSlots();
 };
 
 
