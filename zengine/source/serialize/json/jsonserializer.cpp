@@ -3,9 +3,18 @@
 #include <include/base/helpers.h>
 #include <include/nodes/valuenodes.h>
 #include <include/shaders/valuestubslot.h>
+#include "base64/base64.h"
 #include <rapidjson/include/rapidjson/writer.h>
 #include <rapidjson/include/rapidjson/prettywriter.h>
 #include <rapidjson/include/rapidjson/stringbuffer.h>
+
+const EnumMapperA TexelTypeMapper[] = {
+  {"RGBA8", UINT(TEXELTYPE_RGBA_UINT8)},
+  {"RGBA16", UINT(TEXELTYPE_RGBA_UINT16)},
+  {"RGBA16F", UINT(TEXELTYPE_RGBA_FLOAT16)},
+  {"RGBA32F", UINT(TEXELTYPE_RGBA_FLOAT32)},
+  {"", -1}
+};
 
 JSONSerializer::JSONSerializer(Node* root) {
   mJsonDocument.SetObject();
@@ -88,6 +97,9 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   if (IsInstanceOf<FloatNode>(node)) {
     SerializeFloatNode(v, static_cast<FloatNode*>(node));
   }
+  else if (IsInstanceOf<TextureNode>(node)) {
+    SerializeTextureNode(v, static_cast<TextureNode*>(node));
+  }
   else {
     SerializeGeneralNode(v, node);
   }
@@ -125,11 +137,12 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
       }
       else {
         Node* connectedNode = slot->GetAbstractNode();
-        rapidjson::Value slotValue(rapidjson::kObjectType);
 
         /// Save FloatSlot
-        FloatSlot* floatSlot = dynamic_cast<FloatSlot*>(slot);
-        if (floatSlot != nullptr) {
+        FloatSlot* floatSlot;
+        StringSlot* stringSlot;
+        if ((floatSlot = dynamic_cast<FloatSlot*>(slot)) != nullptr) {
+          rapidjson::Value slotValue(rapidjson::kObjectType);
           float f = floatSlot->GetDefaultValue();
           slotValue.AddMember("default", f, *mAllocator);
           if (node != nullptr && !slot->IsDefaulted()) {
@@ -138,6 +151,15 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
           }
           slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
             slotValue, *mAllocator);
+        } 
+        
+        /// Save StringSlot
+        else if ((stringSlot = dynamic_cast<StringSlot*>(slot)) != nullptr) {
+          const string& f = stringSlot->GetDefaultValue();
+          rapidjson::Value slotValue(rapidjson::kObjectType);
+          slotValue.AddMember("default", f, *mAllocator);
+          slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
+                                slotValue, *mAllocator);
         }
 
         /// Save all other kind of slots
@@ -157,5 +179,17 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
 void JSONSerializer::SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node)
 {
   nodeValue.AddMember("value", node->Get(), *mAllocator);
+}
+
+void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node) {
+  Texture* texture = node->Get();
+  ASSERT(texture->mTexelData);
+  string b64 = base64_encode((UCHAR*)texture->mTexelData, texture->mTexelDataByteCount);
+  nodeValue.AddMember("width", texture->mWidth, *mAllocator);
+  nodeValue.AddMember("height", texture->mHeight, *mAllocator);
+  nodeValue.AddMember("type", rapidjson::Value(
+    EnumMapperA::GetStringFromEnum(TexelTypeMapper, texture->mType), *mAllocator), 
+    *mAllocator);
+  nodeValue.AddMember("base64", b64, *mAllocator);
 }
 

@@ -37,8 +37,6 @@ private:
   Material mSolidTextureMaterial;
   Material mTextTextureMaterial;
 
-  Texture* mSomeTexture;
-
   StaticMeshNode* mLineMeshNode;
   StaticMeshNode* mRectMeshNode;
   StaticMeshNode* mBoxMeshNode;

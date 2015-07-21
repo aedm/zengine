@@ -46,10 +46,11 @@ void TextTexture::SetText( const QString& Text, const QFont& Font )
 	if (TheTexture == NULL || TheTexture->mWidth < tw || TheTexture->mHeight < th)
 	{
 		DestroyTexture();
-		TheTexture = TheResourceManager->CreateTexture(tw, th, TEXELTYPE_RGBA_UINT8, image.bits());
+		TheTexture = TheResourceManager->CreateGPUTexture(
+      tw, th, TEXELTYPE_RGBA_UINT8, image.bits());
 	} else {
-		TheDrawingAPI->UploadTextureSubData(TheTexture->mHandle, 0, 0, tw, th, TEXELTYPE_RGBA_UINT8, 
-			image.bits());
+		TheDrawingAPI->UploadTextureSubData(
+      TheTexture->mHandle, 0, 0, tw, th, TEXELTYPE_RGBA_UINT8, image.bits());
 	}
 }
 

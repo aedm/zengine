@@ -183,7 +183,7 @@ void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget) {
 }
 
 Texture* ZenGarden::CreateSampleTexture() {
-  UINT tmp[256 * 256];
+  UINT* tmp = new UINT[256 * 256];
   for (UINT i = 0; i < 256; i++)
     for (UINT o = 0; o < 256; o++) {
       UINT c = i^o;

@@ -92,13 +92,24 @@ void ResourceManager::DiscardMesh(Mesh* meshInstance) {
 }
 
 Texture* ResourceManager::CreateTexture(int width, int height, TexelTypeEnum type, 
-                                        void* texelData) {
+                                        OWNERSHIP void* texelData) {
   TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type);
   if (texelData) {
     TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling
   }
-  Texture* texture = new Texture(width, height, type, handle);
+  Texture* texture = new Texture(width, height, type, handle, texelData);
+  return texture;
+}
+
+Texture* ResourceManager::CreateGPUTexture(int width, int height, TexelTypeEnum type, 
+                                           void* texelData) {
+  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type);
+  if (texelData) {
+    TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
+    // TODO: error handling
+  }
+  Texture* texture = new Texture(width, height, type, handle, nullptr);
   return texture;
 }
 
@@ -106,7 +117,6 @@ void ResourceManager::DiscardTexture(Texture* textureInstance) {
   TheDrawingAPI->DeleteTexture(textureInstance->mHandle);
   delete textureInstance;
 }
-
 
 //ResourceManager::TexCategory::TexCategory( int Width, int Height, TextureType Type )
 //{

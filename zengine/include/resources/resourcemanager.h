@@ -21,7 +21,12 @@ public:
   ResourceManager();
   ~ResourceManager();
 
+  /// Creates texture which remembers texel data
   Texture* CreateTexture(int width, int height, TexelTypeEnum type, void* texelData);
+  
+  /// Creates texture with GPU-only texel data that can't be serialized
+  Texture* CreateGPUTexture(int width, int height, TexelTypeEnum type, void* texelData);
+
   void DiscardTexture(Texture* texture);
 
   Mesh* CreateMesh();

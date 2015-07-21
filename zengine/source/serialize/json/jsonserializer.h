@@ -26,6 +26,7 @@ private:
 
   /// Node serializers
   void SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node);
+  void SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node);
   void SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node);
 
   /// Helpers

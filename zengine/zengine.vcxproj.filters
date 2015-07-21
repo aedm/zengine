@@ -147,6 +147,7 @@
       <Filter>source\shaders</Filter>
     </ClInclude>
     <ClInclude Include="source\shaders\stubanalyzer.h" />
+    <ClInclude Include="source\serialize\json\base64\base64.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -221,6 +222,7 @@
     <ClCompile Include="source\shaders\shaderbuilder.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="source\serialize\json\base64\base64.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

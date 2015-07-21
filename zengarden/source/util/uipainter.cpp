@@ -54,12 +54,6 @@ UiPainter::UiPainter() {
   ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
   mTextTextureMaterial.mSolidPass.Connect(pass);
 
-  /// Create a texture
-  const int m = 256;
-  UINT tex[m*m];
-  for (UINT y = 0; y < m; y++) for (UINT x = 0; x < m; x++) tex[y*m + x] = (x^y) | 0xff000000;
-  mSomeTexture = TheResourceManager->CreateTexture(m, m, TEXELTYPE_RGBA_UINT8, tex);
-
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
 
   /// Meshes
