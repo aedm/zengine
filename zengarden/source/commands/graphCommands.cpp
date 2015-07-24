@@ -73,7 +73,6 @@ DeleteNodeCommand::~DeleteNodeCommand() {
 bool DeleteNodeCommand::Do() {
   for (Node* node : *mNodes) {
     /// TODO: don't delete them, just remove them from the graph.
-    node->ReceiveMessage(NodeMessage::NODE_REMOVED);
     delete node;
   }
   SafeDelete(mNodes);

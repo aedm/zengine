@@ -31,6 +31,9 @@ public:
   /// Get the OpenGL widget, if any
   virtual GLWidget* GetGLWidget();
 
+  /// Watcher died, commit suicide.
+  void HandleWatcherDeath();
+
   const WatcherPosition	mPosition;
 
 protected:

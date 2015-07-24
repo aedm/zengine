@@ -215,15 +215,8 @@ void Node::SendMsg(NodeMessage message, void* payload) {
 
 
 void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
-  if (message == NodeMessage::NODE_REMOVED) {
-    /// Remove all watchers. Create a copy of the event hook, because watchers remove
-    /// themselves from the callback list while the Event object iterates through it.
-    auto eventCopy = onSniffMessage;
-    eventCopy(message, nullptr, nullptr);
-  } else {
-    HandleMessage(message, slot, payload);
-    onSniffMessage(message, slot, payload);
-  }
+  HandleMessage(message, slot, payload);
+  onSniffMessage(message, slot, payload);
 }
 
 
@@ -251,9 +244,16 @@ void Node::Evaluate() {
 
 
 Node::~Node() {
+  /// Remove all watchers. Create a copy of the event hook, because watchers remove
+  /// themselves from the callback list while the Event object iterates through it.
+  auto eventCopy = onSniffMessage;
+  eventCopy(NodeMessage::NODE_REMOVED, nullptr, nullptr); 
+  
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
-    deps.back()->Disconnect(this);
+    Slot* slot = deps.back();
+    slot->Disconnect(this);
+    //deps.back()->Disconnect(this);
   }
 }
 

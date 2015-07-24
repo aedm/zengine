@@ -378,6 +378,7 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
           selectedNodes->insert(nodeWidget->GetNode());
         }
         TheCommandStack->Execute(new DeleteNodeCommand(selectedNodes));
+        mWatcherWidget->onSelectNode(nullptr);
       }
       break;
 

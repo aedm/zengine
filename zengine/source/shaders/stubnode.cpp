@@ -44,8 +44,8 @@ StubNode::StubNode(const StubNode& original)
 }
 
 StubNode::~StubNode() {
-  SafeDelete(mMetadata);
   ResetStubSlots();
+  SafeDelete(mMetadata);
 }
 
 void StubNode::SetStubSource(const string& source) {

@@ -18,6 +18,7 @@ void Watcher::SniffMessage(NodeMessage message, Slot* slot, void* payload) {
   HandleSniffedMessage(message, slot, payload);
   if (message == NodeMessage::NODE_REMOVED) {
     ChangeNode(nullptr);
+    if (mWatcherWidget) mWatcherWidget->HandleWatcherDeath();
   }
 }
 

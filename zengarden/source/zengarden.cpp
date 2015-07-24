@@ -157,21 +157,21 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   }
 }
 
-void ZenGarden::Watch(Node* Nd, WatcherWidget* Widget) {
-  QTabWidget* tabWidget = Widget->mPosition == WatcherPosition::RIGHT_TAB
+void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
+  QTabWidget* tabWidget = sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
     ? mUI.leftPanel : mUI.rightPanel;
-  WatcherPosition position = Widget->mPosition == WatcherPosition::RIGHT_TAB
+  WatcherPosition position = sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
     ? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 
   WatcherWidget* watcherWidget = nullptr;
   Watcher* watcher = nullptr;
 
-  switch (Nd->GetType()) {
+  switch (node->GetType()) {
     case NodeType::PASS:
     {
       GLWatcherWidget* glWatcherWidget =
         new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new PassWatcher(static_cast<Pass*>(Nd), glWatcherWidget);
+      watcher = new PassWatcher(static_cast<Pass*>(node), glWatcherWidget);
       watcherWidget = glWatcherWidget;
       break;
     }

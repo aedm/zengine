@@ -134,9 +134,6 @@ public:
   /// Reruns Operate() if dirty (on dirty ancestors too)
   void Evaluate();
 
-  /// Receives message through a slot
-  void ReceiveMessage(NodeMessage message, Slot* slot = nullptr, void* payload = nullptr);
-
 protected:
   Node(NodeType type);
 
@@ -148,6 +145,9 @@ protected:
 
   /// Main operation
   virtual void Operate() {}
+
+  /// Receives message through a slot
+  void ReceiveMessage(NodeMessage message, Slot* slot = nullptr, void* payload = nullptr);
 
   /// Sends a message to dependants. ('SendMessage' is already defined in WinUser.h)
   void SendMsg(NodeMessage message, void* payload = nullptr);
