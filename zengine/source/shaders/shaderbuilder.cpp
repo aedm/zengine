@@ -154,7 +154,7 @@ void ShaderBuilder::GenerateSlots() {
     }
   }
 
-  mShader->ReceiveMessage(nullptr, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
+  mShader->ReceiveMessage(NodeMessage::SLOT_STRUCTURE_CHANGED);
 }
 
 void ShaderBuilder::GenerateSource() {

@@ -77,7 +77,7 @@ template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
   mValue = newValue;
   SendMsg(NodeMessage::VALUE_CHANGED);
-  onMessageReceived(nullptr, NodeMessage::VALUE_CHANGED, nullptr);
+  onSniffMessage(NodeMessage::VALUE_CHANGED, nullptr, nullptr);
 }
 
 
@@ -137,7 +137,6 @@ template<NodeType T>
 void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
   ASSERT(IsDefaulted());
   mDefault.Set(value);
-  mOwner->ReceiveMessage(this, NodeMessage::VALUE_CHANGED);
 }
 
 
@@ -159,7 +158,7 @@ bool ValueSlot<T>::Connect(Node* target) {
   if (mNode) mNode->DisconnectFromSlot(this);
   mNode = target ? target : &mDefault;
   mNode->ConnectToSlot(this);
-  mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+  mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
   return true;
 }
 
@@ -176,7 +175,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
   }
   mNode = nullptr;
   mDefault.ConnectToSlot(this);
-  mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+  mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
 }
 
 
@@ -185,7 +184,7 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   if (mNode == &mDefault) return;
   mDefault.ConnectToSlot(this);
   if (notifyOwner) {
-    mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+    mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
   }
 }
 

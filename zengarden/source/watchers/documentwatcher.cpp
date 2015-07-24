@@ -20,7 +20,7 @@ DocumentWatcher::~DocumentWatcher() {
 }
 
 
-void DocumentWatcher::HandleSniffedMessage(Slot* slot, NodeMessage message, 
+void DocumentWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
                                            void* payload) {
   Document* doc = static_cast<Document*>(mNode);
   switch (message) {

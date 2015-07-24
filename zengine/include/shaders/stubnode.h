@@ -131,8 +131,7 @@ public:
 
 protected:
   /// Handle received messages
-  virtual void HandleMessage(Slot* slot, NodeMessage message,
-                             const void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 
   /// Metadata
   StubMetadata* mMetadata;

@@ -31,7 +31,7 @@ public:
 private:
   map<Slot*, Watcher*> mSlotWatchers;
 
-  virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
 };
 

@@ -11,7 +11,7 @@ using namespace std;
 using namespace fastdelegate;
 
 /// Notifications that nodes send to each other when something changed.
-/// An accompanying UINT data can also be set for each event type.
+/// An accompanying void* payload can also be set for each event type.
 enum class NodeMessage {
   /// Some slots were added or removed.
   SLOT_STRUCTURE_CHANGED,
@@ -34,7 +34,7 @@ enum class NodeMessage {
   /// The value of a connected node changed, reevaluation might be needed
   VALUE_CHANGED,
 
-  /// Node looks changed, watchers need to redraw it.
+  /// Node contents changed, watchers need to redraw it.
   NEEDS_REDRAW,
 
   /// Name of the node changed
@@ -135,7 +135,7 @@ public:
   void Evaluate();
 
   /// Receives message through a slot
-  void ReceiveMessage(Slot* slot, NodeMessage message, void* payload = nullptr);
+  void ReceiveMessage(NodeMessage message, Slot* slot = nullptr, void* payload = nullptr);
 
 protected:
   Node(NodeType type);
@@ -153,7 +153,7 @@ protected:
   void SendMsg(NodeMessage message, void* payload = nullptr);
 
   /// Handle received messages
-  virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload);
 
   /// Output type
   NodeType mType;
@@ -189,8 +189,8 @@ public:
   /// Returns the slots that need to be serialized when saving / loading
   const unordered_map<SharedString, Slot*>& GetSerializableSlots();
 
-  /// Hook for watchers (UI only)
-  Event<Slot*, NodeMessage, void*> onMessageReceived;
+  /// Hook for watchers (UI only). This way watchers get all messages emitted by nodes.
+  Event<NodeMessage, Slot*, void*> onSniffMessage;
 
 protected:
   /// Registers a new slot

@@ -41,8 +41,7 @@ protected:
   ShaderSlot mFragmentSource;
   ShaderSlot mVertexSource;
 
-  virtual void HandleMessage(Slot* slot, NodeMessage message, 
-                             const void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 
   /// Creates the shader program
   void BuildRenderPipeline();

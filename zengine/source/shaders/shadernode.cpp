@@ -20,7 +20,7 @@ ShaderNode::~ShaderNode() {
 }
 
 
-void ShaderNode::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void ShaderNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:

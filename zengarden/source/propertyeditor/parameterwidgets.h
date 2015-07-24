@@ -73,7 +73,7 @@ protected:
 private:
   //virtual void HandleMessage(Slot* slot, NodeMessage message, 
   //                           const void* payload) override;
-  virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot, 
                                     void* payload) override;
 
   /// Allow editing

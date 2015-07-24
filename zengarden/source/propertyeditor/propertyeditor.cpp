@@ -75,7 +75,7 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
   }
 }
 
-void DefaultPropertyEditor::HandleSniffedMessage(Slot* slot, NodeMessage message, 
+void DefaultPropertyEditor::HandleSniffedMessage(NodeMessage message, Slot* slot,
                                                  void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:

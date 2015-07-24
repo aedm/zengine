@@ -142,8 +142,7 @@ void FloatWatcher::SliderValueChanged(float value) {
   static_cast<FloatNode*>(mNode)->Set(value);
 }
 
-void FloatWatcher::HandleSniffedMessage(Slot*, NodeMessage message, 
-                                        void* payload) {
+void FloatWatcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED: {
       float value = static_cast<FloatNode*>(mNode)->Get();

@@ -31,7 +31,7 @@ public:
   vector<WidgetSlot*>	mWidgetSlots;
 
 private:
-  virtual void HandleSniffedMessage(Slot* S, NodeMessage Message,
+  virtual void HandleSniffedMessage(NodeMessage Message, Slot* S,
                                     void* Payload) override;
 
   /// Handles node title change

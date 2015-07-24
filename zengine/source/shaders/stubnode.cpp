@@ -106,7 +106,7 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
-void StubNode::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
       CheckConnections();

@@ -398,7 +398,7 @@ Graph* GraphWatcher::GetGraph() {
 }
 
 
-void GraphWatcher::HandleSniffedMessage(Slot* slot, NodeMessage message, 
+void GraphWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
                                         void* payload) {
   switch (message) {
     case NodeMessage::MULTISLOT_CONNECTION_ADDED: {

@@ -29,7 +29,7 @@ private:
   void HandleKeyPress(GLWidget*, QKeyEvent* event);
 
   /// This method will be callen when the watched graph receives an internal message
-  virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.

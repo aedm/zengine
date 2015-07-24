@@ -47,7 +47,7 @@ void PassWatcher::Paint(GLWidget* Widget) {
   mDrawable->Draw(&mGlobals);
 }
 
-void PassWatcher::HandleSniffedMessage(Slot* slot, NodeMessage message,
+void PassWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
                                        void* payload) {
   if (message == NodeMessage::NEEDS_REDRAW) {
     GetGLWidget()->updateGL();

@@ -20,7 +20,7 @@ Pass::Pass()
 Pass::~Pass() 
 {}
 
-void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
       if (slot == &mVertexStub || slot == &mFragmentStub) {
@@ -30,14 +30,14 @@ void Pass::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
           (slot == &mVertexStub) ? &mVertexSource : &mFragmentSource;
         sourceSlot->Connect(stub == nullptr ? nullptr : stub->GetShader());
         BuildRenderPipeline();
-        ReceiveMessage(nullptr, NodeMessage::NEEDS_REDRAW);
+        ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       } 
       break;
     case NodeMessage::VALUE_CHANGED:
       if (slot == &mVertexSource || slot == &mFragmentSource) {
         /// Shader sources changed, rebuild pipeline
         BuildRenderPipeline();
-        ReceiveMessage(nullptr, NodeMessage::NEEDS_REDRAW);
+        ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       }
       break;
     default: break;

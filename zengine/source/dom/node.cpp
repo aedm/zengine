@@ -21,7 +21,7 @@ Slot::Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot,
   mName = name;
   mOwner->AddSlot(this, isPublic, isSerializable);
   if (isPublic) {
-    mOwner->ReceiveMessage(this, NodeMessage::SLOT_STRUCTURE_CHANGED, nullptr);
+    mOwner->ReceiveMessage(NodeMessage::SLOT_STRUCTURE_CHANGED, this, nullptr);
   }
 }
 
@@ -48,13 +48,13 @@ bool Slot::Connect(Node* target) {
     }
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
-    mOwner->ReceiveMessage(this, NodeMessage::MULTISLOT_CONNECTION_ADDED, target);
+    mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_ADDED, this, target);
   } else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
-      mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+      mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
     }
   }
   return true;
@@ -67,7 +67,7 @@ void Slot::Disconnect(Node* target) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        mOwner->ReceiveMessage(this, NodeMessage::MULTISLOT_CONNECTION_REMOVED, target);
+        mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_REMOVED, this, target);
         return;
       }
     }
@@ -87,13 +87,13 @@ void Slot::DisconnectAll(bool notifyOwner) {
     }
     mMultiNodes.clear();
     if (notifyOwner) {
-      mOwner->ReceiveMessage(this, NodeMessage::MULTISLOT_CLEARED);
+      mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CLEARED, this);
     }
   } else {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
     if (notifyOwner) {
-      mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+      mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
     }
   }
 }
@@ -189,7 +189,7 @@ NodeType Node::GetType() const {
 }
 
 
-void Node::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
       CheckConnections();
@@ -209,20 +209,20 @@ void Node::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
 
 void Node::SendMsg(NodeMessage message, void* payload) {
   for (Slot* slot : mDependants) {
-    slot->mOwner->ReceiveMessage(slot, message, payload);
+    slot->mOwner->ReceiveMessage(message, slot, payload);
   }
 }
 
 
-void Node::ReceiveMessage(Slot* slot, NodeMessage message, void* payload) {
+void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
   if (message == NodeMessage::NODE_REMOVED) {
-    /// Remove all watchers. Create a copy of the event hook, because watcher remove
-    /// themselves from it while the Event object iterates through them.
-    auto eventCopy = onMessageReceived;
-    eventCopy(nullptr, message, nullptr);
+    /// Remove all watchers. Create a copy of the event hook, because watchers remove
+    /// themselves from the callback list while the Event object iterates through it.
+    auto eventCopy = onSniffMessage;
+    eventCopy(message, nullptr, nullptr);
   } else {
-    HandleMessage(slot, message, payload);
-    onMessageReceived(slot, message, payload);
+    HandleMessage(message, slot, payload);
+    onSniffMessage(message, slot, payload);
   }
 }
 
@@ -259,7 +259,7 @@ Node::~Node() {
 
 void Node::SetName(const string& name) {
   mName = name;
-  ReceiveMessage(nullptr, NodeMessage::NODE_NAME_CHANGED);
+  ReceiveMessage(NodeMessage::NODE_NAME_CHANGED);
 }
 
 const string& Node::GetName() const {
@@ -268,7 +268,7 @@ const string& Node::GetName() const {
 
 void Node::SetPosition(const Vec2 position) {
   mPosition = position;
-  ReceiveMessage(nullptr, NodeMessage::NODE_POSITION_CHANGED);
+  ReceiveMessage(NodeMessage::NODE_POSITION_CHANGED);
 }
 
 const Vec2 Node::GetPosition() const {
@@ -277,7 +277,7 @@ const Vec2 Node::GetPosition() const {
 
 void Node::SetSize(const Vec2 size) {
   mSize = size;
-  ReceiveMessage(nullptr, NodeMessage::NODE_POSITION_CHANGED);
+  ReceiveMessage(NodeMessage::NODE_POSITION_CHANGED);
 }
 
 const Vec2 Node::GetSize() const {

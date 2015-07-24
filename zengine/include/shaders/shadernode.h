@@ -52,8 +52,7 @@ public:
 protected:
   friend class ShaderBuilder;
 
-  virtual void HandleMessage(Slot* slot, NodeMessage message, 
-                             const void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 
   ShaderMetadata* metadata;
   string mSource;

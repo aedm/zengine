@@ -193,7 +193,7 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
   return mNode->GetPosition() + sw->mSpotPos;
 }
 
-void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, void* Payload)
+void NodeWidget::HandleSniffedMessage(NodeMessage Message, Slot* S, void* Payload)
 {
 	switch (Message)
 	{

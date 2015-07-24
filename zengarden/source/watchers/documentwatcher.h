@@ -12,7 +12,7 @@ public:
 	virtual ~DocumentWatcher();
 
 protected:
-	virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
 
 	QListView* mListView;

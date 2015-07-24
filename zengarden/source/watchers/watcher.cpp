@@ -7,15 +7,15 @@ Watcher::Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type)
     , mWatcherWidget(watcherWidget) {
   if (watcherWidget) watcherWidget->mWatcher = this;
   MakeDisplayedName();
-  node->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
+  node->onSniffMessage += Delegate(this, &Watcher::SniffMessage);
 }
 
-void Watcher::SniffMessage(Slot* slot, NodeMessage message, void* payload) {
+void Watcher::SniffMessage(NodeMessage message, Slot* slot, void* payload) {
   if (message == NodeMessage::NODE_NAME_CHANGED) {
     MakeDisplayedName();
     if (mWatcherWidget) mWatcherWidget->SetTabLabel(mDisplayedName);
   }
-  HandleSniffedMessage(slot, message, payload);
+  HandleSniffedMessage(message, slot, payload);
   if (message == NodeMessage::NODE_REMOVED) {
     ChangeNode(nullptr);
   }
@@ -23,12 +23,12 @@ void Watcher::SniffMessage(Slot* slot, NodeMessage message, void* payload) {
 
 Watcher::~Watcher() {
   if (mNode) {
-    mNode->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+    mNode->onSniffMessage -= Delegate(this, &Watcher::SniffMessage);
     mNode = nullptr;
   }
 }
 
-void Watcher::HandleSniffedMessage(Slot*, NodeMessage, void*) {}
+void Watcher::HandleSniffedMessage(NodeMessage, Slot*, void*) {}
 
 Node* Watcher::GetNode() {
   return mNode;
@@ -36,11 +36,11 @@ Node* Watcher::GetNode() {
 
 void Watcher::ChangeNode(Node* node) {
   if (mNode) {
-    mNode->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+    mNode->onSniffMessage -= Delegate(this, &Watcher::SniffMessage);
   }
   mNode = node;
   if (node) {
-    node->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
+    node->onSniffMessage += Delegate(this, &Watcher::SniffMessage);
   }
   MakeDisplayedName();
   HandleChangedNode(node);
