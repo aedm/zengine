@@ -1,9 +1,9 @@
 #include "graphCommands.h"
 #include "../graph/nodewidget.h"
 
-CreateNodeCommand::CreateNodeCommand(Node* node, GraphWatcher* graphWatcher)
+CreateNodeCommand::CreateNodeCommand(Node* node, Graph* graph)
   : mNode(node)
-  , mGraphWatcher(graphWatcher) {}
+  , mGraph(graph) {}
 
 CreateNodeCommand::~CreateNodeCommand() {
   if (!mIsActive) {
@@ -12,7 +12,7 @@ CreateNodeCommand::~CreateNodeCommand() {
 }
 
 bool CreateNodeCommand::Do() {
-  mGraphWatcher->AddNode(mNode);
+  mGraph->mNodes.Connect(mNode);
   return true;
 }
 
@@ -59,24 +59,24 @@ bool ConnectNodeToSlotCommand::Undo() {
   return mSlot->Connect(mOldNode);
 }
 
-DeleteNodeCommand::DeleteNodeCommand(const set<NodeWidget*>& nodeWidgets)
-  : mNodeWidgets(nodeWidgets) {}
+DeleteNodeCommand::DeleteNodeCommand(OWNERSHIP set<Node*>* nodes)
+  : mNodes(nodes) {}
 
 DeleteNodeCommand::~DeleteNodeCommand() {
-  if (mIsActive) {
-    for(NodeWidget* widget : mNodeWidgets) {
-      delete widget;
-    }
-  }
+  //if (mIsActive) {
+  //  for (Node* node : *mNodes) {
+  //    delete node;
+  //  }
+  //}
 }
 
 bool DeleteNodeCommand::Do() {
-  NOT_IMPLEMENTED;
-  for (NodeWidget* widget : mNodeWidgets) {
-    for (Slot* slot : widget->GetNode()->GetPublicSlots()) {
-      slot->Connect(NULL);
-    }
+  for (Node* node : *mNodes) {
+    /// TODO: don't delete them, just remove them from the graph.
+    node->ReceiveMessage(nullptr, NodeMessage::NODE_REMOVED);
+    delete node;
   }
+  SafeDelete(mNodes);
   return true;
 }
 

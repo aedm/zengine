@@ -51,12 +51,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="engine">
-      <UniqueIdentifier>{faca7a57-1c15-4ec6-8d31-0b83512f72f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="engine\stubs">
-      <UniqueIdentifier>{69b027d5-af08-46e6-b16d-1e778376e756}</UniqueIdentifier>
-    </Filter>
     <Filter Include="source\nodes">
       <UniqueIdentifier>{be7d4f85-0608-44a2-a5bd-7f871c878816}</UniqueIdentifier>
     </Filter>
@@ -256,9 +250,6 @@
     </None>
     <None Include="source\shaders\transformPosUV.vs">
       <Filter>source\shaders</Filter>
-    </None>
-    <None Include="app\engine\stubs\add.shader">
-      <Filter>engine\stubs</Filter>
     </None>
   </ItemGroup>
 </Project>

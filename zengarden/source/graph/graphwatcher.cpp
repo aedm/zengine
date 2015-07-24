@@ -77,11 +77,8 @@ void GraphWatcher::Paint(GLWidget* glWidget) {
   }
 
   /// Draw nodes
-  //for (int i = nodes.size() - 1; i >= 0; i--) {
-    //static_cast<NodeWidget*>(GetGraph()->Widgets[i])->Paint(this);
-  //}
   for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
-    mWidgetMap.at(node)->Paint(this);
+    mWidgetMap.at(node)->Paint();
   }
 
   /// Draw selection rectangle
@@ -94,7 +91,7 @@ void GraphWatcher::Paint(GLWidget* glWidget) {
 }
 
 
-void GraphWatcher::HandleGraphNeedsRepaint() {
+void GraphWatcher::Update() {
   GetGLWidget()->update();
 }
 
@@ -114,21 +111,6 @@ void GraphWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
   } else if (event->button() == Qt::RightButton) {
     HandleMouseRightUp(event);
   }
-}
-
-
-NodeWidget* GraphWatcher::AddNode(Node* node) {
-  NodeWidget* widget = new NodeWidget(node);
-  widget->OnRepaint += Delegate(this, &GraphWatcher::HandleWidgetRepaint);
-  mWidgetMap[node] = widget;
-  GetGraph()->mNodes.Connect(node);
-  GetGLWidget()->update();
-  return widget;
-}
-
-
-void GraphWatcher::HandleWidgetRepaint() {
-  GetGLWidget()->update();
 }
 
 
@@ -305,7 +287,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
 
   Node* node = ThePrototypes->AskUser(mWatcherWidget, event->globalPos());
   if (node) {
-    TheCommandStack->Execute(new CreateNodeCommand(node, this));
+    TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
     TheCommandStack->Execute(new MoveNodeCommand(node, Vec2(event->x(), event->y())));
   }
 }
@@ -394,8 +376,13 @@ bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
 void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
   switch (event->key()) {
     case Qt::Key_Delete:
-      //new DeleteOperatorCommand()
-      //TheCommandStack->Execute(new CreateOperatorCommand(op, this));
+      if (mSelectedNodeWidgets.size() > 0) {
+        set<Node*>* selectedNodes = new set<Node*>();
+        for (NodeWidget* nodeWidget : mSelectedNodeWidgets) {
+          selectedNodes->insert(nodeWidget->GetNode());
+        }
+        TheCommandStack->Execute(new DeleteNodeCommand(selectedNodes));
+      }
       break;
 
       /// Space opens watcher
@@ -412,4 +399,40 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
 
 Graph* GraphWatcher::GetGraph() {
   return static_cast<Graph*>(GetNode());
+}
+
+
+void GraphWatcher::HandleSniffedMessage(Slot* slot, NodeMessage message, 
+                                        void* payload) {
+  switch (message) {
+    case NodeMessage::MULTISLOT_CONNECTION_ADDED: {
+        Node* node = static_cast<Node*>(payload);
+        NodeWidget* widget = new NodeWidget(node, this);
+        mWidgetMap[node] = widget;
+        GetGLWidget()->update();
+      }
+      break;
+    case NodeMessage::MULTISLOT_CONNECTION_REMOVED: {
+        Node* node = static_cast<Node*>(payload);
+        auto it = mWidgetMap.find(node);
+        DeselectAll();
+        if (it != mWidgetMap.end()) {
+          delete it->second;
+          mWidgetMap.erase(it);
+        }
+        UpdateHoveredWidget(mCurrentMousePos);
+        Update();
+    }
+      break;
+    case NodeMessage::MULTISLOT_CLEARED:
+      break;
+    case NodeMessage::NEEDS_REDRAW:
+      break;
+    case NodeMessage::NODE_NAME_CHANGED:
+      break;
+    case NodeMessage::NODE_POSITION_CHANGED:
+      break;
+    default:
+      break;
+  }
 }

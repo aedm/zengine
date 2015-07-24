@@ -10,7 +10,6 @@ class NodeWidget;
 class Graph;
 
 class GraphWatcher: public Watcher {
-  friend class CreateNodeCommand;
   friend class NodeWidget;
 
 public:
@@ -29,16 +28,15 @@ private:
   void HandleMouseRightUp(QMouseEvent* event);
   void HandleKeyPress(GLWidget*, QKeyEvent* event);
 
-  void HandleGraphNeedsRepaint();
+  /// This method will be callen when the watched graph receives an internal message
+  virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+                                    void* payload) override;
+
+  /// Sends an update message. Graph panel will be repainted at the next suitable moment.
+  void Update();
 
   /// Draws the graph
   void Paint(GLWidget*);
-
-  /// Will be called when a widget wants to repaint
-  void HandleWidgetRepaint();
-
-  /// Command-accessible functions
-  NodeWidget* AddNode(Node* node);
 
   /// All wigdets on the graph
   Graph* GetGraph();

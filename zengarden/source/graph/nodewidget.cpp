@@ -37,14 +37,20 @@ static const Vec4 ConnectionColorValid(0, 1, 0, 1);
 static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
-NodeWidget::NodeWidget(Node* node)
+NodeWidget::NodeWidget(Node* node, GraphWatcher* graphWatcher)
 	: Watcher(node, nullptr, NodeType::WIDGET)
-	, mTitleTexture(NULL)
+	, mTitleTexture(nullptr)
+  , mGraphWatcher(graphWatcher)
 {
 	mIsSelected = false;
   HandleTitleChange();
   
 	CreateWidgetSlots();
+}
+
+
+NodeWidget::~NodeWidget() {
+  SafeDelete(mTitleTexture);
 }
 
 
@@ -84,7 +90,7 @@ void NodeWidget::CalculateLayout()
 }
 
 
-void NodeWidget::Paint(GraphWatcher* graphWatcher)
+void NodeWidget::Paint()
 {
   Vec2 position = GetNode()->GetPosition();
   Vec2 size = GetNode()->GetSize();
@@ -107,13 +113,15 @@ void NodeWidget::Paint(GraphWatcher* graphWatcher)
 	for (int i=0; i<mWidgetSlots.size(); i++)
 	{
 		Vec4 slotFrameColor(1, 1, 1, 0.1);
-		if (graphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
-			if (graphWatcher->mClickedWidget == this && graphWatcher->mClickedSlotIndex == i) {
+		if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
+      if (mGraphWatcher->mClickedWidget == this 
+          && mGraphWatcher->mClickedSlotIndex == i) {
 				slotFrameColor = ConnectionColor;
 			}
-		} else if (graphWatcher->mHoveredWidget == this && graphWatcher->mHoveredSlotIndex == i) {
-			if (graphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT) {
-				slotFrameColor = graphWatcher->mIsConnectionValid 
+    } else if (mGraphWatcher->mHoveredWidget == this 
+               && mGraphWatcher->mHoveredSlotIndex == i) {
+      if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT) {
+        slotFrameColor = mGraphWatcher->mIsConnectionValid
 					? ConnectionColorValid : ConnectionColorInvalid;
 			} else slotFrameColor = Vec4(1, 1, 1, 0.2);
 		}
@@ -134,13 +142,13 @@ void NodeWidget::Paint(GraphWatcher* graphWatcher)
 	Vec4 frameColor(1, 1, 1, 0.1);
 	if (mIsSelected) {
 		frameColor = Vec4(1, 1, 1, 1);
-	} else if (graphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT 
-		&& graphWatcher->mClickedWidget == this) {
+  } else if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT
+             && mGraphWatcher->mClickedWidget == this) {
 			frameColor = ConnectionColor;
-	} else if (graphWatcher->mHoveredWidget == this) {
-		if (graphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
-			if (graphWatcher->mClickedWidget != this) {
-				frameColor = graphWatcher->mIsConnectionValid 
+  } else if (mGraphWatcher->mHoveredWidget == this) {
+    if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
+      if (mGraphWatcher->mClickedWidget != this) {
+        frameColor = mGraphWatcher->mIsConnectionValid
           ? ConnectionColorValid : ConnectionColorInvalid;
 			}
 		} else frameColor = Vec4(1, 1, 1, 0.3);
@@ -173,12 +181,7 @@ void NodeWidget::HandleTitleChange()
   } 
 	mTitleTexture = new TextTexture();
 	mTitleTexture->SetText(text, ThePainter->mTitleFont);
-	OnRepaint();
-}
-
-NodeWidget::~NodeWidget()
-{
-	SafeDelete(mTitleTexture);
+  mGraphWatcher->Update();
 }
 
 Vec2 NodeWidget::GetOutputPosition()
@@ -192,23 +195,24 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
   return GetNode()->GetPosition() + sw->mSpotPos;
 }
 
-void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload)
+void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, void* Payload)
 {
 	switch (Message)
 	{
 	case NodeMessage::SLOT_STRUCTURE_CHANGED:
 		CreateWidgetSlots();
-    OnRepaint();
+    mGraphWatcher->Update();
     break;
-	case NodeMessage::SLOT_CONNECTION_CHANGED:
-    OnRepaint();
-		break;
   case NodeMessage::NODE_NAME_CHANGED:
     HandleTitleChange();
     break;
+  case NodeMessage::SLOT_CONNECTION_CHANGED:
   case NodeMessage::NODE_POSITION_CHANGED:
-    OnRepaint();
+    mGraphWatcher->Update();
     break;
+  //case NodeMessage::NODE_REMOVED:
+  //  delete this; /// YEAH BABY! :)
+  //  break;
 	default: break;
 	}
 }

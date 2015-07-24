@@ -38,15 +38,7 @@ bool Slot::Connect(Node* target) {
     ASSERT(false);
     return false;
   }
-  if (!mIsMultiSlot) {
-    if (mNode != target) {
-      if (mNode) mNode->DisconnectFromSlot(this);
-      mNode = target;
-      if (mNode) mNode->ConnectToSlot(this);
-
-      mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
-    }
-  } else {
+  if (mIsMultiSlot) {
     ASSERT(target != nullptr);
     for (Node* node : mMultiNodes) {
       if (node == target) {
@@ -55,7 +47,15 @@ bool Slot::Connect(Node* target) {
       }
     }
     mMultiNodes.push_back(target);
-    mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+    target->ConnectToSlot(this);
+    mOwner->ReceiveMessage(this, NodeMessage::MULTISLOT_CONNECTION_ADDED, target);
+  } else {
+    if (mNode != target) {
+      if (mNode) mNode->DisconnectFromSlot(this);
+      mNode = target;
+      if (mNode) mNode->ConnectToSlot(this);
+      mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+    }
   }
   return true;
 }
@@ -67,7 +67,7 @@ void Slot::Disconnect(Node* target) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+        mOwner->ReceiveMessage(this, NodeMessage::MULTISLOT_CONNECTION_REMOVED, target);
         return;
       }
     }
@@ -86,13 +86,15 @@ void Slot::DisconnectAll(bool notifyOwner) {
       (*it)->DisconnectFromSlot(this);
     }
     mMultiNodes.clear();
+    if (notifyOwner) {
+      mOwner->ReceiveMessage(this, NodeMessage::MULTISLOT_CLEARED);
+    }
   } else {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
-  }
-
-  if (notifyOwner) {
-    mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+    if (notifyOwner) {
+      mOwner->ReceiveMessage(this, NodeMessage::SLOT_CONNECTION_CHANGED);
+    }
   }
 }
 
@@ -205,16 +207,23 @@ void Node::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
 }
 
 
-void Node::SendMsg(NodeMessage message, const void* payload) {
+void Node::SendMsg(NodeMessage message, void* payload) {
   for (Slot* slot : mDependants) {
     slot->mOwner->ReceiveMessage(slot, message, payload);
   }
 }
 
 
-void Node::ReceiveMessage(Slot* slot, NodeMessage message, const void* payload) {
-  HandleMessage(slot, message, payload);
-  onMessageReceived(slot, message, payload);
+void Node::ReceiveMessage(Slot* slot, NodeMessage message, void* payload) {
+  if (message == NodeMessage::NODE_REMOVED) {
+    /// Remove all watchers. Create a copy of the event hook, because watcher remove
+    /// themselves from it while the Event object iterates through them.
+    auto eventCopy = onMessageReceived;
+    eventCopy(nullptr, message, nullptr);
+  } else {
+    HandleMessage(slot, message, payload);
+    onMessageReceived(slot, message, payload);
+  }
 }
 
 

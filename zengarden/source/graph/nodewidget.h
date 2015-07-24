@@ -13,14 +13,12 @@ class NodeWidget: public Watcher {
   friend class GraphWatcher;
 
 public:
-  NodeWidget(Node* Nd);
+  NodeWidget(Node* node, GraphWatcher* graphWatcher);
   ~NodeWidget();
 
-  void Paint(GraphWatcher* panel);
+  void Paint();
   Vec2 GetOutputPosition();
   Vec2 GetInputPosition(int slotIndex);
-
-  Event<> OnRepaint;
 
   struct WidgetSlot {
     TextTexture mTexture;
@@ -34,13 +32,10 @@ public:
 
 private:
   virtual void HandleSniffedMessage(Slot* S, NodeMessage Message,
-                                    const void* Payload) override;
+                                    void* Payload) override;
 
   /// Handles node title change
   void HandleTitleChange();
-
-  /// Command-accessible
-  //void SetPosition(Vec2 position);
 
   /// Layout
   void CalculateLayout();
@@ -60,5 +55,7 @@ private:
   void CreateWidgetSlots();
 
   TextTexture* mTitleTexture;
+
+  GraphWatcher* mGraphWatcher;
 };
 

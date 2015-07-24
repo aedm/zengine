@@ -13,7 +13,7 @@ public:
 protected:
 	void Paint(GLWidget* widget);
 	virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
-                                    const void* payload) override;
+                                    void* payload) override;
 
 	Drawable* mDrawable;
 	Material* mMaterial;

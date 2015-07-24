@@ -5,7 +5,7 @@
 
 class CreateNodeCommand: public Command {
 public:
-  CreateNodeCommand(Node* node, GraphWatcher* graphWatcher);
+  CreateNodeCommand(Node* node, Graph* graph);
   ~CreateNodeCommand();
 
   virtual bool Do() override;
@@ -13,7 +13,7 @@ public:
 
 private:
   Node* mNode;
-  GraphWatcher* mGraphWatcher;
+  Graph* mGraph;
 };
 
 
@@ -48,12 +48,12 @@ private:
 
 class DeleteNodeCommand: public Command {
 public:
-  DeleteNodeCommand(const set<NodeWidget*>& nodeWidgets);
+  DeleteNodeCommand(OWNERSHIP set<Node*>* nodes);
   virtual ~DeleteNodeCommand();
 
   virtual bool Do() override;
   virtual bool Undo() override;
 
 private:
-  set<NodeWidget*> mNodeWidgets;
+  set<Node*>* mNodes;
 };

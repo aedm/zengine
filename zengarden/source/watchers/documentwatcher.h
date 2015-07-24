@@ -8,12 +8,13 @@
 class DocumentWatcher : public Watcher
 {
 public:
-	DocumentWatcher(QListView* ListView, Document* DocumentNode);
+	DocumentWatcher(QListView* listView, Document* documentNode);
 	virtual ~DocumentWatcher();
 
 protected:
-	virtual void		HandleSniffedMessage(Slot* S, NodeMessage Message, const void* Payload);
+	virtual void HandleSniffedMessage(Slot* slot, NodeMessage message, 
+                                    void* payload) override;
 
-	QListView*			ListView;
-	QStandardItemModel* Model;
+	QListView* mListView;
+	QStandardItemModel* mModel;
 };

@@ -13,11 +13,20 @@ using namespace fastdelegate;
 /// Notifications that nodes send to each other when something changed.
 /// An accompanying UINT data can also be set for each event type.
 enum class NodeMessage {
-  /// A slot was added or removed.
+  /// Some slots were added or removed.
   SLOT_STRUCTURE_CHANGED,
 
-  /// Direct slot connection changed.
+  /// Direct slot connection changed. Only emitted by single slots.
   SLOT_CONNECTION_CHANGED,
+
+  /// A node was added to the multislot. Payload is the added Node* pointer.
+  MULTISLOT_CONNECTION_ADDED,
+
+  /// A node was removed from the multislot. Payload is the removed Node* pointer.
+  MULTISLOT_CONNECTION_REMOVED,
+
+  /// All connections were removed from the multislot.
+  MULTISLOT_CLEARED,
 
   /// Some transitive connection changed
   TRANSITIVE_CONNECTION_CHANGED,
@@ -30,6 +39,13 @@ enum class NodeMessage {
 
   /// Name of the node changed
   NODE_NAME_CHANGED,
+
+  /// The node will be removed from the editor immediately. The underlying object 
+  /// is not necessarily deleted, it's just removed from the document, and all of its
+  /// watchers need to be deactivated. If the object stays in the command stack, the 
+  /// removal might be undone later.
+  /// This message is only emitted by the editor.
+  NODE_REMOVED,
 
   /// Position of the node changed
   NODE_POSITION_CHANGED,
@@ -118,8 +134,8 @@ public:
   /// Reruns Operate() if dirty (on dirty ancestors too)
   void Evaluate();
 
-  /// Hook for watchers (UI only)
-  Event<Slot*, NodeMessage, const void*> onMessageReceived;
+  /// Receives message through a slot
+  void ReceiveMessage(Slot* slot, NodeMessage message, void* payload = nullptr);
 
 protected:
   Node(NodeType type);
@@ -134,13 +150,10 @@ protected:
   virtual void Operate() {}
 
   /// Sends a message to dependants. ('SendMessage' is already defined in WinUser.h)
-  void SendMsg(NodeMessage message, const void* payload = nullptr);
+  void SendMsg(NodeMessage message, void* payload = nullptr);
 
   /// Handle received messages
   virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);
-
-  /// Receives message through a slot
-  void ReceiveMessage(Slot* slot, NodeMessage message, const void* payload = nullptr);
 
   /// Output type
   NodeType mType;
@@ -175,6 +188,9 @@ public:
 
   /// Returns the slots that need to be serialized when saving / loading
   const unordered_map<SharedString, Slot*>& GetSerializableSlots();
+
+  /// Hook for watchers (UI only)
+  Event<Slot*, NodeMessage, void*> onMessageReceived;
 
 protected:
   /// Registers a new slot
