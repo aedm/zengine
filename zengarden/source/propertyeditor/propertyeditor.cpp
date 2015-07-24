@@ -42,37 +42,37 @@ PropertyEditor::PropertyEditor(Node* node, WatcherWidget* panel)
 }
 
 void PropertyEditor::HandleNameTexBoxChanged() {
-  GetNode()->SetName(mNameTextBox->text().toStdString());
+  mNode->SetName(mNameTextBox->text().toStdString());
 }
 
 
 DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
   : PropertyEditor(node, panel)
 {
-    /// Slots
-    for (Slot* slot : GetNode()->GetPublicSlots()) {
-      /// TODO: use dynamic_cast
-      if (slot->DoesAcceptType(NodeType::FLOAT) && 
-          slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
-        /// Float slots
-        WatcherWidget* widget =
-          new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-        FloatWatcher* watcher = new FloatWatcher(
-          static_cast<FloatNode*>(slot->GetAbstractNode()), widget,
-          QString::fromStdString(*slot->GetName()));
+  /// Slots
+  for (Slot* slot : mNode->GetPublicSlots()) {
+    /// TODO: use dynamic_cast
+    if (slot->DoesAcceptType(NodeType::FLOAT) && 
+        slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
+      /// Float slots
+      WatcherWidget* widget =
+        new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+      FloatWatcher* watcher = new FloatWatcher(
+        static_cast<FloatNode*>(slot->GetAbstractNode()), widget,
+        QString::fromStdString(*slot->GetName()));
 
-        if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
-          watcher->SetReadOnly(true);
-        }
-        mLayout->addWidget(widget);
-        mSlotWatchers[slot] = watcher;
-      } else {
-        /// General slots, just add a label
-        QLabel* slotLabel =
-          new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
-        mLayout->addWidget(slotLabel);
+      if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
+        watcher->SetReadOnly(true);
       }
+      mLayout->addWidget(widget);
+      mSlotWatchers[slot] = watcher;
+    } else {
+      /// General slots, just add a label
+      QLabel* slotLabel =
+        new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
+      mLayout->addWidget(slotLabel);
     }
+  }
 }
 
 void DefaultPropertyEditor::HandleSniffedMessage(Slot* slot, NodeMessage message, 
@@ -104,7 +104,7 @@ StaticFloatEditor::StaticFloatEditor(FloatNode* node, WatcherWidget* panel)
   : PropertyEditor(node, panel) {
   static const QString valueString("value");
   WatcherWidget* widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-  new FloatWatcher(static_cast<FloatNode*>(GetNode()), widget, valueString);
+  new FloatWatcher(static_cast<FloatNode*>(mNode), widget, valueString);
   mLayout->addWidget(widget);
 }
 

@@ -129,7 +129,7 @@ FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widg
 void FloatWatcher::SpinBoxValueChanged() {
   mAllowTextboxValueChanges = false;
   float value = mTextBox->text().toFloat();
-  static_cast<FloatNode*>(GetNode())->Set(value);
+  static_cast<FloatNode*>(mNode)->Set(value);
   mAllowTextboxValueChanges = false;
 }
 
@@ -138,14 +138,15 @@ void FloatWatcher::SetTextBoxValue(float value) {
 }
 
 void FloatWatcher::SliderValueChanged(float value) {
-  if (mIsReadOnly || !GetNode()) return;
-  static_cast<FloatNode*>(GetNode())->Set(value);
+  if (mIsReadOnly || !mNode) return;
+  static_cast<FloatNode*>(mNode)->Set(value);
 }
 
-void FloatWatcher::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {
+void FloatWatcher::HandleSniffedMessage(Slot*, NodeMessage message, 
+                                        void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED: {
-      float value = static_cast<FloatSlot*>(slot)->Get();
+      float value = static_cast<FloatNode*>(mNode)->Get();
       mSlider->Set(value);
       if (mAllowTextboxValueChanges) SetTextBoxValue(value);
       break;

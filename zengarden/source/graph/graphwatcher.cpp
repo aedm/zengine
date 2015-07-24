@@ -41,10 +41,6 @@ void GraphWatcher::Paint(GLWidget* glWidget) {
 
   /// Draw connections
   ThePainter->mColor.Set(Vec4(1, 1, 1, 1));
-  //const vector<Node*>& nodes = GetGraph()->Widgets.GetMultiNodes();
-  //for (int i = nodes.size() - 1; i >= 0; i--) {
-  //  NodeWidget* ndWidget = static_cast<NodeWidget*>(nodes[i]);
-  //  Node* node = ndWidget->GetNode();
   for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
     NodeWidget* nodeWidget = mWidgetMap.at(node);
     for (int i = 0; i < nodeWidget->mWidgetSlots.size(); i++) {

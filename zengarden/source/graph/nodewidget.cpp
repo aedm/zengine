@@ -59,8 +59,7 @@ void NodeWidget::CreateWidgetSlots()
 	for (auto x : mWidgetSlots) delete x;
 	mWidgetSlots.clear();
 
-	Node* node = GetNode();
-	for(Slot* slot : node->GetPublicSlots())
+  for (Slot* slot : mNode->GetPublicSlots())
 	{
     if (slot->DoesAcceptType(NodeType::STRING)) continue;
 		WidgetSlot* sw = new WidgetSlot();
@@ -86,14 +85,14 @@ void NodeWidget::CalculateLayout()
 	}
 	Vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
 	mOutputPosition = Vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
-  GetNode()->SetSize(size);
+  mNode->SetSize(size);
 }
 
 
 void NodeWidget::Paint()
 {
-  Vec2 position = GetNode()->GetPosition();
-  Vec2 size = GetNode()->GetSize();
+  Vec2 position = mNode->GetPosition();
+  Vec2 size = mNode->GetSize();
 
   ThePainter->mColor.Set(Vec4(0, 0.2, 0.4, Opacity));
 	ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
@@ -161,17 +160,16 @@ void NodeWidget::HandleTitleChange()
 {
   static const QString stubLabel(" [stub]");
 
-  Node* node = GetNode();
   QString text;
-  if (!node->GetName().empty()) {
+  if (!mNode->GetName().empty()) {
     /// Node has a name, use that.
-    text = QString::fromStdString(node->GetName());
+    text = QString::fromStdString(mNode->GetName());
   } else {
     /// Just use the type as a name by default
     text = QString::fromStdString(
-      NodeRegistry::GetInstance()->GetNodeClass(GetNode())->mClassName);
-    if (node->GetType() == NodeType::SHADER_STUB) {
-      StubNode* stub = static_cast<StubNode*>(node);
+      NodeRegistry::GetInstance()->GetNodeClass(mNode)->mClassName);
+    if (mNode->GetType() == NodeType::SHADER_STUB) {
+      StubNode* stub = static_cast<StubNode*>(mNode);
       StubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {
         /// For shader stubs, use the stub name by default
@@ -186,13 +184,13 @@ void NodeWidget::HandleTitleChange()
 
 Vec2 NodeWidget::GetOutputPosition()
 {
-	return GetNode()->GetPosition() + mOutputPosition;
+  return mNode->GetPosition() + mOutputPosition;
 }
 
 Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 {
 	WidgetSlot* sw = mWidgetSlots[SlotIndex];
-  return GetNode()->GetPosition() + sw->mSpotPos;
+  return mNode->GetPosition() + sw->mSpotPos;
 }
 
 void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, void* Payload)
@@ -210,9 +208,6 @@ void NodeWidget::HandleSniffedMessage(Slot* S, NodeMessage Message, void* Payloa
   case NodeMessage::NODE_POSITION_CHANGED:
     mGraphWatcher->Update();
     break;
-  //case NodeMessage::NODE_REMOVED:
-  //  delete this; /// YEAH BABY! :)
-  //  break;
 	default: break;
 	}
 }

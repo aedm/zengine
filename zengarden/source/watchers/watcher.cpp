@@ -3,11 +3,9 @@
 #include "../graph/prototypes.h"
 
 Watcher::Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type)
-    : Node(type)
-    , mWatchedNode(NodeType::ALLOW_ALL, this, nullptr)
+    : mNode(node)
     , mWatcherWidget(watcherWidget) {
   if (watcherWidget) watcherWidget->mWatcher = this;
-  mWatchedNode.Connect(node);
   MakeDisplayedName();
   node->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
 }
@@ -18,29 +16,30 @@ void Watcher::SniffMessage(Slot* slot, NodeMessage message, void* payload) {
     if (mWatcherWidget) mWatcherWidget->SetTabLabel(mDisplayedName);
   }
   HandleSniffedMessage(slot, message, payload);
+  if (message == NodeMessage::NODE_REMOVED) {
+    ChangeNode(nullptr);
+  }
 }
 
 Watcher::~Watcher() {
-  if (mWatchedNode.GetAbstractNode()) {
-    mWatchedNode.GetAbstractNode()->onMessageReceived -= 
-      Delegate(this, &Watcher::SniffMessage);
+  if (mNode) {
+    mNode->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
+    mNode = nullptr;
   }
 }
 
 void Watcher::HandleSniffedMessage(Slot*, NodeMessage, void*) {}
 
 Node* Watcher::GetNode() {
-  return mWatchedNode.GetAbstractNode();
+  return mNode;
 }
 
 void Watcher::ChangeNode(Node* node) {
-  if (mWatchedNode.GetAbstractNode()) {
-    mWatchedNode.GetAbstractNode()->onMessageReceived -= 
-      Delegate(this, &Watcher::SniffMessage);
-    mWatchedNode.DisconnectAll(false);
+  if (mNode) {
+    mNode->onMessageReceived -= Delegate(this, &Watcher::SniffMessage);
   }
+  mNode = node;
   if (node) {
-    mWatchedNode.Connect(node);
     node->onMessageReceived += Delegate(this, &Watcher::SniffMessage);
   }
   MakeDisplayedName();
@@ -48,8 +47,6 @@ void Watcher::ChangeNode(Node* node) {
 }
 
 void Watcher::HandleChangedNode(Node* node) {
-  /// Overload this method if your watcher supports changing nodes.
-  SHOULDNT_HAPPEN;
 }
 
 GLWidget* Watcher::GetGLWidget() {
@@ -57,18 +54,17 @@ GLWidget* Watcher::GetGLWidget() {
 }
 
 void Watcher::MakeDisplayedName() {
-  Node* node = GetNode();
-  if (node == nullptr) {
+  if (mNode == nullptr) {
     mDisplayedName = QString();
-  } else if (!node->GetName().empty()) {
+  } else if (!mNode->GetName().empty()) {
     /// Node has a name, use that.
-    mDisplayedName = QString::fromStdString(node->GetName());
+    mDisplayedName = QString::fromStdString(mNode->GetName());
   } else {
     /// Just use the type as a name by default
     mDisplayedName = QString::fromStdString(
-      NodeRegistry::GetInstance()->GetNodeClass(GetNode())->mClassName);
-    if (node->GetType() == NodeType::SHADER_STUB) {
-      StubNode* stub = static_cast<StubNode*>(node);
+      NodeRegistry::GetInstance()->GetNodeClass(mNode)->mClassName);
+    if (mNode->GetType() == NodeType::SHADER_STUB) {
+      StubNode* stub = static_cast<StubNode*>(mNode);
       StubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {
         /// For shader stubs, use the stub name by default
@@ -80,31 +76,4 @@ void Watcher::MakeDisplayedName() {
 
 const QString& Watcher::GetDisplayedName() {
   return mDisplayedName;
-}
-
-void Watcher::SetName(const string& name) {
-  SHOULDNT_HAPPEN;
-}
-
-const string& Watcher::GetName() const {
-  SHOULDNT_HAPPEN;
-  return Node::GetName();
-}
-
-void Watcher::SetPosition(const Vec2 position) {
-  SHOULDNT_HAPPEN;
-}
-
-const Vec2 Watcher::GetPosition() const {
-  SHOULDNT_HAPPEN;
-  return Vec2(0, 0);
-}
-
-void Watcher::SetSize(const Vec2 size) {
-  SHOULDNT_HAPPEN;
-}
-
-const Vec2 Watcher::GetSize() const {
-  SHOULDNT_HAPPEN;
-  return Vec2(0, 0);
 }
