@@ -6,7 +6,6 @@
 #include <map>
 
 using namespace std;
-class ShaderNode;
 
 /// Macrolist for global uniforms (name, type, variable/token)
 #define GLOBALUSAGE_LIST \
@@ -103,8 +102,7 @@ struct StubMetadata {
 
 /// A stub is a part of a shader. It contains shader source code annotated
 /// by directives. Using these annotations, stubs can depend on each other and
-/// on other nodes likes textures and floats. A tree of stubs can be turned into
-/// a ShaderNode.
+/// on other nodes likes textures and floats. 
 class StubNode: public Node {
   friend class ShaderBuilder;
 
@@ -119,9 +117,6 @@ public:
   /// Returns the metadata containing information about the stub source.
   StubMetadata* GetStubMetadata() const;
 
-  /// Returns the shader that's made of this stub and its transitive closure.
-  ShaderNode* GetShader();
-
   /// Get slot by shader parameter name
   Slot* GetSlotByParameter(StubParameter*);
   Slot* GetSlotByParameterName(const string& name);
@@ -135,9 +130,6 @@ protected:
 
   /// Metadata
   StubMetadata* mMetadata;
-
-  /// The shader which is made of this stub and its transitive closure.
-  ShaderNode* mShader;
 
   /// Maps stub parameters to stub slots
   map<StubParameter*, Slot*> mParameterSlotMap;

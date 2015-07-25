@@ -30,14 +30,12 @@ const int GlobalUniformOffsets[] = {
 StubNode::StubNode()
   : Node(NodeType::SHADER_STUB)
   , mMetadata(nullptr)
-  , mShader(nullptr)
   , mSource(this, SourceSlotName)
 {}
 
 StubNode::StubNode(const StubNode& original)
   : Node(original)
   , mMetadata(nullptr)
-  , mShader(nullptr) 
   , mSource(this, SourceSlotName)
 {
   SetStubSource(original.mSource.Get());
@@ -84,14 +82,6 @@ void StubNode::SetStubSource(const string& source) {
     mParameterSlotMap[param] = slot;
     mParameterNameSlotMap[param->name] = slot;
   }
-}
-
-ShaderNode* StubNode::GetShader() {
-  if (mShader == nullptr) {
-    mShader = new ShaderNode();
-    mShader->mStub.Connect(this);
-  }
-  return mShader;
 }
 
 StubMetadata* StubNode::GetStubMetadata() const {

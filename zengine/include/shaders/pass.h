@@ -29,18 +29,10 @@ public:
   /// Returns true if pass can be used
   bool isComplete();
 
-  /// List of attributes used by the program
+  /// List of vertex attributes used by the program
   const vector<ShaderAttributeDesc>& GetUsedAttributes();
 
-  /// Getter for automatic slots
-  const Slot* GetFragmentSourceSlot();
-  const Slot* GetVertexSourceSlot();
-
 protected:
-  /// automatic slots
-  ShaderSlot mFragmentSource;
-  ShaderSlot mVertexSource;
-
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 
   /// Creates the shader program
@@ -50,6 +42,11 @@ protected:
   vector<PassUniform>	mUniforms;
   vector<PassUniform>	mSamplers;
   vector<ShaderAttributeDesc> mAttributes;
+
+  ShaderMetadata* mFragmentShaderMetadata = nullptr;
+  ShaderMetadata* mVertexShaderMetadata = nullptr;
+
+  vector<Slot*> mUniformAndSamplerSlots;
 };
 
 typedef TypedSlot<NodeType::PASS, Pass> PassSlot;

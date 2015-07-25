@@ -30,33 +30,15 @@ struct ShaderMetadata {
     const vector<OWNERSHIP ShaderVariable*>& inputs,
     const vector<OWNERSHIP ShaderVariable*>& outputs,
     const vector<OWNERSHIP ShaderUniform*>& uniforms,
-    const vector<OWNERSHIP ShaderUniform*>& samplers);
+    const vector<OWNERSHIP ShaderUniform*>& samplers,
+    const string& source);
   ~ShaderMetadata();
 
-  const vector<ShaderVariable*>	inputs;
-  const vector<ShaderVariable*>	outputs;
-  const vector<ShaderUniform*>	uniforms;
-  const vector<ShaderUniform*>	samplers;
-};
+  const vector<ShaderVariable*>	mInputs;
+  const vector<ShaderVariable*>	mOutputs;
+  const vector<ShaderUniform*>	mUniforms;
+  const vector<ShaderUniform*>	mSamplers;
 
-
-class ShaderNode: public Node {
-public:
-  ShaderNode();
-  virtual ~ShaderNode();
-
-  const string& GetSource() const;
-  const ShaderMetadata* GetMetadata() const;
-  StubSlot mStub;
-
-protected:
-  friend class ShaderBuilder;
-
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
-
-  ShaderMetadata* metadata;
   string mSource;
 };
-
-typedef TypedSlot<NodeType::SHADER_SOURCE, ShaderNode> ShaderSlot;
 

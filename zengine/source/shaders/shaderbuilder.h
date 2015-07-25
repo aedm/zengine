@@ -3,59 +3,57 @@
 #include <include/shaders/shadernode.h>
 #include <sstream>
 
-class ShaderBuilder
-{
+class ShaderBuilder {
 public:
-	static void FromStub(StubNode* stub, ShaderNode* shader);
+  static OWNERSHIP ShaderMetadata* FromStub(StubNode* stub);
 
 private:
-  ShaderBuilder(StubNode* stub, ShaderNode* shader);
-	~ShaderBuilder();
+  ShaderBuilder(StubNode* stub);
+  ~ShaderBuilder();
 
-	struct NodeData
-	{
-		/// The variable name in the main function,
-		/// or the uniform name if the node isn't a stub.
-		string VariableName;
+  struct NodeData {
+    /// The variable name in the main function,
+    /// or the uniform name if the node isn't a stub.
+    string VariableName;
 
-		/// Function name for stubs
-		string FunctionName;
+    /// Function name for stubs
+    string FunctionName;
 
-		/// Stub return type
-		NodeType ReturnType;
-	};
+    /// Stub return type
+    NodeType ReturnType;
+  };
 
-	/// Creates topological order of dependency tree
-	void CollectDependencies(Node* root);
-	
-	/// Generates function and variable names
-	void GenerateNames();
+  /// Creates topological order of dependency tree
+  void CollectDependencies(Node* root);
 
-	/// Generate metadata
-	void CollectStubMetadata(Node* node);
-  void GenerateSourceMetadata();
-	void GenerateSlots();
+  /// Generates function and variable names
+  void GenerateNames();
 
-	/// Generate source
-	void GenerateSource();
-	void GenerateSourceHeader(stringstream& stream);
-	void GenerateSourceFunctions(stringstream& stream);
-	void GenerateSourceMain(stringstream& stream);
+  /// Generate metadata
+  void CollectStubMetadata(Node* node);
+  void GenerateSlots();
 
-	static const string& GetTypeString(NodeType type);
+  /// Generate source
+  void GenerateSource();
+  void GenerateSourceHeader(stringstream& stream);
+  void GenerateSourceFunctions(stringstream& stream);
+  void GenerateSourceMain(stringstream& stream);
 
-	/// Topologic order of dependencies
-	vector<Node*> mDependencies;
+  static const string& GetTypeString(NodeType type);
 
-	/// Metadata for analyzing nodes
-	map<Node*, NodeData*> mDataMap;
+  /// Topologic order of dependencies
+  vector<Node*> mDependencies;
 
-  ShaderNode* mShader;
+  /// Metadata for analyzing nodes
+  map<Node*, NodeData*> mDataMap;
 
-	/// Metadata
-	map<string, ShaderVariable*> mInputsMap;
-	vector<ShaderVariable*>	mInputs;
-	vector<ShaderVariable*>	mOutputs;
+  stringstream sourceStream;
+  //ShaderNode* mShader;
+
+  /// Metadata
+  map<string, ShaderVariable*> mInputsMap;
+  vector<ShaderVariable*>	mInputs;
+  vector<ShaderVariable*>	mOutputs;
   vector<ShaderUniform*> mUniforms;
   vector<ShaderUniform*> mSamplers;
 };

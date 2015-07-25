@@ -1,24 +1,18 @@
 #include "shaderbuilder.h"
 #include <exception>
 
-void ShaderBuilder::FromStub(StubNode* stub, ShaderNode* source) {
-  ShaderBuilder builder(stub, source);
-}
-
-ShaderBuilder::ShaderBuilder(StubNode* stub, ShaderNode* shader)
-  : mShader(shader) {
-  SafeDelete(mShader->metadata);
-  for (Slot* slot : mShader->GetPublicSlots()) {
-    if (slot != &mShader->mStub) delete slot;
-  }
-  mShader->ClearSlots();
-  //mSource->mSlots.push_back(&mSource->mStub);
-
+OWNERSHIP ShaderMetadata* ShaderBuilder::FromStub(StubNode* stub) {
   if (stub == nullptr) {
     ERR("stub is nullptr");
-    return;
+    return nullptr;
   }
 
+  ShaderBuilder builder(stub);
+  return new ShaderMetadata(builder.mInputs, builder.mOutputs, builder.mUniforms, 
+                            builder.mSamplers, builder.sourceStream.str());
+}
+
+ShaderBuilder::ShaderBuilder(StubNode* stub) {
   StubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
     ERR("stub has no metadata.");
@@ -40,8 +34,6 @@ ShaderBuilder::ShaderBuilder(StubNode* stub, ShaderNode* shader)
     }
     GenerateSlots();
     GenerateSource();
-    shader->metadata = 
-      new ShaderMetadata(mInputs, mOutputs, mUniforms, mSamplers);
   } catch (...) {
     ERR("Shader source creation failed");
   }
@@ -128,21 +120,10 @@ void ShaderBuilder::GenerateNames() {
   }
 }
 
-void ShaderBuilder::GenerateSourceMetadata() {
-  vector<ShaderVariable*> inputs;
-  for (auto input : mInputsMap) {
-    inputs.push_back(input.second);
-  }
-  mShader->metadata = new ShaderMetadata(inputs, mOutputs, mUniforms, mSamplers);
-}
-
 void ShaderBuilder::GenerateSlots() {
   for (Node* node : mDependencies) {
     if (node->GetType() != NodeType::SHADER_STUB) {
       NodeData* data = mDataMap.at(node);
-      Slot* slot = new Slot(node->GetType(), mShader, nullptr, false, true);
-      slot->Connect(node);
-
       /// TODO: move this into a separate function
       if (node->GetType() == NodeType::TEXTURE) {
         mSamplers.push_back(new ShaderUniform(
@@ -153,20 +134,13 @@ void ShaderBuilder::GenerateSlots() {
       }
     }
   }
-
-  mShader->ReceiveMessage(NodeMessage::SLOT_STRUCTURE_CHANGED);
 }
 
 void ShaderBuilder::GenerateSource() {
-  mShader->mSource.clear();
-  stringstream stream;
-  stream << "#version 150" << endl;
-
-  GenerateSourceHeader(stream);
-  GenerateSourceFunctions(stream);
-  GenerateSourceMain(stream);
-
-  mShader->mSource = stream.str();
+  sourceStream << "#version 150" << endl;
+  GenerateSourceHeader(sourceStream);
+  GenerateSourceFunctions(sourceStream);
+  GenerateSourceMain(sourceStream);
 }
 
 void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {

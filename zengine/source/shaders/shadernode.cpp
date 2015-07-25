@@ -1,66 +1,23 @@
 #include <include/shaders/shadernode.h>
-#include "shaderbuilder.h"
 #include <include/shaders/stubnode.h>
 
-static SharedString StubSlotName = make_shared<string>("Stub");
-
-ShaderNode::ShaderNode()
-  : Node(NodeType::SHADER_SOURCE)
-  , mStub(this, StubSlotName)
-  , metadata(nullptr) {}
-
-
-ShaderNode::~ShaderNode() {
-  SafeDelete(metadata);
-  /// There are dynamically created slots that won't be automatically 
-  /// disconencted.
-  for (Slot* slot : GetPublicSlots()) {
-    delete slot;
-  }
-}
-
-
-void ShaderNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-    case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-      if (slot == &mStub) {
-        ShaderBuilder::FromStub(mStub.GetNode(), this);
-        SendMsg(NodeMessage::VALUE_CHANGED, nullptr);
-      }
-      break;
-    case NodeMessage::VALUE_CHANGED:
-      SendMsg(NodeMessage::NEEDS_REDRAW, nullptr);
-      break;
-    default:
-      break;
-  }
-}
-
-const string& ShaderNode::GetSource() const {
-  return mSource;
-}
-
-const ShaderMetadata* ShaderNode::GetMetadata() const {
-  return metadata;
-}
-
-
 ShaderMetadata::ShaderMetadata(
-  const vector<OWNERSHIP ShaderVariable*>& _Inputs,
-  const vector<OWNERSHIP ShaderVariable*>& _Outputs,
-  const vector<OWNERSHIP ShaderUniform*>& _Uniforms,
-  const vector<OWNERSHIP ShaderUniform*>& _samplers)
-  : inputs(_Inputs)
-  , outputs(_Outputs)
-  , uniforms(_Uniforms)
-  , samplers(_samplers)
+  const vector<OWNERSHIP ShaderVariable*>& inputs,
+  const vector<OWNERSHIP ShaderVariable*>& outputs,
+  const vector<OWNERSHIP ShaderUniform*>& uniforms,
+  const vector<OWNERSHIP ShaderUniform*>& samplers,
+  const string& source)
+  : mInputs(inputs)
+  , mOutputs(outputs)
+  , mUniforms(uniforms)
+  , mSamplers(samplers)
+  , mSource(source)
 {}
 
 ShaderMetadata::~ShaderMetadata() {
-  for (auto x : inputs) delete x;
-  for (auto x : outputs) delete x;
-  for (auto x : uniforms) delete x;
+  for (auto x : mInputs) delete x;
+  for (auto x : mOutputs) delete x;
+  for (auto x : mUniforms) delete x;
 }
 
 

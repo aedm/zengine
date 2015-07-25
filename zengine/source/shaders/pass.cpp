@@ -1,5 +1,7 @@
+#include "shaderbuilder.h"
 #include <include/shaders/pass.h>
 #include <include/shaders/stubnode.h>
+#include <include/shaders/shadernode.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
@@ -12,8 +14,6 @@ Pass::Pass()
   : Node(NodeType::PASS)
   , mVertexStub(this, VertesStubSlotName)
   , mFragmentStub(this, FragmentStubSlotName)
-  , mVertexSource(this, nullptr, false, false, false)
-  , mFragmentSource(this, nullptr, false, false, false)
   , mHandle(-1) 
 {}
 
@@ -23,22 +23,26 @@ Pass::~Pass()
 void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
-      if (slot == &mVertexStub || slot == &mFragmentStub) {
-        /// Stub slots changed, reconnect source slots
-        StubNode* stub = static_cast<StubNode*>(slot->GetAbstractNode());
-        ShaderSlot* sourceSlot = 
-          (slot == &mVertexStub) ? &mVertexSource : &mFragmentSource;
-        sourceSlot->Connect(stub == nullptr ? nullptr : stub->GetShader());
-        BuildRenderPipeline();
-        ReceiveMessage(NodeMessage::NEEDS_REDRAW);
-      } 
-      break;
-    case NodeMessage::VALUE_CHANGED:
-      if (slot == &mVertexSource || slot == &mFragmentSource) {
-        /// Shader sources changed, rebuild pipeline
+    case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
+      if (slot == &mVertexStub) {
+        SafeDelete(mVertexShaderMetadata);
+        mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode());
         BuildRenderPipeline();
         ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       }
+      else if (slot == &mFragmentStub) {
+        SafeDelete(mFragmentShaderMetadata);
+        mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode());
+        BuildRenderPipeline();
+        ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+      }
+      break;
+    case NodeMessage::VALUE_CHANGED:
+      if (slot == &mVertexStub || slot == &mFragmentStub) {
+        /// Shader sources changed, rebuild pipeline
+        BuildRenderPipeline();
+      }
+      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }
@@ -51,17 +55,47 @@ void Pass::BuildRenderPipeline() {
   /// TODO: delete previous handle
   mHandle = -1;
 
-  ShaderNode* vertex = mVertexSource.GetNode();
-  ShaderNode* fragment = mFragmentSource.GetNode();
-  if (vertex == nullptr || vertex->GetMetadata() == nullptr ||
-      fragment == nullptr || fragment->GetMetadata() == nullptr) {
+  for (Slot* slot : mUniformAndSamplerSlots) delete slot;
+  mUniformAndSamplerSlots.clear();
+  
+  if (mFragmentShaderMetadata == nullptr || mVertexShaderMetadata == nullptr) {
     return;
   }
 
   INFO("Building render pipeline...");
 
-  const string& vertexSource = vertex->GetSource();
-  const string& fragmentSource = fragment->GetSource();
+  for (auto sampler : mVertexShaderMetadata->mSamplers) {
+    if (sampler->node) {
+      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false);
+      slot->Connect(sampler->node);
+      mUniformAndSamplerSlots.push_back(slot);
+    }
+  }
+  for (auto uniform : mVertexShaderMetadata->mUniforms) {
+    if (uniform->node) {
+      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false);
+      slot->Connect(uniform->node);
+      mUniformAndSamplerSlots.push_back(slot);
+    }
+  }
+  for (auto sampler : mFragmentShaderMetadata->mSamplers) {
+    if (sampler->node) {
+      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false);
+      slot->Connect(sampler->node);
+      mUniformAndSamplerSlots.push_back(slot);
+    }
+  }
+  for (auto uniform : mFragmentShaderMetadata->mUniforms) {
+    if (uniform->node) {
+      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false);
+      slot->Connect(uniform->node);
+      mUniformAndSamplerSlots.push_back(slot);
+    }
+  }
+
+
+  const string& vertexSource = mVertexShaderMetadata->mSource;
+  const string& fragmentSource = mFragmentShaderMetadata->mSource;
 
   ShaderCompileDesc* shaderCompileDesc = TheDrawingAPI->CreateShaderFromSource(
     vertexSource.c_str(), fragmentSource.c_str());
@@ -74,19 +108,19 @@ void Pass::BuildRenderPipeline() {
 
   /// Collect uniforms from shader stage sources
   map<string, ShaderUniform*> uniformMap;
-  for (auto sampler : vertex->GetMetadata()->uniforms) {
+  for (auto sampler : mVertexShaderMetadata->mUniforms) {
     uniformMap[sampler->name] = sampler;
   }
-  for (auto sampler : fragment->GetMetadata()->uniforms) {
+  for (auto sampler : mFragmentShaderMetadata->mUniforms) {
     uniformMap[sampler->name] = sampler;
   }
 
   /// Collect samplers
   map<string, ShaderUniform*> samplerMap;
-  for (auto sampler : vertex->GetMetadata()->samplers) {
+  for (auto sampler : mVertexShaderMetadata->mSamplers) {
     samplerMap[sampler->name] = sampler;
   }
-  for (auto sampler : fragment->GetMetadata()->samplers) {
+  for (auto sampler : mFragmentShaderMetadata->mSamplers) {
     samplerMap[sampler->name] = sampler;
   }
 
@@ -163,12 +197,3 @@ const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes() {
 bool Pass::isComplete() {
   return mHandle != -1;
 }
-
-const Slot* Pass::GetFragmentSourceSlot() {
-  return &mFragmentSource;
-}
-
-const Slot* Pass::GetVertexSourceSlot() {
-  return &mVertexSource;
-}
-
