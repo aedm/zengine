@@ -43,15 +43,6 @@ namespace Util {
     pass->mVertexStub.Connect(vertexStub);
     pass->mFragmentStub.Connect(fragmentStub);
 
-    /// Cleanup if unsuccesful
-    if (!pass->isComplete()) {
-      ERR("Pass incomplete.");
-      delete pass;
-      delete vertexStub;
-      delete fragmentStub;
-      return nullptr;
-    }
-
     return pass;
   }
 

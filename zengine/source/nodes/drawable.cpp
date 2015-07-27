@@ -18,7 +18,10 @@ void Drawable::Draw(Globals* globals, PrimitiveTypeEnum Primitive) {
 
   /// Set pass (pipeline state)
   Pass* pass = material->GetPass();
-  if (!pass || !pass->isComplete()) return;
+  if (!pass) return;
+  pass->Update();
+
+  if (!pass->isComplete()) return;
   pass->Set(globals);
 
   /// Set vertex buffer and attributes

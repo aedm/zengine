@@ -131,8 +131,8 @@ public:
   /// List of slots this node's output is connected to
   const vector<Slot*>& GetDependants() const;
 
-  /// Reruns Operate() if dirty (on dirty ancestors too)
-  void Evaluate();
+  /// Reruns Operate() if not up to date (also updates on ancestors)
+  void Update();
 
 protected:
   Node(NodeType type);
@@ -161,10 +161,10 @@ protected:
   /// Check if all slots are properly connected to an operator
   void CheckConnections();
 
-private:
   /// True if Operate() needs to be called
-  bool mIsDirty;
+  bool mIsUpToDate;
 
+private:
   /// Slots that this node is connected to (as an input)
   vector<Slot*> mDependants;
 

@@ -157,7 +157,7 @@ bool Slot::IsDefaulted() {
 Node::Node(NodeType type)
   : mType(type) 
 {
-  mIsDirty = true;
+  mIsUpToDate = false;
   mIsProperlyConnected = true;
 }
 
@@ -196,8 +196,8 @@ void Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
       //SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
       /// Fall through:
     case NodeMessage::VALUE_CHANGED:
-      if (!mIsDirty) {
-        mIsDirty = true;
+      if (mIsUpToDate) {
+        mIsUpToDate = false;
         SendMsg(NodeMessage::VALUE_CHANGED);
       }
       break;
@@ -232,13 +232,13 @@ void Node::CheckConnections() {
 }
 
 
-void Node::Evaluate() {
-  if (mIsDirty && mIsProperlyConnected) {
+void Node::Update() {
+  if (!mIsUpToDate && mIsProperlyConnected) {
     for(Slot* slot : mPublicSlots) {
-      slot->GetAbstractNode()->Evaluate();
+      slot->GetAbstractNode()->Update();
     }
     Operate();
-    mIsDirty = false;
+    mIsUpToDate = true;
   }
 }
 

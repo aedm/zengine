@@ -26,21 +26,19 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
       if (slot == &mVertexStub) {
         SafeDelete(mVertexShaderMetadata);
-        mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode());
-        BuildRenderPipeline();
+        mIsUpToDate = false;
         ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       }
       else if (slot == &mFragmentStub) {
         SafeDelete(mFragmentShaderMetadata);
-        mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode());
-        BuildRenderPipeline();
+        mIsUpToDate = false;
         ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       }
       break;
     case NodeMessage::VALUE_CHANGED:
       if (slot == &mVertexStub || slot == &mFragmentStub) {
         /// Shader sources changed, rebuild pipeline
-        BuildRenderPipeline();
+        mIsUpToDate = false;
       }
       ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       break;
@@ -48,7 +46,7 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   }
 }
 
-void Pass::BuildRenderPipeline() {
+void Pass::Operate() {
   mUniforms.clear();
   mSamplers.clear();
   mAttributes.clear();
@@ -57,11 +55,20 @@ void Pass::BuildRenderPipeline() {
 
   for (Slot* slot : mUniformAndSamplerSlots) delete slot;
   mUniformAndSamplerSlots.clear();
-  
+
+  /// Recreates shader metadata if needed
+  if (mVertexShaderMetadata == nullptr) {
+    mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode());
+  }
+  if (mFragmentShaderMetadata == nullptr) {
+    mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode());
+  }
+
+  /// Both fragment and vertex metadata are needed
   if (mFragmentShaderMetadata == nullptr || mVertexShaderMetadata == nullptr) {
     return;
   }
-
+  
   INFO("Building render pipeline...");
 
   for (auto sampler : mVertexShaderMetadata->mSamplers) {
@@ -92,7 +99,6 @@ void Pass::BuildRenderPipeline() {
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
-
 
   const string& vertexSource = mVertexShaderMetadata->mSource;
   const string& fragmentSource = mFragmentShaderMetadata->mSource;

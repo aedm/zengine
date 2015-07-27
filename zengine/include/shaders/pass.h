@@ -36,7 +36,7 @@ protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 
   /// Creates the shader program
-  void BuildRenderPipeline();
+  virtual void Operate();
 
   ShaderHandle mHandle;
   vector<PassUniform>	mUniforms;

@@ -173,7 +173,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
     mNode = nullptr;
     return;
   }
-  mNode = nullptr;
+  mNode = &mDefault;
   mDefault.ConnectToSlot(this);
   mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
 }
