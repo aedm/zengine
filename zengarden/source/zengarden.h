@@ -52,5 +52,7 @@ private slots:
 
   void UpdateTimeNode();
 
-  void SaveAs();
+  /// Menu buttons
+  void HandleMenuSaveAs();
+  void HandleMenuNew();
 };

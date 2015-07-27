@@ -22,7 +22,8 @@ ZenGarden::ZenGarden(QWidget *parent)
   //TheLogger->OnLog += Delegate(this, &ZenGarden::Log);
 
   connect(mUI.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
-  connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(SaveAs()));
+  connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
+  connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   QTimer::singleShot(0, this, SLOT(InitModules()));
 }
 
@@ -192,7 +193,7 @@ Texture* ZenGarden::CreateSampleTexture() {
   return TheResourceManager->CreateTexture(256, 256, TEXELTYPE_RGBA_UINT8, tmp);
 }
 
-void ZenGarden::SaveAs() {
+void ZenGarden::HandleMenuSaveAs() {
   INFO("Saving document...");
   QTime myTimer;
   myTimer.start();
@@ -208,4 +209,18 @@ void ZenGarden::SaveAs() {
 void ZenGarden::UpdateTimeNode() {
   TimeNode::OnTimeChanged(float(mTime.elapsed()) / 1000.0f);
   QTimer::singleShot(10, this, SLOT(UpdateTimeNode()));
+}
+
+void ZenGarden::HandleMenuNew() {
+  vector<Node*> nodes;
+  Util::CreateTopologicalOrder(mDocument, nodes);
+  for (UINT i = nodes.size(); i > 0; i--) {
+    delete nodes[i - 1];
+  }
+
+  mDocument = new Document();
+  mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
+  Graph* graph = new Graph();
+  mDocument->mGraphs.Connect(graph);
+  OpenGraphViewer(false, graph);
 }
