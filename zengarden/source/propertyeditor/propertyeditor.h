@@ -33,6 +33,9 @@ private:
 
   virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
+
+  void RemoveWatcherWidget(WatcherWidget* watcherWidget);
+
 };
 
 
@@ -41,4 +44,8 @@ class StaticFloatEditor: public PropertyEditor {
 public:
   StaticFloatEditor(FloatNode* node, WatcherWidget* panel);
   virtual ~StaticFloatEditor() {}
+
+private:
+  WatcherWidget* mFloatWatcherWidget = nullptr;
+  void RemoveFloatWatcher(WatcherWidget* watcherWidget);
 };

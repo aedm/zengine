@@ -62,6 +62,8 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
       FloatWatcher* watcher = new FloatWatcher(
         static_cast<FloatNode*>(slot->GetAbstractNode()), widget,
         QString::fromStdString(*slot->GetName()));
+      widget->onWatcherDeath = 
+        Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
 
       if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
         watcher->SetReadOnly(true);
@@ -101,12 +103,23 @@ void DefaultPropertyEditor::HandleSniffedMessage(NodeMessage message, Slot* slot
   }
 }
 
+void DefaultPropertyEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
+  delete watcherWidget;
+}
+
 
 StaticFloatEditor::StaticFloatEditor(FloatNode* node, WatcherWidget* panel)
   : PropertyEditor(node, panel) {
   static const QString valueString("value");
-  WatcherWidget* widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-  new FloatWatcher(static_cast<FloatNode*>(mNode), widget, valueString);
-  mLayout->addWidget(widget);
+  mFloatWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+  new FloatWatcher(static_cast<FloatNode*>(mNode), mFloatWatcherWidget, valueString);
+  mLayout->addWidget(mFloatWatcherWidget);
+  mFloatWatcherWidget->onWatcherDeath = 
+    Delegate(this, &StaticFloatEditor::RemoveFloatWatcher);
+}
+
+void StaticFloatEditor::RemoveFloatWatcher(WatcherWidget* watcherWidget) {
+  ASSERT(mFloatWatcherWidget == watcherWidget);
+  SafeDelete(mFloatWatcherWidget);
 }
 
