@@ -124,3 +124,4 @@ namespace Convert {
 }
 
 string ToJSON(Document* document);
+Document* FromJSON(string& json);

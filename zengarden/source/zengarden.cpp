@@ -24,6 +24,7 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
+  connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
   QTimer::singleShot(0, this, SLOT(InitModules()));
 }
 
@@ -78,7 +79,7 @@ void ZenGarden::InitModules() {
     /// fragment shader
     char* testShaderStubSource = Util::ReadFileQt("test2.fs");
     auto fragmentStub = new StubNode();
-    fragmentStub->SetStubSource(testShaderStubSource);
+    fragmentStub->mSource.SetDefaultValue(testShaderStubSource);
     //ThePrototypes->AddStub(fragmentStub);
     TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graph));
     TheCommandStack->Execute(new MoveNodeCommand(fragmentStub, Vec2(150, 150)));
@@ -87,7 +88,7 @@ void ZenGarden::InitModules() {
     /// vertex shader
     testShaderStubSource = Util::ReadFileQt("test2.vs");
     auto vertexStub = new StubNode();
-    vertexStub->SetStubSource(testShaderStubSource);
+    vertexStub->mSource.SetDefaultValue(testShaderStubSource);
     //ThePrototypes->AddStub(vertexStub);
     TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graph));
     TheCommandStack->Execute(new MoveNodeCommand(vertexStub, Vec2(150, 250)));
@@ -212,15 +213,38 @@ void ZenGarden::UpdateTimeNode() {
 }
 
 void ZenGarden::HandleMenuNew() {
-  vector<Node*> nodes;
-  Util::CreateTopologicalOrder(mDocument, nodes);
-  for (UINT i = nodes.size(); i > 0; i--) {
-    delete nodes[i - 1];
-  }
-
+  DeleteDocument();
   mDocument = new Document();
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
   OpenGraphViewer(false, graph);
+}
+
+void ZenGarden::HandleMenuOpen() {
+  QTime myTimer;
+  myTimer.start();
+
+  DeleteDocument();
+  char* json = Util::ReadFileQt("sample.zen");
+
+  mCommonGLWidget->makeCurrent();
+  mDocument = FromJSON(string(json));
+  mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
+  Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
+  OpenGraphViewer(false, graph);
+  delete json;
+
+  int milliseconds = myTimer.elapsed();
+  INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
+}
+
+void ZenGarden::DeleteDocument() {
+  vector<Node*> nodes;
+  Util::CreateTopologicalOrder(mDocument, nodes);
+  for (UINT i = nodes.size(); i > 0; i--) {
+    delete nodes[i - 1];
+  }
+  mDocument = nullptr;
+  mDocumentWatcher = nullptr;
 }

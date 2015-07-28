@@ -148,6 +148,7 @@
     </ClInclude>
     <ClInclude Include="source\shaders\stubanalyzer.h" />
     <ClInclude Include="source\serialize\json\base64\base64.h" />
+    <ClInclude Include="source\serialize\json\jsondeserializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -223,6 +224,7 @@
       <Filter>source\shaders</Filter>
     </ClCompile>
     <ClCompile Include="source\serialize\json\base64\base64.cpp" />
+    <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

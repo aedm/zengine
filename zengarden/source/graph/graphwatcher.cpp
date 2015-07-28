@@ -23,6 +23,12 @@ GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
   mHoveredWidget = NULL;
   mHoveredSlotIndex = -1;
 
+  parent->mShareWidget->makeCurrent();
+  for (Node* node : graph->mNodes.GetMultiNodes()) {
+    NodeWidget* widget = new NodeWidget(node, this);
+    mWidgetMap[node] = widget;
+  }
+
   GetGLWidget()->OnPaint += Delegate(this, &GraphWatcher::Paint);
   GetGLWidget()->OnMousePress += Delegate(this, &GraphWatcher::HandleMousePress);
   GetGLWidget()->OnMouseRelease += Delegate(this, &GraphWatcher::HandleMouseRelease);

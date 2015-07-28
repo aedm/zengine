@@ -10,7 +10,7 @@ void StubLoader::LoadStubs() {
     INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
     char* stubSource = Util::ReadFileQt(fileInfo.absoluteFilePath());
     StubNode* stub = new StubNode();
-    stub->SetStubSource(stubSource);
+    stub->mSource.SetDefaultValue(stubSource);
     ThePrototypes->AddStub(stub);
   }
 }

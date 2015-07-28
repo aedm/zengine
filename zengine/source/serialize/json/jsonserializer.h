@@ -9,6 +9,8 @@
 
 using namespace std;
 
+extern const EnumMapperA TexelTypeMapper[];
+
 class JSONSerializer {
 public:
   JSONSerializer(Node* root);

@@ -35,9 +35,9 @@ namespace Util {
     }
 
     StubNode* vertexStub = new StubNode();
-    vertexStub->SetStubSource(string(vertexContent.get()));
+    vertexStub->mSource.SetDefaultValue(string(vertexContent.get()));
     StubNode* fragmentStub = new StubNode();
-    fragmentStub->SetStubSource(string(fragmentContent.get()));
+    fragmentStub->mSource.SetDefaultValue(string(fragmentContent.get()));
 
     Pass* pass = new Pass();
     pass->mVertexStub.Connect(vertexStub);

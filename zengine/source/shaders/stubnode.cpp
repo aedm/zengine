@@ -38,7 +38,7 @@ StubNode::StubNode(const StubNode& original)
   , mMetadata(nullptr)
   , mSource(this, SourceSlotName)
 {
-  SetStubSource(original.mSource.Get());
+  mSource.SetDefaultValue(original.mSource.Get());
 }
 
 StubNode::~StubNode() {
@@ -46,11 +46,9 @@ StubNode::~StubNode() {
   SafeDelete(mMetadata);
 }
 
-void StubNode::SetStubSource(const string& source) {
+void StubNode::HandleSourceChange() {
   ResetStubSlots();
-
   ASSERT(mSource.IsDefaulted());
-  mSource.SetDefaultValue(source);
 
   SafeDelete(mMetadata);
   mMetadata = StubAnalyzer::FromText(mSource.Get().c_str());
@@ -104,6 +102,10 @@ void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
     case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
       SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
       break;
+    case NodeMessage::VALUE_CHANGED:
+      if (slot == &mSource) {
+        HandleSourceChange();
+      }
     default:
       break;
   }

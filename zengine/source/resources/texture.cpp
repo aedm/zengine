@@ -1,4 +1,5 @@
 #include <include/resources/texture.h>
+#include <include/base/helpers.h>
 
 Texture::Texture( int width, int height, TexelTypeEnum type, TextureHandle handle,
                  OWNERSHIP void* texelData)
@@ -26,4 +27,6 @@ UINT Texture::GetTexelByteCount(TexelTypeEnum type) {
     case TEXELTYPE_RGBA_FLOAT32:
       return 16;
   }
+  SHOULDNT_HAPPEN;
+  return 0;
 }

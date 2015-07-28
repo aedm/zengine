@@ -52,7 +52,10 @@ private slots:
 
   void UpdateTimeNode();
 
+  void DeleteDocument();
+
   /// Menu buttons
   void HandleMenuSaveAs();
   void HandleMenuNew();
+  void HandleMenuOpen();
 };

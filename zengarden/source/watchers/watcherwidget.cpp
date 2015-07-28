@@ -40,6 +40,7 @@ void WatcherWidget::HandleWatcherDeath() {
 GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget, 
                                  WatcherPosition position, QTabWidget* tabWidget)
   : WatcherWidget(parent, position, tabWidget) 
+  , mShareWidget(shareWidget)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(4, 4, 4, 4);

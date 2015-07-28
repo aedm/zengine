@@ -93,6 +93,8 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
     v.AddMember("position", SerializeVec2(node->GetPosition()), *mAllocator);
   }
 
+  /// TODO: save size
+
   /// Save node content
   if (IsInstanceOf<FloatNode>(node)) {
     SerializeFloatNode(v, static_cast<FloatNode*>(node));

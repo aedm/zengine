@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "../serialize/json/jsonserializer.h"
+#include "../serialize/json/jsondeserializer.h"
 #include <include/base/helpers.h>
 #include <include/base/vectormath.h>
 #include <include/base/types.h>
@@ -72,3 +73,7 @@ string ToJSON(Document* document) {
   return serialzer.GetJSON();
 }
 
+Document* FromJSON(string& json) {
+  JSONDeserializer deserialzer(json);
+  return deserialzer.GetDocument();
+}

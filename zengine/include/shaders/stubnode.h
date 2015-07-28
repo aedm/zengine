@@ -111,9 +111,6 @@ public:
   StubNode(const StubNode& original);
   virtual ~StubNode();
 
-  /// Sets new source to the stub and performs metadata analysis.
-  void SetStubSource(const string& source);
-  
   /// Returns the metadata containing information about the stub source.
   StubMetadata* GetStubMetadata() const;
 
@@ -125,6 +122,9 @@ public:
   StringSlot mSource;
 
 protected:
+  /// Performs metadata analysis on the new stub source.
+  void HandleSourceChange();
+
   /// Handle received messages
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 

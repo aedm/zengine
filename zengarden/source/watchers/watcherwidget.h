@@ -76,6 +76,7 @@ public:
   virtual ~GLWatcherWidget();
 
   virtual GLWidget* GetGLWidget() override;
+  QGLWidget* mShareWidget;
 
 protected:
   GLWidget* mGLWidget;

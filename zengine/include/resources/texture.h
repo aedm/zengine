@@ -11,9 +11,9 @@ protected:
           OWNERSHIP void* texelData);
   ~Texture();
 
+public:
   static UINT GetTexelByteCount(TexelTypeEnum type);
 
-public:
   const TexelTypeEnum mType;
 
   const int	mWidth;
