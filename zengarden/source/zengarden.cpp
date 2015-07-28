@@ -15,7 +15,7 @@
 ZenGarden::ZenGarden(QWidget *parent)
   : QMainWindow(parent)
   , mNextGraphIndex(0)
-  , mPropertyWatcher(nullptr)
+  , mPropertyEditor(nullptr)
   , mPropertyLayout(nullptr) {
   mUI.setupUi(this);
 
@@ -131,6 +131,7 @@ GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, Graph* Graph) {
   //WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
   glWatcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
   glWatcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
+  glWatcherWidget->onWatcherDeath = Delegate(this, &ZenGarden::CloseWatcherTab);
 
   GraphWatcher* graphEditor = new GraphWatcher(Graph, glWatcherWidget);
   //graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -144,20 +145,29 @@ void ZenGarden::NewGraph() {
   mDocument->mGraphs.Connect(graph);
 }
 
+
 void ZenGarden::SetNodeForPropertyEditor(Node* node) {
-  SafeDelete(mPropertyWatcher);
+  SafeDelete(mPropertyEditor);
   if (node != nullptr) {
-    mPropertyWatcher =
+    mPropertyEditor =
       new WatcherWidget(mUI.propertyPanel, WatcherPosition::PROPERTY_PANEL);
-    mPropertyLayout->addWidget(mPropertyWatcher);
+    mPropertyEditor->onWatcherDeath = Delegate(this, &ZenGarden::RemovePropertyEditor);
+    mPropertyLayout->addWidget(mPropertyEditor);
 
     if (IsInstanceOf<FloatNode>(node)) {
-      new StaticFloatEditor(static_cast<FloatNode*>(node), mPropertyWatcher);
+      new StaticFloatEditor(static_cast<FloatNode*>(node), mPropertyEditor);
     } else {
-      new DefaultPropertyEditor(node, mPropertyWatcher);
+      new DefaultPropertyEditor(node, mPropertyEditor);
     }
   }
 }
+
+
+void ZenGarden::RemovePropertyEditor(WatcherWidget* watcherWidget) {
+  ASSERT(watcherWidget == mPropertyEditor);
+  SafeDelete(mPropertyEditor);
+}
+
 
 void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
   QTabWidget* tabWidget = sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
@@ -182,7 +192,19 @@ void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
 
   int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
   tabWidget->setCurrentIndex(index);
+  watcherWidget->onWatcherDeath = Delegate(this, &ZenGarden::CloseWatcherTab);
 }
+
+
+void ZenGarden::CloseWatcherTab(WatcherWidget* widget) {
+  ASSERT(widget->mTabWidget);
+  int index = widget->mTabWidget->indexOf(widget);
+  ASSERT(index >= 0);
+  widget->mTabWidget->removeTab(index);
+  delete widget;
+}
+
+
 
 Texture* ZenGarden::CreateSampleTexture() {
   UINT* tmp = new UINT[256 * 256];

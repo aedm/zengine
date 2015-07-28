@@ -18,7 +18,9 @@ Pass::Pass()
 {}
 
 Pass::~Pass() 
-{}
+{
+  RemoveUniformSlots();
+}
 
 void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
@@ -52,9 +54,7 @@ void Pass::Operate() {
   mAttributes.clear();
   /// TODO: delete previous handle
   mHandle = -1;
-
-  for (Slot* slot : mUniformAndSamplerSlots) delete slot;
-  mUniformAndSamplerSlots.clear();
+  RemoveUniformSlots();
 
   /// Recreates shader metadata if needed
   if (mVertexShaderMetadata == nullptr) {
@@ -202,4 +202,9 @@ const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes() {
 
 bool Pass::isComplete() {
   return mHandle != -1;
+}
+
+void Pass::RemoveUniformSlots() {
+  for (Slot* slot : mUniformAndSamplerSlots) delete slot;
+  mUniformAndSamplerSlots.clear();
 }

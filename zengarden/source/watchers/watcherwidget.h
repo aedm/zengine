@@ -27,22 +27,20 @@ public:
 
   /// Triggered when a node is selected (eg. in graph editor)
   Event<Node*> onSelectNode;
-  
+
+  /// Triggered when the watcher needs to be removed
+  FastDelegate<void(WatcherWidget*)> onWatcherDeath;
+
   /// Get the OpenGL widget, if any
   virtual GLWidget* GetGLWidget();
 
-  /// Watcher died, commit suicide.
-  void HandleWatcherDeath();
-
   const WatcherPosition	mPosition;
+  QTabWidget* mTabWidget;
 
 protected:
   Watcher* mWatcher;
 
   void SetTabLabel(const QString& text);
-
-private:
-  QTabWidget* mTabWidget;
 };
 
 

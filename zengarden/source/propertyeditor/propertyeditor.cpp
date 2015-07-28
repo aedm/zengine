@@ -42,7 +42,9 @@ PropertyEditor::PropertyEditor(Node* node, WatcherWidget* panel)
 }
 
 void PropertyEditor::HandleNameTexBoxChanged() {
-  mNode->SetName(mNameTextBox->text().toStdString());
+  if (mNode) {
+    mNode->SetName(mNameTextBox->text().toStdString());
+  }
 }
 
 

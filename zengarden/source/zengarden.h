@@ -19,11 +19,16 @@ public:
   ~ZenGarden();
 
 private:
-
-  /// Open viewers
+  /// Open and close viewers
   GraphWatcher* OpenGraphViewer(bool leftPanel, Graph* graph);
   void Watch(Node* node, WatcherWidget* widget);
+  void CloseWatcherTab(WatcherWidget* widget);
+
+  /// Property editor related
   void SetNodeForPropertyEditor(Node* node);
+  void RemovePropertyEditor(WatcherWidget* watcherWidget);
+  WatcherWidget* mPropertyEditor;
+  QBoxLayout* mPropertyLayout;
 
   /// Test code
   Texture* CreateSampleTexture();
@@ -38,10 +43,6 @@ private:
   /// App UI
   Ui::zengardenClass mUI;
   LogWatcher*	mLogWatcher;
-
-  //PropertyEditor*				PropEditor;
-  WatcherWidget* mPropertyWatcher;
-  QBoxLayout* mPropertyLayout;
 
   QTime mTime;
 

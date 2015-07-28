@@ -27,16 +27,6 @@ void WatcherWidget::SetTabLabel(const QString& text) {
   }
 }
 
-void WatcherWidget::HandleWatcherDeath() {
-  if (mTabWidget) {
-    int index = mTabWidget->indexOf(this);
-    ASSERT(index >= 0);
-    mTabWidget->removeTab(index);
-    delete this; /// We are the Judean People's Front crack suicide squad!
-  }
-}
-
-
 GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget, 
                                  WatcherPosition position, QTabWidget* tabWidget)
   : WatcherWidget(parent, position, tabWidget) 

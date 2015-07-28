@@ -247,9 +247,19 @@ void Node::Update() {
 Node::~Node() {
   /// Remove all watchers. Create a copy of the event hook, because watchers remove
   /// themselves from the callback list while the Event object iterates through it.
-  auto eventCopy = onSniffMessage;
-  eventCopy(NodeMessage::NODE_REMOVED, nullptr, nullptr); 
-  
+  //auto eventCopy = onSniffMessage;
+  //eventCopy(NodeMessage::NODE_REMOVED, nullptr, nullptr); 
+    
+  /// Remove all watchers.
+  while (onSniffMessage.mDelegates.size()) {
+    auto callback = *onSniffMessage.mDelegates.begin();
+    callback(NodeMessage::NODE_REMOVED, nullptr, nullptr);
+
+    /// Check whether the watcher was removed. 
+    ASSERT(onSniffMessage.mDelegates.size() == 0 || 
+           *onSniffMessage.mDelegates.begin() != callback);
+  }
+
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
     Slot* slot = deps.back();

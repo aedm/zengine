@@ -38,6 +38,9 @@ protected:
   /// Creates the shader program
   virtual void Operate();
 
+  /// Removes all hidden uniform slots
+  void RemoveUniformSlots();
+
   ShaderHandle mHandle;
   vector<PassUniform>	mUniforms;
   vector<PassUniform>	mSamplers;
