@@ -55,6 +55,7 @@ public:
   Event<GLWidget*, QMouseEvent*> OnMouseRelease;
   Event<GLWidget*, QKeyEvent*> OnKeyPress;
   Event<GLWidget*, QKeyEvent*> OnKeyRelease;
+  Event<GLWidget*, QWheelEvent*> OnMouseWheel;
   Event<GLWidget*> OnPaint;
 
 protected:
@@ -63,6 +64,7 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent* event) override;
   virtual void keyPressEvent(QKeyEvent* event) override;
   virtual void keyReleaseEvent(QKeyEvent* event) override;
+  virtual void wheelEvent(QWheelEvent * event) override;
   virtual void paintGL() override;
 };
 

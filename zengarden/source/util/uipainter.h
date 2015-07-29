@@ -18,7 +18,7 @@ public:
   UiPainter();
   ~UiPainter();
 
-  void Set(int width, int height);
+  void SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, Vec2 size);
 
   void DrawLine(float x1, float y1, float x2, float y2);
   void DrawLine(const Vec2& from, const Vec2& to);

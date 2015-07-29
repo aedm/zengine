@@ -77,3 +77,7 @@ void GLWidget::paintGL() {
   OnPaint(this);
 }
 
+void GLWidget::wheelEvent(QWheelEvent * event) {
+  OnMouseWheel(this, event);
+}
+

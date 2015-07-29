@@ -178,13 +178,15 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
 }
 
 
-void UiPainter::Set(int Width, int Height) {
-  TheDrawingAPI->SetViewport(0, 0, Width, Height);
+void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, 
+                              Vec2 size) {
+  TheDrawingAPI->SetViewport(0, 0, canvasWidth, canvasHeight);
   TheDrawingAPI->SetRenderState(&mCanvasRenderstate);
   mColor.Set(Vec4(1, 1, 1, 1));
 
-  mGlobals.RenderTargetSize = Vec2(Width, Height);
-  mGlobals.RenderTargetSizeRecip = Vec2(1.0f / float(Width), 1.0f / float(Height));
+  mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);
+  mGlobals.RenderTargetSizeRecip = 
+    Vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
 
-  mGlobals.Transformation = Matrix::Ortho(0, 0, Width, Height);
+  mGlobals.Transformation = Matrix::Ortho(topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y);
 }

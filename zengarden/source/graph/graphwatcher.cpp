@@ -34,13 +34,17 @@ GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
   GetGLWidget()->OnMouseRelease += Delegate(this, &GraphWatcher::HandleMouseRelease);
   GetGLWidget()->OnMouseMove += Delegate(this, &GraphWatcher::HandleMouseMove);
   GetGLWidget()->OnKeyPress += Delegate(this, &GraphWatcher::HandleKeyPress);
+  GetGLWidget()->OnMouseWheel += Delegate(this, &GraphWatcher::HandleMouseWheel);
 }
 
 
 void GraphWatcher::Paint(GLWidget* glWidget) {
   TheDrawingAPI->OnContextSwitch();
 
-  ThePainter->Set(glWidget->width(), glWidget->height());
+  Vec2 canvasSize, topLeft;
+  GetCanvasDimensions(canvasSize, topLeft);
+
+  ThePainter->SetupViewport(glWidget->width(), glWidget->height(), topLeft, canvasSize);
 
   glClearColor(0.26f, 0.26f, 0.26f, 1.0f);
   TheDrawingAPI->Clear();
@@ -170,7 +174,7 @@ void GraphWatcher::StorePositionOfSelectedNodes() {
 
 
 void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
-  Vec2 mousePos(event->x(), event->y());
+  Vec2 mousePos = MouseToWorld(event);
   mOriginalMousePos = mousePos;
   mCurrentMousePos = mousePos;
 
@@ -217,7 +221,6 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
       }
       break;
     case State::CONNECT_TO_NODE:
-
       break;
     default: break;
   }
@@ -226,7 +229,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
 
 
 void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
-  Vec2 mousePos(event->x(), event->y());
+  Vec2 mousePos = MouseToWorld(event);
   switch (mCurrentState) {
     case State::MOVE_NODES:
       if (mAreNodesMoved) {
@@ -287,20 +290,25 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
     return;
   }
 
-  Node* node = ThePrototypes->AskUser(mWatcherWidget, event->globalPos());
-  if (node) {
-    TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
-    TheCommandStack->Execute(new MoveNodeCommand(node, Vec2(event->x(), event->y())));
+  /// Pan canvas
+  Vec2 mousePos = MouseToWorld(event);
+  if (mCurrentState == State::DEFAULT) {
+    mOriginalMousePos = Vec2(event->x(), event->y());
+    mOriginalCenter = mCenter;
+    mCurrentState = State::PAN_CANVAS;
   }
 }
 
 
 void GraphWatcher::HandleMouseRightUp(QMouseEvent* event) {
+  if (mCurrentState == State::PAN_CANVAS) {
+    mCurrentState = State::DEFAULT;
+  }
 }
 
 
 void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
-  Vec2 mousePos(event->x(), event->y());
+  Vec2 mousePos = MouseToWorld(event);
   mCurrentMousePos = mousePos;
   switch (mCurrentState) {
     case State::MOVE_NODES:
@@ -342,10 +350,26 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       }
       GetGLWidget()->update();
       break;
+    case State::PAN_CANVAS:
+      {
+        Vec2 mousePixelPos(event->x(), event->y());
+        Vec2 diff = mousePixelPos - mOriginalMousePos;
+        mCenter = mOriginalCenter - diff * mZoomFactor;
+        GetGLWidget()->update();
+      }
+      break;
     default:
       if (UpdateHoveredWidget(mousePos)) GetGLWidget()->update();
       break;
   }
+}
+
+
+void GraphWatcher::HandleMouseWheel(GLWidget*, QWheelEvent* event) {
+  mZoomExponent -= event->delta();
+  if (mZoomExponent < 0) mZoomExponent = 0;
+  mZoomFactor = powf(2.0, float(mZoomExponent) / (120.0f * 4.0f));
+  GetGLWidget()->update();
 }
 
 
@@ -388,13 +412,23 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
       }
       break;
 
-      /// Space opens watcher
-    case Qt::Key_Space:
+      /// 1 opens watcher
+    case Qt::Key_1:
       if (mSelectedNodeWidgets.size() == 1) {
-        mWatcherWidget->onWatchNode((*mSelectedNodeWidgets.begin())->GetNode(), mWatcherWidget);
+        mWatcherWidget->onWatchNode(
+          (*mSelectedNodeWidgets.begin())->GetNode(), mWatcherWidget);
       }
       break;
 
+    case Qt::Key_Space:
+    {
+      Node* node = ThePrototypes->AskUser(mWatcherWidget, QCursor::pos());
+      if (node) {
+        TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
+        TheCommandStack->Execute(new MoveNodeCommand(node, mCurrentMousePos));
+      }
+      break;
+    }
     default: break;
   }
 }
@@ -438,4 +472,20 @@ void GraphWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
     default:
       break;
   }
+}
+
+Vec2 GraphWatcher::MouseToWorld(QMouseEvent* event) {
+  Vec2 mouseCoord(event->x(), event->y());
+  Vec2 canvasSize, topLeft;
+  GetCanvasDimensions(canvasSize, topLeft);
+  return topLeft + mouseCoord * mZoomFactor;
+}
+
+void GraphWatcher::GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) {
+  oCanvasSize = Vec2(GetGLWidget()->width(), GetGLWidget()->height()) * mZoomFactor;
+  oTopLeft = mCenter - oCanvasSize / 2.0f;
+
+  /// Consistent shape of nodes
+  oTopLeft.x = floorf(oTopLeft.x);
+  oTopLeft.y = floorf(oTopLeft.y);
 }
