@@ -15,6 +15,8 @@ protected:
   virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
 
+  void RefreshGraphList();
+
 	QListView* mListView;
 	QStandardItemModel* mModel;
 };
