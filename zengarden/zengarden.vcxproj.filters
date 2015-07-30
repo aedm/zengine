@@ -51,9 +51,6 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="source\nodes">
-      <UniqueIdentifier>{be7d4f85-0608-44a2-a5bd-7f871c878816}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
@@ -149,9 +146,6 @@
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_parameterwidgets.cpp">
       <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
-    <ClCompile Include="source\nodes\stubloader.cpp">
-      <Filter>source\nodes</Filter>
-    </ClCompile>
     <ClCompile Include="source\graph\graphwatcher.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
@@ -227,9 +221,6 @@
     </ClInclude>
     <ClInclude Include="source\watchers\stubwatcher.h">
       <Filter>source\watchers</Filter>
-    </ClInclude>
-    <ClInclude Include="source\nodes\stubloader.h">
-      <Filter>source\nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

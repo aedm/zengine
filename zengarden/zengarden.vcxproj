@@ -105,7 +105,6 @@
     <ClCompile Include="source\graph\nodewidget.cpp" />
     <ClCompile Include="source\graph\prototypes.cpp" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\nodes\stubloader.cpp" />
     <ClCompile Include="source\propertyeditor\parameterwidgets.cpp" />
     <ClCompile Include="source\propertyeditor\propertyeditor.cpp" />
     <ClCompile Include="source\util\util.cpp" />
@@ -183,7 +182,6 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
-    <ClInclude Include="source\nodes\stubloader.h" />
     <ClInclude Include="source\watchers\passwatcher.h" />
     <ClInclude Include="source\watchers\stubwatcher.h" />
     <ClInclude Include="source\watchers\watcher.h" />

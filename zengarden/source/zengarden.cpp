@@ -6,7 +6,6 @@
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
 #include "propertyeditor/propertyeditor.h"
-#include "nodes/stubloader.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
@@ -61,9 +60,6 @@ void ZenGarden::InitModules() {
   InitZengine();
   InitPainter();
   Prototypes::Init();
-
-  /// Initialize engine parts
-  StubLoader::LoadStubs();
 
   /// Create blank document
   mDocument = new Document();

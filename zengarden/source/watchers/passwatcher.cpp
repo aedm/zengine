@@ -8,7 +8,7 @@ PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
   mMaterial->mSolidPass.Connect(PassNode);
 
   /// Mesh
-  Vec2 Position(10, 10);
+  Vec2 Position(3.5f, 3.5f);
   float w = 512, h = 512, u = 1, v = 1;
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
   VertexPosUV vertices[] = {

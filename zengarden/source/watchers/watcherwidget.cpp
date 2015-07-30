@@ -33,7 +33,7 @@ GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget,
   , mShareWidget(shareWidget)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->setContentsMargins(4, 4, 4, 4);
+  layout->setContentsMargins(0, 0, 0, 0);
 
   mGLWidget = new GLWidget(this, shareWidget);
   layout->addWidget(mGLWidget);

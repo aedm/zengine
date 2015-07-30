@@ -12,18 +12,6 @@ extern Prototypes* ThePrototypes;
 
 using namespace std;
 
-/// Unique identifier for all possible node types
-//enum class NodeClass {
-//  STATIC_FLOAT,
-//  STATIC_VEC4,
-//  STATIC_TEXTURE,
-//  SHADER_STUB,
-//  SHADER_SOURCE,
-//  PASS,
-//
-//  UNKNOWN,
-//};
-
 class Prototypes: public QObject {
   Q_OBJECT
 
@@ -36,23 +24,48 @@ public:
 
   Node* AskUser(QWidget* parent, QPoint position);
 
-  //QString GetNodeClassString(Node* Nd);
-
   void AddPrototype(NodeClass* nodeClass);
-  void AddStub(OWNERSHIP StubNode* stub);
+  //void AddStub(OWNERSHIP StubNode* stub);
+
+  /// Load default engine stubs
+  void LoadStubs();
 
 private:
-  //vector<Node*> mPrototypeNodes;
+  /// A single prototype node
   struct Prototype {
+    ~Prototype();
     NodeClass* mNodeClass;
     Node* mNode;
-    string mName;
+    QString mName;
   };
-  vector<Prototype> mPrototypes;
 
-  unordered_map<type_index, NodeClass*> mNodeIndexMap;
+  /// Tree of prototypes
+  struct Category {
+    ~Category();
+    QString mName;
+    vector<Prototype*> mPrototypes;
+    vector<Category*> mSubCategories;
+  };
 
+  Category mMainCategory;
+
+  /// An item in the tree view
+  class SelectorItem: public QTreeWidgetItem {
+  public:
+    SelectorItem(SelectorItem* Parent, QString Label, int prototypeIndex);
+    int mPrototypeIndex;
+  };
+  
+  /// Dialog window displaying the prototype selector
   QDialog* mDialog;
+
+  /// Loads a stub folder
+  void LoadStubFolder(QString folder, Category* category);
+
+  /// Adds a category to the Qt tree widget
+  void AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget,
+                               QTreeWidgetItem* parentItem, 
+                               vector<const Prototype*>& allPrototypes);
 
   private slots:
   void HandleItemSelected(QTreeWidgetItem* Item, int Column);

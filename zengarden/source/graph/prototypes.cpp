@@ -1,55 +1,48 @@
 #include "prototypes.h"
 #include <ui_operatorSelector.h>
+#include <QtCore/QDir>
+#include "../util/util.h"
 
 Prototypes* ThePrototypes = NULL;
 
-class SelectorItem: public QTreeWidgetItem {
-public:
-  SelectorItem(SelectorItem* Parent, QString Label, int OpIndex)
-    : QTreeWidgetItem(Parent) {
-    setText(0, Label);
-    this->NodeIndex = OpIndex;
-  }
-
-  int NodeIndex;
-};
+Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label, 
+                                       int prototypeIndex)
+  : QTreeWidgetItem(Parent)
+  , mPrototypeIndex(prototypeIndex) 
+{
+  setText(0, Label);
+}
 
 
 Prototypes::Prototypes() {
-  //AddPrototype(new FloatNode(), NodeClass::STATIC_FLOAT);
-  //AddPrototype(new Vec4Node(), NodeClass::STATIC_VEC4);
-  //AddPrototype(new TextureNode(), NodeClass::STATIC_TEXTURE);
-  //AddPrototype(new Pass(), NodeClass::PASS);
   NodeRegistry* registry = NodeRegistry::GetInstance();
   AddPrototype(registry->GetNodeClass<FloatNode>());
   AddPrototype(registry->GetNodeClass<Vec4Node>());
-  //AddPrototype(registry->GetNodeClass<TextureNode>());
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<TimeNode>());
+
+  LoadStubs();
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {
-  Prototype prototype;
-  prototype.mNodeClass = nodeClass;
-  prototype.mNode = nullptr;
-  prototype.mName = nodeClass->mClassName;
-  mPrototypes.push_back(prototype);
+  Prototype* prototype = new Prototype();
+  prototype->mNodeClass = nodeClass;
+  prototype->mNode = nullptr;
+  prototype->mName = QString::fromStdString(nodeClass->mClassName);
+  mMainCategory.mPrototypes.push_back(prototype);
 }
 
-void Prototypes::AddStub(OWNERSHIP StubNode* stub) {
-  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(stub);
-  Prototype prototype;
-  prototype.mNodeClass = nodeClass;
-  prototype.mNode = stub;
-  prototype.mName = stub->GetStubMetadata() == nullptr 
-    ? nodeClass->mClassName : stub->GetStubMetadata()->name;
-  mPrototypes.push_back(prototype);
-}
+//void Prototypes::AddStub(OWNERSHIP StubNode* stub) {
+//  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(stub);
+//  Prototype prototype;
+//  prototype.mNodeClass = nodeClass;
+//  prototype.mNode = stub;
+//  prototype.mName = stub->GetStubMetadata() == nullptr 
+//    ? nodeClass->mClassName : stub->GetStubMetadata()->name;
+//  mMainCategory.mPrototypes.push_back(prototype);
+//}
 
 Prototypes::~Prototypes() {
-  for (Prototype& prototype: mPrototypes) {
-    SafeDelete(prototype.mNode);
-  }
 }
 
 Node* Prototypes::AskUser(QWidget* Parent, QPoint Position) {
@@ -57,13 +50,12 @@ Node* Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   mDialog = &dialog;
   Ui::OperatorSelector selector;
   selector.setupUi(&dialog);
-  for (int i = 0; i < mPrototypes.size(); i++) {
-    Prototype& prototype = mPrototypes[i];
-    QString name = QString::fromStdString(prototype.mName);
-    selector.treeWidget->addTopLevelItem(new SelectorItem(nullptr, name, i + 1));
-  }
+
+  vector<const Prototype*> allPrototypes;
+  AddCategoryToTreeWidget(&mMainCategory, selector.treeWidget, nullptr, allPrototypes);
+
   dialog.setModal(true);
-  dialog.resize(150, 300);
+  dialog.resize(200, 400);
   dialog.move(Position);
   connect(selector.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
           this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
@@ -71,17 +63,19 @@ Node* Prototypes::AskUser(QWidget* Parent, QPoint Position) {
 
   int ret = dialog.exec();
   if (ret <= 0) return nullptr;
+  const Prototype* prototype = allPrototypes[ret - 1];
 
-  Prototype& prototype = mPrototypes[ret - 1];
-  if (prototype.mNode == nullptr) {
-    return prototype.mNodeClass->Manufacture();
+  /// Create new node, possibly based on original
+  if (prototype->mNode == nullptr) {
+    return prototype->mNodeClass->Manufacture();
   }
-  return prototype.mNodeClass->Manufacture(prototype.mNode);
+  return prototype->mNodeClass->Manufacture(prototype->mNode);
 }
+
 
 void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int) {
   SelectorItem* item = static_cast<SelectorItem*>(Item);
-  if (item->NodeIndex >= 0) mDialog->done(item->NodeIndex);
+  if (item->mPrototypeIndex >= 0) mDialog->done(item->mPrototypeIndex);
 }
 
 void Prototypes::Init() {
@@ -92,17 +86,70 @@ void Prototypes::Dispose() {
   SafeDelete(ThePrototypes);
 }
 
-//QString Prototypes::GetNodeClassString(Node* Nd) {
-//  switch (GetNodeClass(Nd)) {
-//    case NodeClass::STATIC_FLOAT:		return QString("Static Float");
-//    case NodeClass::STATIC_TEXTURE:		return QString("Static Texture");
-//    case NodeClass::STATIC_VEC4:		return QString("Static Vec4");
-//    case NodeClass::SHADER_STUB:		return QString("ShaderStub");
-//    case NodeClass::SHADER_SOURCE:		return QString("Shader Source");
-//    case NodeClass::PASS:				return QString("Pass");
-//    case NodeClass::UNKNOWN:			return QString("unknown");
-//  }
-//  ASSERT(false);
-//  return QString();
-//}
+void Prototypes::LoadStubs() {
+  LoadStubFolder(QString("engine/stubs"), &mMainCategory);
+}
 
+void Prototypes::LoadStubFolder(QString folder, Category* category) {
+  static const QString shaderSuffix("shader");
+
+  QDir dir(folder);
+  for (QFileInfo& fileInfo : dir.entryInfoList()) {
+    if (fileInfo.isDir()) {
+      if (fileInfo.fileName().startsWith(".")) continue;
+      Category* subCategory = new Category();
+      subCategory->mName = fileInfo.fileName();
+      category->mSubCategories.push_back(subCategory);
+      LoadStubFolder(fileInfo.filePath(), subCategory);
+    }
+    else if (fileInfo.completeSuffix() == shaderSuffix) {
+      INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
+      char* stubSource = Util::ReadFileQt(fileInfo.absoluteFilePath());
+
+      StubNode* stub = new StubNode();
+      stub->mSource.SetDefaultValue(stubSource);
+
+      NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass<StubNode>();
+      Prototype* prototype = new Prototype();
+      prototype->mNodeClass = nodeClass;
+      prototype->mNode = stub;
+      prototype->mName = QString::fromStdString(stub->GetStubMetadata() == nullptr 
+        ? nodeClass->mClassName : stub->GetStubMetadata()->name);
+      category->mPrototypes.push_back(prototype);
+    }
+  }
+}
+
+void Prototypes::AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget, 
+                                         QTreeWidgetItem* parentItem, 
+                                         vector<const Prototype*>& allPrototypes) 
+{
+  for (const Prototype* prototype : category->mPrototypes) {
+    allPrototypes.push_back(prototype);
+    SelectorItem* item = 
+      new SelectorItem(nullptr, prototype->mName, allPrototypes.size());
+    if (parentItem == nullptr) treeWidget->addTopLevelItem(item);
+    else parentItem->addChild(item);
+  }
+
+  for (Category* subCategory : category->mSubCategories) {
+    SelectorItem* item = new SelectorItem(nullptr, subCategory->mName, -1);
+    if (parentItem == nullptr) treeWidget->addTopLevelItem(item);
+    else parentItem->addChild(item);
+    AddCategoryToTreeWidget(subCategory, treeWidget, item, allPrototypes);
+    item->setExpanded(true);
+  }
+}
+
+Prototypes::Category::~Category() {
+  for (Category* category : mSubCategories) {
+    delete category;
+  }
+  for (Prototype* prototype : mPrototypes) {
+    delete prototype;
+  }
+}
+
+Prototypes::Prototype::~Prototype() {
+  SafeDelete(mNode);
+}
