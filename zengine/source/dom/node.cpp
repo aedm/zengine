@@ -278,7 +278,8 @@ const string& Node::GetName() const {
 }
 
 void Node::SetPosition(const Vec2 position) {
-  mPosition = position;
+  mPosition.x = floorf(position.x);
+  mPosition.y = floorf(position.y);
   ReceiveMessage(NodeMessage::NODE_POSITION_CHANGED);
 }
 

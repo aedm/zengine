@@ -315,8 +315,6 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
     {
       mAreNodesMoved = true;
       Vec2 mouseDiff = mousePos - mOriginalMousePos;
-      mouseDiff.x = floorf(mouseDiff.x);
-      mouseDiff.y = floorf(mouseDiff.y);
       for (NodeWidget* widget : mSelectedNodeWidgets) {
         widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
       }

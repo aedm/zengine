@@ -34,7 +34,7 @@ PassWatcher::~PassWatcher() {
 }
 
 void PassWatcher::Paint(GLWidget* Widget) {
-  TheDrawingAPI->Clear(true, true, 0x80a080a0);
+  TheDrawingAPI->Clear(true, true, 0);
 
   Vec2 size = Vec2(Widget->width(), Widget->height());
   mGlobals.RenderTargetSize = size;
