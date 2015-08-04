@@ -1,22 +1,14 @@
 #pragma once
 
-#include "watcher.h"
-#include "watcherwidget.h"
-#include <zengine.h>
+#include "generalscenewatcher.h"
 
-class PassWatcher : public Watcher
+class PassWatcher : public GeneralSceneWatcher
 {
 public:
-	PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget);
+	PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget);
 	virtual ~PassWatcher();
 
 protected:
-	void Paint(GLWidget* widget);
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
-
-	Drawable* mDrawable;
 	Material* mMaterial;
 	MeshNode* mMesh;
-	Globals mGlobals;
 };

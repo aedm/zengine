@@ -112,6 +112,14 @@ void ZenGarden::InitModules() {
 }
 
 void ZenGarden::DisposeModules() {
+  /// Close all watchers
+  while (mUI.leftPanel->count() > 0) {
+    delete mUI.leftPanel->widget(0);
+  }
+  while (mUI.rightPanel->count() > 0) {
+    delete mUI.rightPanel->widget(0);
+  }
+  
   Prototypes::Dispose();
   DisposePainter();
   CloseZengine();

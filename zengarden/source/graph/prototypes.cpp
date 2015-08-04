@@ -20,6 +20,7 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Vec4Node>());
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<TimeNode>());
+  AddPrototype(registry->GetNodeClass<Material>());
 
   LoadStubs();
 }

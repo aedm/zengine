@@ -1,11 +1,10 @@
 #include "passwatcher.h"
 
-PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
-  : Watcher(PassNode, WatchWidget) {
-  GetGLWidget()->OnPaint += Delegate(this, &PassWatcher::Paint);
-
+PassWatcher::PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget)
+  : GeneralSceneWatcher(pass, watcherWidget) 
+{
   mMaterial = new Material();
-  mMaterial->mSolidPass.Connect(PassNode);
+  mMaterial->mSolidPass.Connect(pass);
 
   /// Mesh
   Vec2 Position(3.5f, 3.5f);
@@ -29,27 +28,6 @@ PassWatcher::PassWatcher(Pass* PassNode, GLWatcherWidget* WatchWidget)
 }
 
 PassWatcher::~PassWatcher() {
-  SafeDelete(mDrawable);
   SafeDelete(mMaterial);
-}
-
-void PassWatcher::Paint(GLWidget* Widget) {
-  TheDrawingAPI->Clear(true, true, 0);
-
-  Vec2 size = Vec2(Widget->width(), Widget->height());
-  mGlobals.RenderTargetSize = size;
-  mGlobals.RenderTargetSizeRecip = Vec2(1.0f / size.x, 1.0f / size.y);
-
-  mGlobals.View.LoadIdentity();
-  mGlobals.Projection = Matrix::Ortho(0, 0, size.x, size.y);
-  mGlobals.Transformation = mGlobals.View * mGlobals.Projection;
-
-  mDrawable->Draw(&mGlobals);
-}
-
-void PassWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                       void* payload) {
-  if (message == NodeMessage::NEEDS_REDRAW) {
-    GetGLWidget()->updateGL();
-  }
+  SafeDelete(mMesh);
 }

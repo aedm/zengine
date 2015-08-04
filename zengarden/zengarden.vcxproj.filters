@@ -149,6 +149,9 @@
     <ClCompile Include="source\graph\graphwatcher.cpp">
       <Filter>source\graph</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\generalscenewatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -220,6 +223,9 @@
       <Filter>source\watchers</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\stubwatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\generalscenewatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>
