@@ -1,4 +1,4 @@
-:name "default VS"
+:name "Default VS"
 :returns void
 
 :input vec3 aPosition;

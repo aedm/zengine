@@ -78,36 +78,6 @@ void ZenGarden::InitModules() {
 
   /// TEST
   {
-    /// fragment shader
-    char* testShaderStubSource = Util::ReadFileQt("test2.fs");
-    auto fragmentStub = new StubNode();
-    fragmentStub->mSource.SetDefaultValue(testShaderStubSource);
-    //ThePrototypes->AddStub(fragmentStub);
-    TheCommandStack->Execute(new CreateNodeCommand(fragmentStub, graph));
-    TheCommandStack->Execute(new MoveNodeCommand(fragmentStub, Vec2(150, 150)));
-    delete testShaderStubSource;
-
-    /// vertex shader
-    testShaderStubSource = Util::ReadFileQt("test2.vs");
-    auto vertexStub = new StubNode();
-    vertexStub->mSource.SetDefaultValue(testShaderStubSource);
-    //ThePrototypes->AddStub(vertexStub);
-    TheCommandStack->Execute(new CreateNodeCommand(vertexStub, graph));
-    TheCommandStack->Execute(new MoveNodeCommand(vertexStub, Vec2(150, 250)));
-
-    /// pass
-    auto pass = new Pass();
-    pass->mFragmentStub.Connect(fragmentStub);
-    pass->mVertexStub.Connect(vertexStub);
-    TheCommandStack->Execute(new CreateNodeCommand(pass, graph));
-    TheCommandStack->Execute(new MoveNodeCommand(pass, Vec2(280, 200)));
-
-    /// float
-    auto floatNode = new FloatNode();
-    //fragmentStub->mSlots[0]->Connect(floatNode); /// hack
-    TheCommandStack->Execute(new CreateNodeCommand(floatNode, graph));
-    TheCommandStack->Execute(new MoveNodeCommand(floatNode, Vec2(20, 150)));
-
     /// texture
     TextureNode* textureNode = new TextureNode();
     Texture* sampleTexture = CreateSampleTexture();

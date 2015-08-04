@@ -1,4 +1,4 @@
-:name "default FS"
+:name "Default FS"
 :returns void
 
 :output vec4 FragColor
