@@ -13,6 +13,15 @@
   <property name="windowTitle">
    <string>zengarden</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"> QTabBar::close-button {
+     /*image: url(close.png);*/
+     /*subcontrol-position: left;*/
+     /*image-size:  50%;*/
+/*    padding: 0px;
+	margin: 0px;*/
+ }</string>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">
@@ -34,6 +43,9 @@
      <widget class="QTabWidget" name="leftPanel">
       <property name="currentIndex">
        <number>-1</number>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -285,7 +297,7 @@
        <bool>false</bool>
       </property>
       <property name="tabsClosable">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="movable">
        <bool>false</bool>

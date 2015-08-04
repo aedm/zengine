@@ -14,7 +14,7 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 void GeneralSceneWatcher::Paint(GLWidget* widget) {
   ASSERT(mDrawable);
 
-  TheDrawingAPI->Clear(true, true, 0);
+  TheDrawingAPI->Clear(true, true, 0x202020);
 
   Vec2 size = Vec2(widget->width(), widget->height());
   mGlobals.RenderTargetSize = size;

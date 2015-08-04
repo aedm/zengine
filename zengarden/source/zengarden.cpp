@@ -9,6 +9,7 @@
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
+#include <QMouseEvent>
 
 
 ZenGarden::ZenGarden(QWidget *parent)
@@ -18,7 +19,12 @@ ZenGarden::ZenGarden(QWidget *parent)
   , mPropertyLayout(nullptr) {
   mUI.setupUi(this);
 
-  //TheLogger->OnLog += Delegate(this, &ZenGarden::Log);
+  connect(mUI.leftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
+    if (index>0) delete mUI.leftPanel->widget(index);
+  });
+  connect(mUI.rightPanel, &QTabWidget::tabCloseRequested, [=](int index) {
+    delete mUI.rightPanel->widget(index);
+  });
 
   connect(mUI.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
