@@ -27,6 +27,14 @@ void WatcherWidget::SetTabLabel(const QString& text) {
   }
 }
 
+void WatcherWidget::dragEnterEvent(QDragEnterEvent *event) {
+  mWatcher->HandleDragEnterEvent(event);
+}
+
+void WatcherWidget::dropEvent(QDropEvent *event) {
+  mWatcher->HandleDropEvent(event);
+}
+
 GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget, 
                                  WatcherPosition position, QTabWidget* tabWidget)
   : WatcherWidget(parent, position, tabWidget) 

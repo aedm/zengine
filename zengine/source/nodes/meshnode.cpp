@@ -1,6 +1,7 @@
 #include <include/nodes/meshnode.h>
 #include <include/resources/resourcemanager.h>
 
+REGISTER_NODECLASS(StaticMeshNode, "Static Mesh");
 
 MeshNode::MeshNode()
   : Node(NodeType::MESH) {}

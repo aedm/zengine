@@ -2,6 +2,8 @@
 
 #include <zengine.h>
 #include <QtCore/QString>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 
 class WatcherWidget;
 class GLWidget;
@@ -24,6 +26,10 @@ public:
 
   /// Get displayed name
   const QString& GetDisplayedName();
+
+  /// Handle drag events
+  virtual void HandleDragEnterEvent(QDragEnterEvent* event) {}
+  virtual void HandleDropEvent(QDropEvent* event) {}
 
 protected:
   Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type = NodeType::UI);

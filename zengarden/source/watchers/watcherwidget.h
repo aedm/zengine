@@ -41,6 +41,10 @@ protected:
   Watcher* mWatcher;
 
   void SetTabLabel(const QString& text);
+
+  /// Handle drag events
+  virtual void dragEnterEvent(QDragEnterEvent *event);
+  virtual void dropEvent(QDropEvent *event);
 };
 
 

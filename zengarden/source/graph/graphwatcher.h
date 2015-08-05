@@ -42,6 +42,10 @@ private:
   /// All wigdets on the graph
   Graph* GetGraph();
 
+  /// Handle drag events
+  virtual void HandleDragEnterEvent(QDragEnterEvent* event) override;
+  virtual void HandleDropEvent(QDropEvent* event) override;
+
   /// Mapping from node to widget
   map<Node*, NodeWidget*> mWidgetMap;
 
@@ -66,6 +70,7 @@ private:
 
   /// Convertes pixel coordinates (eg. mouse) to world coordinates
   Vec2 MouseToWorld(QMouseEvent* event);
+  Vec2 CanvasToWorld(const Vec2& canvasCoord);
   void GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft);
 
   /// True if mouse movement was made during STATE_MOVE_NODES

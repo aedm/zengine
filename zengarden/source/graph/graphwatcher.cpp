@@ -10,13 +10,16 @@
 #include <QPainter>
 #include <QTimer>
 #include <QMouseEvent>
-
+#include <QMimeData>
+#include <QFileInfo>
 
 GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
   : Watcher(graph, parent) 
 {
   GetGLWidget()->setMouseTracking(true);
   GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
+
+  parent->setAcceptDrops(true);
 
   mCurrentState = State::DEFAULT;
   mClickedWidget = NULL;
@@ -474,11 +477,17 @@ void GraphWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
   }
 }
 
-Vec2 GraphWatcher::MouseToWorld(QMouseEvent* event) {
-  Vec2 mouseCoord(event->x(), event->y());
+
+Vec2 GraphWatcher::CanvasToWorld(const Vec2& canvasCoord) {
   Vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
-  return topLeft + mouseCoord * mZoomFactor;
+  return topLeft + canvasCoord * mZoomFactor;
+}
+
+
+Vec2 GraphWatcher::MouseToWorld(QMouseEvent* event) {
+  Vec2 mouseCoord(event->x(), event->y());
+  return CanvasToWorld(mouseCoord);
 }
 
 void GraphWatcher::GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) {
@@ -488,4 +497,35 @@ void GraphWatcher::GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) {
   /// Consistent shape of nodes
   oTopLeft.x = floorf(oTopLeft.x);
   oTopLeft.y = floorf(oTopLeft.y);
+}
+
+
+void GraphWatcher::HandleDragEnterEvent(QDragEnterEvent* event) {
+  const QMimeData* mimeData = event->mimeData();
+  if (!mimeData->hasUrls()) return;
+  QList<QUrl> urlList = mimeData->urls();
+  if (urlList.size() != 1) return;
+
+  QString fileName = urlList.at(0).toLocalFile();
+  if (fileName.endsWith(".obj")) event->acceptProposedAction();
+}
+
+/// TODO: remove code duplication with HandleDragEnterEvent
+void GraphWatcher::HandleDropEvent(QDropEvent* event) {
+  const QMimeData* mimeData = event->mimeData();
+  if (!mimeData->hasUrls()) return;
+  QList<QUrl> urlList = mimeData->urls();
+  if (urlList.size() != 1) return;
+
+  QString fileName = urlList.at(0).toLocalFile();
+  QFileInfo fileInfo(fileName);
+  if (fileInfo.suffix() == "obj") {
+    MeshNode* node = StaticMeshNode::Create(nullptr);
+    node->SetName(fileInfo.fileName().toStdString());
+    TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
+
+    Vec2 pos = CanvasToWorld(Vec2(event->pos().x(), event->pos().y()));
+    TheCommandStack->Execute(new MoveNodeCommand(node, pos));
+    event->acceptProposedAction();
+  }
 }
