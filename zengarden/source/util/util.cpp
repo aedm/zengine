@@ -83,4 +83,63 @@ namespace Util {
     TopologicalOrder tmp(root, oResult);
   }
 
+  static Vec3 ObjLineToVec3(const QString& line) {
+    QStringList v = line.split(' ', QString::SkipEmptyParts);
+    if (v.size() != 4) {
+      ERR("Syntax error in .obj line: %s", line.toLatin1());
+      return Vec3(0, 0, 0);
+    }
+    return Vec3(v[1].toFloat(), v[2].toFloat(), v[3].toFloat());
+  }
+  
+  OWNERSHIP Mesh* LoadMesh(const QString& fileName) {
+    unique_ptr<char> fileContent(ReadFileQt(fileName));
+    QString contentString(fileContent.get());
+    QStringList lines = contentString.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    
+    vector<Vec3> coords;
+    vector<Vec3> normals;
+    vector<Vec2> texcoord;
+    struct Triplet { UINT c, n, t; };
+    vector<Triplet> triplets;
+
+    for (QString& line : lines) {
+      if (line.startsWith("v ")) {
+        /// Vertex definition
+        coords.push_back(ObjLineToVec3(line));
+      }
+      else if (line.startsWith("vn ")) {
+        /// Normal definition
+        normals.push_back(ObjLineToVec3(line));
+      }
+      else if (line.startsWith("vt ")) {
+        /// Texcoord definition
+        Vec3 t = ObjLineToVec3(line);
+        texcoord.push_back(Vec2(t.x, t.y));
+      }
+      else if (line.startsWith("f ")) {
+        /// Face definition
+        QStringList t = line.right(line.length()-2).split(' ', QString::SkipEmptyParts);
+        for (QString& s : t) {
+          QStringList a = s.split('/');
+          triplets.push_back({a[0].toInt(), a[2].toInt(), a[1].toInt()});
+        }
+      }
+    }
+
+    vector<VertexPosUVNorm> vertices(triplets.size());
+
+    for (UINT i = 0; i < triplets.size(); i++) {
+      vertices[i].position = coords[triplets[i].c - 1];
+      vertices[i].normal = normals[triplets[i].n - 1];
+      vertices[i].uv = texcoord[triplets[i].t - 1];
+    }
+
+    Mesh* mesh = TheResourceManager->CreateMesh();
+    mesh->AllocateVertices(VertexPosUVNorm::format, triplets.size());
+    mesh->UploadVertices(&vertices[0]);
+
+    return mesh;
+  }
+
 } // namespace Util

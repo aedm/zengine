@@ -1,6 +1,7 @@
 #include "graphwatcher.h"
 #include "nodewidget.h"
 #include "../util/uipainter.h"
+#include "../util/util.h"
 #include "../commands/graphcommands.h"
 #include "prototypes.h"
 #include <zengine.h>
@@ -520,7 +521,8 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
   QString fileName = urlList.at(0).toLocalFile();
   QFileInfo fileInfo(fileName);
   if (fileInfo.suffix() == "obj") {
-    MeshNode* node = StaticMeshNode::Create(nullptr);
+    Mesh* mesh = Util::LoadMesh(fileName);
+    MeshNode* node = StaticMeshNode::Create(mesh);
     node->SetName(fileInfo.fileName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
 
