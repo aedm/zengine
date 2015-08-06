@@ -25,6 +25,8 @@ PassWatcher::PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget)
   mDrawable = new Drawable();
   mDrawable->mMaterial.Connect(mMaterial);
   mDrawable->mMesh.Connect(mMesh);
+
+  mOrthonormal = true;
 }
 
 PassWatcher::~PassWatcher() {

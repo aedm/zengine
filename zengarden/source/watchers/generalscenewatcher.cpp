@@ -23,9 +23,20 @@ void GeneralSceneWatcher::Paint(GLWidget* widget) {
   mGlobals.RenderTargetSize = size;
   mGlobals.RenderTargetSizeRecip = Vec2(1.0f / size.x, 1.0f / size.y);
 
-  mGlobals.View.LoadIdentity();
-  mGlobals.Projection = Matrix::Ortho(0, 0, size.x, size.y);
-  mGlobals.Transformation = mGlobals.View * mGlobals.Projection;
+  if (mOrthonormal) {
+    mGlobals.View.LoadIdentity();
+    mGlobals.Projection = Matrix::Ortho(0, 0, size.x, size.y);
+  }
+  else {
+    float aspectRatio = size.x / size.y;
+    mGlobals.Projection = Matrix::Projection(mFovY, mZFar, mZNear, aspectRatio);
+    mGlobals.View = Matrix::LookAt(Vec3(10, 10, 50), mTarget, Vec3(0, 1, 0));
+  }
+  
+  mGlobals.Transformation = mGlobals.Projection * mGlobals.View;
+
+  Vec4 t = Vec4(10, 10, 10, 1) * mGlobals.Transformation;
+  Vec3 tt = Vec3(t.x / t.w, t.y / t.w, t.z / t.w);
 
   mDrawable->Draw(&mGlobals);
 }

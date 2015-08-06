@@ -3,6 +3,7 @@
 #include "defines.h"
 
 class Quaternion;
+class Matrix;
 
 class Vec2
 {
@@ -63,6 +64,7 @@ public:
 	float Dot(const Vec4& v) const;
 	Vec4 operator - (const Vec4& v) const;
 	bool operator == (const Vec4& v) const;
+  Vec4 operator * (const Matrix& m) const;
 
 	Vec3 XYZ();
 };
@@ -78,7 +80,11 @@ public:
 	Vec4 operator * (const Vec4& v) const;
 
 	void LoadIdentity();
+  
+  /// Matrix data
+  float			m[16];
 
+  /// 3D transformation matrices
 	static Matrix	Translate(const Vec3& translateVector);
 	static Matrix	Rotate(float angle, const Vec3& axis);
 	static Matrix	Rotate(const Quaternion& q);
@@ -87,7 +93,11 @@ public:
 	/// Ortho matrix where (0,0) is the top left
 	static Matrix	Ortho(float x1, float y1, float x2, float y2);
 
-	float			m[16];
+  /// Projection matrix
+  static Matrix Projection(float fovY, float zFar, float zNear, float aspectRatio);
+
+  /// Camera matrix
+  static Matrix LookAt(const Vec3& position, const Vec3& target, const Vec3& up);
 };
 
 

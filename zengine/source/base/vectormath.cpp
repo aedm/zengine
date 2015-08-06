@@ -148,6 +148,16 @@ Vec3 Vec4::XYZ() {
   return Vec3(x, y, z);
 }
 
+Vec4 Vec4::operator*(const Matrix& m) const
+{
+  return Vec4(
+    x*m.m[0]  + y*m.m[1]  + z*m.m[2]  + w*m.m[3],
+    x*m.m[4]  + y*m.m[5]  + z*m.m[6]  + w*m.m[7],
+    x*m.m[8]  + y*m.m[9]  + z*m.m[10] + w*m.m[11],
+    x*m.m[12] + y*m.m[13] + z*m.m[14] + w*m.m[15]
+    );
+}
+
 Matrix::Matrix() {}
 
 float& Matrix::operator() (UINT y, UINT x) {
@@ -275,11 +285,44 @@ Matrix Matrix::Ortho(float x1, float y1, float x2, float y2) {
   float rx = 1.0f / (x2 - x1);
   float ry = 1.0f / (y2 - y1);
   Matrix m;
-  m.m[0] = 2.0f*rx;	m.m[1] = 0;		m.m[2] = 0;	m.m[3] = -(x1 + x2) * rx;
-  m.m[4] = 0;		m.m[5] = -2.0f*ry;	m.m[6] = 0;	m.m[7] = (y1 + y2) * ry;
-  m.m[8] = 0;		m.m[9] = 0;		m.m[10] = -1;	m.m[11] = 0;
-  m.m[12] = 0;		m.m[13] = 0;		m.m[14] = 0;	m.m[15] = 1;
+  m.m[0] = 2.0f*rx;	m.m[1] = 0;		      m.m[2] = 0;	    m.m[3] = -(x1 + x2) * rx;
+  m.m[4] = 0;		    m.m[5] = -2.0f*ry;	m.m[6] = 0;	    m.m[7] = (y1 + y2) * ry;
+  m.m[8] = 0;		    m.m[9] = 0;		      m.m[10] = -1;	  m.m[11] = 0;
+  m.m[12] = 0;		  m.m[13] = 0;		    m.m[14] = 0;	  m.m[15] = 1;
   return m;
+}
+
+Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio)
+{
+  /// Create projection matrix
+  /// https://unspecified.wordpress.com/2012/06/21/calculating-the-gluperspective-matrix-and-other-opengl-matrix-maths/
+
+  float f = 1.0f / tanf(fovY / 2.0f);
+  float a = zNear - zFar;
+
+  Matrix m;
+  m.m[0] = f / aspectRatio;	m.m[1] = 0;		m.m[2] = 0;	    m.m[3] = 0;
+  m.m[4] = 0;		            m.m[5] = f;	  m.m[6] = 0;	    m.m[7] = 0;
+  m.m[8] = 0;		            m.m[9] = 0;		m.m[10] = (zFar + zNear) / a;	  
+  m.m[11] = 2.0f * zFar * zNear / a;
+  m.m[12] = 0;	            m.m[13] = 0;  m.m[14] = -1;	  m.m[15] = 0;
+  return m;
+}
+
+Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) {
+  /// Generate view matrix for position camera 	
+  /// http://wiki.delphigl.com/index.php/gluLookAt
+
+  Vec3 f = -(target - position).Normal();
+  Vec3 s = -f.Cross(up.Normal());
+  Vec3 u = -s.Cross(f);
+
+  Matrix m;
+  m.m[0] = s.x;	  m.m[1] = s.y;	  m.m[2] = s.z;	  m.m[3] = 0;
+  m.m[4] = u.x;	  m.m[5] = u.y;	  m.m[6] = u.z;	  m.m[7] = 0;
+  m.m[8] = -f.x;	m.m[9] = -f.y;	m.m[10] = -f.z;	m.m[11] = 0;
+  m.m[12] = 0;		m.m[13] = 0;		m.m[14] = 0;		m.m[15] = 1;
+  return Translate(-position) * m;
 }
 
 void Quaternion::FromEuler(float roll, float pitch, float yaw) {
