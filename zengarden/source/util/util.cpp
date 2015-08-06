@@ -34,6 +34,7 @@ namespace Util {
       return nullptr;
     }
 
+    /// TODO: use LoadStub instead
     StubNode* vertexStub = new StubNode();
     vertexStub->mSource.SetDefaultValue(string(vertexContent.get()));
     StubNode* fragmentStub = new StubNode();
@@ -132,7 +133,8 @@ namespace Util {
     for (UINT i = 0; i < triplets.size(); i++) {
       vertices[i].position = coords[triplets[i].c - 1];
       vertices[i].normal = normals[triplets[i].n - 1];
-      vertices[i].uv = texcoord[triplets[i].t - 1];
+      UINT tindex = triplets[i].t;
+      vertices[i].uv = tindex == 0 ? Vec2(0, 0) : texcoord[tindex-1];
     }
 
     Mesh* mesh = TheResourceManager->CreateMesh();
@@ -140,6 +142,15 @@ namespace Util {
     mesh->UploadVertices(&vertices[0]);
 
     return mesh;
+  }
+
+  StubNode* LoadStub(const QString& fileName)
+  {
+    unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
+    /// TODO: register this as an engine node
+    StubNode* stub = new StubNode();
+    stub->mSource.SetDefaultValue(stubSource.get());
+    return stub;
   }
 
 } // namespace Util

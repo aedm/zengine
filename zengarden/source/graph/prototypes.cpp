@@ -33,16 +33,6 @@ void Prototypes::AddPrototype(NodeClass* nodeClass) {
   mMainCategory.mPrototypes.push_back(prototype);
 }
 
-//void Prototypes::AddStub(OWNERSHIP StubNode* stub) {
-//  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(stub);
-//  Prototype prototype;
-//  prototype.mNodeClass = nodeClass;
-//  prototype.mNode = stub;
-//  prototype.mName = stub->GetStubMetadata() == nullptr 
-//    ? nodeClass->mClassName : stub->GetStubMetadata()->name;
-//  mMainCategory.mPrototypes.push_back(prototype);
-//}
-
 Prototypes::~Prototypes() {
 }
 
@@ -105,10 +95,7 @@ void Prototypes::LoadStubFolder(QString folder, Category* category) {
     }
     else if (fileInfo.completeSuffix() == shaderSuffix) {
       INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
-      char* stubSource = Util::ReadFileQt(fileInfo.absoluteFilePath());
-
-      StubNode* stub = new StubNode();
-      stub->mSource.SetDefaultValue(stubSource);
+      StubNode* stub = Util::LoadStub(fileInfo.absoluteFilePath());
 
       NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass<StubNode>();
       Prototype* prototype = new Prototype();

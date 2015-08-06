@@ -152,6 +152,9 @@
     <ClCompile Include="source\watchers\generalscenewatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\meshwatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -226,6 +229,9 @@
       <Filter>source\watchers</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\generalscenewatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\meshwatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,7 @@
 #include "generalscenewatcher.h"
+#include "../util/util.h"
+
+Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
 GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget) 
   : Watcher(node, watcherWidget)
@@ -33,5 +36,18 @@ void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
   if (message == NodeMessage::NEEDS_REDRAW) {
     GetGLWidget()->updateGL();
   }
+}
+
+void GeneralSceneWatcher::Init()
+{
+  StubNode* defaultVertex = Util::LoadStub("engine/scenewatcher/defaultvertex.shader");
+  StubNode* defaultFragment = Util::LoadStub("engine/scenewatcher/defaultfragment.shader");
+  
+  Pass* defaultPass = new Pass();
+  defaultPass->mFragmentStub.Connect(defaultFragment);
+  defaultPass->mVertexStub.Connect(defaultVertex);
+
+  mDefaultMaterial = new Material();
+  mDefaultMaterial->mSolidPass.Connect(defaultPass);
 }
 

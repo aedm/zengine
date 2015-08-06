@@ -113,6 +113,7 @@
     <ClCompile Include="source\watchers\documentwatcher.cpp" />
     <ClCompile Include="source\watchers\generalscenewatcher.cpp" />
     <ClCompile Include="source\watchers\logwatcher.cpp" />
+    <ClCompile Include="source\watchers\meshwatcher.cpp" />
     <ClCompile Include="source\watchers\passwatcher.cpp" />
     <ClCompile Include="source\watchers\stubwatcher.cpp" />
     <ClCompile Include="source\watchers\watcherwidget.cpp" />
@@ -184,6 +185,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="source\watchers\generalscenewatcher.h" />
+    <ClInclude Include="source\watchers\meshwatcher.h" />
     <ClInclude Include="source\watchers\passwatcher.h" />
     <ClInclude Include="source\watchers\stubwatcher.h" />
     <ClInclude Include="source\watchers\watcher.h" />

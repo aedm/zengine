@@ -9,6 +9,9 @@ public:
   GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget);
   virtual ~GeneralSceneWatcher();
 
+  /// Initializes resources needed for scene watchers
+  static void Init();
+
 protected:
   void Paint(GLWidget* widget);
   virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
@@ -16,4 +19,7 @@ protected:
 
   Drawable* mDrawable = nullptr;
   Globals mGlobals;
+
+  /// Static resources initializes by Init()
+  static Material* mDefaultMaterial;
 };
