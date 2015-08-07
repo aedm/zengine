@@ -165,7 +165,7 @@ void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
     {
       GLWatcherWidget* glWatcherWidget =
         new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new PassWatcher(static_cast<Pass*>(node), glWatcherWidget);
+      watcher = new PassWatcher(dynamic_cast<Pass*>(node), glWatcherWidget);
       watcherWidget = glWatcherWidget;
       break;
     }
@@ -173,7 +173,7 @@ void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
     {
       GLWatcherWidget* glWatcherWidget =
         new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new MeshWatcher(static_cast<MeshNode*>(node), glWatcherWidget);
+      watcher = new MeshWatcher(dynamic_cast<MeshNode*>(node), glWatcherWidget);
       watcherWidget = glWatcherWidget;
       break;
     }

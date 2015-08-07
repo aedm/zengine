@@ -13,5 +13,5 @@ SHADER
 {
 	//vec4 c = texture2D(Texture, vTexCoord);
 	//FragColor = vec4(c.x, Green, vTexCoord.y, 1.0);
-	FragColor = vec4(vTexCoord, 0.5, 1.0);
+	FragColor = vec4(vTexCoord, vNormal.x, 1.0);
 }

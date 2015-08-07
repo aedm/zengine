@@ -55,6 +55,7 @@ public:
   virtual ~GLWidget();
 
   Event<GLWidget*, QMouseEvent*> OnMouseMove;
+  /// TODO: split this to left and right press/release
   Event<GLWidget*, QMouseEvent*> OnMousePress;
   Event<GLWidget*, QMouseEvent*> OnMouseRelease;
   Event<GLWidget*, QKeyEvent*> OnKeyPress;

@@ -112,7 +112,7 @@ public:
 	
 	float s, vx, vy, vz;							
 
-	void FromEuler(float roll, float pitch, float yaw);
+	static Quaternion FromEuler(float roll, float pitch, float yaw);
 	void ToEuler(float& oRoll, float& oPitch, float& oYaw);
 
 	Quaternion Conjugate();

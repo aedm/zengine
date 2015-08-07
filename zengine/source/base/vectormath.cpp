@@ -325,7 +325,7 @@ Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) 
   return Translate(-position) * m;
 }
 
-void Quaternion::FromEuler(float roll, float pitch, float yaw) {
+Quaternion Quaternion::FromEuler(float roll, float pitch, float yaw) {
   float sr, cr, sp, cp, sy, cy;
   float rr = 0.5f*roll;
   float pp = 0.5f*pitch;
@@ -334,10 +334,11 @@ void Quaternion::FromEuler(float roll, float pitch, float yaw) {
   sp = sinf(pp); cp = cosf(pp);
   sy = sinf(yy); cy = cosf(yy);
 
-  vx = sr*cp*cy - cr*sp*sy;
-  vy = cr*sp*cy + sr*cp*sy;
-  vz = cr*cp*sy - sr*sp*cy;
-  s = cr*cp*cy + sr*sp*sy;
+  float vx = sr*cp*cy - cr*sp*sy;
+  float vy = cr*sp*cy + sr*cp*sy;
+  float vz = cr*cp*sy - sr*sp*cy;
+  float s = cr*cp*cy + sr*sp*sy;
+  return Quaternion(s, vx, vy, vz);
 }
 
 void Quaternion::ToEuler(float& oRoll, float& oPitch, float& oYaw) {
