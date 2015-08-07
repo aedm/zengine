@@ -48,7 +48,6 @@ private:
   Drawable* mTexturedBox;
   Drawable* mTextBox;
 
-  RenderState mCanvasRenderstate;
   Globals mGlobals;
 };
 

@@ -32,6 +32,8 @@ public:
   /// List of vertex attributes used by the program
   const vector<ShaderAttributeDesc>& GetUsedAttributes();
 
+  RenderState mRenderstate;
+
 protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 

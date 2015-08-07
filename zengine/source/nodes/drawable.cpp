@@ -32,6 +32,8 @@ void Drawable::Draw(Globals* globals, PrimitiveTypeEnum Primitive) {
       TheDrawingAPI->EnableVertexAttribute(desc.Handle,
           gVertexAttributeType[(UINT)desc.Usage], attribute->Offset,
           mesh->mFormat->mStride);
+    } else {
+      SHOULDNT_HAPPEN;
     }
   }
 

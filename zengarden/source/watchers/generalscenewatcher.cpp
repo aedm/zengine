@@ -34,9 +34,12 @@ void GeneralSceneWatcher::Paint(GLWidget* widget) {
   else {
     float aspectRatio = size.x / size.y;
     mGlobals.Projection = Matrix::Projection(mFovY, mZFar, mZNear, aspectRatio);
-    Matrix rotate = Matrix::Rotate(Quaternion::FromEuler(0, mOrientation.x, 0));
+    //Matrix rotate = 
+    //  Matrix::Rotate(Quaternion::FromEuler(mOrientation.x, mOrientation.y, 0));
+    Matrix xRot = Matrix::Rotate(mOrientation.x, Vec3(1, 0, 0));
+    Matrix yRot = Matrix::Rotate(mOrientation.y, Vec3(0, 1, 0));
     Matrix lookAt = Matrix::LookAt(Vec3(0, 0, 20), mTarget, Vec3(0, 1, 0));
-    mGlobals.View = lookAt * rotate;
+    mGlobals.View = lookAt * yRot * xRot;
   }
   
   mGlobals.Transformation = mGlobals.Projection * mGlobals.View;
@@ -89,7 +92,8 @@ void GeneralSceneWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
 void GeneralSceneWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
-    mOrientation.x = mOriginalOrientation.x + float(diff.x()) / 100.0f;
+    mOrientation.y = mOriginalOrientation.y - float(diff.x()) / 200.0f;
+    mOrientation.x = mOriginalOrientation.x - float(diff.y()) / 200.0f;
     GetGLWidget()->update();
   }
 }

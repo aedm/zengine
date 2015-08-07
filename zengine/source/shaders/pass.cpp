@@ -15,7 +15,11 @@ Pass::Pass()
   , mVertexStub(this, VertesStubSlotName)
   , mFragmentStub(this, FragmentStubSlotName)
   , mHandle(-1) 
-{}
+{
+  mRenderstate.DepthTest = true;
+  mRenderstate.Face = RenderState::FACE_BACK;
+  mRenderstate.BlendMode = RenderState::BLEND_ALPHA;
+}
 
 Pass::~Pass() 
 {
@@ -161,6 +165,7 @@ void Pass::Operate() {
 void Pass::Set(Globals* globals) {
   ASSERT(mHandle != -1);
 
+  TheDrawingAPI->SetRenderState(&mRenderstate);
   TheDrawingAPI->SetShaderProgram(mHandle);
 
   /// Set uniforms

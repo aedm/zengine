@@ -43,15 +43,18 @@ UiPainter::UiPainter() {
   /// Shaders
   Pass* pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
   ConnectToStubParameter(pass, false, "uColor", &mColor);
+  pass->mRenderstate.DepthTest = false;
   mSolidColorMaterial.mSolidPass.Connect(pass);
   
   pass = Util::LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
   ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
+  pass->mRenderstate.DepthTest = false;
   mSolidTextureMaterial.mSolidPass.Connect(pass);
 
   pass = Util::LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
   ConnectToStubParameter(pass, false, "uColor", &mColor);
   ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
+  pass->mRenderstate.DepthTest = false;
   mTextTextureMaterial.mSolidPass.Connect(pass);
 
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
@@ -93,11 +96,6 @@ UiPainter::UiPainter() {
   mTextBox = new Drawable();
   mTextBox->mMaterial.Connect(&mTextTextureMaterial);
   mTextBox->mMesh.Connect(mTexturedBoxMeshNode);
-
-  // Renderstate
-  mCanvasRenderstate.DepthTest = false;
-  mCanvasRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
-  mCanvasRenderstate.BlendMode = RenderState::BLEND_ALPHA;
 }
 
 UiPainter::~UiPainter() {
@@ -181,7 +179,6 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
 void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, 
                               Vec2 size) {
   TheDrawingAPI->SetViewport(0, 0, canvasWidth, canvasHeight);
-  TheDrawingAPI->SetRenderState(&mCanvasRenderstate);
   mColor.Set(Vec4(1, 1, 1, 1));
 
   mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);

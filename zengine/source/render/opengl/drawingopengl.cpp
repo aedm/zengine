@@ -477,13 +477,15 @@ void DrawingOpenGL::SetFace(RenderState::FaceEnum face) {
   if (FaceShadow == face) return;
   switch (face) {
     case RenderState::FACE_FRONT:
-      glPolygonMode(GL_FRONT, GL_FILL);
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_FRONT);
       break;
     case RenderState::FACE_FRONT_AND_BACK:
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      glDisable(GL_CULL_FACE);
       break;
     case RenderState::FACE_BACK:
-      glPolygonMode(GL_BACK, GL_FILL);
+      glEnable(GL_CULL_FACE);
+      glCullFace(GL_FRONT);
       break;
   }
   FaceShadow = face;
