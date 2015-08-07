@@ -213,9 +213,12 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
     GLenum type;
 
     glGetActiveAttrib(program, i, attributeNameMaxLength, &nameLength, &size, &type, name);
+    
+    /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
+    AttributeId location = glGetAttribLocation(program, name);
 
     ShaderAttributeDesc attribute;
-    attribute.Handle = i;
+    attribute.Handle = location; 
     attribute.Name = name;
     switch (type) {
       case GL_FLOAT:		attribute.Type = NodeType::FLOAT;		break;
