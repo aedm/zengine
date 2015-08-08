@@ -6,6 +6,7 @@
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
 #include "watchers/meshwatcher.h"
+#include "watchers/scenewatcher.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
@@ -174,6 +175,14 @@ void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
       GLWatcherWidget* glWatcherWidget =
         new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
       watcher = new MeshWatcher(dynamic_cast<MeshNode*>(node), glWatcherWidget);
+      watcherWidget = glWatcherWidget;
+      break;
+    }
+    case NodeType::SCENE:
+    {
+      GLWatcherWidget* glWatcherWidget =
+        new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
+      watcher = new SceneWatcher(dynamic_cast<SceneNode*>(node), glWatcherWidget);
       watcherWidget = glWatcherWidget;
       break;
     }

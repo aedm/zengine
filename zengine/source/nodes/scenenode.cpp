@@ -16,7 +16,8 @@ SceneNode::~SceneNode() {
 
 void SceneNode::Draw(const Vec2& canvasSize) {
   Camera* camera = mCamera.GetNode();
-  ASSERT(camera != nullptr);
+  if (camera == nullptr) return;
+
   camera->SetupGlobals(&mGlobals, canvasSize);
 
   for (Node* node : mDrawables.GetMultiNodes()) {

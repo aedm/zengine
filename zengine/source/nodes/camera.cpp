@@ -26,7 +26,7 @@ Camera::Camera()
   mZNear.SetDefaultValue(0.1f);
   mZFar.SetDefaultValue(150.0f);
   mTarget.SetDefaultValue(Vec3(0, 0, 0));
-  mDistance.SetDefaultValue(100.0f);
+  mDistance.SetDefaultValue(50.0f);
   mOrientation.SetDefaultValue(Vec3(0, 0, 0));
 }
 
@@ -45,7 +45,8 @@ void Camera::SetupGlobals(Globals* globals, const Vec2& canvasSize) {
     //  Matrix::Rotate(Quaternion::FromEuler(mOrientation.x, mOrientation.y, 0));
     Matrix xRot = Matrix::Rotate(mOrientation.Get().x, Vec3(1, 0, 0));
     Matrix yRot = Matrix::Rotate(mOrientation.Get().y, Vec3(0, 1, 0));
-    Matrix lookAt = Matrix::LookAt(Vec3(0, 0, 20), mTarget.Get(), Vec3(0, 1, 0));
+    Matrix lookAt = 
+      Matrix::LookAt(Vec3(0, 0, mDistance.Get()), mTarget.Get(), Vec3(0, 1, 0));
     globals->View = lookAt * xRot * yRot;
   }
 
