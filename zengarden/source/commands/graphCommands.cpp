@@ -48,7 +48,8 @@ bool MoveNodeCommand::Undo() {
 ConnectNodeToSlotCommand::ConnectNodeToSlotCommand(Node* fromNode, Slot* slot)
   : mNewNode(fromNode)
   , mSlot(slot) {
-  mOldNode = mSlot->GetAbstractNode();
+  /// TODO: keep old, connected nodes (multinodes)
+  //mOldNode = mSlot->GetAbstractNode();
 }
 
 bool ConnectNodeToSlotCommand::Do() {

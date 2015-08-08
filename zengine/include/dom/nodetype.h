@@ -19,14 +19,12 @@ enum class NodeType {
   /// Other node types 
   STRING,
   TEXTURE,
-  SAMPLER,
-  SHADER_SOURCE,
   SHADER_STUB,
   PASS,
   MATERIAL,
-  MODEL,
   MESH,
   DRAWABLE,
+  SCENE,
   GRAPH,
   DOCUMENT,
 

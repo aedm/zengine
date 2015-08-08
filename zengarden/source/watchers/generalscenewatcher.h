@@ -18,6 +18,7 @@ protected:
                                     void* payload) override;
 
   Drawable* mDrawable = nullptr;
+  SceneNode* mScene = nullptr;
   Globals mGlobals;
 
   /// Qt widget event handlers

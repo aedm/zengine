@@ -21,6 +21,8 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<TimeNode>());
   AddPrototype(registry->GetNodeClass<Material>());
+  AddPrototype(registry->GetNodeClass<Drawable>());
+  AddPrototype(registry->GetNodeClass<SceneNode>());
 
   LoadStubs();
 }

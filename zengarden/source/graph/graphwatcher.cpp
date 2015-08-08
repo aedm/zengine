@@ -59,14 +59,27 @@ void GraphWatcher::Paint(GLWidget* glWidget) {
     NodeWidget* nodeWidget = mWidgetMap.at(node);
     for (int i = 0; i < nodeWidget->mWidgetSlots.size(); i++) {
       Slot* slot = nodeWidget->mWidgetSlots[i]->mSlot;
-      Node* connectedOp = slot->GetAbstractNode();
-      if (connectedOp) {
-        NodeWidget* connectedOpWidget = GetNodeWidget(connectedOp);
-        if (connectedOpWidget != NULL) {
-          /// Draw connection
-          Vec2 p1 = connectedOpWidget->GetOutputPosition();
-          Vec2 p2 = nodeWidget->GetInputPosition(i);
-          ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
+      if (slot->mIsMultiSlot) {
+        for (Node* connectedNode : slot->GetMultiNodes()) {
+          NodeWidget* connectedNodeWidget = GetNodeWidget(connectedNode);
+          if (connectedNodeWidget != NULL) {
+            /// Draw connection
+            Vec2 p1 = connectedNodeWidget->GetOutputPosition();
+            Vec2 p2 = nodeWidget->GetInputPosition(i);
+            ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
+          }
+        }
+      } else {
+        /// TODO: remove code duplication
+        Node* connectedNode = slot->GetAbstractNode();
+        if (connectedNode) {
+          NodeWidget* connectedNodeWidget = GetNodeWidget(connectedNode);
+          if (connectedNodeWidget != NULL) {
+            /// Draw connection
+            Vec2 p1 = connectedNodeWidget->GetOutputPosition();
+            Vec2 p2 = nodeWidget->GetInputPosition(i);
+            ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
+          }
         }
       }
     }

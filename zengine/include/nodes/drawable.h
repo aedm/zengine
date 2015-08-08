@@ -13,3 +13,5 @@ public:
 
   void Draw(Globals* globals, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
 };
+
+typedef TypedSlot<NodeType::DRAWABLE, Drawable> DrawableSlot;

@@ -12,6 +12,8 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
   GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
   GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
+
+  mScene = new SceneNode();
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
@@ -43,10 +45,6 @@ void GeneralSceneWatcher::Paint(GLWidget* widget) {
   }
   
   mGlobals.Transformation = mGlobals.Projection * mGlobals.View;
-
-  Vec4 t = Vec4(10, 10, 10, 1) * mGlobals.Transformation;
-  Vec3 tt = Vec3(t.x / t.w, t.y / t.w, t.z / t.w);
-
   mDrawable->Draw(&mGlobals);
 }
 

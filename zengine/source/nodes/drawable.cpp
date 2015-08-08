@@ -1,10 +1,12 @@
 #include <include/nodes/drawable.h>
 
+REGISTER_NODECLASS(Drawable, "Drawable");
+
 static SharedString MaterialSlotName = make_shared<string>("Material");
 static SharedString MeshSlotName = make_shared<string>("Mesh");
 
 Drawable::Drawable()
-  : Node(NodeType::PASS)
+  : Node(NodeType::DRAWABLE)
   , mMesh(this, MeshSlotName)
   , mMaterial(this, MaterialSlotName) 
 {}

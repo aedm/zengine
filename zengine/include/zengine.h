@@ -22,6 +22,7 @@
 #include "nodes/valuenodes.h"
 #include "nodes/meshnode.h"
 #include "nodes/timenode.h"
+#include "nodes/scenenode.h"
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();
