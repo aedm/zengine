@@ -11,12 +11,12 @@ public:
   void SetupGlobals(Globals* globals, const Vec2& canvasSize);
 
   /// Camera setup
-  float mFovY = 60.0f * (Pi / 180.0f);
-  float mZFar = 150.0f;
-  float mZNear = 0.01f;
-  Vec3 mTarget = Vec3(0, 0, 0);
-  float mDistance = 100;
-  Vec3 mOrientation = Vec3(0, 0, 0);
+  FloatSlot mFovY;
+  FloatSlot mZFar;
+  FloatSlot mZNear;
+  FloatSlot mDistance;
+  Vec3Slot mTarget;
+  Vec3Slot mOrientation;
 
   bool mOrthonormal = false;
 };

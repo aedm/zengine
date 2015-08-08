@@ -51,7 +51,7 @@ void GeneralSceneWatcher::Init()
 
 void GeneralSceneWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
   mOriginalPosition = event->pos();
-  mOriginalOrientation = mCamera.mOrientation;
+  mOriginalOrientation = mCamera.mOrientation.Get();
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   } else if (event->button() == Qt::RightButton) {
@@ -70,8 +70,10 @@ void GeneralSceneWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
 void GeneralSceneWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
-    mCamera.mOrientation.y = mOriginalOrientation.y - float(diff.x()) / 300.0f;
-    mCamera.mOrientation.x = mOriginalOrientation.x - float(diff.y()) / 300.0f;
+    Vec3 orientation = mCamera.mOrientation.Get();
+    orientation.y = mOriginalOrientation.y - float(diff.x()) / 300.0f;
+    orientation.x = mOriginalOrientation.x - float(diff.y()) / 300.0f;
+    mCamera.mOrientation.SetDefaultValue(orientation);
     GetGLWidget()->update();
   }
 }

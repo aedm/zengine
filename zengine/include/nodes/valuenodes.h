@@ -205,9 +205,11 @@ inline static ValueSlot<T>* ToValueSlot(Slot* slot) {
 /// Node and slot types
 typedef ValueSlot<NodeType::FLOAT>			FloatSlot;
 typedef ValueSlot<NodeType::VEC4>			  Vec4Slot;
+typedef ValueSlot<NodeType::VEC3>			  Vec3Slot;
 typedef ValueSlot<NodeType::MATRIX44>		Matrix4Slot;
 
 typedef StaticValueNode<NodeType::FLOAT>	  FloatNode;
+typedef StaticValueNode<NodeType::VEC3>	    Vec3Node;
 typedef StaticValueNode<NodeType::VEC4>		  Vec4Node;
 typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
 
