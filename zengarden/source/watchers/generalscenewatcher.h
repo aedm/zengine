@@ -17,9 +17,14 @@ protected:
   virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
 
-  Drawable* mDrawable = nullptr;
-  SceneNode* mScene = nullptr;
-  Globals mGlobals;
+  /// Scene node to be drawn.
+  SceneNode* mScene;
+  
+  /// Default scene node, might be unused
+  SceneNode mDefaultScene;
+
+  /// Default camera
+  Camera mCamera;
 
   /// Qt widget event handlers
   void HandleMousePress(GLWidget*, QMouseEvent* event);
@@ -32,20 +37,14 @@ protected:
   void HandleMouseRightUp(QMouseEvent* event);
   void HandleKeyPress(GLWidget*, QKeyEvent* event);
 
-  /// Camera setup
-  float mFovY = 60.0f * (Pi / 180.0f);
-  float mZFar = 150.0f;
-  float mZNear = 0.01f;
-  Vec3 mTarget = Vec3(0, 0, 0);
-  float mDistance = 100;
-  Vec3 mOrientation = Vec3(0, 0, 0);
-    
-  bool mOrthonormal = false;
-
   /// Mouse position at pressing
   QPoint mOriginalPosition;
   Vec3 mOriginalOrientation;
 
   /// Static resources initializes by Init()
   static Material* mDefaultMaterial;
+
+private:
+  /// The Drawable supplied by an implementation
+  Drawable* mDrawable = nullptr;
 };

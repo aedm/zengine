@@ -3,7 +3,7 @@
 MeshWatcher::MeshWatcher(MeshNode* meshNode, GLWatcherWidget* watcherWidget)
   : GeneralSceneWatcher(meshNode, watcherWidget)
 {
-  mDrawable = new Drawable();
-  mDrawable->mMaterial.Connect(mDefaultMaterial);
-  mDrawable->mMesh.Connect(meshNode);
+  mDrawable.mMaterial.Connect(mDefaultMaterial);
+  mDrawable.mMesh.Connect(meshNode);
+  mDefaultScene.mDrawables.Connect(&mDrawable);
 }

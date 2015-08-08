@@ -35,6 +35,7 @@ extern const EnumMapperA GlobalUniformMapper[];
 extern const NodeType GlobalUniformTypes[];
 extern const int GlobalUniformOffsets[];
 
+/// TODO: move this to shader-independent place
 struct Globals {
 #undef ITEM
 #define ITEM(name, type, token) NodeTypes<NodeType::type>::Type token;

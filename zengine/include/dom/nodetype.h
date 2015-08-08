@@ -24,10 +24,12 @@ enum class NodeType {
   MATERIAL,
   MESH,
   DRAWABLE,
+  WORLD,
+  CAMERA,
   SCENE,
   GRAPH,
   DOCUMENT,
-
+  
   /// Empty stub value type
   NONE,
 

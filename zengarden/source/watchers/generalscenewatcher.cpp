@@ -13,7 +13,8 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
   GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
 
-  mScene = new SceneNode();
+  mDefaultScene.mCamera.Connect(&mCamera);
+  mScene = &mDefaultScene;
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
@@ -21,31 +22,10 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 }
 
 void GeneralSceneWatcher::Paint(GLWidget* widget) {
-  ASSERT(mDrawable);
-
-  TheDrawingAPI->Clear(true, true, 0x202020);
+  TheDrawingAPI->Clear(true, true, 0x303030);
 
   Vec2 size = Vec2(widget->width(), widget->height());
-  mGlobals.RenderTargetSize = size;
-  mGlobals.RenderTargetSizeRecip = Vec2(1.0f / size.x, 1.0f / size.y);
-
-  if (mOrthonormal) {
-    mGlobals.View.LoadIdentity();
-    mGlobals.Projection = Matrix::Ortho(0, 0, size.x, size.y);
-  }
-  else {
-    float aspectRatio = size.x / size.y;
-    mGlobals.Projection = Matrix::Projection(mFovY, mZFar, mZNear, aspectRatio);
-    //Matrix rotate = 
-    //  Matrix::Rotate(Quaternion::FromEuler(mOrientation.x, mOrientation.y, 0));
-    Matrix xRot = Matrix::Rotate(mOrientation.x, Vec3(1, 0, 0));
-    Matrix yRot = Matrix::Rotate(mOrientation.y, Vec3(0, 1, 0));
-    Matrix lookAt = Matrix::LookAt(Vec3(0, 0, 20), mTarget, Vec3(0, 1, 0));
-    mGlobals.View = lookAt * xRot * yRot;
-  }
-  
-  mGlobals.Transformation = mGlobals.Projection * mGlobals.View;
-  mDrawable->Draw(&mGlobals);
+  mScene->Draw(size);
 }
 
 void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot, 
@@ -71,7 +51,7 @@ void GeneralSceneWatcher::Init()
 
 void GeneralSceneWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
   mOriginalPosition = event->pos();
-  mOriginalOrientation = mOrientation;
+  mOriginalOrientation = mCamera.mOrientation;
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   } else if (event->button() == Qt::RightButton) {
@@ -90,8 +70,8 @@ void GeneralSceneWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
 void GeneralSceneWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
-    mOrientation.y = mOriginalOrientation.y - float(diff.x()) / 300.0f;
-    mOrientation.x = mOriginalOrientation.x - float(diff.y()) / 300.0f;
+    mCamera.mOrientation.y = mOriginalOrientation.y - float(diff.x()) / 300.0f;
+    mCamera.mOrientation.x = mOriginalOrientation.x - float(diff.y()) / 300.0f;
     GetGLWidget()->update();
   }
 }

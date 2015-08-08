@@ -9,6 +9,7 @@ public:
 	virtual ~PassWatcher();
 
 protected:
-	Material* mMaterial;
+	Material mMaterial;
 	MeshNode* mMesh;
+  Drawable mDrawable;
 };

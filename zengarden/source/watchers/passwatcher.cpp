@@ -3,8 +3,7 @@
 PassWatcher::PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget)
   : GeneralSceneWatcher(pass, watcherWidget) 
 {
-  mMaterial = new Material();
-  mMaterial->mSolidPass.Connect(pass);
+  mMaterial.mSolidPass.Connect(pass);
 
   /// Mesh
   Vec2 Position(3.5f, 3.5f);
@@ -22,14 +21,14 @@ PassWatcher::PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget)
   boxMesh->SetVertices(vertices);
   mMesh = StaticMeshNode::Create(boxMesh);
 
-  mDrawable = new Drawable();
-  mDrawable->mMaterial.Connect(mMaterial);
-  mDrawable->mMesh.Connect(mMesh);
+  mDrawable.mMaterial.Connect(&mMaterial);
+  mDrawable.mMesh.Connect(mMesh);
 
-  mOrthonormal = true;
+  mDefaultScene.mDrawables.Connect(&mDrawable);
+
+  mCamera.mOrthonormal = true;
 }
 
 PassWatcher::~PassWatcher() {
-  SafeDelete(mMaterial);
   SafeDelete(mMesh);
 }
