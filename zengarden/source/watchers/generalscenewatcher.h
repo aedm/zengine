@@ -40,6 +40,7 @@ protected:
   /// Mouse position at pressing
   QPoint mOriginalPosition;
   Vec3 mOriginalOrientation;
+  float mOriginalDistance;
 
   /// Static resources initializes by Init()
   static Material* mDefaultMaterial;

@@ -11,7 +11,14 @@ Material::Material()
 
 Material::~Material() {}
 
-void Material::HandleMessage(Slot* slot, NodeMessage message, const void* payload) {}
+void Material::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::NEEDS_REDRAW:
+      SendMsg(NodeMessage::NEEDS_REDRAW);
+      break;
+    default: break;
+  }
+}
 
 Pass* Material::GetPass() {
   return mSolidPass.GetNode();

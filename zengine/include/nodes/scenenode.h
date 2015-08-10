@@ -16,4 +16,7 @@ public:
 
 protected:
   Globals mGlobals;
+
+  /// Handle received messages
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };

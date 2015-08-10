@@ -19,6 +19,10 @@ public:
   Vec3Slot mOrientation;
 
   bool mOrthonormal = false;
+
+protected:
+  /// Handle received messages
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };
 
 typedef TypedSlot<NodeType::CAMERA, Camera> CameraSlot;

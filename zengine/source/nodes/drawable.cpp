@@ -16,6 +16,7 @@ Drawable::~Drawable() {}
 void Drawable::Draw(Globals* globals, PrimitiveTypeEnum Primitive) {
   if (!mIsProperlyConnected) return;
   Material* material = mMaterial.GetNode();
+  if (!material) return;
   const Mesh* mesh = mMesh.GetNode()->GetMesh();
 
   /// Set pass (pipeline state)
@@ -46,5 +47,16 @@ void Drawable::Draw(Globals* globals, PrimitiveTypeEnum Primitive) {
     TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, Primitive);
   } else {
     TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive);
+  }
+}
+
+void Drawable::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+    case NodeMessage::VALUE_CHANGED:
+    case NodeMessage::NEEDS_REDRAW:
+      SendMsg(NodeMessage::NEEDS_REDRAW);
+      break;
+    default: break;
   }
 }

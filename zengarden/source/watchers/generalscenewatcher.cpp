@@ -15,9 +15,11 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
 
   mDefaultScene.mCamera.Connect(&mCamera);
   mScene = &mDefaultScene;
+  mDefaultScene.onSniffMessage += Delegate(this, &GeneralSceneWatcher::SniffMessage);
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
+  mDefaultScene.onSniffMessage -= Delegate(this, &GeneralSceneWatcher::SniffMessage);
   SafeDelete(mDrawable);
 }
 
@@ -52,6 +54,7 @@ void GeneralSceneWatcher::Init()
 void GeneralSceneWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
   mOriginalPosition = event->pos();
   mOriginalOrientation = mCamera.mOrientation.Get();
+  mOriginalDistance = mCamera.mDistance.Get();
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   } else if (event->button() == Qt::RightButton) {
@@ -74,7 +77,12 @@ void GeneralSceneWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
     orientation.y = mOriginalOrientation.y - float(diff.x()) / 300.0f;
     orientation.x = mOriginalOrientation.x - float(diff.y()) / 300.0f;
     mCamera.mOrientation.SetDefaultValue(orientation);
-    GetGLWidget()->update();
+  }
+  else if (event->buttons() & Qt::RightButton) {
+    auto diff = event->pos() - mOriginalPosition;
+    float distance = mCamera.mDistance.Get();
+    distance = mOriginalDistance - float(diff.y()) / 2.0f;
+    mCamera.mDistance.SetDefaultValue(distance);
   }
 }
 

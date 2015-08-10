@@ -25,3 +25,14 @@ void SceneNode::Draw(const Vec2& canvasSize) {
     drawable->Draw(&mGlobals);
   }
 }
+
+void SceneNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+    case NodeMessage::VALUE_CHANGED:
+    case NodeMessage::NEEDS_REDRAW:
+      SendMsg(NodeMessage::NEEDS_REDRAW);
+      break;
+    default: break;
+  }
+}

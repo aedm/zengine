@@ -111,6 +111,7 @@
     <ClCompile Include="source\util\uipainter.cpp" />
     <ClCompile Include="source\util\textTexture.cpp" />
     <ClCompile Include="source\watchers\documentwatcher.cpp" />
+    <ClCompile Include="source\watchers\drawablewatcher.cpp" />
     <ClCompile Include="source\watchers\generalscenewatcher.cpp" />
     <ClCompile Include="source\watchers\logwatcher.cpp" />
     <ClCompile Include="source\watchers\meshwatcher.cpp" />
@@ -185,6 +186,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release-static|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="source\watchers\drawablewatcher.h" />
     <ClInclude Include="source\watchers\generalscenewatcher.h" />
     <ClInclude Include="source\watchers\meshwatcher.h" />
     <ClInclude Include="source\watchers\passwatcher.h" />

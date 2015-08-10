@@ -23,8 +23,8 @@ Camera::Camera()
   , mZFar(this, ZFarSlotName)
 {
   mFovY.SetDefaultValue(60.0f * (Pi / 180.0f));
-  mZNear.SetDefaultValue(0.1f);
-  mZFar.SetDefaultValue(150.0f);
+  mZNear.SetDefaultValue(1.0f);
+  mZFar.SetDefaultValue(550.0f);
   mTarget.SetDefaultValue(Vec3(0, 0, 0));
   mDistance.SetDefaultValue(50.0f);
   mOrientation.SetDefaultValue(Vec3(0, 0, 0));
@@ -54,4 +54,14 @@ void Camera::SetupGlobals(Globals* globals, const Vec2& canvasSize) {
 }
 
 Camera::~Camera() {
+}
+
+void Camera::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+    case NodeMessage::VALUE_CHANGED:
+      SendMsg(NodeMessage::NEEDS_REDRAW);
+      break;
+    default: break;
+  }
 }

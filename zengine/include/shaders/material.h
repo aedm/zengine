@@ -12,7 +12,7 @@ public:
   Pass* GetPass();
 
 protected:
-  virtual void HandleMessage(Slot* slot, NodeMessage message, const void* payload);
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };
 
 typedef TypedSlot<NodeType::MATERIAL, Material> MaterialSlot;

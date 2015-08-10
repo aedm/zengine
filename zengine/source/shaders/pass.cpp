@@ -48,6 +48,9 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
       }
       ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       break;
+    case NodeMessage::NEEDS_REDRAW:
+      SendMsg(NodeMessage::NEEDS_REDRAW);
+      break;
     default: break;
   }
 }

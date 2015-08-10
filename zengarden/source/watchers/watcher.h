@@ -51,10 +51,10 @@ protected:
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;
 
-private:
   /// Helper function for forwaring internal messages of the watched node
   void SniffMessage(NodeMessage message, Slot* slot, void* payload);
 
+private:
   /// Generate the name displayed for the node. If the node has no name, it shows
   /// the node type or the shader stub name.
   void MakeDisplayedName();
