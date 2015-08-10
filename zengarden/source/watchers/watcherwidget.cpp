@@ -55,7 +55,9 @@ GLWidget* GLWatcherWidget::GetGLWidget() {
 
 
 GLWidget::GLWidget(QWidget* Parent, QGLWidget* ShareWidget)
-  : QGLWidget(Parent, ShareWidget) {}
+  : QGLWidget(Parent, ShareWidget) {
+  setAttribute(Qt::WA_OpaquePaintEvent);
+}
 
 GLWidget::~GLWidget() {}
 
@@ -88,4 +90,3 @@ void GLWidget::paintGL() {
 void GLWidget::wheelEvent(QWheelEvent * event) {
   OnMouseWheel(this, event);
 }
-

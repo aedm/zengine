@@ -34,7 +34,7 @@ void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
                                                void* payload) 
 {
   if (message == NodeMessage::NEEDS_REDRAW) {
-    GetGLWidget()->updateGL();
+    GetGLWidget()->update();
   }
 }
 
