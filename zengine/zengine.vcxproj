@@ -110,6 +110,7 @@
     <ClInclude Include="include\nodes\scenenode.h" />
     <ClInclude Include="include\nodes\timenode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
+    <ClInclude Include="include\nodes\vectornodes.h" />
     <ClInclude Include="include\render\drawingapi.h" />
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\resourcemanager.h" />
@@ -143,6 +144,7 @@
     <ClCompile Include="source\nodes\scenenode.cpp" />
     <ClCompile Include="source\nodes\timenode.cpp" />
     <ClCompile Include="source\nodes\valuenodes.cpp" />
+    <ClCompile Include="source\nodes\vectornodes.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />

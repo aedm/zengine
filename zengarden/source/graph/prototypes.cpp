@@ -19,6 +19,7 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<FloatNode>());
   AddPrototype(registry->GetNodeClass<Vec3Node>());
   AddPrototype(registry->GetNodeClass<Vec4Node>());
+  AddPrototype(registry->GetNodeClass<FloatsToVec3Node>());
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<TimeNode>());
   AddPrototype(registry->GetNodeClass<Material>());
@@ -27,6 +28,9 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<SceneNode>());
 
   LoadStubs();
+
+  /// Hack to force linking
+  FloatsToVec3Node tmp;
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {

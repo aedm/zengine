@@ -225,7 +225,7 @@ Texture* ZenGarden::CreateSampleTexture() {
   for (UINT i = 0; i < 256; i++)
     for (UINT o = 0; o < 256; o++) {
       UINT c = i^o;
-      tmp[i * 256 + o] = c | (c << 8) | (c << 16);
+      tmp[i * 256 + o] = 0xff000000 | c | (c << 8) | (c << 16);
     }
   return TheResourceManager->CreateTexture(256, 256, TEXELTYPE_RGBA_UINT8, tmp);
 }
