@@ -144,7 +144,9 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
     else if (IsInstanceOf<Vec3Node>(node)) {
       new StaticVec3Editor(static_cast<Vec3Node*>(node), mPropertyEditor);
     } 
-    else {
+    else if (IsInstanceOf<Vec4Node>(node)) {
+      new StaticVec4Editor(static_cast<Vec4Node*>(node), mPropertyEditor);
+    } else {
       new DefaultPropertyEditor(node, mPropertyEditor);
     }
   }

@@ -137,3 +137,29 @@ private:
   void HandleValueChange(FloatEditor* editor, float value);
 };
 
+
+/// A parameter panel item for Vec4Nodes
+class Vec4Watcher: public Watcher {
+public:
+  Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget, QString name,
+              bool readOnly);
+  virtual ~Vec4Watcher() {}
+
+  /// Enable/disable editing
+  void SetReadOnly(bool readOnly);
+
+protected:
+  /// This method will be called when the watched node was changed
+  virtual void HandleChangedNode(Node* node) override;
+
+private:
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
+                                    void* payload) override;
+
+  FloatEditor* mEditorX = nullptr;
+  FloatEditor* mEditorY = nullptr;
+  FloatEditor* mEditorZ = nullptr;
+  FloatEditor* mEditorW = nullptr;
+
+  void HandleValueChange(FloatEditor* editor, float value);
+};

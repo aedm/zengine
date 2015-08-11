@@ -279,3 +279,78 @@ void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
 }
 
 
+
+Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget,
+                         QString name, bool readOnly)
+  : Watcher(node, widget) 
+{
+  QVBoxLayout* layout = new QVBoxLayout(widget);
+  layout->setSpacing(4);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  Vec4 value = node->Get();
+
+  mEditorX = new FloatEditor(widget, name + ".x", value.x);
+  mEditorX->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorX);
+
+  mEditorY = new FloatEditor(widget, name + ".y", value.y);
+  mEditorY->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorY);
+
+  mEditorZ = new FloatEditor(widget, name + ".z", value.z);
+  mEditorZ->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorZ);
+
+  mEditorW = new FloatEditor(widget, name + ".w", value.w);
+  mEditorW->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorW);
+
+  SetReadOnly(readOnly);
+}
+
+
+void Vec4Watcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
+  switch (message) {
+    case NodeMessage::VALUE_CHANGED: {
+      Vec4 value = static_cast<ValueNode<NodeType::VEC4>*>(mNode)->Get();
+      mEditorX->Set(value.x);
+      mEditorY->Set(value.y);
+      mEditorZ->Set(value.z);
+      mEditorW->Set(value.w);
+      break;
+    }
+    default: break;
+  }
+}
+
+
+void Vec4Watcher::SetReadOnly(bool readOnly) {
+  mEditorX->SetReadOnly(readOnly);
+  mEditorY->SetReadOnly(readOnly);
+  mEditorZ->SetReadOnly(readOnly);
+  mEditorW->SetReadOnly(readOnly);
+}
+
+
+void Vec4Watcher::HandleChangedNode(Node* node) {
+  Vec4 value =
+    node ? static_cast<ValueNode<NodeType::VEC4>*>(node)->Get() : Vec4(0, 0, 0, 0);
+  mEditorX->Set(value.x);
+  mEditorY->Set(value.y);
+  mEditorZ->Set(value.z);
+  mEditorW->Set(value.w);
+}
+
+
+void Vec4Watcher::HandleValueChange(FloatEditor* editor, float value) {
+  if (mNode == nullptr) return;
+  ASSERT(dynamic_cast<Vec4Node*>(mNode) != nullptr);
+  Vec4Node* node = static_cast<Vec4Node*>(mNode);
+  Vec4 v = node->Get();
+  if (editor == mEditorX) v.x = value;
+  else if (editor == mEditorY) v.y = value;
+  else if (editor == mEditorZ) v.z = value;
+  else if (editor == mEditorW) v.w = value;
+  node->Set(v);
+}

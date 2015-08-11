@@ -6,6 +6,8 @@ Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget) 
   : Watcher(node, watcherWidget)
 {
+  ASSERT(dynamic_cast<GLWatcherWidget*>(static_cast<QWidget*>(watcherWidget)) != nullptr);
+
   GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
   GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
   GetGLWidget()->OnMouseRelease += Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
