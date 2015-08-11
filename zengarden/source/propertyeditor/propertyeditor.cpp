@@ -109,17 +109,34 @@ void DefaultPropertyEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
 
 
 StaticFloatEditor::StaticFloatEditor(FloatNode* node, WatcherWidget* panel)
-  : PropertyEditor(node, panel) {
+  : PropertyEditor(node, panel) 
+{
   static const QString valueString("value");
-  mFloatWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-  new FloatWatcher(static_cast<FloatNode*>(mNode), mFloatWatcherWidget, valueString);
-  mLayout->addWidget(mFloatWatcherWidget);
-  mFloatWatcherWidget->onWatcherDeath = 
-    Delegate(this, &StaticFloatEditor::RemoveFloatWatcher);
+  mValueWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+  new FloatWatcher(static_cast<FloatNode*>(mNode), mValueWatcherWidget, valueString);
+  mLayout->addWidget(mValueWatcherWidget);
+  mValueWatcherWidget->onWatcherDeath = 
+    Delegate(this, &StaticFloatEditor::RemoveStaticWatcher);
 }
 
-void StaticFloatEditor::RemoveFloatWatcher(WatcherWidget* watcherWidget) {
-  ASSERT(mFloatWatcherWidget == watcherWidget);
-  SafeDelete(mFloatWatcherWidget);
+void StaticFloatEditor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
+  ASSERT(mValueWatcherWidget == watcherWidget);
+  SafeDelete(mValueWatcherWidget);
 }
 
+
+StaticVec4Editor::StaticVec4Editor(Vec4Node* node, WatcherWidget* panel)
+  : PropertyEditor(node, panel) 
+{
+  static const QString valueString("value");
+  mValueWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+  new FloatWatcher(static_cast<FloatNode*>(mNode), mValueWatcherWidget, valueString);
+  mLayout->addWidget(mValueWatcherWidget);
+  mValueWatcherWidget->onWatcherDeath =
+    Delegate(this, &StaticVec4Editor::RemoveStaticWatcher);
+}
+
+void StaticVec4Editor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
+  ASSERT(mValueWatcherWidget == watcherWidget);
+  SafeDelete(mValueWatcherWidget);
+}

@@ -55,6 +55,39 @@ public:
 };
 
 
+/// A widget able to edit and display a float value
+class FloatEditor: public QWidget {
+public: 
+  FloatEditor(QWidget* parent, QString name, float value);
+
+  /// Set the value of the editor
+  void Set(float value);
+
+  /// Subscribe to get value updates
+  Event<FloatEditor*, float> onValueChange;
+
+  /// Set read only mode
+  void SetReadOnly(bool readOnly);
+  
+protected:
+  void SetTextBoxValue(float value);
+  void SliderValueChanged(float value);
+  void SpinBoxValueChanged();
+
+  /// Current value of the editor
+  float mValue;
+
+  /// Allow editing
+  bool mIsReadOnly = false;
+  
+  TextBox* mTextBox = nullptr;
+  Slider* mSlider = nullptr;
+
+  /// Do not attempt to modify textbox when the new value is originated from there.
+  bool mAllowTextboxValueChanges = true;
+};
+
+
 /// A parameter panel item for FloatNodes
 class FloatWatcher: public Watcher {
 public:
@@ -64,28 +97,15 @@ public:
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-
 protected:
   /// This method will be called when the watched node was changed
   virtual void HandleChangedNode(Node* node) override;
 
-
 private:
-  //virtual void HandleMessage(Slot* slot, NodeMessage message, 
-  //                           const void* payload) override;
   virtual void HandleSniffedMessage(NodeMessage message, Slot* slot, 
                                     void* payload) override;
 
-  /// Allow editing
-  bool mIsReadOnly;
+  FloatEditor* mEditorX = nullptr;
 
-  TextBox* mTextBox;
-  Slider* mSlider;
-
-  /// Do not attempt to modify textbox when the new value is originated from there.
-  bool mAllowTextboxValueChanges;
-
-  void SetTextBoxValue(float value);
-  void SliderValueChanged(float Vlaue);
-  void SpinBoxValueChanged();
+  void HandleValueChange(FloatEditor* editor, float value);
 };

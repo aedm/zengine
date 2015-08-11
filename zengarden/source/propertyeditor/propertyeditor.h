@@ -46,6 +46,18 @@ public:
   virtual ~StaticFloatEditor() {}
 
 private:
-  WatcherWidget* mFloatWatcherWidget = nullptr;
-  void RemoveFloatWatcher(WatcherWidget* watcherWidget);
+  WatcherWidget* mValueWatcherWidget = nullptr;
+  void RemoveStaticWatcher(WatcherWidget* watcherWidget);
+};
+
+
+/// Editor for static vec4 nodes
+class StaticVec4Editor: public PropertyEditor {
+public:
+  StaticVec4Editor(Vec4Node* node, WatcherWidget* panel);
+  virtual ~StaticVec4Editor() {}
+
+private:
+  WatcherWidget* mValueWatcherWidget = nullptr;
+  void RemoveStaticWatcher(WatcherWidget* watcherWidget);
 };

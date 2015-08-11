@@ -73,14 +73,14 @@ float Slider::Get() {
 void Slider::Set(float value) {
   if (value != mValue) {
     this->mValue = value;
-    repaint();
+    update();
   }
 }
 
 void Slider::SetReadOnly(bool readOnly) {
   if (mIsReadOnly != readOnly) {
     mIsReadOnly = readOnly;
-    repaint();
+    update();
   }
 }
 
@@ -97,73 +97,115 @@ void TextBox::HandleEditingFinished() {
 }
 
 
-FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, 
-                           QString name)
-  : Watcher(node, widget)
-  , mIsReadOnly(false)
-{
-  float value = node->Get();
-
-  QHBoxLayout* layout = new QHBoxLayout(widget);
+FloatEditor::FloatEditor(QWidget* parent, QString name, float value)
+  : QWidget(parent)
+  , mValue(value) {
+  QHBoxLayout* layout = new QHBoxLayout(this);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mSlider = new Slider(widget, name, node->Get(), 0, 1);
+  mSlider = new Slider(this, name, mValue, 0, 1);
   mSlider->setMinimumHeight(20);
   mSlider->setMinimumWidth(70);
   mSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   mSlider->Set(value);
   layout->addWidget(mSlider);
 
-  mTextBox = new TextBox(widget);
+  mTextBox = new TextBox(this);
   SetTextBoxValue(value);
   mTextBox->setFixedWidth(40);
   layout->addWidget(mTextBox);
 
-  mSlider->onValueChange += Delegate(this, &FloatWatcher::SliderValueChanged);
-  mTextBox->onEditingFinished += Delegate(this, &FloatWatcher::SpinBoxValueChanged);
+  mSlider->onValueChange += Delegate(this, &FloatEditor::SliderValueChanged);
+  mTextBox->onEditingFinished += Delegate(this, &FloatEditor::SpinBoxValueChanged);
+}
 
+
+void FloatEditor::SetTextBoxValue(float value) {
+  if (mAllowTextboxValueChanges) {
+    mTextBox->setText(QString::number(value, 'g', 3));
+  }
+}
+
+
+void FloatEditor::SliderValueChanged(float value) {
+  if (mIsReadOnly || value == mValue) return;
+  mValue = value;
+  SetTextBoxValue(value);
+  /// TODO: slider should set and repaint itself
+  mSlider->Set(value);
+  onValueChange(this, value);
+}
+
+
+void FloatEditor::SpinBoxValueChanged() {
+  float value = mTextBox->text().toFloat();
+  if (mIsReadOnly || value == mValue) return;
+  /// TODO: slider should set and repaint itself
+  mSlider->Set(value);
+  mAllowTextboxValueChanges = false;
+  onValueChange(this, value);
   mAllowTextboxValueChanges = true;
 }
 
-void FloatWatcher::SpinBoxValueChanged() {
-  mAllowTextboxValueChanges = false;
-  float value = mTextBox->text().toFloat();
-  static_cast<FloatNode*>(mNode)->Set(value);
-  mAllowTextboxValueChanges = false;
+
+void FloatEditor::Set(float value) {
+  if (mIsReadOnly || value == mValue) return;
+  mValue = value;
+  SetTextBoxValue(value);
+  mSlider->Set(value);
 }
 
-void FloatWatcher::SetTextBoxValue(float value) {
-  mTextBox->setText(QString::number(value, 'g', 3));
+void FloatEditor::SetReadOnly(bool readOnly) {
+  mSlider->SetReadOnly(readOnly);
+  mTextBox->setReadOnly(readOnly);
+  mIsReadOnly = readOnly;
 }
 
-void FloatWatcher::SliderValueChanged(float value) {
-  if (mIsReadOnly || !mNode) return;
-  static_cast<FloatNode*>(mNode)->Set(value);
+
+FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, 
+                           QString name)
+  : Watcher(node, widget)
+{
+  QVBoxLayout* layout = new QVBoxLayout(widget);
+  layout->setSpacing(4);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  mEditorX = new FloatEditor(widget, name, node->Get());
+  mEditorX->onValueChange += Delegate(this, &FloatWatcher::HandleValueChange);
+  layout->addWidget(mEditorX);
 }
+
 
 void FloatWatcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED: {
-      float value = static_cast<FloatNode*>(mNode)->Get();
-      mSlider->Set(value);
-      if (mAllowTextboxValueChanges) SetTextBoxValue(value);
+      float value = static_cast<ValueNode<NodeType::FLOAT>*>(mNode)->Get();
+      mEditorX->Set(value);
       break;
     }
     default: break;
   }
 }
 
+
 void FloatWatcher::SetReadOnly(bool readOnly) {
-  if (mIsReadOnly != readOnly) {
-    mIsReadOnly = readOnly;
-    mTextBox->setEnabled(!readOnly);
-    mSlider->SetReadOnly(readOnly);
-  }
+  mEditorX->SetReadOnly(readOnly);
 }
+
 
 void FloatWatcher::HandleChangedNode(Node* node) {
   float value = node ? static_cast<ValueNode<NodeType::FLOAT>*>(node)->Get() : 0.0f;
-  mSlider->Set(value);
-  SetTextBoxValue(value);
+  mEditorX->Set(value);
 }
+
+
+void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
+  if (mNode == nullptr) return;
+  ASSERT(dynamic_cast<FloatNode*>(mNode) != nullptr);
+  FloatNode* node = static_cast<FloatNode*>(mNode);
+  node->Set(value);
+}
+
+
+
