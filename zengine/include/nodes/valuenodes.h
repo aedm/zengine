@@ -125,7 +125,6 @@ protected:
 template<NodeType T>
 ValueSlot<T>::ValueSlot(Node* owner, SharedString name)
   : Slot(T, owner, name) {
-  mDefault.Set(ValueType());
   Connect(&mDefault);
 }
 

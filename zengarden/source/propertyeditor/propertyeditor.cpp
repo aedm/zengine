@@ -61,13 +61,15 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
         slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
       /// Float slots
       widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-      watcher = new FloatWatcher(static_cast<FloatNode*>(slot->GetAbstractNode()), 
+      ASSERT(dynamic_cast<FloatNode*>(slot->GetAbstractNode()));
+      watcher = new FloatWatcher(static_cast<FloatNode*>(slot->GetAbstractNode()),
         widget, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
     } 
     else if (slot->DoesAcceptType(NodeType::VEC3) &&
              slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
       /// Vec3 slots
       widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+      ASSERT(dynamic_cast<Vec3Node*>(slot->GetAbstractNode()));
       watcher = new Vec3Watcher(static_cast<Vec3Node*>(slot->GetAbstractNode()),
         widget, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
     }
@@ -75,6 +77,7 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
              slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
       /// Vec4 slots
       widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+      ASSERT(dynamic_cast<Vec4Node*>(slot->GetAbstractNode()));
       watcher = new Vec4Watcher(static_cast<Vec4Node*>(slot->GetAbstractNode()),
         widget, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
     }
