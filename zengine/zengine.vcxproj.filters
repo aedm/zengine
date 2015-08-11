@@ -229,6 +229,7 @@
     <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
     <ClCompile Include="source\nodes\camera.cpp" />
+    <ClCompile Include="source\nodes\valuenodes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

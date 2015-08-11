@@ -142,6 +142,7 @@
     <ClCompile Include="source\nodes\meshnode.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
     <ClCompile Include="source\nodes\timenode.cpp" />
+    <ClCompile Include="source\nodes\valuenodes.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />

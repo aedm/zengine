@@ -53,6 +53,10 @@ protected:
 };
 
 
+template<> StaticValueNode<NodeType::VEC2>::StaticValueNode();
+template<> StaticValueNode<NodeType::VEC3>::StaticValueNode();
+template<> StaticValueNode<NodeType::VEC4>::StaticValueNode();
+
 template<NodeType T>
 StaticValueNode<T>::StaticValueNode()
   : ValueNode() {

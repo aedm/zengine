@@ -10,6 +10,7 @@ REGISTER_NODECLASS(TextureNode, "Texture");
 REGISTER_NODECLASS(StringNode, "String");
 REGISTER_NODECLASS(FloatNode, "Float");
 REGISTER_NODECLASS(Vec4Node, "Vec4");
+REGISTER_NODECLASS(Vec3Node, "Vec3");
 REGISTER_NODECLASS(Matrix4Node, "Matrix4");
 
 

@@ -91,7 +91,8 @@ protected:
 /// A parameter panel item for FloatNodes
 class FloatWatcher: public Watcher {
 public:
-  FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, QString name);
+  FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, QString name,
+               bool readOnly);
   virtual ~FloatWatcher() {}
 
   /// Enable/disable editing
@@ -109,3 +110,30 @@ private:
 
   void HandleValueChange(FloatEditor* editor, float value);
 };
+
+
+/// A parameter panel item for Vec3Nodes
+class Vec3Watcher: public Watcher {
+public:
+  Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget, QString name,
+              bool readOnly);
+  virtual ~Vec3Watcher() {}
+
+  /// Enable/disable editing
+  void SetReadOnly(bool readOnly);
+
+protected:
+  /// This method will be called when the watched node was changed
+  virtual void HandleChangedNode(Node* node) override;
+
+private:
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
+                                    void* payload) override;
+
+  FloatEditor* mEditorX = nullptr;
+  FloatEditor* mEditorY = nullptr;
+  FloatEditor* mEditorZ = nullptr;
+
+  void HandleValueChange(FloatEditor* editor, float value);
+};
+

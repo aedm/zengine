@@ -53,21 +53,28 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
 {
   /// Slots
   for (Slot* slot : mNode->GetPublicSlots()) {
+    WatcherWidget* widget = nullptr;
+    Watcher* watcher = nullptr;
+
     /// TODO: use dynamic_cast
     if (slot->DoesAcceptType(NodeType::FLOAT) && 
         slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
       /// Float slots
-      WatcherWidget* widget =
-        new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-      FloatWatcher* watcher = new FloatWatcher(
-        static_cast<FloatNode*>(slot->GetAbstractNode()), widget,
-        QString::fromStdString(*slot->GetName()));
-      widget->onWatcherDeath = 
-        Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
+      widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+      watcher = new FloatWatcher(static_cast<FloatNode*>(slot->GetAbstractNode()), 
+        widget, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
+    } 
+    else if (slot->DoesAcceptType(NodeType::VEC3) &&
+             slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
+      /// Vec3 slots
+      widget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+      watcher = new Vec3Watcher(static_cast<Vec3Node*>(slot->GetAbstractNode()), 
+        widget, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
+    }
 
-      if (!static_cast<FloatSlot*>(slot)->IsDefaulted()) {
-        watcher->SetReadOnly(true);
-      }
+    if (watcher != nullptr) {
+      widget->onWatcherDeath =
+        Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
       mLayout->addWidget(widget);
       mSlotWatchers[slot] = watcher;
     } else {
@@ -92,8 +99,10 @@ void DefaultPropertyEditor::HandleSniffedMessage(NodeMessage message, Slot* slot
         } else {
           watcher->ChangeNode(slot->GetAbstractNode());
           if (slot->DoesAcceptType(NodeType::FLOAT)) {
-            bool defaulted = static_cast<FloatSlot*>(slot)->IsDefaulted();
-            static_cast<FloatWatcher*>(watcher)->SetReadOnly(!defaulted);
+            static_cast<FloatWatcher*>(watcher)->SetReadOnly(!slot->IsDefaulted());
+          }
+          else if (slot->DoesAcceptType(NodeType::VEC3)) {
+            static_cast<Vec3Watcher*>(watcher)->SetReadOnly(!slot->IsDefaulted());
           }
         }
       }
@@ -113,7 +122,8 @@ StaticFloatEditor::StaticFloatEditor(FloatNode* node, WatcherWidget* panel)
 {
   static const QString valueString("value");
   mValueWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-  new FloatWatcher(static_cast<FloatNode*>(mNode), mValueWatcherWidget, valueString);
+  new FloatWatcher(
+    static_cast<FloatNode*>(mNode), mValueWatcherWidget, valueString, false);
   mLayout->addWidget(mValueWatcherWidget);
   mValueWatcherWidget->onWatcherDeath = 
     Delegate(this, &StaticFloatEditor::RemoveStaticWatcher);
@@ -125,12 +135,31 @@ void StaticFloatEditor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
 }
 
 
+StaticVec3Editor::StaticVec3Editor(Vec3Node* node, WatcherWidget* panel)
+  : PropertyEditor(node, panel)
+{
+  static const QString valueString("value");
+  mValueWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
+  new Vec3Watcher(
+    static_cast<Vec3Node*>(mNode), mValueWatcherWidget, valueString, false);
+  mLayout->addWidget(mValueWatcherWidget);
+  mValueWatcherWidget->onWatcherDeath =
+    Delegate(this, &StaticVec3Editor::RemoveStaticWatcher);
+}
+
+void StaticVec3Editor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
+  ASSERT(mValueWatcherWidget == watcherWidget);
+  SafeDelete(mValueWatcherWidget);
+}
+
+
 StaticVec4Editor::StaticVec4Editor(Vec4Node* node, WatcherWidget* panel)
   : PropertyEditor(node, panel) 
 {
   static const QString valueString("value");
   mValueWatcherWidget = new WatcherWidget(panel, WatcherPosition::PROPERTY_PANEL);
-  new FloatWatcher(static_cast<FloatNode*>(mNode), mValueWatcherWidget, valueString);
+  new FloatWatcher(
+    static_cast<FloatNode*>(mNode), mValueWatcherWidget, valueString, false);
   mLayout->addWidget(mValueWatcherWidget);
   mValueWatcherWidget->onWatcherDeath =
     Delegate(this, &StaticVec4Editor::RemoveStaticWatcher);
@@ -140,3 +169,4 @@ void StaticVec4Editor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
   ASSERT(mValueWatcherWidget == watcherWidget);
   SafeDelete(mValueWatcherWidget);
 }
+

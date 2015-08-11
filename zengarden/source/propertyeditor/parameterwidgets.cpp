@@ -164,7 +164,7 @@ void FloatEditor::SetReadOnly(bool readOnly) {
 
 
 FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, 
-                           QString name)
+                           QString name, bool readOnly)
   : Watcher(node, widget)
 {
   QVBoxLayout* layout = new QVBoxLayout(widget);
@@ -174,6 +174,8 @@ FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widg
   mEditorX = new FloatEditor(widget, name, node->Get());
   mEditorX->onValueChange += Delegate(this, &FloatWatcher::HandleValueChange);
   layout->addWidget(mEditorX);
+
+  SetReadOnly(readOnly);
 }
 
 
@@ -207,5 +209,73 @@ void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
   node->Set(value);
 }
 
+
+
+Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget,
+                         QString name, bool readOnly)
+  : Watcher(node, widget) 
+{
+  QVBoxLayout* layout = new QVBoxLayout(widget);
+  layout->setSpacing(4);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  Vec3 value = node->Get();
+
+  mEditorX = new FloatEditor(widget, name + ".x", value.x);
+  mEditorX->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+  layout->addWidget(mEditorX);
+
+  mEditorY = new FloatEditor(widget, name + ".y", value.y);
+  mEditorY->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+  layout->addWidget(mEditorY);
+
+  mEditorZ = new FloatEditor(widget, name + ".z", value.z);
+  mEditorZ->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+  layout->addWidget(mEditorZ);
+
+  SetReadOnly(readOnly);
+}
+
+
+void Vec3Watcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
+  switch (message) {
+    case NodeMessage::VALUE_CHANGED: {
+      Vec3 value = static_cast<ValueNode<NodeType::VEC3>*>(mNode)->Get();
+      mEditorX->Set(value.x);
+      mEditorY->Set(value.y);
+      mEditorZ->Set(value.z);
+      break;
+    }
+    default: break;
+  }
+}
+
+
+void Vec3Watcher::SetReadOnly(bool readOnly) {
+  mEditorX->SetReadOnly(readOnly);
+  mEditorY->SetReadOnly(readOnly);
+  mEditorZ->SetReadOnly(readOnly);
+}
+
+
+void Vec3Watcher::HandleChangedNode(Node* node) {
+  Vec3 value = 
+    node ? static_cast<ValueNode<NodeType::VEC3>*>(node)->Get() : Vec3(0, 0, 0);
+  mEditorX->Set(value.x);
+  mEditorY->Set(value.y);
+  mEditorZ->Set(value.z);
+}
+
+
+void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
+  if (mNode == nullptr) return;
+  ASSERT(dynamic_cast<Vec3Node*>(mNode) != nullptr);
+  Vec3Node* node = static_cast<Vec3Node*>(mNode);
+  Vec3 v = node->Get();
+  if (editor == mEditorX) v.x = value;
+  else if (editor == mEditorY) v.y = value;
+  else if (editor == mEditorZ) v.z = value;
+  node->Set(v);
+}
 
 

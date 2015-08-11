@@ -17,6 +17,7 @@ Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label,
 Prototypes::Prototypes() {
   NodeRegistry* registry = NodeRegistry::GetInstance();
   AddPrototype(registry->GetNodeClass<FloatNode>());
+  AddPrototype(registry->GetNodeClass<Vec3Node>());
   AddPrototype(registry->GetNodeClass<Vec4Node>());
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<TimeNode>());

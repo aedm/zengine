@@ -51,6 +51,18 @@ private:
 };
 
 
+/// Editor for static vec3 nodes
+class StaticVec3Editor: public PropertyEditor {
+public:
+  StaticVec3Editor(Vec3Node* node, WatcherWidget* panel);
+  virtual ~StaticVec3Editor() {}
+
+private:
+  WatcherWidget* mValueWatcherWidget = nullptr;
+  void RemoveStaticWatcher(WatcherWidget* watcherWidget);
+};
+
+
 /// Editor for static vec4 nodes
 class StaticVec4Editor: public PropertyEditor {
 public:

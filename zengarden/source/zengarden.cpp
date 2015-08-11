@@ -140,7 +140,11 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
 
     if (IsInstanceOf<FloatNode>(node)) {
       new StaticFloatEditor(static_cast<FloatNode*>(node), mPropertyEditor);
-    } else {
+    } 
+    else if (IsInstanceOf<Vec3Node>(node)) {
+      new StaticVec3Editor(static_cast<Vec3Node*>(node), mPropertyEditor);
+    } 
+    else {
       new DefaultPropertyEditor(node, mPropertyEditor);
     }
   }
