@@ -102,10 +102,14 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   else if (IsInstanceOf<TextureNode>(node)) {
     SerializeTextureNode(v, static_cast<TextureNode*>(node));
   }
-  else {
-    SerializeGeneralNode(v, node);
+  else if (IsInstanceOf<StaticMeshNode>(node)) {
+    SerializeStaticMeshNode(v, static_cast<StaticMeshNode*>(node));
+  } 
+  else if (IsInstanceOf<StubNode>(node)) {
+    SerializeStubNode(v, static_cast<StubNode*>(node));
   }
 
+  SerializeGeneralNode(v, node);
   return v;
 }
 
@@ -193,5 +197,28 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNo
     EnumMapperA::GetStringFromEnum(TexelTypeMapper, texture->mType), *mAllocator), 
     *mAllocator);
   nodeValue.AddMember("base64", b64, *mAllocator);
+}
+
+void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue, 
+                                             StaticMeshNode* node) {
+  Mesh* mesh = node->GetMesh();
+  ASSERT(mesh->mIndexCount == 0);
+  ASSERT(mesh->mRawVertexData != nullptr);
+  nodeValue.AddMember("format", mesh->mFormat->mBinaryFormat, *mAllocator);
+  nodeValue.AddMember("vertexcount", mesh->mVertexCount, *mAllocator);
+
+  UINT floatCount = mesh->mVertexCount * mesh->mFormat->mStride / sizeof(float);
+  float* attribs = reinterpret_cast<float*>(mesh->mRawVertexData);
+  rapidjson::Value attribArray(rapidjson::kArrayType);
+  for (UINT i = 0; i < floatCount; i++) {
+    attribArray.PushBack(double(attribs[i]), *mAllocator);
+  }
+  nodeValue.AddMember("vertices", attribArray, *mAllocator);  
+}
+
+void JSONSerializer::SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node) {
+  const string& f = node->mSource.Get();
+  rapidjson::Value slotValue(rapidjson::kObjectType);
+  nodeValue.AddMember("source", f, *mAllocator);
 }
 

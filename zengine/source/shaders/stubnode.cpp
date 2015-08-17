@@ -30,13 +30,13 @@ const int GlobalUniformOffsets[] = {
 StubNode::StubNode()
   : Node(NodeType::SHADER_STUB)
   , mMetadata(nullptr)
-  , mSource(this, SourceSlotName)
+  , mSource(this, SourceSlotName, false, false)
 {}
 
 StubNode::StubNode(const StubNode& original)
   : Node(original)
   , mMetadata(nullptr)
-  , mSource(this, SourceSlotName)
+  , mSource(this, SourceSlotName, false, false)
 {
   mSource.SetDefaultValue(original.mSource.Get());
 }
@@ -114,7 +114,6 @@ void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
 void StubNode::ResetStubSlots() {
   for (auto slotPair : mParameterSlotMap) delete(slotPair.second);
   ClearSlots();
-  AddSlot(&mSource, true, true);
 }
 
 StubMetadata::StubMetadata(const string& _name, NodeType _returnType,

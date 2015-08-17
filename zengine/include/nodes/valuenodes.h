@@ -94,7 +94,8 @@ class ValueSlot: public Slot {
 public:
   typedef typename NodeTypes<T>::Type ValueType;
 
-  ValueSlot(Node* owner, SharedString name);
+  ValueSlot(Node* owner, SharedString name, bool isMultiSlot = false,
+            bool isPublic = true, bool isSerializable = true);
 
   const ValueType& Get() const;
 
@@ -123,8 +124,9 @@ protected:
 
 
 template<NodeType T>
-ValueSlot<T>::ValueSlot(Node* owner, SharedString name)
-  : Slot(T, owner, name) {
+ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
+                        bool isPublic, bool isSerializable)
+  : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {
   Connect(&mDefault);
 }
 

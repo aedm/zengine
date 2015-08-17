@@ -2,8 +2,7 @@
 
 #include <include/resources/mesh.h>
 #include <include/render/drawingapi.h>
-
-#include <assert.h>
+#include <include/base/helpers.h>
 
 VertexFormat* VertexPos::format;
 VertexFormat* VertexPosNorm::format;
@@ -34,26 +33,17 @@ VertexFormat::VertexFormat(UINT binaryFormat) {
   }
 
   mStride = stride;
-  //Declaration = TheDrawingAPI->CreateVertexDeclaration(Attributes);
-
-  assert(stride % 4 == 0);	/// Vertex structure size should always be mod4.
+  ASSERT(stride % 4 == 0);	/// Vertex structure size should always be mod4.
 }
 
-VertexFormat::~VertexFormat() {
-  //TheDrawingAPI->DestroyVertexDeclaration(Declaration);
-}
 
-//void VertexFormat::SetAttributeDefines( ShaderDefines& Defines )
-//{
-//	for (UINT i=0; i<Attributes.size(); i++)
-//	{
-//		Defines[VertexAttribute::GetAttribString(Attributes[i].Type)] = L"";
-//	}
-//}
+VertexFormat::~VertexFormat() {}
+
 
 bool VertexFormat::HasAttribute(VertexAttributeUsage attrib) {
   return (mBinaryFormat & (1 << (UINT)attrib)) != 0;
 }
+
 
 Mesh::Mesh() {
   mVertexCount = 0;
@@ -66,22 +56,26 @@ Mesh::Mesh() {
   mWireframeIndexCount = 0;
   mWireframeIndexHandle = 0;
 
-  mFormat = NULL;
+  mFormat = nullptr;
 }
 
 Mesh::~Mesh() {
   if (mVertexHandle) TheDrawingAPI->DestroyVertexBuffer(mVertexHandle);
   if (mIndexHandle) TheDrawingAPI->DestroyIndexBuffer(mIndexHandle);
   if (mWireframeIndexHandle) TheDrawingAPI->DestroyIndexBuffer(mWireframeIndexHandle);
+  SafeDelete(mRawVertexData);
 }
 
 void Mesh::AllocateVertices(VertexFormat* format, UINT vertexCount) {
   this->mFormat = format;
   this->mVertexCount = vertexCount;
-
   UINT newBufferSize = format->mStride * vertexCount;
+
   if (mVertexBufferSize != newBufferSize) {
     mVertexBufferSize = newBufferSize;
+
+    SafeDelete(mRawVertexData);
+    mRawVertexData = new char[newBufferSize];
 
     if (mVertexHandle) TheDrawingAPI->DestroyVertexBuffer(mVertexHandle);
     mVertexHandle = TheDrawingAPI->CreateVertexBuffer(newBufferSize);
@@ -115,6 +109,9 @@ void Mesh::UploadVertices(void* vertices) {
   void* mappedMesh = TheDrawingAPI->MapVertexBuffer(mVertexHandle);
   memcpy(mappedMesh, vertices, mVertexCount * mFormat->mStride);
   TheDrawingAPI->UnMapVertexBuffer(mVertexHandle);
+
+  /// TODO: use unique_ptr or OWNERSHIP instead of copying twice
+  memcpy(mRawVertexData, vertices, mVertexCount * mFormat->mStride);
 }
 
 
@@ -122,9 +119,7 @@ void Mesh::UploadVertices(void* vertices, int vertexCount) {
   void* mappedMesh = TheDrawingAPI->MapVertexBuffer(mVertexHandle);
   memcpy(mappedMesh, vertices, vertexCount * mFormat->mStride);
   TheDrawingAPI->UnMapVertexBuffer(mVertexHandle);
-}
 
-//const wchar_t* VertexAttribute::GetAttribString( VertexAttributeType Type )
-//{
-//	return Framework::GetWStringFromEnum(AttributeTypeMapper,  Type);
-//}
+  /// TODO: use unique_ptr or OWNERSHIP instead of copying twice
+  memcpy(mRawVertexData, vertices, vertexCount * mFormat->mStride);
+}

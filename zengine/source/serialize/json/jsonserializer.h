@@ -2,6 +2,8 @@
 
 #include <include/dom/document.h>
 #include <include/nodes/valuenodes.h>
+#include <include/nodes/meshnode.h>
+#include <include/shaders/stubnode.h>
 #include <string>
 #include <rapidjson/include/rapidjson/document.h>
 #include <unordered_map>
@@ -29,6 +31,8 @@ private:
   /// Node serializers
   void SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node);
   void SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node);
+  void SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node);
+  void SerializeStaticMeshNode(rapidjson::Value& nodeValue, StaticMeshNode* node);
   void SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node);
 
   /// Helpers

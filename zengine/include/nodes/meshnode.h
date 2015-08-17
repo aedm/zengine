@@ -12,7 +12,7 @@ public:
   Mesh*	GetMesh() const;
 
 protected:
-  Mesh*	mMesh;
+  Mesh*	mMesh = nullptr;
 };
 
 typedef TypedSlot<NodeType::MESH, MeshNode> MeshSlot;
@@ -23,6 +23,8 @@ class StaticMeshNode: public MeshNode {
 public:
   StaticMeshNode();
   virtual ~StaticMeshNode();
+
+  void Set(OWNERSHIP Mesh* mesh);
 
   static StaticMeshNode* Create(OWNERSHIP Mesh* mesh);
 };

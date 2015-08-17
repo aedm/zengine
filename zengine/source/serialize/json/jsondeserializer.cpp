@@ -50,6 +50,12 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   if (IsInstanceOf<TextureNode>(node)) {
     DeserializeTextureNode(value, static_cast<TextureNode*>(node));
   }
+  else if (IsInstanceOf<StaticMeshNode>(node)) {
+    DeserializeStaticMeshNode(value, static_cast<StaticMeshNode*>(node));
+  } 
+  else if (IsInstanceOf<StubNode>(node)) {
+    DeserializeStubNode(value, static_cast<StubNode*>(node));
+  } 
   else if (IsInstanceOf<Document>(node)) {
     ASSERT(mDocument == nullptr);
     mDocument = static_cast<Document*>(node);
@@ -90,6 +96,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
       else if (dynamic_cast<FloatSlot*>(slot) != nullptr) {
         static_cast<FloatSlot*>(slot)->
           SetDefaultValue(itr->value["default"].GetDouble());
+        ConnectValueSlotById(itr->value, slot);
       }
       else if (itr->value.IsArray()) {
         for (UINT i = 0; i < itr->value.Size(); i++) {
@@ -128,5 +135,40 @@ void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
 
   Texture* texture = TheResourceManager->CreateTexture(width, height, texelType, texels);
   node->Set(texture);
+}
+
+
+void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value, 
+                                                 StaticMeshNode* node) {
+  int binaryFormat = value["format"].GetInt();
+  UINT vertexCount = value["vertexcount"].GetInt();
+  VertexFormat* format = TheResourceManager->GetVertexFormat(binaryFormat);
+  Mesh* mesh = TheResourceManager->CreateMesh();
+  mesh->AllocateVertices(format, vertexCount);
+
+  vector<float> rawVertices(vertexCount * format->mStride / sizeof(float));
+  const rapidjson::Value& jsonVertices = value["vertices"];
+  for (UINT i = 0; i < jsonVertices.Size(); i++) {
+    rawVertices[i] = float(jsonVertices[i].GetDouble());
+  }
+  mesh->UploadVertices(&rawVertices[0]);
+
+  node->Set(mesh);
+}
+
+
+void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value, 
+                                           StubNode* node) {
+  string source = value["source"].GetString();
+  node->mSource.SetDefaultValue(source);
+}
+
+
+void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
+  if (value.HasMember("id")) {
+    int connId = value["id"].GetDouble();
+    Node* connNode = mNodes.at(connId);
+    slot->Connect(connNode);
+  }
 }
 

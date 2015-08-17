@@ -108,12 +108,18 @@ public:
   IndexBufferHandle	mWireframeIndexHandle;
 
   VertexFormat* mFormat;
+
+  /// Raw vertex data for deserialization
+  void* mRawVertexData = nullptr;
 };
 
 template<typename T, int N>
 void Mesh::SetVertices(const T(&staticVertices)[N]) {
   AllocateVertices(T::format, N);
   UploadVertices((void*)staticVertices);
+
+  SafeDelete(mRawVertexData);
+  mRawVertexData = new char[N * T::format->mStride];
 }
 
 template<int N>

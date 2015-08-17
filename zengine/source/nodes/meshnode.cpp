@@ -27,4 +27,10 @@ StaticMeshNode* StaticMeshNode::Create(OWNERSHIP Mesh* mesh) {
   return meshNode;
 }
 
+void StaticMeshNode::Set(OWNERSHIP Mesh* mesh) {
+  if (mMesh) TheResourceManager->DiscardMesh(mMesh);
+  mMesh = mesh;
+  SendMsg(NodeMessage::VALUE_CHANGED);
+}
+
 
