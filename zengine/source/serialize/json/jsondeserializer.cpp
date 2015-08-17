@@ -47,7 +47,20 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   //  Vec2 position = DeserializeVec2(jsonPosition);
   //  node->SetPosition(position);
   //}
-  if (IsInstanceOf<TextureNode>(node)) {
+
+  if (IsInstanceOf<FloatNode>(node)) {
+    DeserializeFloatNode(value, static_cast<FloatNode*>(node));
+  }
+  else if (IsInstanceOf<Vec2Node>(node)) {
+    DeserializeVec2Node(value, static_cast<Vec2Node*>(node));
+  } 
+  else if (IsInstanceOf<Vec3Node>(node)) {
+    DeserializeVec3Node(value, static_cast<Vec3Node*>(node));
+  } 
+  else if (IsInstanceOf<Vec4Node>(node)) {
+    DeserializeVec4Node(value, static_cast<Vec4Node*>(node));
+  } 
+  else if (IsInstanceOf<TextureNode>(node)) {
     DeserializeTextureNode(value, static_cast<TextureNode*>(node));
   }
   else if (IsInstanceOf<StaticMeshNode>(node)) {
@@ -62,10 +75,27 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   }
 }
 
-Vec2 JSONDeserializer::DeserializeVec2(rapidjson::Value& value) {
+Vec2 JSONDeserializer::DeserializeVec2(const rapidjson::Value& value) {
   float x = value["x"].GetDouble();
   float y = value["y"].GetDouble();
   return Vec2(x, y);
+}
+
+
+Vec3 JSONDeserializer::DeserializeVec3(const rapidjson::Value& value) {
+  float x = value["x"].GetDouble();
+  float y = value["y"].GetDouble();
+  float z = value["z"].GetDouble();
+  return Vec3(x, y, z);
+}
+
+
+Vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
+  float x = value["x"].GetDouble();
+  float y = value["y"].GetDouble();
+  float z = value["z"].GetDouble();
+  float w = value["w"].GetDouble();
+  return Vec4(x, y, z, w);
 }
 
 void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
@@ -98,6 +128,21 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
           SetDefaultValue(itr->value["default"].GetDouble());
         ConnectValueSlotById(itr->value, slot);
       }
+      else if (dynamic_cast<Vec2Slot*>(slot) != nullptr) {
+        static_cast<Vec2Slot*>(slot)->
+          SetDefaultValue(DeserializeVec2(itr->value["default"]));
+        ConnectValueSlotById(itr->value, slot);
+      } 
+      else if (dynamic_cast<Vec3Slot*>(slot) != nullptr) {
+        static_cast<Vec3Slot*>(slot)->
+          SetDefaultValue(DeserializeVec3(itr->value["default"]));
+        ConnectValueSlotById(itr->value, slot);
+      } 
+      else if (dynamic_cast<Vec4Slot*>(slot) != nullptr) {
+        static_cast<Vec4Slot*>(slot)->
+          SetDefaultValue(DeserializeVec4(itr->value["default"]));
+        ConnectValueSlotById(itr->value, slot);
+      } 
       else if (itr->value.IsArray()) {
         for (UINT i = 0; i < itr->value.Size(); i++) {
           int connId = itr->value[i].GetInt();
@@ -171,4 +216,25 @@ void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot*
     slot->Connect(connNode);
   }
 }
+
+void JSONDeserializer::DeserializeFloatNode(const rapidjson::Value& value, 
+                                            FloatNode* node) {
+  node->Set(value["value"].GetDouble());
+}
+
+void JSONDeserializer::DeserializeVec2Node(const rapidjson::Value& value, 
+                                           Vec2Node* node) {
+  node->Set(DeserializeVec2(value["value"]));
+}
+
+void JSONDeserializer::DeserializeVec3Node(const rapidjson::Value& value,
+                                           Vec3Node* node) {
+  node->Set(DeserializeVec3(value["value"]));
+}
+
+void JSONDeserializer::DeserializeVec4Node(const rapidjson::Value& value,
+                                           Vec4Node* node) {
+  node->Set(DeserializeVec4(value["value"]));
+}
+
 

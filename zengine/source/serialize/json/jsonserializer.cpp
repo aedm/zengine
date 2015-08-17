@@ -99,6 +99,15 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   if (IsInstanceOf<FloatNode>(node)) {
     SerializeFloatNode(v, static_cast<FloatNode*>(node));
   }
+  else if (IsInstanceOf<Vec2Node>(node)) {
+    SerializeVec2Node(v, static_cast<Vec2Node*>(node));
+  } 
+  else if (IsInstanceOf<Vec3Node>(node)) {
+    SerializeVec3Node(v, static_cast<Vec3Node*>(node));
+  } 
+  else if (IsInstanceOf<Vec4Node>(node)) {
+    SerializeVec4Node(v, static_cast<Vec4Node*>(node));
+  } 
   else if (IsInstanceOf<TextureNode>(node)) {
     SerializeTextureNode(v, static_cast<TextureNode*>(node));
   }
@@ -118,6 +127,23 @@ rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec)
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
   jsonObject.AddMember("y", vec.y, *mAllocator);
+  return jsonObject;
+}
+
+rapidjson::Value JSONSerializer::SerializeVec3(const Vec3& vec) {
+  rapidjson::Value jsonObject(rapidjson::kObjectType);
+  jsonObject.AddMember("x", vec.x, *mAllocator);
+  jsonObject.AddMember("y", vec.y, *mAllocator);
+  jsonObject.AddMember("z", vec.z, *mAllocator);
+  return jsonObject;
+}
+
+rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) {
+  rapidjson::Value jsonObject(rapidjson::kObjectType);
+  jsonObject.AddMember("x", vec.x, *mAllocator);
+  jsonObject.AddMember("y", vec.y, *mAllocator);
+  jsonObject.AddMember("z", vec.z, *mAllocator);
+  jsonObject.AddMember("w", vec.w, *mAllocator);
   return jsonObject;
 }
 
@@ -144,21 +170,36 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
       else {
         Node* connectedNode = slot->GetAbstractNode();
 
-        /// Save FloatSlot
         FloatSlot* floatSlot;
+        Vec2Slot* vec2Slot;
+        Vec3Slot* vec3Slot;
+        Vec4Slot* vec4Slot;
         StringSlot* stringSlot;
+
+        /// Save FloatSlot
         if ((floatSlot = dynamic_cast<FloatSlot*>(slot)) != nullptr) {
-          rapidjson::Value slotValue(rapidjson::kObjectType);
-          float f = floatSlot->GetDefaultValue();
-          slotValue.AddMember("default", f, *mAllocator);
-          if (node != nullptr && !slot->IsDefaulted()) {
-            int connectedID = mNodes.at(connectedNode);
-            slotValue.AddMember("id", connectedID, *mAllocator);
-          }
-          slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
-            slotValue, *mAllocator);
+          rapidjson::Value defaultValue(floatSlot->GetDefaultValue());
+          SerializeValueSlot(slotsObject, slot, defaultValue);
         } 
-        
+
+        /// Save Vec2Slot
+        else if ((vec2Slot = dynamic_cast<Vec2Slot*>(slot)) != nullptr) {
+          rapidjson::Value defaultValue = SerializeVec2(vec2Slot->GetDefaultValue());
+          SerializeValueSlot(slotsObject, slot, defaultValue);
+        }
+
+        /// Save Vec3Slot
+        else if ((vec3Slot = dynamic_cast<Vec3Slot*>(slot)) != nullptr) {
+          rapidjson::Value defaultValue = SerializeVec3(vec3Slot->GetDefaultValue());
+          SerializeValueSlot(slotsObject, slot, defaultValue);
+        }
+
+        /// Save Vec4Slot
+        else if ((vec4Slot = dynamic_cast<Vec4Slot*>(slot)) != nullptr) {
+          rapidjson::Value defaultValue = SerializeVec4(vec4Slot->GetDefaultValue());
+          SerializeValueSlot(slotsObject, slot, defaultValue);
+        }
+
         /// Save StringSlot
         else if ((stringSlot = dynamic_cast<StringSlot*>(slot)) != nullptr) {
           const string& f = stringSlot->GetDefaultValue();
@@ -182,10 +223,23 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
   }
 }
 
-void JSONSerializer::SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node)
-{
+
+void JSONSerializer::SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node) {
   nodeValue.AddMember("value", node->Get(), *mAllocator);
 }
+
+void JSONSerializer::SerializeVec2Node(rapidjson::Value& nodeValue, Vec2Node* node) {
+  nodeValue.AddMember("value", SerializeVec2(node->Get()), *mAllocator);
+}
+
+void JSONSerializer::SerializeVec3Node(rapidjson::Value& nodeValue, Vec3Node* node) {
+  nodeValue.AddMember("value", SerializeVec3(node->Get()), *mAllocator);
+}
+
+void JSONSerializer::SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* node) {
+  nodeValue.AddMember("value", SerializeVec4(node->Get()), *mAllocator);
+}
+
 
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node) {
   Texture* texture = node->Get();
@@ -222,3 +276,16 @@ void JSONSerializer::SerializeStubNode(rapidjson::Value& nodeValue, StubNode* no
   nodeValue.AddMember("source", f, *mAllocator);
 }
 
+
+void JSONSerializer::SerializeValueSlot(rapidjson::Value& slotsObject, Slot* slot,
+                                        rapidjson::Value& defaultValue) {
+  rapidjson::Value slotValue(rapidjson::kObjectType);
+  slotValue.AddMember("default", defaultValue, *mAllocator);
+  Node* connectedNode = slot->GetAbstractNode();
+  if (!slot->IsDefaulted()) {
+    int connectedID = mNodes.at(connectedNode);
+    slotValue.AddMember("id", connectedID, *mAllocator);
+  }
+  slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
+                        slotValue, *mAllocator);
+}

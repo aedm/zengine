@@ -30,6 +30,10 @@ private:
 
   /// Node serializers
   void SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node);
+  void SerializeVec2Node(rapidjson::Value& nodeValue, Vec2Node* node);
+  void SerializeVec3Node(rapidjson::Value& nodeValue, Vec3Node* node);
+  void SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* node);
+
   void SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node);
   void SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node);
   void SerializeStaticMeshNode(rapidjson::Value& nodeValue, StaticMeshNode* node);
@@ -37,6 +41,11 @@ private:
 
   /// Helpers
   rapidjson::Value SerializeVec2(const Vec2& vec);
+  rapidjson::Value SerializeVec3(const Vec3& vec);
+  rapidjson::Value SerializeVec4(const Vec4& vec);
+
+  void SerializeValueSlot(rapidjson::Value& slotsObject, Slot* slot,
+                          rapidjson::Value& defaultValue);
 
   /// Number of nodes to save
   int mNodeCount;
