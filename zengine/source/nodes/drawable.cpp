@@ -6,6 +6,7 @@ static SharedString MaterialSlotName = make_shared<string>("Material");
 static SharedString MeshSlotName = make_shared<string>("Mesh");
 static SharedString MoveSlotName = make_shared<string>("Move");
 static SharedString RotateSlotName = make_shared<string>("Rotate");
+static SharedString ChildrenSlotName = make_shared<string>("Children");
 
 Drawable::Drawable()
   : Node(NodeType::DRAWABLE)
@@ -13,6 +14,7 @@ Drawable::Drawable()
   , mMaterial(this, MaterialSlotName) 
   , mMove(this, MoveSlotName)
   , mRotate(this, RotateSlotName)
+  , mChildren(this, ChildrenSlotName, true)
 {}
 
 Drawable::~Drawable() {}
@@ -69,6 +71,10 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
     TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, Primitive);
   } else {
     TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive);
+  }
+
+  for (Node* node : mChildren.GetMultiNodes()) {
+    static_cast<Drawable*>(node)->Draw(&globals);
   }
 }
 

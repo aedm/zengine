@@ -3,6 +3,9 @@
 #include "meshnode.h"
 #include "../shaders/material.h"
 
+class Drawable;
+typedef TypedSlot<NodeType::DRAWABLE, Drawable> DrawableSlot;
+
 class Drawable: public Node {
 public:
   Drawable();
@@ -11,6 +14,7 @@ public:
   MeshSlot mMesh;
   MaterialSlot mMaterial;
 
+  DrawableSlot mChildren;
   Vec3Slot mMove;
   Vec3Slot mRotate;
 
@@ -21,4 +25,3 @@ protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };
 
-typedef TypedSlot<NodeType::DRAWABLE, Drawable> DrawableSlot;
