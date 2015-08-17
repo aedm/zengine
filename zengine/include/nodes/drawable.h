@@ -11,6 +11,9 @@ public:
   MeshSlot mMesh;
   MaterialSlot mMaterial;
 
+  Vec3Slot mMove;
+  Vec3Slot mRotate;
+
   void Draw(Globals* globals, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
 
 protected:

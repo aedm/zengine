@@ -185,5 +185,8 @@ void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft,
   mGlobals.RenderTargetSizeRecip = 
     Vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
 
-  mGlobals.Transformation = Matrix::Ortho(topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y);
+  mGlobals.View.LoadIdentity();
+  mGlobals.Projection = 
+    Matrix::Ortho(topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y);
+  mGlobals.Transformation = mGlobals.Projection;
 }
