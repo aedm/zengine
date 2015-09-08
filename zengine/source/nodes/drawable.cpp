@@ -53,7 +53,7 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
 
   /// Set vertex buffer and attributes
   TheDrawingAPI->SetVertexBuffer(mesh->mVertexHandle);
-  for (ShaderAttributeDesc desc : pass->GetUsedAttributes()) {
+  for (const ShaderAttributeDesc& desc : pass->GetUsedAttributes()) {
     VertexAttribute* attribute = mesh->mFormat->mAttributesArray[(UINT)desc.Usage];
     if (attribute != nullptr) {
       TheDrawingAPI->EnableVertexAttribute(desc.Handle,

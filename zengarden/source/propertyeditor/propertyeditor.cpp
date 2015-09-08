@@ -5,6 +5,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QPushButton>
 
 PropertyEditor::PropertyEditor(Node* node, WatcherWidget* panel)
 	: Watcher(node, panel, NodeType::UI)
@@ -97,6 +98,17 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
       mLayout->addWidget(slotLabel);
     }
   }
+
+  /// Source editor button
+  if (IsInstanceOf<StubNode>(node)) {
+    StubNode* stub = static_cast<StubNode*>(node);
+    QPushButton* sourceButton = new QPushButton("Edit source", panel);
+    panel->connect(sourceButton, &QPushButton::pressed, [=]() {
+      panel->onWatchNode(stub->mSource.GetAbstractNode(), panel);
+    });
+    mLayout->addWidget(sourceButton);
+  }
+
 }
 
 void DefaultPropertyEditor::HandleSniffedMessage(NodeMessage message, Slot* slot,

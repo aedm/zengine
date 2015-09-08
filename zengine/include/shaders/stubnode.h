@@ -135,9 +135,6 @@ protected:
   /// Maps stub parameters to stub slots
   map<StubParameter*, Slot*> mParameterSlotMap;
   map<string, Slot*> mParameterNameSlotMap;
-
-  /// Deletes stub-related slots
-  void ResetStubSlots();
 };
 
 

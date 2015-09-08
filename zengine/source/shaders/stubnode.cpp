@@ -42,43 +42,73 @@ StubNode::StubNode(const StubNode& original)
 }
 
 StubNode::~StubNode() {
-  ResetStubSlots();
+  for (auto slotPair : mParameterSlotMap) delete(slotPair.second);
+  mParameterSlotMap.clear();
+  mParameterNameSlotMap.clear();
+  ClearSlots();
   SafeDelete(mMetadata);
 }
 
 void StubNode::HandleSourceChange() {
-  ResetStubSlots();
-  ASSERT(mSource.IsDefaulted());
-
+  /// Regenerate metadata
+  StubMetadata* metadata = StubAnalyzer::FromText(mSource.Get().c_str());
+  if (metadata == nullptr) {
+    /// Keep old shader. Not strictly correct, but better than deleting everything 
+    /// with a typo.
+    return;
+  }
   SafeDelete(mMetadata);
-  mMetadata = StubAnalyzer::FromText(mSource.Get().c_str());
+  mMetadata = metadata;
 
-  if (mMetadata == nullptr) return;
+  /// Clear previous list of public slots (but not the Slot objects)
+  ClearSlots();
+  mParameterSlotMap.clear();
 
+  /// Create a new list of slots
   for (auto param : mMetadata->parameters) {
-    Slot* slot = nullptr;
-    switch (param->type) {
-      case NodeType::FLOAT:
-        slot = new ValueStubSlot<NodeType::FLOAT>(this, make_shared<string>(param->name));
-        break;
-      case NodeType::VEC2:
-        slot = new ValueStubSlot<NodeType::VEC2>(this, make_shared<string>(param->name));
-        break;
-      case NodeType::VEC3:
-        slot = new ValueStubSlot<NodeType::VEC3>(this, make_shared<string>(param->name));
-        break;
-      case NodeType::VEC4:
-        slot = new ValueStubSlot<NodeType::VEC4>(this, make_shared<string>(param->name));
-        break;
-      case NodeType::TEXTURE:
-        slot = new TextureSlot(this, make_shared<string>(param->name));
-        break;
-      default:
-        SHOULDNT_HAPPEN;
-        break;
+    auto it = mParameterNameSlotMap.find(param->name);
+    if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptType(param->type)) {
+      /// This slot was used before, reuse it.
+      AddSlot(it->second, true, true);
+      mParameterSlotMap[param] = it->second;
+      it->second = nullptr;
     }
-    mParameterSlotMap[param] = slot;
-    mParameterNameSlotMap[param->name] = slot;
+    else {
+      /// Generate new slot.
+      Slot* slot = nullptr;
+      switch (param->type) {
+        case NodeType::FLOAT:
+          slot = new ValueStubSlot<NodeType::FLOAT>(this, make_shared<string>(param->name));
+          break;
+        case NodeType::VEC2:
+          slot = new ValueStubSlot<NodeType::VEC2>(this, make_shared<string>(param->name));
+          break;
+        case NodeType::VEC3:
+          slot = new ValueStubSlot<NodeType::VEC3>(this, make_shared<string>(param->name));
+          break;
+        case NodeType::VEC4:
+          slot = new ValueStubSlot<NodeType::VEC4>(this, make_shared<string>(param->name));
+          break;
+        case NodeType::TEXTURE:
+          slot = new TextureSlot(this, make_shared<string>(param->name));
+          break;
+        default:
+          SHOULDNT_HAPPEN;
+          break;
+      }
+      mParameterSlotMap[param] = slot;
+    }
+  }
+
+  /// Delete unused slots
+  for (auto it = mParameterNameSlotMap.begin(); it != mParameterNameSlotMap.end(); ++it) {
+    SafeDelete(it->second);
+  }
+  mParameterNameSlotMap.clear();
+
+  /// Index the new slots
+  for (auto it = mParameterSlotMap.begin(); it != mParameterSlotMap.end(); ++it) {
+    mParameterNameSlotMap[it->first->name] = it->second;
   }
 }
 
@@ -105,15 +135,14 @@ void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
     case NodeMessage::VALUE_CHANGED:
       if (slot == &mSource) {
         HandleSourceChange();
+        SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+      }
+      else if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
+        SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
       }
     default:
       break;
   }
-}
-
-void StubNode::ResetStubSlots() {
-  for (auto slotPair : mParameterSlotMap) delete(slotPair.second);
-  ClearSlots();
 }
 
 StubMetadata::StubMetadata(const string& _name, NodeType _returnType,

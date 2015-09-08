@@ -193,13 +193,22 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
   return mNode->GetPosition() + sw->mSpotPos;
 }
 
-void NodeWidget::HandleSniffedMessage(NodeMessage Message, Slot* S, void* Payload)
+void NodeWidget::HandleSniffedMessage(NodeMessage message, Slot* slot, void*)
 {
-	switch (Message)
+	switch (message)
 	{
 	case NodeMessage::SLOT_STRUCTURE_CHANGED:
 		CreateWidgetSlots();
     mGraphWatcher->Update();
+    break;
+  case NodeMessage::VALUE_CHANGED:
+    if (mNode->GetType() == NodeType::SHADER_STUB) {
+      StubNode* stub = static_cast<StubNode*>(mNode);
+      if (slot == &stub->mSource) {
+        CreateWidgetSlots();
+        mGraphWatcher->Update();
+      }
+    }
     break;
   case NodeMessage::NODE_NAME_CHANGED:
     HandleTitleChange();

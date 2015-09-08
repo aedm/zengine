@@ -29,14 +29,18 @@ Document* JSONDeserializer::GetDocument() {
 }
 
 void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
-  const char* nodeName = value["node"].GetString();
+  const char* nodeClassName = value["node"].GetString();
   int id = value["id"].GetInt();
-  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(string(nodeName));
+  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(string(nodeClassName));
 
   Node* node = nodeClass->Manufacture();
   ASSERT(mNodes.find(id) == mNodes.end());
   mNodes[id] = node;
 
+  if (value.HasMember("name")) {
+    node->SetName(value["name"].GetString());
+  }
+  
   if (value.HasMember("position")) {
     Vec2 position = DeserializeVec2(value["position"]);
     node->SetPosition(position);

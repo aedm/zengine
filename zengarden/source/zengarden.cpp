@@ -8,6 +8,7 @@
 #include "watchers/meshwatcher.h"
 #include "watchers/scenewatcher.h"
 #include "watchers/drawablewatcher.h"
+#include "watchers/textwatcher.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
@@ -135,6 +136,7 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   if (node != nullptr) {
     mPropertyEditor =
       new WatcherWidget(mUI.propertyPanel, WatcherPosition::PROPERTY_PANEL);
+    mPropertyEditor->onWatchNode += Delegate(this, &ZenGarden::Watch);
     mPropertyEditor->onWatcherDeath = Delegate(this, &ZenGarden::RemovePropertyEditor);
     mPropertyLayout->addWidget(mPropertyEditor);
 
@@ -199,6 +201,12 @@ void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
         new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
       watcher = new SceneWatcher(dynamic_cast<SceneNode*>(node), glWatcherWidget);
       watcherWidget = glWatcherWidget;
+      break;
+    }
+    case NodeType::STRING:
+    {
+      watcherWidget = new WatcherWidget(tabWidget, position, tabWidget);
+      watcher = new TextWatcher(dynamic_cast<StringNode*>(node), watcherWidget);
       break;
     }
     default: return;
