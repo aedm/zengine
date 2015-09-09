@@ -1,18 +1,19 @@
 #include "shaderbuilder.h"
 #include <exception>
 
-OWNERSHIP ShaderMetadata* ShaderBuilder::FromStub(StubNode* stub) {
+OWNERSHIP ShaderMetadata* ShaderBuilder::FromStub(StubNode* stub, const string& prefix) {
   if (stub == nullptr) {
     ERR("stub is nullptr");
     return nullptr;
   }
 
-  ShaderBuilder builder(stub);
+  ShaderBuilder builder(stub, prefix);
   return new ShaderMetadata(builder.mInputs, builder.mOutputs, builder.mUniforms, 
                             builder.mSamplers, builder.sourceStream.str());
 }
 
-ShaderBuilder::ShaderBuilder(StubNode* stub) {
+ShaderBuilder::ShaderBuilder(StubNode* stub, const string& prefix) {
+  this->prefix = prefix;
   StubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
     ERR("stub has no metadata.");
@@ -114,7 +115,7 @@ void ShaderBuilder::GenerateNames() {
       data->VariableName = string(tmp);
     } else {
       /// It's a uniform
-      sprintf_s(tmp, "_uniform_%d", ++uniformIndex);
+      sprintf_s(tmp, "%s_uniform_%d", prefix.c_str(), ++uniformIndex);
       data->VariableName = string(tmp);
     }
   }

@@ -13,6 +13,7 @@
 #include <QMouseEvent>
 #include <QMimeData>
 #include <QFileInfo>
+#include <QImage>
 
 GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
   : Watcher(graph, parent) 
@@ -300,7 +301,11 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
     if (mHoveredSlotIndex >= 0) {
       /// Remove connection
       Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
-      if (slot->GetAbstractNode()) {
+      if (slot->mIsMultiSlot) {
+        /// HACK HACK HACK
+        slot->DisconnectAll(true);
+      }
+      else if (slot->GetAbstractNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
     }
@@ -521,7 +526,10 @@ void GraphWatcher::HandleDragEnterEvent(QDragEnterEvent* event) {
   if (urlList.size() != 1) return;
 
   QString fileName = urlList.at(0).toLocalFile();
-  if (fileName.endsWith(".obj")) event->acceptProposedAction();
+  if (fileName.endsWith(".obj") || fileName.endsWith(".png")
+      || fileName.endsWith(".jpg")) {
+    event->acceptProposedAction();
+  }
 }
 
 /// TODO: remove code duplication with HandleDragEnterEvent
@@ -539,6 +547,23 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
     node->SetName(fileInfo.fileName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
 
+    Vec2 pos = CanvasToWorld(Vec2(event->pos().x(), event->pos().y()));
+    TheCommandStack->Execute(new MoveNodeCommand(node, pos));
+    event->acceptProposedAction();
+  }
+
+  else if (fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg") {
+    QImage image(fileName);
+    QImage rgba = image.convertToFormat(QImage::Format_ARGB32);
+    char* pixels = new char[rgba.byteCount()];
+    memcpy(pixels, rgba.bits(), rgba.byteCount());
+    Texture* texture = TheResourceManager->CreateTexture(
+      rgba.width(), rgba.height(), TEXELTYPE_ARGB8, pixels);
+    TextureNode* node = new TextureNode();
+    node->Set(texture);
+
+    node->SetName(fileInfo.fileName().toStdString());
+    TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
     Vec2 pos = CanvasToWorld(Vec2(event->pos().x(), event->pos().y()));
     TheCommandStack->Execute(new MoveNodeCommand(node, pos));
     event->acceptProposedAction();

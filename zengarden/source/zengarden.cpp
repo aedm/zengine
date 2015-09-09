@@ -235,7 +235,7 @@ Texture* ZenGarden::CreateSampleTexture() {
       UINT c = i^o;
       tmp[i * 256 + o] = 0xff000000 | c | (c << 8) | (c << 16);
     }
-  return TheResourceManager->CreateTexture(256, 256, TEXELTYPE_RGBA_UINT8, tmp);
+  return TheResourceManager->CreateTexture(256, 256, TEXELTYPE_ARGB8, tmp);
 }
 
 void ZenGarden::HandleMenuSaveAs() {

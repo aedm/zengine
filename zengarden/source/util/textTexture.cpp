@@ -47,10 +47,10 @@ void TextTexture::SetText( const QString& Text, const QFont& Font )
 	{
 		DestroyTexture();
 		TheTexture = TheResourceManager->CreateGPUTexture(
-      tw, th, TEXELTYPE_RGBA_UINT8, image.bits());
+      tw, th, TEXELTYPE_ARGB8, image.bits());
 	} else {
 		TheDrawingAPI->UploadTextureSubData(
-      TheTexture->mHandle, 0, 0, tw, th, TEXELTYPE_RGBA_UINT8, image.bits());
+      TheTexture->mHandle, 0, 0, tw, th, TEXELTYPE_ARGB8, image.bits());
 	}
 }
 

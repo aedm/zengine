@@ -65,10 +65,10 @@ void Pass::Operate() {
 
   /// Recreates shader metadata if needed
   if (mVertexShaderMetadata == nullptr) {
-    mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode());
+    mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode(), "vertex");
   }
   if (mFragmentShaderMetadata == nullptr) {
-    mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode());
+    mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode(), "fragment");
   }
 
   /// Both fragment and vertex metadata are needed

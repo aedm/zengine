@@ -5,10 +5,10 @@
 
 class ShaderBuilder {
 public:
-  static OWNERSHIP ShaderMetadata* FromStub(StubNode* stub);
+  static OWNERSHIP ShaderMetadata* FromStub(StubNode* stub, const string& prefix);
 
 private:
-  ShaderBuilder(StubNode* stub);
+  ShaderBuilder(StubNode* stub, const string& prefix);
   ~ShaderBuilder();
 
   struct NodeData {
@@ -40,6 +40,8 @@ private:
   void GenerateSourceMain(stringstream& stream);
 
   static const string& GetTypeString(NodeType type);
+
+  string prefix;
 
   /// Topologic order of dependencies
   vector<Node*> mDependencies;

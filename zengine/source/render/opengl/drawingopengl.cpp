@@ -528,24 +528,24 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelTypeEnum 
 void GetTextureType(TexelTypeEnum type, GLint &internalFormat, GLenum &format, 
                     GLenum &glType) {
   switch (type) {
-    case TEXELTYPE_RGBA_UINT8:
+    case TEXELTYPE_ARGB8:
       internalFormat = GL_RGBA;
-      format = GL_RGBA;
+      format = GL_BGRA;
       glType = GL_UNSIGNED_BYTE;
       break;
-    case TEXELTYPE_RGBA_UINT16:
+    case TEXELTYPE_ARGB16:
       internalFormat = GL_RGBA16;
-      format = GL_RGBA;
+      format = GL_BGRA;
       glType = GL_UNSIGNED_SHORT;
       break;
-    case TEXELTYPE_RGBA_FLOAT16:
+    case TEXELTYPE_ARGB16F:
       internalFormat = GL_RGBA16F;
-      format = GL_RGBA;
+      format = GL_BGRA;
       glType = GL_FLOAT;
       break;
-    case TEXELTYPE_RGBA_FLOAT32:
+    case TEXELTYPE_ARGB32F:
       internalFormat = GL_RGBA32F;
-      format = GL_RGBA;
+      format = GL_BGRA;
       glType = GL_FLOAT;
       break;
     default:

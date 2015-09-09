@@ -9,10 +9,10 @@
 #include <rapidjson/include/rapidjson/stringbuffer.h>
 
 const EnumMapperA TexelTypeMapper[] = {
-  {"RGBA8", UINT(TEXELTYPE_RGBA_UINT8)},
-  {"RGBA16", UINT(TEXELTYPE_RGBA_UINT16)},
-  {"RGBA16F", UINT(TEXELTYPE_RGBA_FLOAT16)},
-  {"RGBA32F", UINT(TEXELTYPE_RGBA_FLOAT32)},
+  {"RGBA8", UINT(TEXELTYPE_ARGB8)},
+  {"RGBA16", UINT(TEXELTYPE_ARGB16)},
+  {"RGBA16F", UINT(TEXELTYPE_ARGB16F)},
+  {"RGBA32F", UINT(TEXELTYPE_ARGB32F)},
   {"", -1}
 };
 

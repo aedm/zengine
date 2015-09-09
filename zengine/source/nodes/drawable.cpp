@@ -22,16 +22,7 @@ Drawable::~Drawable() {}
 void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
   if (!mIsProperlyConnected) return;
   Material* material = mMaterial.GetNode();
-  if (!material) return;
-  const Mesh* mesh = mMesh.GetNode()->GetMesh();
-
-  /// Set pass (pipeline state)
-  Pass* pass = material->GetPass();
-  if (!pass) return;
-  pass->Update();
-
-  if (!pass->isComplete()) return;
-  
+  MeshNode* meshNode = mMesh.GetNode();
   Globals globals = *oldGlobals;
 
   bool retransform = false;
@@ -48,29 +39,40 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
     retransform = true;
   }
   if (retransform) globals.Transformation = globals.Projection * globals.View;
-  
-  pass->Set(&globals);
 
-  /// Set vertex buffer and attributes
-  TheDrawingAPI->SetVertexBuffer(mesh->mVertexHandle);
-  for (const ShaderAttributeDesc& desc : pass->GetUsedAttributes()) {
-    VertexAttribute* attribute = mesh->mFormat->mAttributesArray[(UINT)desc.Usage];
-    if (attribute != nullptr) {
-      TheDrawingAPI->EnableVertexAttribute(desc.Handle,
-          gVertexAttributeType[(UINT)desc.Usage], attribute->Offset,
-          mesh->mFormat->mStride);
-    } else {
-      SHOULDNT_HAPPEN;
+  if (material && meshNode) {
+    const Mesh* mesh = meshNode->GetMesh();
+
+    /// Set pass (pipeline state)
+    Pass* pass = material->GetPass();
+    if (!pass) return;
+    pass->Update();
+
+    if (pass->isComplete()) {
+      pass->Set(&globals);
+
+      /// Set vertex buffer and attributes
+      TheDrawingAPI->SetVertexBuffer(mesh->mVertexHandle);
+      for (const ShaderAttributeDesc& desc : pass->GetUsedAttributes()) {
+        VertexAttribute* attribute = mesh->mFormat->mAttributesArray[(UINT)desc.Usage];
+        if (attribute != nullptr) {
+          TheDrawingAPI->EnableVertexAttribute(desc.Handle,
+                                               gVertexAttributeType[(UINT)desc.Usage], attribute->Offset,
+                                               mesh->mFormat->mStride);
+        } else {
+          SHOULDNT_HAPPEN;
+        }
+      }
+
+      /// TODO: set output buffers
+
+      /// Render mesh
+      if (mesh->mIndexHandle) {
+        TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, Primitive);
+      } else {
+        TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive);
+      }
     }
-  }
-
-  /// TODO: set output buffers
-
-  /// Render mesh
-  if (mesh->mIndexHandle) {
-    TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, Primitive);
-  } else {
-    TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive);
   }
 
   for (Node* node : mChildren.GetMultiNodes()) {

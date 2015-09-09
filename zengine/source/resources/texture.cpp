@@ -19,12 +19,12 @@ UINT Texture::GetTexelByteCount(TexelTypeEnum type) {
   switch (type) {
     case TEXELTYPE_VOID:
       return 0;
-    case TEXELTYPE_RGBA_UINT8:
+    case TEXELTYPE_ARGB8:
       return 4;
-    case TEXELTYPE_RGBA_UINT16:
-    case TEXELTYPE_RGBA_FLOAT16:
+    case TEXELTYPE_ARGB16:
+    case TEXELTYPE_ARGB16F:
       return 8;
-    case TEXELTYPE_RGBA_FLOAT32:
+    case TEXELTYPE_ARGB32F:
       return 16;
   }
   SHOULDNT_HAPPEN;
