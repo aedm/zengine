@@ -85,7 +85,8 @@ public:
 									PrimitiveTypeEnum PrimitiveType) override;
 	virtual void				Render(IndexBufferHandle IndexBuffer,
 									UINT VertexCount,
-									PrimitiveTypeEnum PrimitiveType) override;
+									PrimitiveTypeEnum PrimitiveType,
+                  UINT InstanceCount) override;
 
 private:
 

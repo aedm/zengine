@@ -216,6 +216,9 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
     
     /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
     AttributeId location = glGetAttribLocation(program, name);
+    
+    /// Shader compiler reports gl_InstanceID as an attribute at -1, who knows why.
+    if (location < 0) continue;
 
     ShaderAttributeDesc attribute;
     attribute.Handle = location; 
@@ -415,14 +418,15 @@ void DrawingOpenGL::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount
 }
 
 void DrawingOpenGL::Render(IndexBufferHandle indexBuffer, UINT count, 
-                           PrimitiveTypeEnum primitiveType) {
+                           PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
   if (indexBuffer != 0) {
     BindIndexBuffer(indexBuffer);
     CheckGLError();
-    glDrawElements(GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL);
+    glDrawElementsInstanced(
+      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, InstanceCount);
     CheckGLError();
   } else {
-    glDrawArrays(GetGLPrimitive(primitiveType), 0, count);
+    glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, InstanceCount);
   }
 }
 

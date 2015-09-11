@@ -7,6 +7,7 @@ static SharedString MeshSlotName = make_shared<string>("Mesh");
 static SharedString MoveSlotName = make_shared<string>("Move");
 static SharedString RotateSlotName = make_shared<string>("Rotate");
 static SharedString ChildrenSlotName = make_shared<string>("Children");
+static SharedString InstancesSlotName = make_shared<string>("Instances");
 
 Drawable::Drawable()
   : Node(NodeType::DRAWABLE)
@@ -15,7 +16,10 @@ Drawable::Drawable()
   , mMove(this, MoveSlotName)
   , mRotate(this, RotateSlotName)
   , mChildren(this, ChildrenSlotName, true)
-{}
+  , mInstances(this, InstancesSlotName)
+{
+  mInstances.SetDefaultValue(1);
+}
 
 Drawable::~Drawable() {}
 
@@ -66,11 +70,14 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
 
       /// TODO: set output buffers
 
+      UINT instanceCount = UINT(mInstances.Get());
+
       /// Render mesh
       if (mesh->mIndexHandle) {
-        TheDrawingAPI->Render(mesh->mIndexHandle, mesh->mIndexCount, Primitive);
+        TheDrawingAPI->Render(
+          mesh->mIndexHandle, mesh->mIndexCount, Primitive, instanceCount);
       } else {
-        TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive);
+        TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive, instanceCount);
       }
     }
   }

@@ -74,7 +74,8 @@ public:
 									PrimitiveTypeEnum PrimitiveType) = 0;
 	virtual void				Render(IndexBufferHandle IndexBuffer,
 									UINT Count,
-									PrimitiveTypeEnum PrimitiveType) = 0;
+									PrimitiveTypeEnum PrimitiveType,
+                  UINT InstanceCount) = 0;
 	//virtual void				RenderMesh(const Mesh* MeshInstance) = 0;
 	//virtual void				RenderTrianglesDirect(int VertexCount, int PrimitiveCount, const VertexFormat* Format, const void* Vertices, const void* Indices) = 0;
 
