@@ -1,0 +1,185 @@
+{
+  "nodes": [
+    {
+      "node": "Document",
+      "id": 1,
+      "slots": {
+        "graphs": [
+          2
+        ]
+      }
+    },
+    {
+      "node": "Graph",
+      "id": 2,
+      "slots": {
+        "nodes": [
+          3,
+          4,
+          5,
+          6,
+          9,
+          8,
+          7
+        ]
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 3,
+      "position": {
+        "x": -53.0,
+        "y": 89.0
+      },
+      "source": ":name \"Default VS\"\n:returns void\n\n:input vec3 aPosition;\n:input vec2 aTexCoord;\n:input vec3 aNormal;\n\n:global mat4 gTransformation;\n:global mat4 gView;\n\n:output vec2 vTexCoord\n:output vec3 vNormal\n\n:param float ZDist\n\nSHADER\n{\n  vec2 t = aTexCoord * 2 -1;\n  gl_Position = vec4(t.x, -t.y, 0.0, 1.0); \n  vTexCoord = aTexCoord;\n}\n",
+      "slots": {
+        "ZDist": {
+          "default": 0.0
+        }
+      }
+    },
+    {
+      "node": "Drawable",
+      "id": 4,
+      "position": {
+        "x": 337.0,
+        "y": -64.0
+      },
+      "slots": {
+        "Mesh": 5,
+        "Material": 6,
+        "Children": [],
+        "Rotate": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        "Move": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      }
+    },
+    {
+      "node": "Static Mesh",
+      "id": 5,
+      "name": "quad.obj",
+      "position": {
+        "x": 205.0,
+        "y": -64.0
+      },
+      "format": 7,
+      "vertexcount": 6,
+      "vertices": [
+        -5.0,
+        0.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        0.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        0.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0
+      ]
+    },
+    {
+      "node": "Material",
+      "id": 6,
+      "position": {
+        "x": 211.0,
+        "y": 10.0
+      },
+      "slots": {
+        "Solid Pass": 7
+      }
+    },
+    {
+      "node": "Pass",
+      "id": 7,
+      "position": {
+        "x": 87.0,
+        "y": 7.0
+      },
+      "slots": {
+        "Fragment shader": 8,
+        "Vertex shader": 3
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 8,
+      "name": "kacsa fs",
+      "position": {
+        "x": -65.0,
+        "y": -9.0
+      },
+      "source": ":name \"Default FS\"\n:returns void\n\n:input vec2 vTexCoord\n\n:output vec4 FragColor\n\n:global vec2 gRenderTargetSize\n\n:param vec4 Color\n:param float Time\n\nfloat sdSphere(vec3 p, float s)\n{\n    float k = length(p)-s;\n    return k < 0.0 ? 0.0 : k;\n}\n\nfloat sdDuckBody(vec3 p) {\n    float k = 6.0;\n    float a = 0.;\n    \n    a += exp(-k * sdSphere(p + vec3(0.11, 0, 0.1), 0.06));\n    a += exp(-k * sdSphere(p + vec3(-0.11, 0, 0.1), 0.06));\n    a += exp(-k * sdSphere(p + vec3(0.2, 0, 0.3), 0.1));\n    a += exp(-k * sdSphere(p + vec3(-0.2, 0, 0.3), 0.1));\n    a += exp(-k * sdSphere(p + vec3(0.2, 0, 0.55), 0.07));\n    a += exp(-k * sdSphere(p + vec3(-0.2, 0, 0.55), 0.07));\n    a += exp(-k * sdSphere(p + vec3(-0.00, 0, 0.72), 0.1));\n    \n    a += exp(-k * sdSphere(p + vec3(0, -0.39, 0.8), 0.01));\n\n    a += exp(-k * sdSphere(p + vec3(0, -0.7, 0.1), 0.15));\n    a += exp(-k * sdSphere(p + vec3(0, -0.65, -0.05), 0.07));\n\n    return -log(a) / k;\n}\n\nfloat sdBeak(vec3 p, float s)\n{\n    \n    float k = max(length(p)-s, -(length(p+vec3(-0.15,-0.2,-0.1))-0.25));\n    k = max(k, -(length(p+vec3(0.12,-0.2,-0.1))-0.25));\n    return k < 0.0 ? 0.0 : k;\n}\n\nfloat sdDuckBeak(vec3 p) {\n    float k = 12.0;\n    float a = 0.;\n    \n    a += exp(-k * sdBeak(p + vec3(0, -0.55, -0.1), 0.15));\n\n    return -log(a) / k;\n}\n\nvec4 nearest(vec4 d1, vec4 d2)\n{\n    return (d1.x<d2.x) ? d1 : d2;\n}\n\nvec3 rotate(vec3 p, float angle)\n{\n    float  c = cos(angle);\n    float  s = sin(angle);\n    return vec3(c*p.x-s*p.z, p.y, s*p.x+c*p.z);\n}\n\n/// HACK HACK\nfloat angle = 0;\n\nvec4 map(vec3 pos)\n{\n    pos = rotate(pos, angle/5);\n    vec3 offset = vec3(0, 0, -0.3);\n    vec4 res = vec4(sdDuckBody(pos-vec3(-0.0, 0.25, 0.0)+offset), vec3(1, 1, 0));\n    res = nearest(res, vec4(sdDuckBeak(pos-vec3(-0.0, 0.25, 0.0)+offset), vec3(1, 0, 0)));\n    res = nearest(res, vec4(sdSphere(pos-vec3(0.09, 0.87, 0.14)+offset, 0.06), vec3(0.0, 0, 0.3)));\n    res = nearest(res, vec4(sdSphere(pos-vec3(-0.09, 0.87, 0.14)+offset, 0.06), vec3(0.0, 0, 0.3)));\n \n    return res;\n}\n\nvec4 castRay(in vec3 ro, in vec3 rd)\n{\n    float tmin = 1.0;\n    float tmax = 20.0;\n    \n    float precis = 0.002;\n    float t = tmin;\n    vec3 color = vec3(1, 0, 1);\n    for(int i=0; i<50; i++)\n    {\n        vec4 res = map(ro+rd*t);\n        if(res.x<precis || t>tmax) break;\n        t += res.x;\n        color = res.yzw;\n    }\n\n    if(t>tmax) t=-1.0;\n    return vec4(t, color);\n}\n\nvec3 calcNormal(in vec3 pos)\n{\n    vec3 eps = vec3(0.001, 0.0, 0.0);\n    vec3 nor = vec3(\n        map(pos+eps.xyy).x - map(pos-eps.xyy).x,\n        map(pos+eps.yxy).x - map(pos-eps.yxy).x,\n        map(pos+eps.yyx).x - map(pos-eps.yyx).x);\n    return normalize(nor);\n}\n\nvec4 render(in vec3 ro, in vec3 rd)\n{ \n    vec4 res = castRay(ro,rd);\n\n    float t = res.x;\n    vec3 col = res.yzw;\n    if(t>-0.5)\n    {\n        vec3 pos = ro + t*rd;\n        vec3 nor = calcNormal(pos);\n        vec3 ref = reflect(rd, nor);\n        \n        vec3  lig = rotate(normalize(vec3(0.6, 0.4, -0.2)), -angle/3);\n        float amb = clamp(0.5+0.5*nor.y, 0.0, 1.0);\n        float dif = clamp(dot(nor, lig), 0.0, 1.0);\n        float bac = clamp(dot(nor, normalize(vec3(-lig.x,0.0,-lig.z))), 0.0, 1.0)*clamp(1.0-pos.y,0.0,1.0);\n        float dom = smoothstep(-0.1, 0.1, ref.y);\n        float fre = pow(clamp(1.0+dot(nor,rd),0.0,1.0), 2.0);\n        float spe = pow(clamp(dot(ref, lig), 0.0, 1.0),16.0);\n\n        vec3 brdf = vec3(0.0);\n        brdf += 1.20*dif*vec3(1.00,0.90,0.60);\n        brdf += 1.20*spe*vec3(1.00,0.90,0.60)*dif;\n        brdf += 0.30*amb*vec3(0.50,0.70,1.00);\n        brdf += 0.40*fre*vec3(1.00,1.00,1.00);\n        brdf += 0.02;\n        col = col*brdf;\n\n        return vec4(clamp(col, 0.0, 1.0), 1.0);\n    }\n   return vec4(0, 0, 0, 0);\n}\n\nmat3 setCamera(in vec3 ro, in vec3 ta, float cr)\n{\n    vec3 cw = normalize(ta-ro);\n    vec3 cp = vec3(sin(cr), cos(cr),0.0);\n    vec3 cu = normalize(cross(cw,cp));\n    vec3 cv = normalize(cross(cu,cw));\n    return mat3(cu, cv, cw);\n}\n\nSHADER\n{\n    vec2 fragCoord = vTexCoord*2-1;\n    vec2 iResolution = gRenderTargetSize;\n\n    vec2 q = vec2(fragCoord.x, -fragCoord.y);\n    vec2 p = q;\n    p.x *= iResolution.x/iResolution.y;\n    vec2 mo = vec2(0.5,0.5); //iMouse.xy/iResolution.xy;\n\t\t \n    float time = 0;\n    angle = Time*3;\n\n    // camera\t\n    vec3 ro = vec3(3.2*cos(0.1*time + 6.0*mo.x), 1.5 , 3.2*sin(0.1*time + 6.0*mo.x));\n    vec3 ta = vec3(-0.0, 0.0, 0.0);\n\t\n    // camera-to-world transformation\n    mat3 ca = setCamera(ro, ta, 0.0);\n    \n    // ray direction\n    vec3 rd = ca * normalize(vec3(p.xy,2.5));\n\n    FragColor = render(ro, rd);\n}\n",
+      "slots": {
+        "Color": {
+          "default": {
+            "x": 0.2954545319080353,
+            "y": 0.4015151560306549,
+            "z": 0.47727271914482119,
+            "w": 0.7424242496490479
+          }
+        },
+        "Time": {
+          "default": 0.25757575035095217,
+          "id": 9
+        }
+      }
+    },
+    {
+      "node": "Time",
+      "id": 9,
+      "position": {
+        "x": -213.0,
+        "y": 0.0
+      }
+    }
+  ]
+}

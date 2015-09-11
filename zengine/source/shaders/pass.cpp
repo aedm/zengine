@@ -17,7 +17,7 @@ Pass::Pass()
   , mHandle(-1) 
 {
   mRenderstate.DepthTest = true;
-  mRenderstate.Face = RenderState::FACE_BACK;
+  mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
   mRenderstate.BlendMode = RenderState::BLEND_ALPHA;
 }
 

@@ -6,3 +6,4 @@ zengarden/app/zengarden-static.exp
 *.opensdf
 *.exp
 zengine/lib/zengine-release.lib
+zengarden/Release/

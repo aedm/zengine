@@ -1,0 +1,232 @@
+{
+  "nodes": [
+    {
+      "node": "Document",
+      "id": 1,
+      "slots": {
+        "graphs": [
+          2
+        ]
+      }
+    },
+    {
+      "node": "Graph",
+      "id": 2,
+      "slots": {
+        "nodes": [
+          3,
+          5,
+          6,
+          11,
+          7,
+          9,
+          8,
+          10,
+          4
+        ]
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 3,
+      "position": {
+        "x": -118.0,
+        "y": -59.0
+      },
+      "source": ":name \"Default FS\"\n:returns void\n\n:output vec4 FragColor\n:input vec2 vTexCoord\n\n:param vec4 Color\n:param float Time\n\n//------------------------------------------------------------\n// complex number operations\nvec2 cadd( vec2 a, float s ) { return vec2( a.x+s, a.y ); }\nvec2 cmul( vec2 a, vec2 b )  { return vec2( a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x ); }\nvec2 cdiv( vec2 a, vec2 b )  { float d = dot(b,b); return vec2( dot(a,b), a.y*b.x - a.x*b.y ) / d; }\nvec2 csqr( vec2 a ) { return vec2(a.x*a.x-a.y*a.y, 2.0*a.x*a.y ); }\nvec2 csqrt( vec2 z ) { float m = length(z); return sqrt( 0.5*vec2(m+z.x, m-z.x) ) * vec2( 1.0, sign(z.y) ); }\nvec2 conj( vec2 z ) { return vec2(z.x,-z.y); }\nvec2 cpow( vec2 z, float n ) { float r = length( z ); float a = atan( z.y, z.x ); return pow( r, n )*vec2( cos(a*n), sin(a*n) ); }\n//------------------------------------------------------------\n\n\nvec2 f( vec2 z, vec2 c )\n{\n  return csqr(z) + c;   // tradicional z -> z^2 + c Julia set\n\n//  return c + cdiv( cmul( z-vec2(0.0,1.0), cmul( cpow(z-1.0,4.0), (z-vec2(-0.1)) ) ), \n//    cmul( z-vec2(1.0,1.0), z+1.0));\n}\n\nvec2 df( vec2 z, vec2 c )\n{\n  vec2 e = vec2(0.001,0.0);\n  return cdiv( f(z,c) - f(z+e,c), e );\n}\n\nSHADER\n{\n  vec2 p = vTexCoord * 2;\n  //p = 2.5*(p+vec2(0.25,0.37));\n\t\n  float time = Time*2;\n  vec2 c = vec2( 0.1-0.08, 0.55-0.3 ) + \n      0.5*vec2( sin(0.31*(time-10.0)), cos(0.37*(time-10.0)) );\n\t\n  // iterate\t\t\n  vec2 dz = vec2( 1.0, 0.0 );\n  vec2 z = p;\n  float g = 1e10;\n  for( int i=0; i<20; i++ )\n  {\n    if( dot(z,z)>10000.0 ) continue;\n\n    // chain rule for derivative\t\t\n    dz = cmul( dz, df( z, c ) );\n\n    // function\t\t\n    z = f( z, c );\n\t\t\n    g = min( g, dot(z-1.0,z-1.0) );\n  }\n\n  // distance estimator\n  float h = 0.5*log(dot(z,z))*sqrt( dot(z,z)/dot(dz,dz) );\n\t\n  h = clamp( h*100.0, 0.0, 1.0 );\n\t\t\n  vec3 col = 0.6 + 0.4*cos( log(log(2.0+g))*0.5 + 4.5 + Color.rgb );\n  col = mix(col, vec3(1,1,1), 1-h);\n  FragColor = vec4( col, 1.0 );\n\n}\n",
+      "slots": {
+        "Color": {
+          "default": {
+            "x": -1.4015151262283326,
+            "y": 0.25,
+            "z": 0.9015151262283325,
+            "w": 0.5833333134651184
+          }
+        },
+        "Time": {
+          "default": 1.174242377281189,
+          "id": 4
+        }
+      }
+    },
+    {
+      "node": "Time",
+      "id": 4,
+      "position": {
+        "x": -232.0,
+        "y": -60.0
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 5,
+      "position": {
+        "x": -106.0,
+        "y": 17.0
+      },
+      "source": ":name \"Default VS\"\n:returns void\n\n:input vec3 aPosition;\n:input vec2 aTexCoord;\n:input vec3 aNormal;\n\n:global vec2 gRenderTargetSize\n\n:output vec2 vTexCoord\n:output vec3 vNormal\n\nSHADER\n{\n  gl_Position = vec4(vec2(aTexCoord.x, 1-aTexCoord.y)*2-1, 0, 1.0); \n\n  vTexCoord = (aTexCoord * 2 -1) * vec2(1, gRenderTargetSize.y / gRenderTargetSize.x);\n\n}\n"
+    },
+    {
+      "node": "Scene",
+      "id": 6,
+      "name": "scene",
+      "position": {
+        "x": 511.0,
+        "y": -130.0
+      },
+      "slots": {
+        "Drawables": [
+          7
+        ],
+        "Camera": 11
+      }
+    },
+    {
+      "node": "Drawable",
+      "id": 7,
+      "position": {
+        "x": 300.0,
+        "y": -117.0
+      },
+      "slots": {
+        "Mesh": 8,
+        "Material": 9,
+        "Children": [],
+        "Rotate": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        "Move": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      }
+    },
+    {
+      "node": "Static Mesh",
+      "id": 8,
+      "name": "quad.obj",
+      "position": {
+        "x": 46.0,
+        "y": -111.0
+      },
+      "format": 7,
+      "vertexcount": 6,
+      "vertices": [
+        -5.0,
+        0.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        0.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        0.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0
+      ]
+    },
+    {
+      "node": "Material",
+      "id": 9,
+      "position": {
+        "x": 174.0,
+        "y": -75.0
+      },
+      "slots": {
+        "Solid Pass": 10
+      }
+    },
+    {
+      "node": "Pass",
+      "id": 10,
+      "position": {
+        "x": 42.0,
+        "y": -59.0
+      },
+      "slots": {
+        "Fragment shader": 3,
+        "Vertex shader": 5
+      }
+    },
+    {
+      "node": "Camera",
+      "id": 11,
+      "position": {
+        "x": 459.0,
+        "y": 4.0
+      },
+      "slots": {
+        "Field of view": {
+          "default": 1.0471975803375245
+        },
+        "Far Z": {
+          "default": 550.0
+        },
+        "Near Z": {
+          "default": 1.0
+        },
+        "Target": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        "Distance": {
+          "default": 50.0
+        },
+        "Orientation": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        }
+      }
+    }
+  ]
+}

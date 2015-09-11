@@ -16,7 +16,8 @@ WatcherWidget::~WatcherWidget() {
 }
 
 GLWidget* WatcherWidget::GetGLWidget() {
-  SHOULDNT_HAPPEN;
+  /// TODO: fix this.
+  /// SHOULDNT_HAPPEN;
   return nullptr;
 }
 
