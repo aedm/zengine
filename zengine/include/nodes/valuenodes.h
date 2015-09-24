@@ -155,9 +155,7 @@ template<NodeType T>
 bool ValueSlot<T>::Connect(Node* target) {
   if (mNode == target || (target == nullptr && mNode == &mDefault)) return true;
   if (target && !DoesAcceptType(target->GetType())) {
-    /// TODO: use ASSERT only
-    ERR("Slot and operator type mismatch");
-    ASSERT(false);
+    DEBUGBREAK("Slot and operator type mismatch");
     return false;
   }
   if (mNode) mNode->DisconnectFromSlot(this);

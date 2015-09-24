@@ -18,6 +18,10 @@ public:
   Vec3Slot mTarget;
   Vec3Slot mOrientation;
 
+  FloatSlot mShake;
+  FloatSlot mShakeTime;
+  FloatSlot mShakeSpeed;
+  
   bool mOrthonormal = false;
 
 protected:

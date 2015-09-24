@@ -33,16 +33,14 @@ Slot::~Slot() {
 
 bool Slot::Connect(Node* target) {
   if (target && NodeType::ALLOW_ALL != mType && target->GetType() != mType) {
-    /// TODO: use ASSERT only
-    ERR("Slot and operator type mismatch");
-    ASSERT(false);
+    DEBUGBREAK("Slot and operator type mismatch");
     return false;
   }
   if (mIsMultiSlot) {
     ASSERT(target != nullptr);
     for (Node* node : mMultiNodes) {
       if (node == target) {
-        ERR("Node already connected to slot.");
+        DEBUGBREAK("Node already connected to slot.");
         return false;
       }
     }
