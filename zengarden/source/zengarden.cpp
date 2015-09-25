@@ -75,21 +75,9 @@ void ZenGarden::InitModules() {
   /// Create blank document
   mDocument = new Document();
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
-
   Graph* graph = new Graph();
-
   mDocument->mGraphs.Connect(graph);
-  GraphWatcher* graphEditor = OpenGraphViewer(false, graph);
-
-  /// TEST
-  {
-    /// texture
-    TextureNode* textureNode = new TextureNode();
-    Texture* sampleTexture = CreateSampleTexture();
-    textureNode->Set(sampleTexture);
-    TheCommandStack->Execute(new CreateNodeCommand(textureNode, graph));
-    TheCommandStack->Execute(new MoveNodeCommand(textureNode, Vec2(20, 250)));
-  }
+  Watch(graph, nullptr);
 }
 
 void ZenGarden::DisposeModules() {
@@ -106,24 +94,6 @@ void ZenGarden::DisposeModules() {
   CloseZengine();
 }
 
-GraphWatcher* ZenGarden::OpenGraphViewer(bool LeftPanel, Graph* Graph) {
-  QTabWidget* tabWidget = LeftPanel ? mUI.leftPanel : mUI.rightPanel;
-  WatcherPosition position = LeftPanel
-    ? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
-
-  GLWatcherWidget* glWatcherWidget =
-    new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-  //WatcherWidget* watcherWidget = new WatcherWidget(tabWidget, position);
-  glWatcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
-  glWatcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
-  glWatcherWidget->onWatcherDeath = Delegate(this, &ZenGarden::CloseWatcherTab);
-
-  GraphWatcher* graphEditor = new GraphWatcher(Graph, glWatcherWidget);
-  //graphEditor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  tabWidget->addTab(glWatcherWidget, "graph");
-
-  return graphEditor;
-}
 
 void ZenGarden::NewGraph() {
   Graph* graph = new Graph();
@@ -162,54 +132,51 @@ void ZenGarden::RemovePropertyEditor(WatcherWidget* watcherWidget) {
 
 
 void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
-  QTabWidget* tabWidget = sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
+  QTabWidget* tabWidget = sourceWidget != nullptr && 
+    sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
     ? mUI.leftPanel : mUI.rightPanel;
-  WatcherPosition position = sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
+  WatcherPosition position = sourceWidget != nullptr && 
+    sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
     ? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
 
   WatcherWidget* watcherWidget = nullptr;
   Watcher* watcher = nullptr;
 
+  /// Non-3D watchers
   switch (node->GetType()) {
-    case NodeType::PASS:
-    {
-      GLWatcherWidget* glWatcherWidget =
-        new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new PassWatcher(dynamic_cast<Pass*>(node), glWatcherWidget);
-      watcherWidget = glWatcherWidget;
-      break;
-    }
-    case NodeType::MESH:
-    {
-      GLWatcherWidget* glWatcherWidget =
-        new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new MeshWatcher(dynamic_cast<MeshNode*>(node), glWatcherWidget);
-      watcherWidget = glWatcherWidget;
-      break;
-    }
-    case NodeType::DRAWABLE:
-    {
-      GLWatcherWidget* glWatcherWidget =
-        new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new DrawableWatcher(dynamic_cast<Drawable*>(node), glWatcherWidget);
-      watcherWidget = glWatcherWidget;
-      break;
-    }
-    case NodeType::SCENE:
-    {
-      GLWatcherWidget* glWatcherWidget =
-        new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
-      watcher = new SceneWatcher(dynamic_cast<SceneNode*>(node), glWatcherWidget);
-      watcherWidget = glWatcherWidget;
-      break;
-    }
     case NodeType::STRING:
-    {
       watcherWidget = new WatcherWidget(tabWidget, position, tabWidget);
       watcher = new TextWatcher(dynamic_cast<StringNode*>(node), watcherWidget);
       break;
+    default: break;
+  }
+
+  /// 3D watchers
+  if (watcherWidget == nullptr) {
+    GLWatcherWidget* glWatcherWidget =
+      new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
+    watcherWidget = glWatcherWidget;
+    switch (node->GetType()) {
+      case NodeType::PASS:
+        watcher = new PassWatcher(dynamic_cast<Pass*>(node), glWatcherWidget);
+        break;
+      case NodeType::MESH:
+        watcher = new MeshWatcher(dynamic_cast<MeshNode*>(node), glWatcherWidget);
+        break;
+      case NodeType::DRAWABLE:
+        watcher = new DrawableWatcher(dynamic_cast<Drawable*>(node), glWatcherWidget);
+        break;
+      case NodeType::SCENE:
+        watcher = new SceneWatcher(dynamic_cast<SceneNode*>(node), glWatcherWidget);
+        break;
+      case NodeType::GRAPH:
+        glWatcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
+        glWatcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
+        glWatcherWidget->onWatcherDeath = Delegate(this, &ZenGarden::CloseWatcherTab);
+        watcher = new GraphWatcher(dynamic_cast<Graph*>(node), glWatcherWidget);
+        break;
+      default: return;
     }
-    default: return;
   }
 
   int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
@@ -226,17 +193,6 @@ void ZenGarden::CloseWatcherTab(WatcherWidget* widget) {
   delete widget;
 }
 
-
-
-Texture* ZenGarden::CreateSampleTexture() {
-  UINT* tmp = new UINT[256 * 256];
-  for (UINT i = 0; i < 256; i++)
-    for (UINT o = 0; o < 256; o++) {
-      UINT c = i^o;
-      tmp[i * 256 + o] = 0xff000000 | c | (c << 8) | (c << 16);
-    }
-  return TheResourceManager->CreateTexture(256, 256, TEXELTYPE_ARGB8, tmp);
-}
 
 void ZenGarden::HandleMenuSaveAs() {
   INFO("Saving document...");
@@ -262,7 +218,7 @@ void ZenGarden::HandleMenuNew() {
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
-  OpenGraphViewer(false, graph);
+  Watch(graph, nullptr);
 }
 
 void ZenGarden::HandleMenuOpen() {
@@ -276,7 +232,7 @@ void ZenGarden::HandleMenuOpen() {
   mDocument = FromJSON(string(json));
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
-  OpenGraphViewer(false, graph);
+  Watch(graph, nullptr);
   delete json;
 
   int milliseconds = myTimer.elapsed();

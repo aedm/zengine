@@ -20,7 +20,6 @@ public:
 
 private:
   /// Open and close viewers
-  GraphWatcher* OpenGraphViewer(bool leftPanel, Graph* graph);
   void Watch(Node* node, WatcherWidget* widget);
   void CloseWatcherTab(WatcherWidget* widget);
 
@@ -29,9 +28,6 @@ private:
   void RemovePropertyEditor(WatcherWidget* watcherWidget);
   WatcherWidget* mPropertyEditor;
   QBoxLayout* mPropertyLayout;
-
-  /// Test code
-  Texture* CreateSampleTexture();
 
   /// The GL widget used for initializing OpenGL and sharing context
   QGLWidget* mCommonGLWidget;
