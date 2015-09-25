@@ -28,10 +28,6 @@ extern Logger* TheLogger;
 #define LOGHEADER \
 	  L"[" _STR2WSTR(__FUNCTION__) L"():" _STR2WSTR(MAGIC(__LINE__)) L"]: "
 
-//#define LOGHEADER L"[" _STR2WSTR(__FILE__) L":" _STR2WSTR(MAGIC(__LINE__)) \
-//	L"] " _STR2WSTR(__FUNCTION__) L"(): "
-//#define LOGHEADER _STR2WSTR(__FUNCTION__) L"(): "
-
 #define LOG(severity, message, ...) \
     TheLogger->LogFunc2(severity, LOGHEADER, message, __VA_ARGS__)
 #define INFO(message, ...) \

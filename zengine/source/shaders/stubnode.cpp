@@ -66,8 +66,8 @@ void StubNode::HandleSourceChange() {
 
   /// Create a new list of slots
   for (auto param : mMetadata->parameters) {
-    auto it = mParameterNameSlotMap.find(param->name);
-    if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptType(param->type)) {
+    auto it = mParameterNameSlotMap.find(*param->mName);
+    if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptType(param->mType)) {
       /// This slot was used before, reuse it.
       AddSlot(it->second, true, true);
       mParameterSlotMap[param] = it->second;
@@ -76,21 +76,21 @@ void StubNode::HandleSourceChange() {
     else {
       /// Generate new slot.
       Slot* slot = nullptr;
-      switch (param->type) {
+      switch (param->mType) {
         case NodeType::FLOAT:
-          slot = new ValueStubSlot<NodeType::FLOAT>(this, make_shared<string>(param->name));
+          slot = new ValueStubSlot<NodeType::FLOAT>(this, param->mName);
           break;
         case NodeType::VEC2:
-          slot = new ValueStubSlot<NodeType::VEC2>(this, make_shared<string>(param->name));
+          slot = new ValueStubSlot<NodeType::VEC2>(this, param->mName);
           break;
         case NodeType::VEC3:
-          slot = new ValueStubSlot<NodeType::VEC3>(this, make_shared<string>(param->name));
+          slot = new ValueStubSlot<NodeType::VEC3>(this, param->mName);
           break;
         case NodeType::VEC4:
-          slot = new ValueStubSlot<NodeType::VEC4>(this, make_shared<string>(param->name));
+          slot = new ValueStubSlot<NodeType::VEC4>(this, param->mName);
           break;
         case NodeType::TEXTURE:
-          slot = new TextureSlot(this, make_shared<string>(param->name));
+          slot = new TextureSlot(this, param->mName);
           break;
         default:
           SHOULDNT_HAPPEN;
@@ -108,7 +108,7 @@ void StubNode::HandleSourceChange() {
 
   /// Index the new slots
   for (auto it = mParameterSlotMap.begin(); it != mParameterSlotMap.end(); ++it) {
-    mParameterNameSlotMap[it->first->name] = it->second;
+    mParameterNameSlotMap[*it->first->mName] = it->second;
   }
 }
 

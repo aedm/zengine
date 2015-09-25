@@ -35,7 +35,7 @@ extern const EnumMapperA GlobalUniformMapper[];
 extern const NodeType GlobalUniformTypes[];
 extern const int GlobalUniformOffsets[];
 
-/// TODO: move this to shader-independent place
+/// A struct to store global uniforms
 struct Globals {
 #undef ITEM
 #define ITEM(name, type, token) NodeTypes<NodeType::type>::Type token;
@@ -45,10 +45,8 @@ struct Globals {
 /// Stub parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct StubParameter {
-  NodeType type;
-  
-  /// TODO: make_shared
-  string name;
+  NodeType mType;
+  SharedString mName;
 };
 
 /// Stub variables are outputs of a shader stage and inputs of the next shader stage.

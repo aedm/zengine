@@ -182,7 +182,7 @@ void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
       stream << endl;
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
         StubParameter* param = stubMeta->parameters[i];
-        if (param->type == NodeType::TEXTURE) {
+        if (param->mType == NodeType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
           Node* paramNode = slot->GetAbstractNode();
           if (paramNode == nullptr) {
@@ -191,7 +191,7 @@ void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
             throw exception();
           }
           NodeData* samplerData = mDataMap.at(paramNode);
-          stream << "#define " << param->name << ' ' << 
+          stream << "#define " << *param->mName << ' ' << 
             samplerData->VariableName << endl;
         }
       }
@@ -201,9 +201,9 @@ void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
         ' ' << data->FunctionName << "(";
       bool isFirstParameter = true;
       for (StubParameter* param : stubMeta->parameters) {
-        if (param->type != NodeType::TEXTURE) {
+        if (param->mType != NodeType::TEXTURE) {
           if (!isFirstParameter) stream << ", ";
-          stream << GetTypeString(param->type) << ' ' << param->name;
+          stream << GetTypeString(param->mType) << ' ' << *param->mName;
           isFirstParameter = false;
         }
       }
@@ -216,8 +216,8 @@ void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
       stream << "#undef SHADER" << endl;
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
         StubParameter* param = stubMeta->parameters[i];
-        if (param->type == NodeType::TEXTURE) {
-          stream << "#undef " << param->name << endl;
+        if (param->mType == NodeType::TEXTURE) {
+          stream << "#undef " << *param->mName << endl;
         }
       }
     }
@@ -242,7 +242,7 @@ void ShaderBuilder::GenerateSourceMain(stringstream& stream) {
       stream << data->FunctionName << "(";
       bool isFirstParameter = true;
       for (StubParameter* param : stubMeta->parameters) {
-        if (param->type != NodeType::TEXTURE) {
+        if (param->mType != NodeType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
           Node* paramNode = slot->GetAbstractNode();
           if (paramNode == nullptr) {

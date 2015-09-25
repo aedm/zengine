@@ -91,8 +91,8 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
   }
 
   StubParameter* parameter = new StubParameter();
-  parameter->type = TokenToType(line->SubStrings[2]);
-  parameter->name = line->SubStrings[3].ToString();
+  parameter->mType = TokenToType(line->SubStrings[2]);
+  parameter->mName = SharedString(line->SubStrings[3].ToStringPtr());
   mParameters.push_back(parameter);
 }
 
