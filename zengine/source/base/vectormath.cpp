@@ -176,8 +176,8 @@ Matrix Matrix::Translate(const Vec3& translateVector) {
 
 Matrix Matrix::Rotate(float angle, const Vec3& axis) {
   Matrix rot;
-  float sn = sin(angle);
-  float cs = cos(angle);
+  float sn = sinf(angle);
+  float cs = cosf(angle);
   float nc = 1 - cs;
   rot.m[0] = nc * (axis.x * axis.x) + cs;
   rot.m[1] = nc * (axis.y * axis.x) - sn * axis.z;
@@ -365,10 +365,10 @@ Quaternion::Quaternion(Quaternion& q1, Quaternion& q2, float ratio) {
   float sclp, sclq;
   if (cosom < 0.9999f) {
     float omega, sinom;
-    omega = acos(cosom);
-    sinom = sin(omega);
-    sclp = sin((1.0f - ratio) * omega) / sinom;
-    sclq = sin(ratio * omega) / sinom;
+    omega = acosf(cosom);
+    sinom = sinf(omega);
+    sclp = sinf((1.0f - ratio) * omega) / sinom;
+    sclq = sinf(ratio * omega) / sinom;
   } else {
     sclp = 1.0f - ratio;
     sclq = ratio;

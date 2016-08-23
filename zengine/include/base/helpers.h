@@ -23,6 +23,9 @@ class Document;
 class Logger;
 extern Logger* TheLogger;
 
+#define __STR2WSTR(str) L##str
+#define _STR2WSTR(str) __STR2WSTR(str)
+
 #define MAGIC(x) MAGIC2(x)
 #define MAGIC2(x) #x
 #define LOGHEADER \

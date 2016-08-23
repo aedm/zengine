@@ -45,5 +45,5 @@ public:
     }
   }
 
-  set<const FastDelegate<void(Types...)>>	mDelegates;
+  set<FastDelegate<void(Types...)>>	mDelegates;
 };

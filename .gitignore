@@ -7,3 +7,4 @@ zengarden/app/zengarden-static.exp
 *.exp
 zengine/lib/zengine-release.lib
 zengarden/Release/
+zengine.VC.db

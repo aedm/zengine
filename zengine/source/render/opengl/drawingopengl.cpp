@@ -89,7 +89,7 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
                                    const char* source) {
   /// Create shader object, set the source, and compile
   GLuint shader = glCreateShader(shaderType);
-  GLint length = strlen(source);
+  GLint length = GLint(strlen(source));
   glShaderSource(shader, 1, (const char **)&source, &length);
   glCompileShader(shader);
 
@@ -638,7 +638,7 @@ void DrawingOpenGL::EnableVertexAttribute(UINT index, NodeType nodeType, UINT of
       break;
   }
   glEnableVertexAttribArray(index);
-  glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)offset);
+  glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)size_t(offset));
 }
 
 AttributeMapperOpenGL::AttributeMapperOpenGL() {
@@ -648,7 +648,7 @@ AttributeMapperOpenGL::AttributeMapperOpenGL() {
 void AttributeMapperOpenGL::Set() const {
   for (const MappedAttributeOpenGL& attr : MappedAttributes) {
     glEnableVertexAttribArray(attr.Index);
-    glVertexAttribPointer(attr.Index, attr.Size, attr.Type, GL_FALSE, Stride, (void*)attr.Offset);
+    glVertexAttribPointer(attr.Index, attr.Size, attr.Type, GL_FALSE, Stride, (void*)size_t(attr.Offset));
     CheckGLError();
   }
 }

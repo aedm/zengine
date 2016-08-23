@@ -123,7 +123,7 @@ namespace Util {
         QStringList t = line.right(line.length()-2).split(' ', QString::SkipEmptyParts);
         for (QString& s : t) {
           QStringList a = s.split('/');
-          triplets.push_back({a[0].toInt(), a[2].toInt(), a[1].toInt()});
+          triplets.push_back({a[0].toUInt(), a[2].toUInt(), a[1].toUInt()});
         }
       }
     }
