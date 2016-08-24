@@ -62,7 +62,7 @@ SubString GetNextQuote(const char* Position, int LineNumber)
 	{
 		ERR(L"Unfinished quotemark in line %d.", LineNumber);
 	} else pos++;
-	return SubString(Position, pos - Position, TOKEN_STRING);
+	return SubString(Position, UINT(pos - Position), TOKEN_STRING);
 }
 
 /// Returns next word. Comment lines are one word. Stops before line endings.
@@ -91,14 +91,14 @@ SubString GetNextWord(const char* Position, int LineNumber)
 			/// Comment here, return rest of the line
 			pos += 2;
 			for (char c=*pos; c!=0 && !strchr("\n\r", c); c=*++pos);
-			return SubString(begin, pos - begin, TOKEN_COMMENT_LINE);
+			return SubString(begin, UINT(pos - begin), TOKEN_COMMENT_LINE);
 		}
 
 		/// Some characters are a word on their own
 		if (strchr("/;=", pos[0])) return SubString(pos, 1);
 	}
 
-	return SubString(begin, pos - begin);
+	return SubString(begin, UINT(pos - begin));
 }
 
 
@@ -121,7 +121,7 @@ vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
 		{
 			if (line) 
 			{
-				line->EntireLine.Length = beforeLineEndings - line->EntireLine.Begin;
+				line->EntireLine.Length = UINT(beforeLineEndings - line->EntireLine.Begin);
 				lines->push_back(line);
 				line = NULL;
 			}

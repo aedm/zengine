@@ -120,7 +120,7 @@ void Slot::ChangeNodeIndex(Node* node, UINT targetIndex) {
 
   auto it = std::find(mMultiNodes.begin(), mMultiNodes.end(), node);
   ASSERT(it != mMultiNodes.end());
-  UINT index = it - mMultiNodes.begin();
+  UINT index = UINT(it - mMultiNodes.begin());
 
   Node* tempNode = mMultiNodes[index];
   if (index < targetIndex) {
