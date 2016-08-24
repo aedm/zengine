@@ -32,8 +32,12 @@ private:
   /// The GL widget used for initializing OpenGL and sharing context
   QGLWidget* mCommonGLWidget;
 
+  /// The currently open document
   Document*	mDocument;
   DocumentWatcher* mDocumentWatcher;
+  QString mDocumentFileName;
+  
+  /// When creating a new Graph, this number will be its index
   UINT mNextGraphIndex;
 
   /// App UI

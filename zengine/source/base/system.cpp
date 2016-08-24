@@ -36,7 +36,7 @@ void System::ReadFilesInFolder(const wchar_t* folder, const wchar_t* filter,
   _wchdir(folder);
 
   _wfinddata_t fileInfo;
-  long handle = long(_wfindfirst(filter, &fileInfo));
+  long handle = _wfindfirst(filter, &fileInfo);
   if (handle == -1) {
     ERR(L"Cannot read folder: %s", folder);
     return;

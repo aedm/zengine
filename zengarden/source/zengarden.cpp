@@ -14,7 +14,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
 #include <QMouseEvent>
-
+#include <QFileDialog>
 
 ZenGarden::ZenGarden(QWidget *parent)
   : QMainWindow(parent)
@@ -195,16 +195,20 @@ void ZenGarden::CloseWatcherTab(WatcherWidget* widget) {
 
 
 void ZenGarden::HandleMenuSaveAs() {
+  QString fileName = QFileDialog::getSaveFileName(this,
+      tr("Open project"), "app", tr("Zengine project (*.zen)"));
+
   INFO("Saving document...");
   QTime myTimer;
   myTimer.start();
   string json = ToJSON(mDocument);
-  QFile file("sample.zen");
+  QFile file(fileName);
   file.open(QIODevice::WriteOnly);
   file.write(json.c_str());
 
   int milliseconds = myTimer.elapsed();
   INFO("Document saved in %.3f seconds.", float(milliseconds) / 1000.0f);
+  mDocumentFileName = fileName;
 }
 
 void ZenGarden::UpdateTimeNode() {
@@ -222,18 +226,32 @@ void ZenGarden::HandleMenuNew() {
 }
 
 void ZenGarden::HandleMenuOpen() {
+  QString fileName = QFileDialog::getOpenFileName(this,
+      tr("Open project"), "app", tr("Zengine project (*.zen)"));
+  if (fileName.isEmpty()) return;
+
+  /// Measure load time
   QTime myTimer;
   myTimer.start();
 
-  DeleteDocument();
-  char* json = Util::ReadFileQt("sample.zen");
+  /// Load file content
+  unique_ptr<char> json = unique_ptr<char>(Util::ReadFileQt(fileName));
+  if (json == nullptr) return;
 
+  /// Parse file into a Document
   mCommonGLWidget->makeCurrent();
-  mDocument = FromJSON(string(json));
+  Document* document = FromJSON(string(json.get()));
+  if (document == nullptr) return;
+
+  /// Load succeeded, remove old document
+  DeleteDocument();
+  mDocument = document;
+  mDocumentFileName = fileName;
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
+
+  /// Open first graph
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
   Watch(graph, nullptr);
-  delete json;
 
   int milliseconds = myTimer.elapsed();
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);

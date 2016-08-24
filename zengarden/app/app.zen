@@ -1,0 +1,351 @@
+{
+  "nodes": [
+    {
+      "node": "Document",
+      "id": 1,
+      "slots": {
+        "graphs": [
+          2
+        ]
+      }
+    },
+    {
+      "node": "Graph",
+      "id": 2,
+      "slots": {
+        "nodes": [
+          3,
+          9,
+          14,
+          15,
+          13,
+          10,
+          4,
+          5,
+          7,
+          6,
+          8,
+          12,
+          11
+        ]
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 3,
+      "name": "napstub",
+      "position": {
+        "x": 45.0,
+        "y": -450.0
+      },
+      "source": ":name \"Default FS\"\n:returns void\n\n:output vec4 FragColor\n:input vec2 vTexCoord\n\n:global vec2 gRenderTargetSize\n\n:param vec3 C1\n:param vec3 C2\n:param vec3 C3\n:param float Time\n:param float Ratio\n\nvec4 mixc(vec4 c1, vec4 c2) {\n  float newa = mix(c2.a, c2.a, c1.a);\n  return vec4(mix(c1.rgb, c2.rgb, newa), 1-(1-c1.a)*(1-c2.a));\n}\n\nSHADER\n{\n   float rat = Ratio;\n  vec2 p = vTexCoord*2-1;\n  p.y *= gRenderTargetSize.y / gRenderTargetSize.x;\n\n  float dist = length(p);\n  float angle = atan(p.x, p.y);\n  vec4 color = vec4(C3.x, C3.y, C3.z, clamp(1 - dist*0.4, 0, 1)*rat);  \n\n  float ray1 = clamp((sin(angle*6 - dist*sin(Time)*5 + Time*2) + 0.0) * 2, 0, 0.7) - dist*0.3;\n  color = mixc(color, vec4(C1.x, C1.y, C1.z, ray1*rat));\n\n  float ray2 = clamp((sin(angle*17 -dist * 8+ Time*3.43) + 0.0) * 2, 0, 0.4) - dist*0.1;\n  color = mixc(color, vec4(C2.x, C2.y, C2.z, ray2*rat));\n\n  float circ = clamp((2.25-dist*2)*0.47, 0, 1);\n  color = mixc(color, vec4(1, 1, 1, circ*rat));\n\n  FragColor = color;\n}\n",
+      "slots": {
+        "C1": {
+          "default": {
+            "x": 0.7121211886405945,
+            "y": 0.6969696879386902,
+            "z": 0.5075757503509522
+          }
+        },
+        "C2": {
+          "default": {
+            "x": 0.6969696879386902,
+            "y": 0.6742424368858337,
+            "z": 0.4166666567325592
+          }
+        },
+        "Ratio": {
+          "default": 1.0151515007019044
+        },
+        "C3": {
+          "default": {
+            "x": 0.6666666865348816,
+            "y": 0.13636364042758943,
+            "z": 0.4848484992980957
+          },
+          "id": 4
+        },
+        "Time": {
+          "default": -0.4166666567325592,
+          "id": 8
+        }
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 4,
+      "position": {
+        "x": -81.0,
+        "y": -344.0
+      },
+      "source": ":name \"vec3\"\n:returns vec3\n\n:param float R\n:param float G\n:param float B\n\nSHADER\n{\n  return vec3(R, G, B);\n}\n",
+      "slots": {
+        "B": {
+          "default": 0.7121211886405945
+        },
+        "R": {
+          "default": 0.560606062412262,
+          "id": 5
+        },
+        "G": {
+          "default": 0.22727273404598237
+        }
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 5,
+      "position": {
+        "x": -221.0,
+        "y": -343.0
+      },
+      "source": ":name \"madd\"\r\n:returns float\r\n\r\n:param float X\r\n:param float Multiply\r\n:param float Add\r\n\r\nSHADER\r\n{\r\n  return X * Multiply + Add;\r\n}\r\n",
+      "slots": {
+        "X": {
+          "default": 0.0,
+          "id": 6
+        },
+        "Multiply": {
+          "default": 1.2727272510528565
+        },
+        "Add": {
+          "default": 0.0
+        }
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 6,
+      "position": {
+        "x": -338.0,
+        "y": -334.0
+      },
+      "source": ":name \"sine\"\r\n:returns float\r\n\r\n:param float Angle\r\n\r\nSHADER\r\n{\r\n  return sin(Angle);\r\n}\r\n",
+      "slots": {
+        "Angle": {
+          "default": 0.0,
+          "id": 7
+        }
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 7,
+      "position": {
+        "x": -478.0,
+        "y": -390.0
+      },
+      "source": ":name \"madd\"\r\n:returns float\r\n\r\n:param float X\r\n:param float Multiply\r\n:param float Add\r\n\r\nSHADER\r\n{\r\n  return X * Multiply + Add;\r\n}\r\n",
+      "slots": {
+        "X": {
+          "default": 0.0,
+          "id": 8
+        },
+        "Multiply": {
+          "default": 0.4848484992980957
+        },
+        "Add": {
+          "default": 0.0
+        }
+      }
+    },
+    {
+      "node": "Time",
+      "id": 8,
+      "position": {
+        "x": -524.0,
+        "y": -515.0
+      }
+    },
+    {
+      "node": "Drawable",
+      "id": 9,
+      "name": "napocska",
+      "position": {
+        "x": 653.0,
+        "y": -492.0
+      },
+      "slots": {
+        "Rotate": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        "Move": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
+        "Mesh": 10,
+        "Material": 11,
+        "Children": [],
+        "Instances": {
+          "default": 1.0
+        }
+      }
+    },
+    {
+      "node": "Static Mesh",
+      "id": 10,
+      "name": "quad.obj",
+      "position": {
+        "x": 351.0,
+        "y": -505.0
+      },
+      "format": 7,
+      "vertexcount": 6,
+      "vertices": [
+        -5.0,
+        0.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        0.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        0.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        0.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0
+      ]
+    },
+    {
+      "node": "Material",
+      "id": 11,
+      "position": {
+        "x": 355.0,
+        "y": -449.0
+      },
+      "slots": {
+        "Solid Pass": 12
+      }
+    },
+    {
+      "node": "Pass",
+      "id": 12,
+      "position": {
+        "x": 225.0,
+        "y": -433.0
+      },
+      "slots": {
+        "Vertex shader": 13,
+        "Fragment shader": 3
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 13,
+      "position": {
+        "x": 130.0,
+        "y": -300.0
+      },
+      "source": ":name \"Default VS\"\n:returns void\n\n:input vec3 aPosition;\n:input vec2 aTexCoord;\n:input vec3 aNormal;\n\n:global mat4 gTransformation;\n:global mat4 gView;\n\n:param float Z\n\n:output vec2 vTexCoord\n:output vec3 vNormal\n\nSHADER\n{\n  vec2 a = aTexCoord * 2 - 1;\n  gl_Position = vec4(a.x, -a.y, 0.98, 1.0); \n  vTexCoord = aTexCoord;\n}\n",
+      "slots": {
+        "Z": {
+          "default": 679.0
+        }
+      }
+    },
+    {
+      "node": "Camera",
+      "id": 14,
+      "name": "kamera",
+      "position": {
+        "x": 1031.0,
+        "y": -178.0
+      },
+      "slots": {
+        "Field of view": {
+          "default": 0.7727272510528565
+        },
+        "Distance": {
+          "default": 10.0
+        },
+        "Far Z": {
+          "default": 550.0
+        },
+        "Near Z": {
+          "default": 1.0
+        },
+        "Target": {
+          "default": {
+            "x": -0.007575757801532745,
+            "y": -5.099999904632568,
+            "z": -30.0
+          }
+        },
+        "Shake": {
+          "default": 0.0
+        },
+        "Orientation": {
+          "default": {
+            "x": 3.140000104904175,
+            "y": 0.007575757801532745,
+            "z": -0.20454545319080354
+          }
+        },
+        "ShakeTime": {
+          "default": 0.0
+        },
+        "ShakeSpeed": {
+          "default": 0.0
+        }
+      }
+    },
+    {
+      "node": "Scene",
+      "id": 15,
+      "name": "scene",
+      "position": {
+        "x": 928.0,
+        "y": -486.0
+      },
+      "slots": {
+        "Camera": 14,
+        "Drawables": [
+          9
+        ]
+      }
+    }
+  ]
+}
