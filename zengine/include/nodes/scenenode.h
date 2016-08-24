@@ -2,7 +2,7 @@
 
 #include "../dom/node.h"
 #include "drawable.h"
-#include "camera.h"
+#include "cameranode.h"
 
 class SceneNode: public Node {
 public:

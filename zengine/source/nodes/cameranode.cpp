@@ -1,6 +1,6 @@
-#include <include/nodes/camera.h>
+#include <include/nodes/cameranode.h>
 
-REGISTER_NODECLASS(Camera, "Camera");
+REGISTER_NODECLASS(CameraNode, "Camera");
 
 static SharedString FovYSlotName = make_shared<string>("Field of view");
 static SharedString ZNearSlotName = make_shared<string>("Near Z");
@@ -12,7 +12,7 @@ static SharedString ShakeSlotName = make_shared<string>("Shake");
 static SharedString ShakeTimeSlotName = make_shared<string>("ShakeTime");
 static SharedString ShakeSpeedSlotName = make_shared<string>("ShakeSpeed");
 
-Camera::Camera() 
+CameraNode::CameraNode() 
   : Node(NodeType::CAMERA)
   , mTarget(this, TargetSlotName)
   , mDistance(this, DistanceSlotName)
@@ -32,7 +32,7 @@ Camera::Camera()
   mOrientation.SetDefaultValue(Vec3(0, 0, 0));
 }
 
-void Camera::SetupGlobals(Globals* globals, const Vec2& canvasSize) {
+void CameraNode::SetupGlobals(Globals* globals, const Vec2& canvasSize) {
   globals->RenderTargetSize = canvasSize;
   globals->RenderTargetSizeRecip = Vec2(1.0f / canvasSize.x, 1.0f / canvasSize.y);
 
@@ -73,10 +73,10 @@ void Camera::SetupGlobals(Globals* globals, const Vec2& canvasSize) {
   globals->Transformation = globals->Projection * globals->View;
 }
 
-Camera::~Camera() {
+CameraNode::~CameraNode() {
 }
 
-void Camera::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void CameraNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:

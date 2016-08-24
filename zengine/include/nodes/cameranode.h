@@ -3,10 +3,10 @@
 #include "../dom/node.h"
 #include "../shaders/stubnode.h"
 
-class Camera: public Node {
+class CameraNode: public Node {
 public:
-  Camera();
-  virtual ~Camera();
+  CameraNode();
+  virtual ~CameraNode();
 
   void SetupGlobals(Globals* globals, const Vec2& canvasSize);
 
@@ -29,4 +29,4 @@ protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };
 
-typedef TypedSlot<NodeType::CAMERA, Camera> CameraSlot;
+typedef TypedSlot<NodeType::CAMERA, CameraNode> CameraSlot;

@@ -15,7 +15,7 @@ SceneNode::~SceneNode() {
 }
 
 void SceneNode::Draw(const Vec2& canvasSize) {
-  Camera* camera = mCamera.GetNode();
+  CameraNode* camera = mCamera.GetNode();
   if (camera == nullptr) return;
 
   camera->SetupGlobals(&mGlobals, canvasSize);

@@ -24,7 +24,7 @@ protected:
   SceneNode mDefaultScene;
 
   /// Default camera
-  Camera mCamera;
+  CameraNode mCamera;
 
   /// Qt widget event handlers
   void HandleMousePress(GLWidget*, QMouseEvent* event);

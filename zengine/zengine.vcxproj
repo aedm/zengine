@@ -104,7 +104,7 @@
     <ClInclude Include="include\dom\graph.h" />
     <ClInclude Include="include\dom\node.h" />
     <ClInclude Include="include\dom\nodetype.h" />
-    <ClInclude Include="include\nodes\camera.h" />
+    <ClInclude Include="include\nodes\cameranode.h" />
     <ClInclude Include="include\nodes\drawable.h" />
     <ClInclude Include="include\nodes\meshnode.h" />
     <ClInclude Include="include\nodes\scenenode.h" />
@@ -138,7 +138,7 @@
     <ClCompile Include="source\dom\graph.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
     <ClCompile Include="source\dom\nodetype.cpp" />
-    <ClCompile Include="source\nodes\camera.cpp" />
+    <ClCompile Include="source\nodes\cameranode.cpp" />
     <ClCompile Include="source\nodes\drawable.cpp" />
     <ClCompile Include="source\nodes\meshnode.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
