@@ -22,6 +22,7 @@ using namespace std;
   ITEM(USAGE_DIFFUSE_COLOR,			      VEC4,			  DiffuseColor)			      \
   ITEM(USAGE_AMBIENT_COLOR,			      VEC4,			  AmbientColor)			      \
   ITEM(USAGE_DEPTH_BIAS,				      FLOAT,			DepthBias)				      \
+  ITEM(USAGE_GBUFFER_ALBEDO,				  TEXTURE,		GBufferAlbedo)		      \
 
 enum class ShaderGlobalType {
 #undef ITEM

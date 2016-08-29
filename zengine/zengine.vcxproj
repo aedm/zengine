@@ -117,6 +117,7 @@
     <ClInclude Include="include\resources\texture.h" />
     <ClInclude Include="include\shaders\material.h" />
     <ClInclude Include="include\shaders\pass.h" />
+    <ClInclude Include="include\render\rendertarget.h" />
     <ClInclude Include="include\shaders\shadernode.h" />
     <ClInclude Include="include\shaders\stubnode.h" />
     <ClInclude Include="include\shaders\valuestubslot.h" />
@@ -146,6 +147,7 @@
     <ClCompile Include="source\nodes\valuenodes.cpp" />
     <ClCompile Include="source\nodes\vectornodes.cpp" />
     <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
+    <ClCompile Include="source\render\rendertarget.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />
     <ClCompile Include="source\resources\texture.cpp" />

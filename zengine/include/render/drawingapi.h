@@ -18,9 +18,6 @@ struct RenderState;
 //class RenderTarget;
 extern DrawingAPI* TheDrawingAPI;
 
-/// Size of a vertex attribute in bytes
-//extern const int* VertexAttributeSize;
-
 enum PrimitiveTypeEnum {
 	PRIMITIVE_TRIANGLES,
 	PRIMITIVE_LINES,
@@ -76,15 +73,6 @@ public:
 									UINT Count,
 									PrimitiveTypeEnum PrimitiveType,
                   UINT InstanceCount) = 0;
-	//virtual void				RenderMesh(const Mesh* MeshInstance) = 0;
-	//virtual void				RenderTrianglesDirect(int VertexCount, int PrimitiveCount, const VertexFormat* Format, const void* Vertices, const void* Indices) = 0;
-
-
-	//virtual void				UploadIndices(IndexBufferHandle Handle, UINT IndexCount, IndexEntry* Indices) = 0;
-	//virtual VertexDeclaration	CreateVertexDeclaration(const vector<VertexAttribute>& Vertex) = 0;
-	//virtual void				DestroyVertexDeclaration(VertexDeclaration Declaration) = 0;
-	//virtual void				RenderWireframeMesh(const Mesh* MeshInstance) = 0;
-	//virtual void				RenderLinesDirect(int VertexCount, int PrimitiveCount, const VertexFormat* Format, const void* Vertices, const void* Indices) = 0;
 
 	/// Texture and surface handling
 	virtual TextureHandle		CreateTexture(int Width, int Height, TexelTypeEnum Type) = 0;
@@ -102,35 +90,22 @@ public:
 
 	/// Drawing
 	virtual void				Clear(bool ColorBuffer = true, bool DepthBuffer = true, UINT RGBColor = 0) = 0;
-	//virtual void				BeginRender() = 0;
-	//virtual void				EndRender() = 0;
-
-	//virtual void				RenderText(int X, int Y, int Width, int Height, const wchar_t* Text, UINT Color, Align Alignment = ALIGN_LEFT) = 0;
-
-	
-	/// Default rendering device
-	//Surface*					DefaultSurface;
 };
 
-//class RenderTarget
-//{
-//public:
-//	virtual ~RenderTarget() {}
-//
-//	virtual void 				SetTexture(Texture* TextureInstance) = 0;
-//	virtual void 				SetDepthBuffer(TextureHandle DepthTexture) = 0;
-//	virtual void 				Set() = 0;
-//};
 
-//class Surface
-//{
-//public:
-//	virtual ~Surface() {}
-//
-//	virtual void				Present() = 0;
-//
-//	RenderTarget*				DefaultRenderTarget;
-//};
+/// G-Buffer
+class GBuffer
+{
+public:
+	virtual ~GBuffer() {}
+
+	/// Sets the G-Buffer as render target
+  virtual void SetAsTarget() = 0;
+
+  /// Sets the G-Buffer as render source
+  virtual void SetAsSource() = 0;
+};
+
 
 /// All states of the rendering pipeline
 struct RenderState

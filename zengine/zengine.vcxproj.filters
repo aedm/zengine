@@ -152,6 +152,7 @@
     <ClInclude Include="include\nodes\scenenode.h" />
     <ClInclude Include="include\nodes\vectornodes.h" />
     <ClInclude Include="include\nodes\cameranode.h" />
+    <ClInclude Include="include\render\rendertarget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -232,6 +233,7 @@
     <ClCompile Include="source\nodes\valuenodes.cpp" />
     <ClCompile Include="source\nodes\vectornodes.cpp" />
     <ClCompile Include="source\nodes\cameranode.cpp" />
+    <ClCompile Include="source\render\rendertarget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

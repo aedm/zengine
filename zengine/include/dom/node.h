@@ -216,10 +216,7 @@ private:
 
 
 
-/// Typed slot macro, syntactic sugar. Unfortunately template parameters can't
-/// be used as method name parts, so this is a macro instead.
-/// Use it like: typedef TypedSlot<NodeType::MESH, MeshNode> MeshSlot;
-/// Then: MeshNode* node = meshSlot->GetMeshNode();
+/// Typed slot macro, syntactic sugar. 
 template<NodeType T, class N>
 class TypedSlot: public Slot {
 public:
