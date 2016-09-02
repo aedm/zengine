@@ -16,10 +16,8 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
 
   GetGLWidget()->makeCurrent();
-  GLenum error = glGetError(); ASSERT(error == GL_NO_ERROR);
   mRenderTarget =
     new RenderTarget(Vec2(float(watcherWidget->width()), float(watcherWidget->height())));
-  error = glGetError(); ASSERT(error == GL_NO_ERROR);
 
   mDefaultScene.mCamera.Connect(&mCamera);
   mScene = &mDefaultScene;
@@ -33,15 +31,9 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 }
 
 void GeneralSceneWatcher::Paint(GLWidget* widget) {
-  GLenum error = glGetError(); ASSERT(error == GL_NO_ERROR);
-
   Vec2 size = Vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
-
-  error = glGetError(); ASSERT(error == GL_NO_ERROR);
   mScene->Draw(mRenderTarget);
-
-  error = glGetError(); ASSERT(error == GL_NO_ERROR);
 }
 
 void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot, 
@@ -61,6 +53,9 @@ void GeneralSceneWatcher::Init()
   Pass* defaultPass = new Pass();
   defaultPass->mFragmentStub.Connect(defaultFragment);
   defaultPass->mVertexStub.Connect(defaultVertex);
+  defaultPass->mRenderstate.DepthTest = true;
+  defaultPass->mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  defaultPass->mRenderstate.BlendMode = RenderState::BLEND_ALPHA;
 
   mDefaultMaterial = new Material();
   mDefaultMaterial->mSolidPass.Connect(defaultPass);

@@ -532,9 +532,9 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type
   CheckGLError();
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                  smoothSampling ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST);
+                  smoothSampling ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
-                  smoothSampling ? GL_LINEAR : GL_NEAREST);
+                  smoothSampling ? GL_LINEAR : GL_LINEAR);
   CheckGLError();
 
   if (repeat) {

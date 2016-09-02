@@ -17,7 +17,7 @@ public:
   void Resize(Vec2 size);
   Vec2 GetSize();
 
-  /// Gaussian ping-pong buffers, for intermediate blurred images
+  /// Gaussian half-resolution ping-pong buffers, for intermediate blurred images
   Texture* mGaussTextures[2] = {nullptr, nullptr};
   FrameBufferId mGaussFramebuffers[2] = {0, 0};
 

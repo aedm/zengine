@@ -2,6 +2,9 @@
 #include <include/shaders/enginestubs.h>
 #include <include/resources/resourcemanager.h>
 
+#define GLEW_STATIC
+#include <glew/glew.h>
+
 EngineShaders::EngineShaders() {
   BuildPostProcessPasses();
 }
@@ -11,7 +14,7 @@ EngineShaders::~EngineShaders() {
 }
 
 void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* globals) {
-  UINT gaussIterationCount = 35;
+  UINT gaussIterationCount = 20;
   mPostProcess_GaussianBlurHorizontal_First.Update();
   mPostProcess_GaussianBlurHorizontal.Update();
   mPostProcess_GaussianBlurVertical.Update();
@@ -21,8 +24,15 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
       || !mPostProcess_GaussianBlurHorizontal_First.isComplete()
       || !mPostProcess_GaussianBlurVertical_Last.isComplete()) return;
   
+  /// Blit G-Buffer into gaussian ping-pong buffers to decrease resolution
+  UINT width = renderTarget->GetSize().x;
+  UINT height = renderTarget->GetSize().y;
+
   globals->GBufferSourceA = renderTarget->mGBufferA;
-  
+  globals->RenderTargetSize = renderTarget->GetSize() / Vec2(2, 2);
+  globals->RenderTargetSizeRecip = Vec2(0.5f, 0.5f) / renderTarget->GetSize();
+  glViewport(0, 0, width / 2, height / 2);
+
   for (int i = 0; i < gaussIterationCount; i++) {
     /// Horizontal pass
     TheDrawingAPI->SetFrameBuffer(renderTarget->mGaussFramebuffers[0]);
@@ -40,6 +50,9 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
     Pass& verticalPass = (i == gaussIterationCount - 1)
       ? mPostProcess_GaussianBlurVertical_Last
       : mPostProcess_GaussianBlurVertical;
+    if (i == gaussIterationCount-1) {
+      glViewport(0, 0, width, height);
+    }
     globals->PPGauss = renderTarget->mGaussTextures[0];
     TheDrawingAPI->SetFrameBuffer(frameBuffer);
     verticalPass.Set(globals);

@@ -1,7 +1,6 @@
 #include <include/render/rendertarget.h>
 #include <include/base/helpers.h>
 #include <include/resources/resourcemanager.h>
-#include <glew/glew.h>
 
 
 RenderTarget::RenderTarget(Vec2 size)
@@ -29,10 +28,7 @@ void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
 
 void RenderTarget::Resize(Vec2 size) {
   if (size == mSize) return;
-  GLenum error = glGetError();
-  ASSERT(error == GL_NO_ERROR);
   DropResources();
-  error = glGetError(); ASSERT(error == GL_NO_ERROR);
 
   mSize = size;
   UINT width = UINT(size.x);
@@ -48,7 +44,7 @@ void RenderTarget::Resize(Vec2 size) {
   /// Create gaussian ping-pong textures
   for (int i = 0; i < 2; i++) {
     mGaussTextures[i] = TheResourceManager->CreateGPUTexture(
-      width, height, TexelType::ARGB16F, nullptr, false, false);
+      width / 2, height / 2, TexelType::ARGB16F, nullptr, false, false);
     mGaussFramebuffers[i] = TheDrawingAPI->CreateFrameBuffer(0, mGaussTextures[i]->mHandle, 0);
   }
 }
