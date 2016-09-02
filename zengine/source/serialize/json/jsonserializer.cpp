@@ -9,10 +9,10 @@
 #include <rapidjson/include/rapidjson/stringbuffer.h>
 
 const EnumMapperA TexelTypeMapper[] = {
-  {"RGBA8", UINT(TEXELTYPE_ARGB8)},
-  {"RGBA16", UINT(TEXELTYPE_ARGB16)},
-  {"RGBA16F", UINT(TEXELTYPE_ARGB16F)},
-  {"RGBA32F", UINT(TEXELTYPE_ARGB32F)},
+  {"RGBA8", UINT(TexelType::ARGB8)},
+  {"RGBA16", UINT(TexelType::ARGB16)},
+  {"RGBA16F", UINT(TexelType::ARGB16F)},
+  {"RGBA32F", UINT(TexelType::ARGB32F)},
   {"", -1}
 };
 
@@ -248,7 +248,7 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNo
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
   nodeValue.AddMember("type", rapidjson::Value(
-    EnumMapperA::GetStringFromEnum(TexelTypeMapper, texture->mType), *mAllocator), 
+    EnumMapperA::GetStringFromEnum(TexelTypeMapper, int(texture->mType)), *mAllocator), 
     *mAllocator);
   nodeValue.AddMember("base64", b64, *mAllocator);
 }

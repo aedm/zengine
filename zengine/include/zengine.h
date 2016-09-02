@@ -17,6 +17,10 @@
 #include "shaders/shadernode.h"
 #include "shaders/pass.h"
 #include "shaders/material.h"
+#include "shaders/enginestubs.h"
+#include "shaders/engineshaders.h"
+
+#include "render/rendertarget.h"
 
 #include "nodes/drawable.h"
 #include "nodes/valuenodes.h"

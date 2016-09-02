@@ -55,30 +55,30 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
     if (pass->isComplete()) {
       pass->Set(&globals);
 
-      /// Set vertex buffer and attributes
-      TheDrawingAPI->SetVertexBuffer(mesh->mVertexHandle);
-      for (const ShaderAttributeDesc& desc : pass->GetUsedAttributes()) {
-        VertexAttribute* attribute = mesh->mFormat->mAttributesArray[(UINT)desc.Usage];
-        if (attribute != nullptr) {
-          TheDrawingAPI->EnableVertexAttribute(desc.Handle,
-                                               gVertexAttributeType[(UINT)desc.Usage], attribute->Offset,
-                                               mesh->mFormat->mStride);
-        } else {
-          SHOULDNT_HAPPEN;
-        }
-      }
+      mesh->Render(pass->GetUsedAttributes(), UINT(mInstances.Get()), Primitive);
 
-      /// TODO: set output buffers
+      ///// Set vertex buffer and attributes
+      //TheDrawingAPI->SetVertexBuffer(mesh->mVertexHandle);
+      //for (const ShaderAttributeDesc& desc : pass->GetUsedAttributes()) {
+      //  VertexAttribute* attribute = mesh->mFormat->mAttributesArray[(UINT)desc.Usage];
+      //  if (attribute != nullptr) {
+      //    TheDrawingAPI->EnableVertexAttribute(desc.Handle,
+      //                                         gVertexAttributeType[(UINT)desc.Usage], attribute->Offset,
+      //                                         mesh->mFormat->mStride);
+      //  } else {
+      //    SHOULDNT_HAPPEN;
+      //  }
+      //}
 
-      UINT instanceCount = UINT(mInstances.Get());
+      //UINT instanceCount = UINT(mInstances.Get());
 
-      /// Render mesh
-      if (mesh->mIndexHandle) {
-        TheDrawingAPI->Render(
-          mesh->mIndexHandle, mesh->mIndexCount, Primitive, instanceCount);
-      } else {
-        TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive, instanceCount);
-      }
+      ///// Render mesh
+      //if (mesh->mIndexHandle) {
+      //  TheDrawingAPI->Render(
+      //    mesh->mIndexHandle, mesh->mIndexCount, Primitive, instanceCount);
+      //} else {
+      //  TheDrawingAPI->Render(0, mesh->mVertexCount, Primitive, instanceCount);
+      //}
     }
   }
 

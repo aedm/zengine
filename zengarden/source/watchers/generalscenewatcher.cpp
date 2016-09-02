@@ -15,6 +15,12 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
   GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
 
+  GetGLWidget()->makeCurrent();
+  GLenum error = glGetError(); ASSERT(error == GL_NO_ERROR);
+  mRenderTarget =
+    new RenderTarget(Vec2(float(watcherWidget->width()), float(watcherWidget->height())));
+  error = glGetError(); ASSERT(error == GL_NO_ERROR);
+
   mDefaultScene.mCamera.Connect(&mCamera);
   mScene = &mDefaultScene;
   mDefaultScene.onSniffMessage += Delegate(this, &GeneralSceneWatcher::SniffMessage);
@@ -23,13 +29,19 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
 GeneralSceneWatcher::~GeneralSceneWatcher() {
   mDefaultScene.onSniffMessage -= Delegate(this, &GeneralSceneWatcher::SniffMessage);
   SafeDelete(mDrawable);
+  SafeDelete(mRenderTarget);
 }
 
 void GeneralSceneWatcher::Paint(GLWidget* widget) {
-  TheDrawingAPI->Clear(true, true, 0x303030);
+  GLenum error = glGetError(); ASSERT(error == GL_NO_ERROR);
 
   Vec2 size = Vec2(widget->width(), widget->height());
-  mScene->Draw(size);
+  mRenderTarget->Resize(size);
+
+  error = glGetError(); ASSERT(error == GL_NO_ERROR);
+  mScene->Draw(mRenderTarget);
+
+  error = glGetError(); ASSERT(error == GL_NO_ERROR);
 }
 
 void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot, 

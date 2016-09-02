@@ -1,7 +1,7 @@
 #include <include/resources/texture.h>
 #include <include/base/helpers.h>
 
-Texture::Texture( int width, int height, TexelTypeEnum type, TextureHandle handle,
+Texture::Texture( int width, int height, TexelType type, TextureHandle handle,
                  OWNERSHIP void* texelData)
 	: mType(type)
 	, mWidth(width)
@@ -15,16 +15,15 @@ Texture::~Texture() {
   delete mTexelData;
 }
 
-UINT Texture::GetTexelByteCount(TexelTypeEnum type) {
+UINT Texture::GetTexelByteCount(TexelType type) {
   switch (type) {
-    case TEXELTYPE_VOID:
-      return 0;
-    case TEXELTYPE_ARGB8:
+    case TexelType::ARGB8:
+    case TexelType::DEPTH32F:
       return 4;
-    case TEXELTYPE_ARGB16:
-    case TEXELTYPE_ARGB16F:
+    case TexelType::ARGB16:
+    case TexelType::ARGB16F:
       return 8;
-    case TEXELTYPE_ARGB32F:
+    case TexelType::ARGB32F:
       return 16;
   }
   SHOULDNT_HAPPEN;

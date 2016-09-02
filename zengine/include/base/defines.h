@@ -32,6 +32,7 @@ typedef			DrawingAPIHandle			VertexDeclaration;
 typedef			int							UniformId;
 typedef			int							AttributeId;
 typedef			int							SamplerId;
+typedef			UINT					  FrameBufferId;
 
 
 /// Other
@@ -48,11 +49,11 @@ UINT ElementCount(const T (&arr)[N]) { return N; }
 typedef		ULONG		IndexEntry;
 
 /// Texel types
-enum TexelTypeEnum
+enum class TexelType
 {
-	TEXELTYPE_VOID,
-	TEXELTYPE_ARGB8,
-	TEXELTYPE_ARGB16,
-	TEXELTYPE_ARGB16F,
-	TEXELTYPE_ARGB32F,
+	ARGB8,
+	ARGB16,
+	ARGB16F,
+	ARGB32F,
+  DEPTH32F,
 };

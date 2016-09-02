@@ -10,9 +10,9 @@ OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
   }
 
   return new StubMetadata(*analyzer.mName, analyzer.mReturnType,
-                                analyzer.mStrippedSource, analyzer.mParameters, 
-                                analyzer.mGlobals,
-                                analyzer.mInputs, analyzer.mOutputs);
+                          analyzer.mStrippedSource, analyzer.mParameters, 
+                          analyzer.mGlobals,
+                          analyzer.mInputs, analyzer.mOutputs);
 }
 
 StubAnalyzer::StubAnalyzer(const char* stubSource)

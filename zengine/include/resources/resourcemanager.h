@@ -22,10 +22,11 @@ public:
   ~ResourceManager();
 
   /// Creates texture which remembers texel data
-  Texture* CreateTexture(int width, int height, TexelTypeEnum type, void* texelData);
+  Texture* CreateTexture(int width, int height, TexelType type, void* texelData);
   
   /// Creates texture with GPU-only texel data that can't be serialized
-  Texture* CreateGPUTexture(int width, int height, TexelTypeEnum type, void* texelData);
+  Texture* CreateGPUTexture(int width, int height, TexelType type, void* texelData, 
+                            bool smoothSampling = true, bool repeat = true);
 
   void DiscardTexture(Texture* texture);
 

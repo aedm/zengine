@@ -81,6 +81,10 @@ class Mesh {
   ~Mesh();
 
 public:
+  void Render(const vector<ShaderAttributeDesc>& usedAttributes,
+              UINT instanceCount,
+              PrimitiveTypeEnum primitive) const;
+
   void AllocateVertices(VertexFormat* format, UINT vertexCount);
   void AllocateIndices(UINT indexCount);
   void AllocateWireframeIndices(UINT indexCount);

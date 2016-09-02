@@ -68,6 +68,13 @@ void ZenGarden::InitModules() {
   }
   mCommonGLWidget->makeCurrent();
   InitZengine();
+
+  /// Load Zengine files
+  QString engineShadersFolder("engine/common/");
+  connect(&mEngineShadersFolderWatcher, SIGNAL(fileChanged(const QString&)),
+          this, SLOT(LoadEngineShader(const QString&)));
+  LoadEngineShaders(engineShadersFolder);
+
   InitPainter();
   Prototypes::Init();
   GeneralSceneWatcher::Init();
@@ -100,6 +107,28 @@ void ZenGarden::NewGraph() {
   mDocument->mGraphs.Connect(graph);
 }
 
+
+void ZenGarden::LoadEngineShaders(QString& path) {
+  static const QString shaderSuffix("shader");
+
+  QDir dir(path);
+  for (QFileInfo& fileInfo : dir.entryInfoList()) {
+    if (!fileInfo.isDir() && fileInfo.completeSuffix() == shaderSuffix) {
+      QString filePath = fileInfo.absoluteFilePath();
+      LoadEngineShader(filePath);
+      mEngineShadersFolderWatcher.addPath(filePath);
+    }
+  }
+  TheEngineStubs->OnLoadFinished();
+}
+
+void ZenGarden::LoadEngineShader(const QString& path) {
+  QFileInfo fileInfo(path);
+  INFO("loading '%s'", fileInfo.fileName().toLatin1().data());
+  unique_ptr<char> stubSource(Util::ReadFileQt(path));
+  TheEngineStubs->SetStubSource(fileInfo.baseName().toStdString(),
+                                string(stubSource.get()));
+}
 
 void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   SafeDelete(mPropertyEditor);

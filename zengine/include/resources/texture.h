@@ -7,14 +7,14 @@ class Texture {
   friend class ResourceManager;
 
 protected:
-  Texture(int width, int height, TexelTypeEnum type, TextureHandle handle, 
+  Texture(int width, int height, TexelType type, TextureHandle handle, 
           OWNERSHIP void* texelData);
   ~Texture();
 
 public:
-  static UINT GetTexelByteCount(TexelTypeEnum type);
+  static UINT GetTexelByteCount(TexelType type);
 
-  const TexelTypeEnum mType;
+  const TexelType mType;
 
   const int	mWidth;
   const int mHeight;

@@ -55,6 +55,9 @@
     <Filter Include="source\serialize\json">
       <UniqueIdentifier>{34a15164-4fca-4b8a-9cac-5615b13662f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="source\serialize\json\base64">
+      <UniqueIdentifier>{d3e9239a-81a8-4e6f-9c60-8db0c5df89fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\shader2.txt">
@@ -146,13 +149,33 @@
     <ClInclude Include="source\shaders\shaderbuilder.h">
       <Filter>source\shaders</Filter>
     </ClInclude>
-    <ClInclude Include="source\shaders\stubanalyzer.h" />
-    <ClInclude Include="source\serialize\json\base64\base64.h" />
-    <ClInclude Include="source\serialize\json\jsondeserializer.h" />
-    <ClInclude Include="include\nodes\scenenode.h" />
-    <ClInclude Include="include\nodes\vectornodes.h" />
-    <ClInclude Include="include\nodes\cameranode.h" />
-    <ClInclude Include="include\render\rendertarget.h" />
+    <ClInclude Include="include\render\rendertarget.h">
+      <Filter>include\render</Filter>
+    </ClInclude>
+    <ClInclude Include="source\serialize\json\base64\base64.h">
+      <Filter>source\serialize\json\base64</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nodes\cameranode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="source\serialize\json\jsondeserializer.h">
+      <Filter>source\serialize\json</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nodes\scenenode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="source\shaders\stubanalyzer.h">
+      <Filter>source\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nodes\vectornodes.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\enginestubs.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shaders\engineshaders.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -227,13 +250,33 @@
     <ClCompile Include="source\shaders\shaderbuilder.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="source\serialize\json\base64\base64.cpp" />
-    <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
-    <ClCompile Include="source\nodes\scenenode.cpp" />
-    <ClCompile Include="source\nodes\valuenodes.cpp" />
-    <ClCompile Include="source\nodes\vectornodes.cpp" />
-    <ClCompile Include="source\nodes\cameranode.cpp" />
-    <ClCompile Include="source\render\rendertarget.cpp" />
+    <ClCompile Include="source\render\rendertarget.cpp">
+      <Filter>source\render</Filter>
+    </ClCompile>
+    <ClCompile Include="source\serialize\json\base64\base64.cpp">
+      <Filter>source\serialize\json\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\cameranode.cpp">
+      <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\serialize\json\jsondeserializer.cpp">
+      <Filter>source\serialize\json</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\scenenode.cpp">
+      <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\valuenodes.cpp">
+      <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\vectornodes.cpp">
+      <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\enginestubs.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\shaders\engineshaders.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

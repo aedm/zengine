@@ -198,8 +198,16 @@ void Pass::Set(Globals* globals) {
   /// Set samplers
   UINT i = 0;
   for (PassUniform& sampler : mSamplers) {
-    ASSERT(sampler.node != nullptr);
-    Texture* tex = static_cast<TextureNode*>(sampler.node)->Get();
+    Texture* tex = nullptr;
+    if (sampler.globalType == ShaderGlobalType::LOCAL) {
+      ASSERT(sampler.node != nullptr);
+      tex = static_cast<TextureNode*>(sampler.node)->Get();
+    } else {
+      /// Global uniform, takes value from the Globals object
+      int offset = GlobalUniformOffsets[(UINT)sampler.globalType];
+      void* source = reinterpret_cast<char*>(globals) + offset;
+      tex = *reinterpret_cast<Texture**>(source);
+    }
     TheDrawingAPI->SetTexture(sampler.handle, tex ? tex->mHandle : 0, i++);
   }
 }

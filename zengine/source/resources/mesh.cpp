@@ -66,6 +66,31 @@ Mesh::~Mesh() {
   SafeDelete(mRawVertexData);
 }
 
+void Mesh::Render(const vector<ShaderAttributeDesc>& usedAttributes, 
+                  UINT instanceCount, 
+                  PrimitiveTypeEnum primitive) const 
+{
+    /// Set vertex buffer and attributes
+    TheDrawingAPI->SetVertexBuffer(mVertexHandle);
+    for (const ShaderAttributeDesc& desc : usedAttributes) {
+      VertexAttribute* attribute = mFormat->mAttributesArray[(UINT)desc.Usage];
+      if (attribute != nullptr) {
+        TheDrawingAPI->EnableVertexAttribute(desc.Handle,
+                                             gVertexAttributeType[(UINT)desc.Usage], 
+                                             attribute->Offset,
+                                             mFormat->mStride);
+      } else {
+        SHOULDNT_HAPPEN;
+      }
+    }
+
+    if (mIndexHandle) {
+      TheDrawingAPI->Render(mIndexHandle, mIndexCount, primitive, instanceCount);
+    } else {
+      TheDrawingAPI->Render(0, mVertexCount, primitive, instanceCount);
+    }
+}
+
 void Mesh::AllocateVertices(VertexFormat* format, UINT vertexCount) {
   this->mFormat = format;
   this->mVertexCount = vertexCount;

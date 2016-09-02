@@ -115,6 +115,8 @@
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\resourcemanager.h" />
     <ClInclude Include="include\resources\texture.h" />
+    <ClInclude Include="include\shaders\engineshaders.h" />
+    <ClInclude Include="include\shaders\enginestubs.h" />
     <ClInclude Include="include\shaders\material.h" />
     <ClInclude Include="include\shaders\pass.h" />
     <ClInclude Include="include\render\rendertarget.h" />
@@ -154,6 +156,8 @@
     <ClCompile Include="source\serialize\json\base64\base64.cpp" />
     <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
     <ClCompile Include="source\serialize\json\jsonserializer.cpp" />
+    <ClCompile Include="source\shaders\engineshaders.cpp" />
+    <ClCompile Include="source\shaders\enginestubs.cpp" />
     <ClCompile Include="source\shaders\material.cpp" />
     <ClCompile Include="source\shaders\pass.cpp" />
     <ClCompile Include="source\shaders\shadernode.cpp" />

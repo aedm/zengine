@@ -21,9 +21,11 @@ ShaderMetadata::~ShaderMetadata() {
 }
 
 
-ShaderVariable::ShaderVariable(NodeType _type, const string& _name)
+ShaderVariable::ShaderVariable(NodeType _type, const string& _name, int _layout)
   : name(_name)
-  , type(_type) {}
+  , type(_type) 
+  , layout(_layout) {}
+
 
 ShaderUniform::ShaderUniform(NodeType _type, const string& _name, Node* _node,
                                          ShaderGlobalType _globalType)

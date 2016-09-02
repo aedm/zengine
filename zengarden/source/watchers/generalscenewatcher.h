@@ -17,6 +17,8 @@ protected:
   virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
                                     void* payload) override;
 
+  RenderTarget* mRenderTarget;
+
   /// Scene node to be drawn.
   SceneNode* mScene;
   

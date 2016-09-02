@@ -18,6 +18,7 @@ public:
 	Vec2 operator * (float F) const;
 	Vec2 operator / (float F) const;
 	Vec2& operator *= (float F);
+  bool operator == (const Vec2& op) const;
 
 	float	Length() const;
 

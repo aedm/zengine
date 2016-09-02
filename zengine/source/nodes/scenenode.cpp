@@ -1,4 +1,5 @@
 #include <include/nodes/scenenode.h>
+#include <include/shaders/engineshaders.h>
 
 REGISTER_NODECLASS(SceneNode, "Scene");
 
@@ -14,12 +15,22 @@ SceneNode::SceneNode()
 SceneNode::~SceneNode() {
 }
 
-void SceneNode::Draw(const Vec2& canvasSize) {
+void SceneNode::Draw(RenderTarget* renderTarget) {
   CameraNode* camera = mCamera.GetNode();
   if (camera == nullptr) return;
 
-  camera->SetupGlobals(&mGlobals, canvasSize);
+  camera->SetupGlobals(&mGlobals, renderTarget->GetSize());
 
+  /// Draw to G-Buffer
+  renderTarget->SetGBufferAsTarget(&mGlobals);
+  TheDrawingAPI->Clear(true, true, 0x303030);
+  RenderDrawables();
+
+  /// Apply post-process to scene to framebuffer
+  TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+}
+
+void SceneNode::RenderDrawables() {
   for (Node* node : mDrawables.GetMultiNodes()) {
     Drawable* drawable = static_cast<Drawable*>(node);
     drawable->Draw(&mGlobals);

@@ -8,9 +8,9 @@ namespace Shaders
 
 static EnumMapperA ShaderTokenMapper[] = { 
 	{"//!",			TOKEN_METADATA },
-	{ ";",			TOKEN_SEMICOLON },
-	{ ":",			TOKEN_COLON },
-	{"=",			TOKEN_EQUALS },
+	{";",			  TOKEN_SEMICOLON },
+	{":",			  TOKEN_COLON },
+	{"=",			  TOKEN_EQUALS },
 	#undef ITEM
 	#define ITEM(name) { MAGIC(name), TOKEN_##name },
 	SHADERTOKEN_LIST	

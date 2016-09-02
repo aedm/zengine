@@ -38,6 +38,10 @@ Vec2& Vec2::operator*=(float f) {
   return *this;
 }
 
+bool Vec2::operator==(const Vec2& op) const {
+  return x == op.x && y == op.y;
+}
+
 float Vec2::Length() const {
   return sqrtf(x*x + y*y);
 }

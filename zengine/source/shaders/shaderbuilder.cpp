@@ -58,8 +58,13 @@ void ShaderBuilder::CollectStubMetadata(Node* node) {
 
   /// Globals
   for (auto global : stubMeta->globals) {
-    mUniforms.push_back(new ShaderUniform(
-      global->type, global->name, nullptr, global->usage));
+    ShaderUniform* uniform = 
+      new ShaderUniform(global->type, global->name, nullptr, global->usage);
+    if (global->type == NodeType::TEXTURE) {
+      mSamplers.push_back(uniform);
+    } else {
+      mUniforms.push_back(uniform);
+    }
   }
 
   /// Inputs
@@ -73,7 +78,12 @@ void ShaderBuilder::CollectStubMetadata(Node* node) {
 
   /// Outputs
   for (auto output : stubMeta->outputs) {
-    mOutputs.push_back(new ShaderVariable(output->type, output->name));
+    int layout = -1;
+    if (output->name == "GBufferTargetA") layout = 0;
+    else if (output->name == "GBufferTargetB") layout = 1;
+    else if (output->name == "GBufferTargetC") layout = 2;
+    else if (output->name == "GBufferTargetD") layout = 3;
+    mOutputs.push_back(new ShaderVariable(output->type, output->name, layout));
   }
 }
 
@@ -88,7 +98,6 @@ void ShaderBuilder::CollectDependencies(Node* root) {
       if (node == nullptr) {
         WARN("Incomplete shader graph.");
         throw exception();
-        continue;
       }
       if (mDataMap.find(node) == mDataMap.end()) {
         CollectDependencies(node);
@@ -138,7 +147,7 @@ void ShaderBuilder::GenerateSlots() {
 }
 
 void ShaderBuilder::GenerateSource() {
-  sourceStream << "#version 150" << endl;
+  sourceStream << "#version 330 core" << endl;
   GenerateSourceHeader(sourceStream);
   GenerateSourceFunctions(sourceStream);
   GenerateSourceMain(sourceStream);
@@ -154,6 +163,9 @@ void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {
 
   /// Outputs
   for (auto var : mOutputs) {
+    if (var->layout >= 0) {
+      stream << "layout (location = " << var->layout << ') ';
+    }
     stream << "out " << GetTypeString(var->type) << ' ' <<
       var->name << ';' << endl;
   }

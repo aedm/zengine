@@ -5,11 +5,16 @@
 
 /// Inputs and output of the shader stage
 struct ShaderVariable {
-  ShaderVariable(NodeType type, const string& name);
+  ShaderVariable(NodeType type, const string& name, int layout = -1);
 
+  /// Variable type
   NodeType type;
+
+  /// Variable name
   string name;
-  /// TODO: layout, vertexformat usage etc.
+  
+  /// Output layout number for G-Buffers
+  int layout;
 };
 
 /// Uniforms of the shader program

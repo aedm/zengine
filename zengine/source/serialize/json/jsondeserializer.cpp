@@ -174,7 +174,7 @@ void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
   if (texelTypeInt < 0) {
     ERR("Unknown texture type: %s", typeString);
   }
-  TexelTypeEnum texelType = (TexelTypeEnum)texelTypeInt;
+  TexelType texelType = (TexelType)texelTypeInt;
   UINT byteSize = width * height * Texture::GetTexelByteCount(texelType);
   char* texels = new char[byteSize];
 

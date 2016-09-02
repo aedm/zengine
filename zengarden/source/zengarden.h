@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QtOpenGL/QGLWidget>
+#include <QFileSystemWatcher>
 #include "ui_zengarden.h"
 #include "graph/graphwatcher.h"
 #include "watchers/documentwatcher.h"
@@ -44,12 +45,20 @@ private:
   Ui::zengardenClass mUI;
   LogWatcher*	mLogWatcher;
 
+  /// Global time
   QTime mTime;
+
+  /// Engine shaders
+  void LoadEngineShaders(QString& path);
+  QFileSystemWatcher mEngineShadersFolderWatcher;
 
 private slots:
   void InitModules();
   void DisposeModules();
   void NewGraph();
+
+  /// Loads an engine-level shader file
+  void LoadEngineShader(const QString& path);
 
   void UpdateTimeNode();
 

@@ -558,7 +558,7 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
     char* pixels = new char[rgba.byteCount()];
     memcpy(pixels, rgba.bits(), rgba.byteCount());
     Texture* texture = TheResourceManager->CreateTexture(
-      rgba.width(), rgba.height(), TEXELTYPE_ARGB8, pixels);
+      rgba.width(), rgba.height(), TexelType::ARGB8, pixels);
     TextureNode* node = new TextureNode();
     node->Set(texture);
 

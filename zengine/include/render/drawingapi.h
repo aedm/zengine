@@ -14,8 +14,7 @@ struct ShaderUniformDesc;
 struct ShaderAttributeDesc;
 struct VertexAttribute;
 struct RenderState;
-//class Surface;
-//class RenderTarget;
+
 extern DrawingAPI* TheDrawingAPI;
 
 enum PrimitiveTypeEnum {
@@ -28,11 +27,6 @@ class DrawingAPI
 {
 public:
 	virtual ~DrawingAPI() {}
-
-	/// Renderer setup
-	//virtual void 				Init(void* Handle, bool Doublebuffer) = 0;
-	//virtual OWNERSHIP Surface*	CreateSurface(void* Handle, int Width, int Height) = 0; 
-	//virtual bool				ResizeSurface(Surface* DrawDev, int Width, int Height) = 0;
 
 	/// Resets renderer. Call this upon context switch.
 	virtual void				OnContextSwitch() = 0;
@@ -75,14 +69,18 @@ public:
                   UINT InstanceCount) = 0;
 
 	/// Texture and surface handling
-	virtual TextureHandle		CreateTexture(int Width, int Height, TexelTypeEnum Type) = 0;
+	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool smoothSampling = true, bool repeat = true) = 0;
 	virtual void				DeleteTexture(TextureHandle Handle) = 0;
-	virtual void				UploadTextureData(TextureHandle Handle, int Width, int Height, TexelTypeEnum Type, void* TexelData) = 0;
-	virtual void				UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, TexelTypeEnum Type, void* TexelData) = 0;
+	virtual void				UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type, void* TexelData) = 0;
+	virtual void				UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, TexelType Type, void* TexelData) = 0;
 	virtual void				SetTexture(SamplerId Sampler, TextureHandle Texture, UINT SlotIndex) = 0;
-	//virtual RenderTarget*		CreateRenderTarget() = 0;
-	//virtual void				GrabTexture(UCHAR* Argb8TargetBuffer, UINT Span, Texture* Tex) = 0;
-	//virtual void				GrabSurface(UCHAR* Argb8TargetBuffer, UINT Span, UINT TargetWidth, UINT TargetHeight, RenderTarget* RTarget) = 0;
+
+  /// Framebuffer operations
+  virtual FrameBufferId CreateFrameBuffer(TextureHandle depthBuffer, 
+                                          TextureHandle targetBufferA, 
+                                          TextureHandle targetBufferB) = 0;
+  virtual void DeleteFrameBuffer(FrameBufferId frameBufferId) = 0;
+  virtual void SetFrameBuffer(FrameBufferId frameBufferid) = 0;
 
 	/// Render parameters
 	virtual void				SetViewport(int X, int Y, int Width, int Height, float DepthMin = 0.0f, float DepthMax = 1.0f) = 0;
@@ -90,20 +88,6 @@ public:
 
 	/// Drawing
 	virtual void				Clear(bool ColorBuffer = true, bool DepthBuffer = true, UINT RGBColor = 0) = 0;
-};
-
-
-/// G-Buffer
-class GBuffer
-{
-public:
-	virtual ~GBuffer() {}
-
-	/// Sets the G-Buffer as render target
-  virtual void SetAsTarget() = 0;
-
-  /// Sets the G-Buffer as render source
-  virtual void SetAsSource() = 0;
 };
 
 

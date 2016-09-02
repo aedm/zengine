@@ -77,9 +77,10 @@ void DrawingOpenGL::OnContextSwitch() {
 
   glDepthMask(true);
 
-  ActiveTextureShadow = 0;
-  BoundVertexBufferShadow = 0;
-  BoundIndexBufferShadow = 0;
+  ActiveTextureShadow = -1;
+  BoundVertexBufferShadow = -1;
+  BoundIndexBufferShadow = -1;
+  BoundFrameBufferShadow = -1;
   for (int i = 0; i < MAX_COMBINED_TEXTURE_SLOTS; i++) {
     BoundTextureShadow[i] = (GLuint)-1;
   }
@@ -336,19 +337,27 @@ void DrawingOpenGL::UnMapIndexBuffer(IndexBufferHandle handle) {
 void DrawingOpenGL::BindVertexBuffer(GLuint bufferID) {
   if (bufferID != BoundVertexBufferShadow) {
     glBindBuffer(GL_ARRAY_BUFFER, bufferID);
-    BoundVertexBufferShadow = bufferID;
     CheckGLError();
+    BoundVertexBufferShadow = bufferID;
   }
 }
 
 void DrawingOpenGL::BindIndexBuffer(GLuint bufferID) {
   if (bufferID != BoundIndexBufferShadow) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-    BoundIndexBufferShadow = bufferID;
     CheckGLError();
+    BoundIndexBufferShadow = bufferID;
   }
 }
 
+void DrawingOpenGL::BindFrameBuffer(GLuint frameBufferID) {
+  if (frameBufferID != BoundFrameBufferShadow) {
+    CheckGLError();
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+    CheckGLError();
+    BoundFrameBufferShadow = frameBufferID;
+  }
+}
 
 AttributeMapper* DrawingOpenGL::CreateAttributeMapper(
   const vector<VertexAttribute>& bufferAttribs, 
@@ -438,8 +447,10 @@ void DrawingOpenGL::SetViewport(int x, int y, int width, int height,
 
 void DrawingOpenGL::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 0*/) {
   SetClearColor(rgbColor);
-  glClear((colorBuffer ? GL_COLOR_BUFFER_BIT : 0) | 
+  CheckGLError();
+  glClear((colorBuffer ? GL_COLOR_BUFFER_BIT : 0) |
           (depthBuffer ? GL_DEPTH_BUFFER_BIT : 0));
+  CheckGLError();
 }
 
 void DrawingOpenGL::SetRenderState(const RenderState* state) {
@@ -512,15 +523,28 @@ void DrawingOpenGL::SetClearColor(UINT clearColor) {
   ClearColorShadow = clearColor;
 }
 
-TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelTypeEnum type) {
+TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type, bool smoothSampling, bool repeat) {
+  CheckGLError();
   GLuint texture;
   glGenTextures(1, &texture);
+  SetActiveTexture(0);
   BindTexture(texture);
+  CheckGLError();
 
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                  smoothSampling ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+                  smoothSampling ? GL_LINEAR : GL_NEAREST);
+  CheckGLError();
+
+  if (repeat) {
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  } else {
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  }
+  CheckGLError();
 
   SetTextureData(width, height, type, NULL);
   /// TODO: mipmap
@@ -528,28 +552,33 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelTypeEnum 
   return texture;
 }
 
-/// Converts a single TexelTypeEnum to OpenGL enums
-void GetTextureType(TexelTypeEnum type, GLint &internalFormat, GLenum &format, 
+/// Converts a single TexelType to OpenGL enums
+void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format, 
                     GLenum &glType) {
   switch (type) {
-    case TEXELTYPE_ARGB8:
+    case TexelType::ARGB8:
       internalFormat = GL_RGBA;
       format = GL_BGRA;
       glType = GL_UNSIGNED_BYTE;
       break;
-    case TEXELTYPE_ARGB16:
+    case TexelType::ARGB16:
       internalFormat = GL_RGBA16;
       format = GL_BGRA;
       glType = GL_UNSIGNED_SHORT;
       break;
-    case TEXELTYPE_ARGB16F:
+    case TexelType::ARGB16F:
       internalFormat = GL_RGBA16F;
       format = GL_BGRA;
       glType = GL_FLOAT;
       break;
-    case TEXELTYPE_ARGB32F:
+    case TexelType::ARGB32F:
       internalFormat = GL_RGBA32F;
       format = GL_BGRA;
+      glType = GL_FLOAT;
+      break;
+    case TexelType::DEPTH32F:
+      internalFormat = GL_DEPTH_COMPONENT32F;
+      format = GL_DEPTH_COMPONENT;
       glType = GL_FLOAT;
       break;
     default:
@@ -558,7 +587,7 @@ void GetTextureType(TexelTypeEnum type, GLint &internalFormat, GLenum &format,
   }
 }
 
-void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelTypeEnum type, 
+void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type, 
                                    void* texelData) {
   GLint internalFormat;
   GLenum format;
@@ -570,7 +599,7 @@ void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelTypeEnum type,
 }
 
 void DrawingOpenGL::SetTextureSubData(UINT x, UINT y, UINT width, UINT height, 
-                                      TexelTypeEnum type, void* texelData) {
+                                      TexelType type, void* texelData) {
   GLint internalFormat;
   GLenum format;
   GLenum glType;
@@ -586,13 +615,13 @@ void DrawingOpenGL::DeleteTexture(TextureHandle handle) {
 }
 
 void DrawingOpenGL::UploadTextureData(TextureHandle handle, int width, int height, 
-                                      TexelTypeEnum type, void* texelData) {
+                                      TexelType type, void* texelData) {
   BindTexture(handle);
   SetTextureData(width, height, type, texelData);
 }
 
 void DrawingOpenGL::UploadTextureSubData(TextureHandle handle, UINT x, UINT y, 
-                                         int width, int height, TexelTypeEnum type, 
+                                         int width, int height, TexelType type, 
                                          void* texelData) {
   BindTexture(handle);
   SetTextureSubData(width, x, y, height, type, texelData);
@@ -604,17 +633,64 @@ void DrawingOpenGL::SetTexture(SamplerId sampler, TextureHandle texture, UINT sl
   glUniform1i(sampler, slotIndex);
 }
 
+FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer, 
+                                               TextureHandle targetBufferA, 
+                                               TextureHandle targetBufferB) {
+  CheckGLError();
+  GLuint bufferId;
+  glGenFramebuffers(1, &bufferId);
+  BindFrameBuffer(bufferId);
+  CheckGLError();
+
+  if (depthBuffer) {
+    CheckGLError();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBuffer, 0);
+    CheckGLError();
+  }
+
+  if (!targetBufferA) {
+    /// No target buffer
+    SHOULDNT_HAPPEN;
+  } else if (!targetBufferB) {
+    CheckGLError();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, targetBufferA, 0);
+    GLuint attachments[] = {GL_COLOR_ATTACHMENT0};
+    CheckGLError();
+    glDrawBuffers(1, attachments);
+    CheckGLError();
+  } else {
+    SHOULDNT_HAPPEN;
+    GLuint attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, attachments);
+    CheckGLError();
+  }
+  CheckGLError();
+
+  return bufferId;
+}
+
+void DrawingOpenGL::DeleteFrameBuffer(FrameBufferId frameBufferId) {
+  glDeleteFramebuffers(1, &frameBufferId);
+}
+
+void DrawingOpenGL::SetFrameBuffer(FrameBufferId frameBufferid) {
+  BindFrameBuffer(frameBufferid);
+  CheckGLError();
+}
+
 void DrawingOpenGL::SetActiveTexture(GLuint activeTextureIndex) {
   if (ActiveTextureShadow == activeTextureIndex) return;
   glActiveTexture(GL_TEXTURE0 + activeTextureIndex);
   ActiveTextureShadow = activeTextureIndex;
 }
 
+
 void DrawingOpenGL::BindTexture(GLuint textureID) {
   if (BoundTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D, textureID);
   BoundTextureShadow[ActiveTextureShadow] = textureID;
 }
+
 
 void DrawingOpenGL::SetVertexBuffer(VertexBufferHandle handle) {
   BindVertexBuffer(handle);
