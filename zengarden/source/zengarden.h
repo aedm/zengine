@@ -21,7 +21,7 @@ public:
 
 private:
   /// Open and close viewers
-  void Watch(Node* node, WatcherWidget* widget);
+  void Watch(Node* node, WatcherPosition watcherPosition);
   void CloseWatcherTab(WatcherWidget* widget);
 
   /// Property editor related

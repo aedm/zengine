@@ -104,7 +104,7 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node, WatcherWidget* panel)
     StubNode* stub = static_cast<StubNode*>(node);
     QPushButton* sourceButton = new QPushButton("Edit source", panel);
     panel->connect(sourceButton, &QPushButton::pressed, [=]() {
-      panel->onWatchNode(stub->mSource.GetAbstractNode(), panel);
+      panel->onWatchNode(stub->mSource.GetAbstractNode(), WatcherPosition::RIGHT_TAB);
     });
     mLayout->addWidget(sourceButton);
   }

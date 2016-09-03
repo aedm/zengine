@@ -19,7 +19,6 @@ SHADER
   for(int i = 0; i < kernelSize * 2 + 1; ++i)
   {
     result += clamp(texture(gGBufferSourceA, vTexCoord + vec2(0.0, d)).rgb - 1.0, 0.0, 1.5) * weight[i];
-    //result += texture2D(gGBufferSourceA, vTexCoord + vec2(d, 0.0)).rgb * weight[i];
     d += gRenderTargetSizeRecip.x;
   }        
   FragColor = vec4(result, 1.0);

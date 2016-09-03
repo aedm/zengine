@@ -434,11 +434,27 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
       }
       break;
 
-      /// 1 opens watcher
+    /// 1 opens watcher on upper left panel
     case Qt::Key_1:
       if (mSelectedNodeWidgets.size() == 1) {
         mWatcherWidget->onWatchNode(
-          (*mSelectedNodeWidgets.begin())->GetNode(), mWatcherWidget);
+          (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::UPPER_LEFT_TAB);
+      }
+      break;
+
+    /// 2 opens watcher on right panel
+    case Qt::Key_2:
+      if (mSelectedNodeWidgets.size() == 1) {
+        mWatcherWidget->onWatchNode(
+          (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::RIGHT_TAB);
+      }
+      break;
+
+    /// 3 opens watcher on bottom left panel
+    case Qt::Key_3:
+      if (mSelectedNodeWidgets.size() == 1) {
+        mWatcherWidget->onWatchNode(
+          (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::BOTTOM_LEFT_TAB);
       }
       break;
 

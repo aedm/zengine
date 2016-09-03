@@ -9,7 +9,8 @@ class GLWidget;
 class QTabWidget;
 
 enum class WatcherPosition {
-  LEFT_TAB,
+  UPPER_LEFT_TAB,
+  BOTTOM_LEFT_TAB,
   RIGHT_TAB,
   PROPERTY_PANEL
 };
@@ -22,8 +23,8 @@ public:
                 QTabWidget* tabWidget = nullptr);
   virtual ~WatcherWidget();
 
-  /// Triggered when a new node needs to be watched (eg. pressed space in graph editor)
-  Event<Node*, WatcherWidget*> onWatchNode;
+  /// Triggered when a new node needs to be watched
+  Event<Node*, WatcherPosition> onWatchNode;
 
   /// Triggered when a node is selected (eg. in graph editor)
   Event<Node*> onSelectNode;

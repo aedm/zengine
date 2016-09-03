@@ -23,8 +23,11 @@ ZenGarden::ZenGarden(QWidget *parent)
   , mPropertyLayout(nullptr) {
   mUI.setupUi(this);
 
-  connect(mUI.leftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
-    if (index>0) delete mUI.leftPanel->widget(index);
+  connect(mUI.upperLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
+    if (index>0) delete mUI.upperLeftPanel->widget(index);
+  });
+  connect(mUI.bottomLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
+    delete mUI.bottomLeftPanel->widget(index);
   });
   connect(mUI.rightPanel, &QTabWidget::tabCloseRequested, [=](int index) {
     delete mUI.rightPanel->widget(index);
@@ -43,7 +46,7 @@ ZenGarden::~ZenGarden() {
 
 void ZenGarden::InitModules() {
   mLogWatcher = new LogWatcher(this);
-  mUI.leftPanel->addTab(mLogWatcher, "Log");
+  mUI.upperLeftPanel->addTab(mLogWatcher, "Log");
   mPropertyLayout = new QVBoxLayout(mUI.propertyPanel);
 
   mTime.start();
@@ -84,17 +87,14 @@ void ZenGarden::InitModules() {
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
-  Watch(graph, nullptr);
+  Watch(graph, WatcherPosition::RIGHT_TAB);
 }
 
 void ZenGarden::DisposeModules() {
   /// Close all watchers
-  while (mUI.leftPanel->count() > 0) {
-    delete mUI.leftPanel->widget(0);
-  }
-  while (mUI.rightPanel->count() > 0) {
-    delete mUI.rightPanel->widget(0);
-  }
+  while (mUI.upperLeftPanel->count() > 0) delete mUI.upperLeftPanel->widget(0);
+  while (mUI.bottomLeftPanel->count() > 0) delete mUI.bottomLeftPanel->widget(0);
+  while (mUI.rightPanel->count() > 0) delete mUI.rightPanel->widget(0);
   
   Prototypes::Dispose();
   DisposePainter();
@@ -160,21 +160,28 @@ void ZenGarden::RemovePropertyEditor(WatcherWidget* watcherWidget) {
 }
 
 
-void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
-  QTabWidget* tabWidget = sourceWidget != nullptr && 
-    sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
-    ? mUI.leftPanel : mUI.rightPanel;
-  WatcherPosition position = sourceWidget != nullptr && 
-    sourceWidget->mPosition == WatcherPosition::RIGHT_TAB
-    ? WatcherPosition::LEFT_TAB : WatcherPosition::RIGHT_TAB;
-
+void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
+  QTabWidget* tabWidget = nullptr;
+  switch (watcherPosition) {
+    case WatcherPosition::UPPER_LEFT_TAB:
+      tabWidget = mUI.upperLeftPanel;
+      break;
+    case WatcherPosition::BOTTOM_LEFT_TAB:
+      tabWidget = mUI.bottomLeftPanel;
+      break;
+    case WatcherPosition::RIGHT_TAB:
+      tabWidget = mUI.rightPanel;
+      break;
+    default: SHOULDNT_HAPPEN; break;
+  }
+  
   WatcherWidget* watcherWidget = nullptr;
   Watcher* watcher = nullptr;
 
   /// Non-3D watchers
   switch (node->GetType()) {
     case NodeType::STRING:
-      watcherWidget = new WatcherWidget(tabWidget, position, tabWidget);
+      watcherWidget = new WatcherWidget(tabWidget, watcherPosition, tabWidget);
       watcher = new TextWatcher(dynamic_cast<StringNode*>(node), watcherWidget);
       break;
     default: break;
@@ -183,7 +190,7 @@ void ZenGarden::Watch(Node* node, WatcherWidget* sourceWidget) {
   /// 3D watchers
   if (watcherWidget == nullptr) {
     GLWatcherWidget* glWatcherWidget =
-      new GLWatcherWidget(tabWidget, mCommonGLWidget, position, tabWidget);
+      new GLWatcherWidget(tabWidget, mCommonGLWidget, watcherPosition, tabWidget);
     watcherWidget = glWatcherWidget;
     switch (node->GetType()) {
       case NodeType::PASS:
@@ -251,7 +258,7 @@ void ZenGarden::HandleMenuNew() {
   mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
-  Watch(graph, nullptr);
+  Watch(graph, WatcherPosition::RIGHT_TAB);
 }
 
 void ZenGarden::HandleMenuOpen() {
@@ -280,7 +287,7 @@ void ZenGarden::HandleMenuOpen() {
 
   /// Open first graph
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
-  Watch(graph, nullptr);
+  Watch(graph, WatcherPosition::RIGHT_TAB);
 
   int milliseconds = myTimer.elapsed();
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
