@@ -17,7 +17,7 @@ private:
   Pass mPostProcess_GaussianBlurHorizontal_First;
   Pass mPostProcess_GaussianBlurHorizontal;
   Pass mPostProcess_GaussianBlurVertical;
-  Pass mPostProcess_GaussianBlurVertical_Last;
+  Pass mPostProcess_GaussianBlur_Blend;
 
   Mesh* mFullScreenQuad = nullptr;
 };

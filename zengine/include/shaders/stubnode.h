@@ -23,8 +23,11 @@ using namespace std;
   ITEM(USAGE_AMBIENT_COLOR,			      VEC4,			  AmbientColor)			      \
   ITEM(USAGE_DEPTH_BIAS,				      FLOAT,			DepthBias)				      \
   ITEM(USAGE_DEPTH_BUFFER,				    TEXTURE,		DepthBufferSource)		  \
-  ITEM(USAGE_GBUFFER_A,				        TEXTURE,		GBufferSourceA)		      \
+  ITEM(USAGE_GBUFFER_SOURCE_A,        TEXTURE,		GBufferSourceA)	        \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,    TEXTURE,		PPGauss)		            \
+  ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE, VEC2,		  PPGaussPixelSize)		\
+  ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE, FLOAT, PPGaussRelativeSize)		\
+
 
 enum class ShaderGlobalType {
 #undef ITEM
@@ -65,6 +68,7 @@ struct StubGlobal {
   NodeType type;
   string name;
   ShaderGlobalType usage;
+  bool isMultiSampler; // type is "sampler2DMS"
 };
 
 

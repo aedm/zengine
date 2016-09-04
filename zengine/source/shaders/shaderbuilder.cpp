@@ -59,7 +59,7 @@ void ShaderBuilder::CollectStubMetadata(Node* node) {
   /// Globals
   for (auto global : stubMeta->globals) {
     ShaderUniform* uniform = 
-      new ShaderUniform(global->type, global->name, nullptr, global->usage);
+      new ShaderUniform(global->type, global->name, nullptr, global->usage, global->isMultiSampler);
     if (global->type == NodeType::TEXTURE) {
       mSamplers.push_back(uniform);
     } else {
@@ -137,17 +137,17 @@ void ShaderBuilder::GenerateSlots() {
       /// TODO: move this into a separate function
       if (node->GetType() == NodeType::TEXTURE) {
         mSamplers.push_back(new ShaderUniform(
-          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
+          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL, false));
       } else {
         mUniforms.push_back(new ShaderUniform(
-          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL));
+          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL, false));
       }
     }
   }
 }
 
 void ShaderBuilder::GenerateSource() {
-  sourceStream << "#version 330 core" << endl;
+  sourceStream << "#version 450 core" << endl;
   GenerateSourceHeader(sourceStream);
   GenerateSourceFunctions(sourceStream);
   GenerateSourceMain(sourceStream);
@@ -178,7 +178,7 @@ void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {
 
   /// Samplers
   for (auto uniform : mSamplers) {
-    stream << "uniform " << GetTypeString(uniform->type) << ' ' <<
+    stream << "uniform " << GetTypeString(uniform->type, uniform->isMultiSampler) << ' ' <<
       uniform->name << ';' << endl;
   }
 }
@@ -275,7 +275,7 @@ void ShaderBuilder::GenerateSourceMain(stringstream& stream) {
 }
 
 
-const string& ShaderBuilder::GetTypeString(NodeType type) {
+const string& ShaderBuilder::GetTypeString(NodeType type, bool isMultiSampler) {
   static const string sfloat("float");
   static const string svec2("vec2");
   static const string svec3("vec3");
@@ -283,8 +283,11 @@ const string& ShaderBuilder::GetTypeString(NodeType type) {
   static const string suint("uint");
   static const string smatrix44("mat4");
   static const string ssampler2d("sampler2D");
+  static const string ssampler2dms("sampler2DMS");
   static const string svoid("void");
   static const string serror("UNKNOWN_TYPE");
+
+  if (isMultiSampler) return ssampler2dms;
 
   switch (type) {
     case NodeType::FLOAT:		  return sfloat;

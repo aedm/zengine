@@ -93,23 +93,23 @@ void ResourceManager::DiscardMesh(Mesh* meshInstance) {
 
 Texture* ResourceManager::CreateTexture(int width, int height, TexelType type, 
                                         OWNERSHIP void* texelData) {
-  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type);
+  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type, false);
   if (texelData) {
     TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling
   }
-  Texture* texture = new Texture(width, height, type, handle, texelData);
+  Texture* texture = new Texture(width, height, type, handle, texelData, false);
   return texture;
 }
 
 Texture* ResourceManager::CreateGPUTexture(int width, int height, TexelType type, 
-                                           void* texelData, bool smoothSampling, bool repeat) {
-  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type, smoothSampling, repeat);
+                                           void* texelData, bool multiSample) {
+  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type, multiSample);
   if (texelData) {
     TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling
   }
-  Texture* texture = new Texture(width, height, type, handle, nullptr);
+  Texture* texture = new Texture(width, height, type, handle, nullptr, multiSample);
   return texture;
 }
 

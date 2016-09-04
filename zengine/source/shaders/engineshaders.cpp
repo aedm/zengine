@@ -5,6 +5,8 @@
 #define GLEW_STATIC
 #include <glew/glew.h>
 
+static const UINT BloomEffectMaxResolution = 400;
+
 EngineShaders::EngineShaders() {
   BuildPostProcessPasses();
 }
@@ -14,50 +16,80 @@ EngineShaders::~EngineShaders() {
 }
 
 void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* globals) {
-  UINT gaussIterationCount = 20;
   mPostProcess_GaussianBlurHorizontal_First.Update();
   mPostProcess_GaussianBlurHorizontal.Update();
   mPostProcess_GaussianBlurVertical.Update();
-  mPostProcess_GaussianBlurVertical_Last.Update();
+  mPostProcess_GaussianBlur_Blend.Update();
   if (!mPostProcess_GaussianBlurHorizontal.isComplete()
       || !mPostProcess_GaussianBlurVertical.isComplete()
       || !mPostProcess_GaussianBlurHorizontal_First.isComplete()
-      || !mPostProcess_GaussianBlurVertical_Last.isComplete()) return;
+      || !mPostProcess_GaussianBlur_Blend.isComplete()) return;
   
+  UINT targetBufferIndex = 0;
+
+  Vec2 size = renderTarget->GetSize();
+  UINT width = UINT(size.x);
+  UINT height = UINT(size.y);
+  UINT originalWidth = width;
+  UINT originalHeight = height;
+
+  UINT downsampleCount = UINT(ceilf(log2f(size.x / float(BloomEffectMaxResolution))));
+
   /// Blit G-Buffer into gaussian ping-pong buffers to decrease resolution
-  UINT width = renderTarget->GetSize().x;
-  UINT height = renderTarget->GetSize().y;
+  FrameBufferId source = renderTarget->mGBufferId;
+  UINT newWidth = width;
+  UINT newHeight = height;
+  for (UINT i = 0; i <= downsampleCount; i++) {
+    FrameBufferId target = renderTarget->mGaussFramebuffers[targetBufferIndex];
+    glBlitNamedFramebuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight, 
+                           GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    auto error = glGetError();  ASSERT(error == GL_NO_ERROR);
+    width = newWidth;
+    height = newHeight;
+    newWidth = (width / 2);
+    newHeight = (height / 2);
+    source = target;
+    targetBufferIndex = 1 - targetBufferIndex;
+  }
 
+  /// Blur the image
+  size = Vec2(width, height);
   globals->GBufferSourceA = renderTarget->mGBufferA;
-  globals->RenderTargetSize = renderTarget->GetSize() / Vec2(2, 2);
-  globals->RenderTargetSizeRecip = Vec2(0.5f, 0.5f) / renderTarget->GetSize();
-  glViewport(0, 0, width / 2, height / 2);
+  globals->PPGaussRelativeSize = 1.0f / float(1 << downsampleCount);
+  globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
+  
+  UINT gaussIterationCount = 4;
 
-  for (int i = 0; i < gaussIterationCount; i++) {
-    /// Horizontal pass
-    TheDrawingAPI->SetFrameBuffer(renderTarget->mGaussFramebuffers[0]);
-    globals->PPGauss = renderTarget->mGaussTextures[1];
-    Pass& horizontalPass = i == 0 
-      ? mPostProcess_GaussianBlurHorizontal_First 
-      : mPostProcess_GaussianBlurHorizontal;
-    horizontalPass.Set(globals);
-    mFullScreenQuad->Render(horizontalPass.GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
-
-    /// Vertical pass
-    FrameBufferId frameBuffer = (i == gaussIterationCount - 1) 
-      ? renderTarget->mColorBufferId 
-      : renderTarget->mGaussFramebuffers[1];
-    Pass& verticalPass = (i == gaussIterationCount - 1)
-      ? mPostProcess_GaussianBlurVertical_Last
-      : mPostProcess_GaussianBlurVertical;
-    if (i == gaussIterationCount-1) {
+  for (int i = 0; i < gaussIterationCount * 2; i++) {
+    FrameBufferId targetBuffer = renderTarget->mGaussFramebuffers[targetBufferIndex];
+    TheDrawingAPI->SetFrameBuffer(targetBuffer);
+    globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];
+    Pass* pass = (i % 2 == 0)
+      ? &mPostProcess_GaussianBlurHorizontal : &mPostProcess_GaussianBlurVertical;
+    if (i == 0) {
+      pass = &mPostProcess_GaussianBlurHorizontal_First;
+    }
+    if (i <= 1) {
+      glViewport(0, 0, originalWidth, originalHeight);
+      TheDrawingAPI->Clear(true, false, 0);
       glViewport(0, 0, width, height);
     }
-    globals->PPGauss = renderTarget->mGaussTextures[0];
-    TheDrawingAPI->SetFrameBuffer(frameBuffer);
-    verticalPass.Set(globals);
-    mFullScreenQuad->Render(verticalPass.GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
+    pass->Set(globals);
+    mFullScreenQuad->Render(pass->GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
+    targetBufferIndex = 1 - targetBufferIndex;
   }
+
+  /// Blend to original image and perform HDR multisampling correction
+  
+  TheDrawingAPI->SetFrameBuffer(renderTarget->mColorBufferId);
+  size = renderTarget->GetSize();
+  glViewport(0, 0, originalWidth, originalHeight);
+  globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];
+  mPostProcess_GaussianBlur_Blend.Set(globals);
+  mFullScreenQuad->Render(mPostProcess_GaussianBlur_Blend.GetUsedAttributes(), 1, 
+                          PRIMITIVE_TRIANGLES);
+
+
 }
 
 void EngineShaders::BuildPostProcessPasses() {
@@ -65,7 +97,7 @@ void EngineShaders::BuildPostProcessPasses() {
   StubNode* gaussianHorizontalFirst = TheEngineStubs->GetStub("postproc-gaussianblur-horizontal-first");
   StubNode* gaussianHorizontal = TheEngineStubs->GetStub("postproc-gaussianblur-horizontal");
   StubNode* gaussianVertical = TheEngineStubs->GetStub("postproc-gaussianblur-vertical");
-  StubNode* gaussianVerticalLast = TheEngineStubs->GetStub("postproc-gaussianblur-vertical-last");
+  StubNode* gaussianBlend = TheEngineStubs->GetStub("postproc-gaussianblur-blend");
 
   mPostProcess_GaussianBlurHorizontal.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurHorizontal.mFragmentStub.Connect(gaussianHorizontal);
@@ -85,11 +117,11 @@ void EngineShaders::BuildPostProcessPasses() {
   mPostProcess_GaussianBlurVertical.mRenderstate.DepthTest = false;
   mPostProcess_GaussianBlurVertical.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
 
-  mPostProcess_GaussianBlurVertical_Last.mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlurVertical_Last.mFragmentStub.Connect(gaussianVerticalLast);
-  mPostProcess_GaussianBlurVertical_Last.mRenderstate.BlendMode = RenderState::BLEND_NORMAL;
-  mPostProcess_GaussianBlurVertical_Last.mRenderstate.DepthTest = false;
-  mPostProcess_GaussianBlurVertical_Last.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  mPostProcess_GaussianBlur_Blend.mVertexStub.Connect(fullscreenVertex);
+  mPostProcess_GaussianBlur_Blend.mFragmentStub.Connect(gaussianBlend);
+  mPostProcess_GaussianBlur_Blend.mRenderstate.BlendMode = RenderState::BLEND_NORMAL;
+  mPostProcess_GaussianBlur_Blend.mRenderstate.DepthTest = false;
+  mPostProcess_GaussianBlur_Blend.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
 
   /// Fullscreen quad
   IndexEntry quadIndices[] = {0, 1, 2, 2, 1, 3};

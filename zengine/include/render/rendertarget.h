@@ -18,8 +18,8 @@ public:
   Vec2 GetSize();
 
   /// Gaussian half-resolution ping-pong buffers, for intermediate blurred images
-  Texture* mGaussTextures[2] = {nullptr, nullptr};
-  FrameBufferId mGaussFramebuffers[2] = {0, 0};
+  Texture* mGaussTextures[3] = {nullptr, nullptr};
+  FrameBufferId mGaussFramebuffers[3] = {0, 0};
 
   /// G-buffer
   /// A: [4x16F] RGB: HDR final color, A: unused

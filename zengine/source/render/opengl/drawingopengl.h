@@ -62,16 +62,17 @@ public:
 	virtual void				SetIndexBuffer(IndexBufferHandle Handle) override;
 
 	/// Texture and surface handling
-	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool smoothSampling, bool repeat) override;
+	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample) override;
 	virtual void				DeleteTexture(TextureHandle Handle) override;
 	virtual void				UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type, void* TexelData) override;
 	virtual void				UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, TexelType Type, void* TexelData) override;
-	virtual void				SetTexture(SamplerId Sampler, TextureHandle Texture, UINT SlotIndex) override;
+	virtual void				SetTexture(SamplerId Sampler, TextureHandle Texture, UINT SlotIndex, bool isRenderTarget) override;
 
   /// Framebuffer operations
   virtual FrameBufferId CreateFrameBuffer(TextureHandle depthBuffer, 
                                           TextureHandle targetBufferA, 
-                                          TextureHandle targetBufferB) override;
+                                          TextureHandle targetBufferB,
+                                          bool isMultiSample) override;
   virtual void DeleteFrameBuffer(FrameBufferId frameBufferId) override;
   virtual void SetFrameBuffer(FrameBufferId frameBufferid) override;
 
@@ -103,7 +104,8 @@ private:
 	/// Shadowed buffer binds
   void						BindVertexBuffer(GLuint BufferID);
 	void						BindIndexBuffer(GLuint BufferID);
-	void						BindTexture(GLuint TextureID);
+  void						BindTexture(GLuint TextureID);
+  void						BindMultisampleTexture(GLuint TextureID);
   void						BindFrameBuffer(GLuint frameBufferID);
 
   void						SetActiveTexture(GLuint ActiveTextureIndex); // silly OpenGL.
@@ -119,7 +121,8 @@ private:
 	GLuint						BoundVertexBufferShadow;
   GLuint						BoundIndexBufferShadow;
   GLuint						BoundFrameBufferShadow;
-	GLuint						BoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
+  GLuint						BoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
+  GLuint						BoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
 	GLuint						ActiveTextureShadow;						
 
 	bool						DepthTestEnabledShadow;

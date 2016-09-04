@@ -208,7 +208,8 @@ void Pass::Set(Globals* globals) {
       void* source = reinterpret_cast<char*>(globals) + offset;
       tex = *reinterpret_cast<Texture**>(source);
     }
-    TheDrawingAPI->SetTexture(sampler.handle, tex ? tex->mHandle : 0, i++);
+    TheDrawingAPI->SetTexture(sampler.handle, tex ? tex->mHandle : 0, i++, 
+                              tex ? tex->mIsMultisampe : false);
   }
 }
 

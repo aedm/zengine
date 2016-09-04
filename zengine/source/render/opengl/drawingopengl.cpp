@@ -4,12 +4,13 @@
 
 #ifdef _DEBUG
 void CheckGLError() {
-  GLenum error = glGetError();
-  ASSERT(error == GL_NO_ERROR);
+  GLenum error = glGetError();  ASSERT(error == GL_NO_ERROR);
 }
 #else
 #	define CheckGLError()
 #endif
+
+const int RenderTargetMultiSampleCount = 8;
 
 struct GLVersion { GLboolean* version; const wchar_t* name; };
 
@@ -55,6 +56,7 @@ DrawingOpenGL::DrawingOpenGL() {
     CheckGLError();
   }
 
+  glEnable(GL_MULTISAMPLE);
   OnContextSwitch();
 }
 
@@ -83,6 +85,7 @@ void DrawingOpenGL::OnContextSwitch() {
   BoundFrameBufferShadow = -1;
   for (int i = 0; i < MAX_COMBINED_TEXTURE_SLOTS; i++) {
     BoundTextureShadow[i] = (GLuint)-1;
+    BoundMultisampleTextureShadow[i] = (GLuint)-1;
   }
 }
 
@@ -175,7 +178,7 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
     glGetActiveUniform(program, i, uniformNameMaxLength, &nameLength, &size, &type, name);
     GLint location = glGetUniformLocation(program, name);
     //ASSERT(i == location);
-    if (type == GL_SAMPLER_2D) {
+    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE) {
       ShaderSamplerDesc sampler;
       sampler.Handle = location;
       sampler.Name = name;
@@ -523,37 +526,9 @@ void DrawingOpenGL::SetClearColor(UINT clearColor) {
   ClearColorShadow = clearColor;
 }
 
-TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type, bool smoothSampling, bool repeat) {
-  CheckGLError();
-  GLuint texture;
-  glGenTextures(1, &texture);
-  SetActiveTexture(0);
-  BindTexture(texture);
-  CheckGLError();
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
-                  smoothSampling ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
-                  smoothSampling ? GL_LINEAR : GL_LINEAR);
-  CheckGLError();
-
-  if (repeat) {
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  } else {
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  }
-  CheckGLError();
-
-  SetTextureData(width, height, type, NULL);
-  /// TODO: mipmap
-
-  return texture;
-}
 
 /// Converts a single TexelType to OpenGL enums
-void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format, 
+static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format,
                     GLenum &glType) {
   switch (type) {
     case TexelType::ARGB8:
@@ -586,6 +561,36 @@ void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format,
       break;
   }
 }
+
+
+TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type, bool isMultiSample) {
+  CheckGLError();
+  GLuint texture;
+  glGenTextures(1, &texture);
+  SetActiveTexture(0);
+  CheckGLError();
+
+  if (isMultiSample) {
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+    CheckGLError();
+    GLint internalFormat;
+    GLenum format, glType;
+    GetTextureType(type, internalFormat, format, glType);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, RenderTargetMultiSampleCount,
+                            internalFormat, width, height, false);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+  } else {
+    BindTexture(texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    SetTextureData(width, height, type, NULL);
+  }
+  CheckGLError();
+  return texture;
+}
+
 
 void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type, 
                                    void* texelData) {
@@ -627,25 +632,29 @@ void DrawingOpenGL::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
   SetTextureSubData(width, x, y, height, type, texelData);
 }
 
-void DrawingOpenGL::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex) {
+void DrawingOpenGL::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex, bool isRenderTarget) {
+  CheckGLError();
   SetActiveTexture(slotIndex);
-  BindTexture(texture);
+  if (isRenderTarget) BindMultisampleTexture(texture);
+  else BindTexture(texture);
   glUniform1i(sampler, slotIndex);
+  CheckGLError();
 }
 
 FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer, 
                                                TextureHandle targetBufferA, 
-                                               TextureHandle targetBufferB) {
+                                               TextureHandle targetBufferB,
+                                               bool isMultiSample) {
   CheckGLError();
   GLuint bufferId;
   glGenFramebuffers(1, &bufferId);
   BindFrameBuffer(bufferId);
   CheckGLError();
 
+  GLenum target = isMultiSample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+
   if (depthBuffer) {
-    CheckGLError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthBuffer, 0);
-    CheckGLError();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, depthBuffer, 0);
   }
 
   if (!targetBufferA) {
@@ -653,7 +662,7 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
     SHOULDNT_HAPPEN;
   } else if (!targetBufferB) {
     CheckGLError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, targetBufferA, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, targetBufferA, 0);
     GLuint attachments[] = {GL_COLOR_ATTACHMENT0};
     CheckGLError();
     glDrawBuffers(1, attachments);
@@ -665,6 +674,9 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
     CheckGLError();
   }
   CheckGLError();
+
+  glNamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+  glNamedFramebufferDrawBuffer(bufferId, GL_COLOR_ATTACHMENT0);
 
   return bufferId;
 }
@@ -689,6 +701,12 @@ void DrawingOpenGL::BindTexture(GLuint textureID) {
   if (BoundTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D, textureID);
   BoundTextureShadow[ActiveTextureShadow] = textureID;
+}
+
+void DrawingOpenGL::BindMultisampleTexture(GLuint textureID) {
+  if (BoundMultisampleTextureShadow[ActiveTextureShadow] == textureID) return;
+  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
+  BoundMultisampleTextureShadow[ActiveTextureShadow] = textureID;
 }
 
 

@@ -2,13 +2,14 @@
 #include <include/base/helpers.h>
 
 Texture::Texture( int width, int height, TexelType type, TextureHandle handle,
-                 OWNERSHIP void* texelData)
+                 OWNERSHIP void* texelData, bool isRenderTarget)
 	: mType(type)
 	, mWidth(width)
 	, mHeight(height)
 	, mHandle(handle)
   , mTexelData(texelData)
   , mTexelDataByteCount(texelData ? width * height * GetTexelByteCount(type) : 0)
+  , mIsMultisampe(isRenderTarget)
 {}
 
 Texture::~Texture() {

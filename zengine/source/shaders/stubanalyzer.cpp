@@ -137,19 +137,21 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
   global->name = name.ToString();
   global->type = declaredType;
   global->usage = (ShaderGlobalType)usage;
+  global->isMultiSampler = (line->SubStrings[2].Token == TOKEN_sampler2DMS);
   mGlobals.push_back(global);
 }
 
 
 NodeType StubAnalyzer::TokenToType(const SubString& subStr) {
   switch (subStr.Token) {
-    case TOKEN_void:		return NodeType::NONE;
-    case TOKEN_float:		return NodeType::FLOAT;
-    case TOKEN_vec2:		return NodeType::VEC2;
-    case TOKEN_vec3:		return NodeType::VEC3;
-    case TOKEN_vec4:		return NodeType::VEC4;
-    case TOKEN_mat4:		return NodeType::MATRIX44;
-    case TOKEN_sampler2D:	return NodeType::TEXTURE;
+    case TOKEN_void:		    return NodeType::NONE;
+    case TOKEN_float:		    return NodeType::FLOAT;
+    case TOKEN_vec2:		    return NodeType::VEC2;
+    case TOKEN_vec3:		    return NodeType::VEC3;
+    case TOKEN_vec4:		    return NodeType::VEC4;
+    case TOKEN_mat4:		    return NodeType::MATRIX44;
+    case TOKEN_sampler2D:	  return NodeType::TEXTURE;
+    case TOKEN_sampler2DMS:	return NodeType::TEXTURE;
     default:
       ERR("line %d: Wrong type '%s'",
           mCurrentLineNumber, subStr.ToString().c_str());

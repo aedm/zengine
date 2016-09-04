@@ -26,7 +26,7 @@ public:
   
   /// Creates texture with GPU-only texel data that can't be serialized
   Texture* CreateGPUTexture(int width, int height, TexelType type, void* texelData, 
-                            bool smoothSampling = true, bool repeat = true);
+                            bool multiSample);
 
   void DiscardTexture(Texture* texture);
 

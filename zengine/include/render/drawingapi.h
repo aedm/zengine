@@ -69,16 +69,17 @@ public:
                   UINT InstanceCount) = 0;
 
 	/// Texture and surface handling
-	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool smoothSampling = true, bool repeat = true) = 0;
+	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool isRenderTarget) = 0;
 	virtual void				DeleteTexture(TextureHandle Handle) = 0;
 	virtual void				UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type, void* TexelData) = 0;
 	virtual void				UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, TexelType Type, void* TexelData) = 0;
-	virtual void				SetTexture(SamplerId Sampler, TextureHandle Texture, UINT SlotIndex) = 0;
+	virtual void				SetTexture(SamplerId Sampler, TextureHandle Texture, UINT SlotIndex, bool isMultiSample) = 0;
 
   /// Framebuffer operations
   virtual FrameBufferId CreateFrameBuffer(TextureHandle depthBuffer, 
                                           TextureHandle targetBufferA, 
-                                          TextureHandle targetBufferB) = 0;
+                                          TextureHandle targetBufferB,
+                                          bool isMultiSample) = 0;
   virtual void DeleteFrameBuffer(FrameBufferId frameBufferId) = 0;
   virtual void SetFrameBuffer(FrameBufferId frameBufferid) = 0;
 

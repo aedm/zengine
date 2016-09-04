@@ -1,9 +1,10 @@
-:name "PostProcess gaussian blur, vertical pass"
+:name "PostProcess gaussian blur, blending"
 
 :input vec2 vTexCoord
 :global sampler2D gPPGauss
-:global sampler2D gGBufferSourceA
-:global vec2 gRenderTargetSizeRecip
+:global sampler2DMS gGBufferSourceA
+:global vec2 gPPGaussPixelSize
+:global float gPPGaussRelativeSize
 :output vec4 FragColor
 
 
@@ -13,12 +14,14 @@ float weight[kernelSize*2+1] = float[] (0.005757, 0.005937, 0.00612, 0.006305, 0
 
 SHADER
 {             
-  vec3 result = vec3(0.0, 0.0, 0.0);
-  float d = -kernelSize * gRenderTargetSizeRecip.y;
-  for(int i = 0; i < kernelSize * 2 + 1; ++i)
-  {
-    result += texture2D(gPPGauss, vTexCoord + vec2(0.0, d)).rgb * weight[i];
-    d += gRenderTargetSizeRecip.y;
-  }        
-  FragColor = vec4(result, 1.0) * 1.0 + clamp(texture(gGBufferSourceA, vTexCoord), 0.0, 1.0);
+  vec3 bloomPixel = texture2D(gPPGauss, vTexCoord * gPPGaussRelativeSize).rgb;
+  
+  vec3 pixel = vec3(0.0, 0.0, 0.0);
+  ivec2 coord = ivec2(textureSize(gGBufferSourceA) * vTexCoord);
+  int sampleCount = textureSamples(gGBufferSourceA);
+  for (int i = 0; i < sampleCount; i++) {
+    pixel += clamp(texelFetch(gGBufferSourceA, coord, i).rgb, 0, 1);
+  }
+  
+  FragColor = vec4(bloomPixel, 0.0) * 1.0 + vec4(pixel / float(sampleCount), 1.0);
 }

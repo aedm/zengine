@@ -8,7 +8,7 @@ class Texture {
 
 protected:
   Texture(int width, int height, TexelType type, TextureHandle handle, 
-          OWNERSHIP void* texelData);
+          OWNERSHIP void* texelData, bool isRenderTarget);
   ~Texture();
 
 public:
@@ -23,6 +23,7 @@ public:
   const UINT mTexelDataByteCount;
 
   const TextureHandle mHandle;
-  //RenderTarget*			RenderTargetInstance;
+
+  const bool mIsMultisampe;
 };
 

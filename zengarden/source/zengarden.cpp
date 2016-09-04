@@ -46,7 +46,7 @@ ZenGarden::~ZenGarden() {
 
 void ZenGarden::InitModules() {
   mLogWatcher = new LogWatcher(this);
-  mUI.upperLeftPanel->addTab(mLogWatcher, "Log");
+  mUI.bottomLeftPanel->addTab(mLogWatcher, "Log");
   mPropertyLayout = new QVBoxLayout(mUI.propertyPanel);
 
   mTime.start();
