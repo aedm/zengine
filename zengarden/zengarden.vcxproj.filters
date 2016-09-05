@@ -164,6 +164,9 @@
     <ClCompile Include="source\watchers\textwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\splinewatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -192,6 +195,9 @@
     </CustomBuild>
     <CustomBuild Include="source\graph\graphwatcher.h">
       <Filter>source\graph</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\forms\splineeditor.ui">
+      <Filter>source\forms</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -251,6 +257,12 @@
     </ClInclude>
     <ClInclude Include="source\watchers\textwatcher.h">
       <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\splinewatcher.h">
+      <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_splineeditor.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

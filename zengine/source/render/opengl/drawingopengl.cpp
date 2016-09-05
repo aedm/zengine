@@ -563,7 +563,8 @@ static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format
 }
 
 
-TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type, bool isMultiSample) {
+TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type, 
+                                           bool isMultiSample, bool doesRepeat) {
   CheckGLError();
   GLuint texture;
   glGenTextures(1, &texture);
@@ -583,8 +584,9 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type
     BindTexture(texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
     SetTextureData(width, height, type, NULL);
   }
   CheckGLError();

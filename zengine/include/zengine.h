@@ -28,6 +28,7 @@
 #include "nodes/timenode.h"
 #include "nodes/scenenode.h"
 #include "nodes/vectornodes.h"
+#include "nodes/splinenode.h"
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();

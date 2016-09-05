@@ -26,7 +26,7 @@ using namespace std;
   ITEM(USAGE_GBUFFER_SOURCE_A,        TEXTURE,		GBufferSourceA)	        \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,    TEXTURE,		PPGauss)		            \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE, VEC2,		  PPGaussPixelSize)		\
-  ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE, FLOAT, PPGaussRelativeSize)		\
+  ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE, VEC2, PPGaussRelativeSize)		\
 
 
 enum class ShaderGlobalType {

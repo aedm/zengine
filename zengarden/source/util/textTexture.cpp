@@ -47,7 +47,7 @@ void TextTexture::SetText( const QString& Text, const QFont& Font )
 	{
 		DestroyTexture();
 		TheTexture = TheResourceManager->CreateGPUTexture(
-      tw, th, TexelType::ARGB8, image.bits(), false);
+      tw, th, TexelType::ARGB8, image.bits(), false, false);
 	} else {
 		TheDrawingAPI->UploadTextureSubData(
       TheTexture->mHandle, 0, 0, tw, th, TexelType::ARGB8, image.bits());

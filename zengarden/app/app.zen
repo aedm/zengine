@@ -16,30 +16,345 @@
         "nodes": [
           3,
           4,
+          5,
+          9,
           7,
-          6,
           8,
-          5
+          6
         ]
       }
     },
     {
-      "node": "Drawable",
+      "node": "Stub",
       "id": 3,
       "position": {
+        "x": -275.0,
+        "y": -16.0
+      },
+      "source": ":name \"Default FS\"\n:returns void\n\n:output vec4 FragColor\n:input vec2 vTexCoord\n:input vec3 vNormal\n:input vec3 vPosition\n\n:param vec4 Color\n//:param sampler2D Texture \n\nSHADER\n{\n  vec3 lightDir = normalize(vec3(-1.0, -1.0, 0.0));\n  vec3 lightRef = reflect (lightDir, normalize(vNormal));\n  float cosTheta = dot(normalize(vPosition), lightRef);\n\n  FragColor = vec4(Color.rgb * cosTheta, Color.a);\n}\n",
+      "slots": {
+        "Color": {
+          "default": {
+            "x": 3.0151515007019045,
+            "y": 2.3636362552642824,
+            "z": 2.689393997192383,
+            "w": 1.0
+          }
+        }
+      }
+    },
+    {
+      "node": "Static Mesh",
+      "id": 4,
+      "name": "koc.obj",
+      "position": {
+        "x": -2.0,
+        "y": -103.0
+      },
+      "format": 7,
+      "vertexcount": 36,
+      "vertices": [
+        -5.0,
+        -5.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        -0.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        -1.0,
+        -0.0,
+        5.0,
+        -5.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        -1.0,
+        -0.0,
+        5.0,
+        -5.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        -1.0,
+        -0.0,
+        5.0,
+        -5.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        -0.0,
+        -5.0,
+        -5.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        -0.0,
+        -5.0,
+        5.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        5.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        5.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        5.0,
+        5.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        5.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        5.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0,
+        -5.0,
+        -5.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        5.0,
+        -5.0,
+        5.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        5.0,
+        5.0,
+        5.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        5.0,
+        5.0,
+        5.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        -5.0,
+        5.0,
+        5.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        -5.0,
+        -5.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        5.0,
+        -5.0,
+        5.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.0,
+        5.0,
+        -5.0,
+        -5.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.0,
+        5.0,
+        5.0,
+        -5.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        -0.0,
+        5.0,
+        5.0,
+        -5.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        -0.0,
+        5.0,
+        5.0,
+        5.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        -0.0,
+        5.0,
+        -5.0,
+        5.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.0,
+        5.0,
+        -5.0,
+        -5.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        -5.0,
+        5.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        -5.0,
+        5.0,
+        -5.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        5.0,
+        5.0,
+        -5.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        5.0,
+        -5.0,
+        -5.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        -0.0,
+        -5.0,
+        -5.0,
+        5.0,
+        1.0,
+        0.0,
+        -1.0,
+        0.0,
+        -0.0,
+        -5.0,
+        5.0,
+        5.0,
+        1.0,
+        1.0,
+        -1.0,
+        0.0,
+        -0.0,
+        -5.0,
+        5.0,
+        5.0,
+        1.0,
+        1.0,
+        -1.0,
+        0.0,
+        -0.0,
+        -5.0,
+        5.0,
+        -5.0,
+        0.0,
+        1.0,
+        -1.0,
+        0.0,
+        -0.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        -0.0
+      ]
+    },
+    {
+      "node": "Drawable",
+      "id": 5,
+      "position": {
         "x": 136.0,
-        "y": -79.0
+        "y": -78.0
       },
       "slots": {
-        "Move": {
-          "default": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          }
-        },
         "Mesh": 4,
-        "Material": 5,
+        "Children": [],
+        "Material": 6,
         "Rotate": {
           "default": {
             "x": 0.0,
@@ -47,15 +362,53 @@
             "z": 0.0
           }
         },
-        "Children": [],
+        "Move": {
+          "default": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          }
+        },
         "Instances": {
           "default": 1.0
         }
       }
     },
     {
+      "node": "Material",
+      "id": 6,
+      "position": {
+        "x": 1.0,
+        "y": -12.0
+      },
+      "slots": {
+        "Solid Pass": 7
+      }
+    },
+    {
+      "node": "Pass",
+      "id": 7,
+      "position": {
+        "x": -125.0,
+        "y": -8.0
+      },
+      "slots": {
+        "Fragment shader": 3,
+        "Vertex shader": 8
+      }
+    },
+    {
+      "node": "Stub",
+      "id": 8,
+      "position": {
+        "x": -275.0,
+        "y": 55.0
+      },
+      "source": ":name \"Default VS\"\n:returns void\n\n:input vec3 aPosition;\n:input vec2 aTexCoord;\n:input vec3 aNormal;\n\n:global mat4 gTransformation;\n:global mat4 gView;\n\n:output vec2 vTexCoord\n:output vec3 vNormal\n:output vec3 vPosition\n\nSHADER\n{\n\tgl_Position = vec4(aPosition, 1.0) * gTransformation; \n\tvTexCoord = aTexCoord;\n\tvPosition = gl_Position.xyz;\n\tvNormal = (vec4(aNormal, 0.0) * gView).xyz;\n}\n"
+    },
+    {
       "node": "Static Mesh",
-      "id": 4,
+      "id": 9,
       "name": "torusz.obj",
       "position": {
         "x": 3.0,
@@ -3137,57 +3490,6 @@
         -0.35740000009536745,
         -0.8629000186920166
       ]
-    },
-    {
-      "node": "Material",
-      "id": 5,
-      "position": {
-        "x": 1.0,
-        "y": -12.0
-      },
-      "slots": {
-        "Solid Pass": 6
-      }
-    },
-    {
-      "node": "Pass",
-      "id": 6,
-      "position": {
-        "x": -125.0,
-        "y": -8.0
-      },
-      "slots": {
-        "Fragment shader": 7,
-        "Vertex shader": 8
-      }
-    },
-    {
-      "node": "Stub",
-      "id": 7,
-      "position": {
-        "x": -276.0,
-        "y": -17.0
-      },
-      "source": ":name \"Default FS\"\n:returns void\n\n:output vec4 FragColor\n:input vec2 vTexCoord\n:input vec3 vNormal\n:input vec3 vPosition\n\n:param vec4 Color\n//:param sampler2D Texture \n\nSHADER\n{\n  vec3 lightDir = normalize(vec3(-1.0, -1.0, 0.0));\n  vec3 lightRef = reflect (lightDir, normalize(vNormal));\n  float cosTheta = dot(normalize(vPosition), lightRef);\n\n  FragColor = vec4(vNormal, 1.0) + Color * cosTheta;\n}\n",
-      "slots": {
-        "Color": {
-          "default": {
-            "x": 2.446969747543335,
-            "y": 4.734848499298096,
-            "z": 6.310606002807617,
-            "w": 0.7424242496490479
-          }
-        }
-      }
-    },
-    {
-      "node": "Stub",
-      "id": 8,
-      "position": {
-        "x": -275.0,
-        "y": 55.0
-      },
-      "source": ":name \"Default VS\"\n:returns void\n\n:input vec3 aPosition;\n:input vec2 aTexCoord;\n:input vec3 aNormal;\n\n:global mat4 gTransformation;\n:global mat4 gView;\n\n:output vec2 vTexCoord\n:output vec3 vNormal\n:output vec3 vPosition\n\nSHADER\n{\n\tgl_Position = vec4(aPosition, 1.0) * gTransformation; \n\tvTexCoord = aTexCoord;\n\tvPosition = gl_Position.xyz;\n\tvNormal = (vec4(aNormal, 0.0) * gView).xyz;\n}\n"
     }
   ]
 }

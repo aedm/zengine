@@ -69,7 +69,7 @@ public:
                   UINT InstanceCount) = 0;
 
 	/// Texture and surface handling
-	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool isRenderTarget) = 0;
+	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample, bool doesRepeat) = 0;
 	virtual void				DeleteTexture(TextureHandle Handle) = 0;
 	virtual void				UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type, void* TexelData) = 0;
 	virtual void				UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, TexelType Type, void* TexelData) = 0;

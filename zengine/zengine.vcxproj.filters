@@ -176,6 +176,9 @@
     <ClInclude Include="include\shaders\engineshaders.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
+    <ClInclude Include="include\nodes\splinenode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -276,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="source\shaders\engineshaders.cpp">
       <Filter>source\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\splinenode.cpp">
+      <Filter>source\nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

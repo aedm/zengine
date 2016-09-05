@@ -9,6 +9,7 @@
 #include "watchers/scenewatcher.h"
 #include "watchers/drawablewatcher.h"
 #include "watchers/textwatcher.h"
+#include "watchers/splinewatcher.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
@@ -185,6 +186,14 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
       watcher = new TextWatcher(dynamic_cast<StringNode*>(node), watcherWidget);
       break;
     default: break;
+  }
+
+  if (watcherWidget == nullptr) {
+    NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
+    if (nodeClass->mClassName == "Float Spline") {
+      watcherWidget = new WatcherWidget(tabWidget, watcherPosition, tabWidget);
+      watcher = new FloatSplineWatcher(dynamic_cast<SSpline*>(node), watcherWidget);
+    }
   }
 
   /// 3D watchers

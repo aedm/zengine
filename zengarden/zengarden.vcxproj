@@ -117,6 +117,7 @@
     <ClCompile Include="source\watchers\meshwatcher.cpp" />
     <ClCompile Include="source\watchers\passwatcher.cpp" />
     <ClCompile Include="source\watchers\scenewatcher.cpp" />
+    <ClCompile Include="source\watchers\splinewatcher.cpp" />
     <ClCompile Include="source\watchers\stubwatcher.cpp" />
     <ClCompile Include="source\watchers\textwatcher.cpp" />
     <ClCompile Include="source\watchers\watcherwidget.cpp" />
@@ -165,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_operatorSelector.h" />
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_splineeditor.h" />
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_zengarden.h" />
     <ClInclude Include="source\commands\command.h" />
     <ClInclude Include="source\commands\graphcommands.h" />
@@ -192,6 +194,7 @@
     <ClInclude Include="source\watchers\meshwatcher.h" />
     <ClInclude Include="source\watchers\passwatcher.h" />
     <ClInclude Include="source\watchers\scenewatcher.h" />
+    <ClInclude Include="source\watchers\splinewatcher.h" />
     <ClInclude Include="source\watchers\stubwatcher.h" />
     <ClInclude Include="source\watchers\textwatcher.h" />
     <ClInclude Include="source\watchers\watcher.h" />
@@ -312,6 +315,24 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.msbuild\qtGeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">.\.msbuild\qtGeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\.msbuild\qtGeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">"$(QTDIR)\bin\uic.exe" -o ".\.msbuild\qtGeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+    </CustomBuild>
+    <CustomBuild Include="source\forms\splineeditor.ui">
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug-static|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug-static|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug-static|x64'">.\.msbuild\qtGeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug-static|x64'">"$(QTDIR)\bin\uic.exe" -o ".\.msbuild\qtGeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\.msbuild\qtGeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\uic.exe" -o ".\.msbuild\qtGeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\.msbuild\qtGeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\.msbuild\qtGeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">.\.msbuild\qtGeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">"$(QTDIR)\bin\uic.exe" -o ".\.msbuild\qtGeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
     </CustomBuild>
     <None Include="source\shaders\2dtransform.vs">

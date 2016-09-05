@@ -5,7 +5,7 @@
 #define GLEW_STATIC
 #include <glew/glew.h>
 
-static const UINT BloomEffectMaxResolution = 400;
+static const UINT BloomEffectMaxResolution = 256;
 
 EngineShaders::EngineShaders() {
   BuildPostProcessPasses();
@@ -55,10 +55,11 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   /// Blur the image
   size = Vec2(width, height);
   globals->GBufferSourceA = renderTarget->mGBufferA;
-  globals->PPGaussRelativeSize = 1.0f / float(1 << downsampleCount);
+  globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth), 
+                                      float(height) / float(originalHeight));
   globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
   
-  UINT gaussIterationCount = 4;
+  UINT gaussIterationCount = 10;
 
   for (int i = 0; i < gaussIterationCount * 2; i++) {
     FrameBufferId targetBuffer = renderTarget->mGaussFramebuffers[targetBufferIndex];

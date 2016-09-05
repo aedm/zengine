@@ -26,6 +26,10 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Drawable>());
   AddPrototype(registry->GetNodeClass<CameraNode>());
   AddPrototype(registry->GetNodeClass<SceneNode>());
+  AddPrototype(registry->GetNodeClass<SSpline>());
+
+  SSpline x;
+  x.getNumPoints();
 
   LoadStubs();
 

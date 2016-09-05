@@ -36,15 +36,15 @@ void RenderTarget::Resize(Vec2 size) {
 
   /// Create G-Buffer
   mDepthBuffer = TheResourceManager->CreateGPUTexture(
-    width, height, TexelType::DEPTH32F, nullptr, true);
+    width, height, TexelType::DEPTH32F, nullptr, true, false);
   mGBufferA = TheResourceManager->CreateGPUTexture(
-    width, height, TexelType::ARGB16F, nullptr, true);
+    width, height, TexelType::ARGB16F, nullptr, true, false);
   mGBufferId = TheDrawingAPI->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
 
   /// Create gaussian ping-pong textures
   for (int i = 0; i < 3; i++) {
     mGaussTextures[i] = TheResourceManager->CreateGPUTexture(
-      width, height, TexelType::ARGB16F, nullptr, false); // don't multisample these
+      width, height, TexelType::ARGB16F, nullptr, false, false); // don't multisample these
     mGaussFramebuffers[i] = TheDrawingAPI->CreateFrameBuffer(0, mGaussTextures[i]->mHandle, 0, false);
   }
 }

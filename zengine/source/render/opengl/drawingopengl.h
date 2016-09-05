@@ -62,7 +62,7 @@ public:
 	virtual void				SetIndexBuffer(IndexBufferHandle Handle) override;
 
 	/// Texture and surface handling
-	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample) override;
+	virtual TextureHandle		CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample, bool doesRepeat) override;
 	virtual void				DeleteTexture(TextureHandle Handle) override;
 	virtual void				UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type, void* TexelData) override;
 	virtual void				UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, TexelType Type, void* TexelData) override;
