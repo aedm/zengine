@@ -5,6 +5,10 @@
 #include "cameranode.h"
 #include "../render/rendertarget.h"
 
+/// Local time of the current scene
+/// TODO: make it not global somehow
+extern FloatNode* TheSceneTime;
+
 class SceneNode: public Node {
 public:
   SceneNode();

@@ -179,9 +179,10 @@ void Pass::Set(Globals* globals) {
       switch (uniform.type) {
 #undef ITEM
 #define ITEM(name, type) \
-				case NodeType::name: \
-					TheDrawingAPI->SetUniform(uniform.handle, NodeType::name, \
-						&static_cast<ValueNode<NodeType::name>*>(uniform.node)->Get()); \
+				case NodeType::name: { \
+          auto vNode = static_cast<ValueNode<NodeType::name>*>(uniform.node); \
+          vNode->Update(); \
+					TheDrawingAPI->SetUniform(uniform.handle, NodeType::name, &vNode->Get()); } \
 					break;
         VALUETYPE_LIST
 

@@ -31,7 +31,7 @@ JSONSerializer::JSONSerializer(Node* root) {
 string JSONSerializer::GetJSON() {
   rapidjson::StringBuffer buffer;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-  writer.SetIndent(' ', 2);
+  writer.SetIndent(' ', 1);
   //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   mJsonDocument.Accept(writer);
   return buffer.GetString();
@@ -107,6 +107,9 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   } 
   else if (IsInstanceOf<Vec4Node>(node)) {
     SerializeVec4Node(v, static_cast<Vec4Node*>(node));
+  } 
+  else if (IsInstanceOf<SSpline>(node)) {
+    SerializeFloatSplineNode(v, static_cast<SSpline*>(node));
   } 
   else if (IsInstanceOf<TextureNode>(node)) {
     SerializeTextureNode(v, static_cast<TextureNode*>(node));
@@ -240,6 +243,20 @@ void JSONSerializer::SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* no
   nodeValue.AddMember("value", SerializeVec4(node->Get()), *mAllocator);
 }
 
+void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, SSpline* node) {
+  rapidjson::Value pointArray(rapidjson::kArrayType);
+  for (int i = 0; i < node->getNumPoints(); i++) {
+    const SSplinePoint& point = node->getPoint(i);
+    rapidjson::Value p(rapidjson::kObjectType);
+    p.AddMember("time", point.time, *mAllocator);
+    p.AddMember("value", point.value, *mAllocator);
+    p.AddMember("autotangent", point.isAutoangent, *mAllocator);
+    p.AddMember("breakpoint", point.isBreakpoint, *mAllocator);
+    p.AddMember("linear", point.isLinear, *mAllocator);
+    pointArray.PushBack(p, *mAllocator);
+  }
+  nodeValue.AddMember("points", pointArray, *mAllocator);
+}
 
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node) {
   Texture* texture = node->Get();

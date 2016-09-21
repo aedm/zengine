@@ -76,6 +76,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event) {
 
 void GLWidget::keyPressEvent(QKeyEvent* event) {
   OnKeyPress(this, event);
+  QGLWidget::keyPressEvent(event);
 }
 
 void GLWidget::keyReleaseEvent(QKeyEvent* event) {

@@ -46,12 +46,6 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     node->SetPosition(position);
   }
 
-  //rapidjson::Value& jsonPosition = value["size"];
-  //if (!jsonPosition.IsNull()) {
-  //  Vec2 position = DeserializeVec2(jsonPosition);
-  //  node->SetPosition(position);
-  //}
-
   if (IsInstanceOf<FloatNode>(node)) {
     DeserializeFloatNode(value, static_cast<FloatNode*>(node));
   }
@@ -63,6 +57,9 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   } 
   else if (IsInstanceOf<Vec4Node>(node)) {
     DeserializeVec4Node(value, static_cast<Vec4Node*>(node));
+  } 
+  else if (IsInstanceOf<SSpline>(node)) {
+    DeserializeFloatSplineNode(value, static_cast<SSpline*>(node));
   } 
   else if (IsInstanceOf<TextureNode>(node)) {
     DeserializeTextureNode(value, static_cast<TextureNode*>(node));
@@ -203,6 +200,21 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   mesh->UploadVertices(&rawVertices[0]);
 
   node->Set(mesh);
+}
+
+
+
+void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, SSpline* node) {
+  const rapidjson::Value& jsonPoints = value["points"];
+  for (UINT i = 0; i < jsonPoints.Size(); i++) {
+    auto& jsonPoint = jsonPoints[i];
+    float time(jsonPoint["time"].GetDouble());
+    float value(jsonPoint["value"].GetDouble());
+    int pIndex = node->addPoint(time, value);
+    node->setAutotangent(pIndex, jsonPoint["autotangent"].GetBool());
+    node->setBreakpoint(pIndex, jsonPoint["breakpoint"].GetBool());
+    node->setLinear(pIndex, jsonPoint["linear"].GetBool());
+  }
 }
 
 

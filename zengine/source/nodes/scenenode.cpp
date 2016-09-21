@@ -6,6 +6,10 @@ REGISTER_NODECLASS(SceneNode, "Scene");
 static SharedString DrawablesSlotName = make_shared<string>("Drawables");
 static SharedString CameraSlotName = make_shared<string>("Camera");
 
+/// Local time of the current scene
+/// TODO: delete it at exit
+FloatNode* TheSceneTime = new FloatNode();
+
 SceneNode::SceneNode()
   : Node(NodeType::SCENE)
   , mDrawables(this, DrawablesSlotName, true)

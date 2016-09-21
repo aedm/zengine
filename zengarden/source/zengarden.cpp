@@ -25,10 +25,10 @@ ZenGarden::ZenGarden(QWidget *parent)
   mUI.setupUi(this);
 
   connect(mUI.upperLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
-    if (index>0) delete mUI.upperLeftPanel->widget(index);
+    delete mUI.upperLeftPanel->widget(index);
   });
   connect(mUI.bottomLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
-    delete mUI.bottomLeftPanel->widget(index);
+    if (index > 0) delete mUI.bottomLeftPanel->widget(index);
   });
   connect(mUI.rightPanel, &QTabWidget::tabCloseRequested, [=](int index) {
     delete mUI.rightPanel->widget(index);
@@ -96,7 +96,7 @@ void ZenGarden::DisposeModules() {
   while (mUI.upperLeftPanel->count() > 0) delete mUI.upperLeftPanel->widget(0);
   while (mUI.bottomLeftPanel->count() > 0) delete mUI.bottomLeftPanel->widget(0);
   while (mUI.rightPanel->count() > 0) delete mUI.rightPanel->widget(0);
-  
+
   Prototypes::Dispose();
   DisposePainter();
   CloseZengine();
@@ -108,6 +108,10 @@ void ZenGarden::NewGraph() {
   mDocument->mGraphs.Connect(graph);
 }
 
+
+void ZenGarden::RestartSceneTimer() {
+  mSceneStartTime = mTime.elapsed() - int(TheSceneTime->Get() * 1000.0f);
+}
 
 void ZenGarden::LoadEngineShaders(QString& path) {
   static const QString shaderSuffix("shader");
@@ -121,6 +125,20 @@ void ZenGarden::LoadEngineShaders(QString& path) {
     }
   }
   TheEngineStubs->OnLoadFinished();
+}
+
+void ZenGarden::keyPressEvent(QKeyEvent* event) {
+  switch (event->key()) {
+    case Qt::Key_Space:
+      RestartSceneTimer();
+      mPlayScene = !mPlayScene;
+      return;
+    case Qt::Key_Escape:
+      TheSceneTime->Set(0);
+      RestartSceneTimer();
+      return;
+  }
+  QMainWindow::keyPressEvent(event);
 }
 
 void ZenGarden::LoadEngineShader(const QString& path) {
@@ -142,11 +160,9 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
 
     if (IsInstanceOf<FloatNode>(node)) {
       new StaticFloatEditor(static_cast<FloatNode*>(node), mPropertyEditor);
-    } 
-    else if (IsInstanceOf<Vec3Node>(node)) {
+    } else if (IsInstanceOf<Vec3Node>(node)) {
       new StaticVec3Editor(static_cast<Vec3Node*>(node), mPropertyEditor);
-    } 
-    else if (IsInstanceOf<Vec4Node>(node)) {
+    } else if (IsInstanceOf<Vec4Node>(node)) {
       new StaticVec4Editor(static_cast<Vec4Node*>(node), mPropertyEditor);
     } else {
       new DefaultPropertyEditor(node, mPropertyEditor);
@@ -175,7 +191,7 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
       break;
     default: SHOULDNT_HAPPEN; break;
   }
-  
+
   WatcherWidget* watcherWidget = nullptr;
   Watcher* watcher = nullptr;
 
@@ -192,7 +208,10 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
       watcherWidget = new WatcherWidget(tabWidget, watcherPosition, tabWidget);
-      watcher = new FloatSplineWatcher(dynamic_cast<SSpline*>(node), watcherWidget);
+      FloatSplineWatcher* splineWatcher =
+        new FloatSplineWatcher(dynamic_cast<SSpline*>(node), watcherWidget);
+      splineWatcher->OnAdjustTime += Delegate(this, &ZenGarden::RestartSceneTimer);
+      watcher = splineWatcher;
     }
   }
 
@@ -241,7 +260,7 @@ void ZenGarden::CloseWatcherTab(WatcherWidget* widget) {
 
 void ZenGarden::HandleMenuSaveAs() {
   QString fileName = QFileDialog::getSaveFileName(this,
-      tr("Open project"), "app", tr("Zengine project (*.zen)"));
+                                                  tr("Open project"), "app", tr("Zengine project (*.zen)"));
 
   INFO("Saving document...");
   QTime myTimer;
@@ -258,6 +277,9 @@ void ZenGarden::HandleMenuSaveAs() {
 
 void ZenGarden::UpdateTimeNode() {
   TimeNode::OnTimeChanged(float(mTime.elapsed()) / 1000.0f);
+  if (mPlayScene) {
+    TheSceneTime->Set(float(mTime.elapsed() - mSceneStartTime) / 1000.0f);
+  }
   QTimer::singleShot(10, this, SLOT(UpdateTimeNode()));
 }
 
@@ -272,7 +294,7 @@ void ZenGarden::HandleMenuNew() {
 
 void ZenGarden::HandleMenuOpen() {
   QString fileName = QFileDialog::getOpenFileName(this,
-      tr("Open project"), "app", tr("Zengine project (*.zen)"));
+                                                  tr("Open project"), "app", tr("Zengine project (*.zen)"));
   if (fileName.isEmpty()) return;
 
   /// Measure load time

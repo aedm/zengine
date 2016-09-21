@@ -7,5 +7,5 @@
 
 SHADER
 {
-  return vec4(R, G, B);
+  return vec3(R, G, B);
 }

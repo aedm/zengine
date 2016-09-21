@@ -3,6 +3,7 @@
 #include <include/dom/document.h>
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/meshnode.h>
+#include <include/nodes/splinenode.h>
 #include <include/shaders/stubnode.h>
 #include <string>
 #include <rapidjson/include/rapidjson/document.h>
@@ -33,6 +34,7 @@ private:
   void SerializeVec2Node(rapidjson::Value& nodeValue, Vec2Node* node);
   void SerializeVec3Node(rapidjson::Value& nodeValue, Vec3Node* node);
   void SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* node);
+  void SerializeFloatSplineNode(rapidjson::Value& nodeValue, SSpline* node);
 
   void SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node);
   void SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node);

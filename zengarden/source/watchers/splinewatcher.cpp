@@ -6,8 +6,8 @@ template class SplineWatcher<NodeType::FLOAT>;
 template<NodeType T>
 SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
   : Watcher(node, watcherWidget)
-  , mXRange(0, 100)
-  , mYRange(-5, 5) {
+  , mXRange(0, 10)
+  , mYRange(5, -5) {
   mUI.setupUi(watcherWidget);
 
   QVBoxLayout* layout = new QVBoxLayout(mUI.splineFrame);
@@ -22,6 +22,70 @@ SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
   mSplineWidget->OnMouseWheel += Delegate(this, &SplineWatcher<T>::HandleMouseWheel);
 
   UpdateRangeLabels();
+  SelectPoint(-1);
+  TheSceneTime->onSniffMessage += Delegate(this, &SplineWatcher<T>::HandleTimeChange);
+
+  //mUI->connect(mUI.addPointButton, SIGNAL(clicked()), this, SLOT(AddPoint()));
+  //mUI->connect(mUI.removePointButton, SIGNAL(clicked()), this, SLOT(RemovePoint()));
+
+  watcherWidget->connect(mUI.addPointButton, &QPushButton::pressed, [=]() { AddPoint(); });
+  watcherWidget->connect(mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
+  watcherWidget->connect(mUI.linearCheckBox, &QPushButton::pressed, [=]() { ToggleLinear(); });
+
+}
+
+template<NodeType T>
+SplineWatcher<T>::~SplineWatcher() {
+  TheSceneTime->onSniffMessage -= Delegate(this, &SplineWatcher<T>::HandleTimeChange);
+}
+
+
+template<NodeType T>
+void SplineWatcher<T>::HandleSniffedMessage(NodeMessage message, Slot* slot, void* payload) {
+  if (message == NodeMessage::VALUE_CHANGED) {
+    mSplineWidget->update();
+  } 
+  if (message == NodeMessage::NEEDS_REDRAW) {
+    SelectPoint(mSelectedPointIndex);
+  }
+}
+
+
+template<NodeType T>
+void SplineWatcher<T>::AddPoint() {
+  SSpline* spline = GetSpline();
+  float time = spline->mTimeSlot.Get();
+  float value = spline->getValue(time);
+  int index = spline->addPoint(time, value);
+  mSelectedPointIndex = -1;
+  SelectPoint(index);
+}
+
+
+template<NodeType T>
+void SplineWatcher<T>::RemovePoint() {
+  if (mSelectedPointIndex >= 0) {
+    GetSpline()->removePoint(mSelectedPointIndex);
+  }
+}
+
+template<NodeType T>
+void SplineWatcher<T>::ToggleLinear() {
+  if (mSelectedPointIndex >= 0) {
+    GetSpline()->setLinear(mSelectedPointIndex, 
+                           !GetSpline()->getPoint(mSelectedPointIndex).isLinear);
+  }
+}
+
+
+template<NodeType T>
+SSpline* SplineWatcher<T>::GetSpline() {
+  return dynamic_cast<SSpline*>(GetNode());
+}
+
+template<NodeType T>
+void SplineWatcher<T>::HandleTimeChange(NodeMessage, Slot*, void*) {
+  mSplineWidget->update();
 }
 
 
@@ -40,7 +104,7 @@ void SplineWatcher<T>::HandleMouseMove(QMouseEvent* event) {
       UpdateRangeLabels();
     }
     break;
-    case State::POINT_MOVE: 
+    case State::POINT_MOVE:
     {
       float height = float(mSplineWidget->height());
       float width = float(mSplineWidget->width());
@@ -52,8 +116,13 @@ void SplineWatcher<T>::HandleMouseMove(QMouseEvent* event) {
       SSpline* spline = dynamic_cast<SSpline*>(GetNode());
       spline->setPointValue(mHoveredPointIndex, xCursor, yCursor);
       mSplineWidget->update();
-    } 
+      SelectPoint(mSelectedPointIndex);
+    }
     break;
+    case SplineWatcher::State::TIME_MOVE:
+      TheSceneTime->Set(ScreenToTime(event->pos().x()));
+      OnAdjustTime();
+      break;
     default:
     {
       float height = float(mSplineWidget->height());
@@ -103,14 +172,23 @@ void SplineWatcher<T>::HandleMouseRightDown(QMouseEvent* event) {
 
 template<NodeType T>
 void SplineWatcher<T>::HandleMouseLeftDown(QMouseEvent* event) {
-  if (mHoveredPointIndex < 0) return;
-  mState = State::POINT_MOVE;
-  mOriginalMousePos = event->pos();
+  if (mHoveredPointIndex >= 0) {
+    /// Select point
+    mState = State::POINT_MOVE;
+    SelectPoint(mHoveredPointIndex);
+    mOriginalMousePos = event->pos();
 
-  SSpline* spline = dynamic_cast<SSpline*>(GetNode());
-  const SSplinePoint& p = spline->getPoint(mHoveredPointIndex);
-  mOriginalTime = p.time;
-  mOriginalValue = p.value;
+    SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+    const SSplinePoint& p = spline->getPoint(mHoveredPointIndex);
+    mOriginalTime = p.time;
+    mOriginalValue = p.value;
+  } else {
+    /// Move time
+    mState = SplineWatcher::State::TIME_MOVE;
+    TheSceneTime->Set(ScreenToTime(event->pos().x()));
+    SelectPoint(-1);
+    OnAdjustTime();
+  }
 }
 
 
@@ -136,16 +214,39 @@ void SplineWatcher<T>::HandleMouseWheel(QWheelEvent* event) {
   float yCursor = mYRange.x + float(event->pos().y()) * yDelta / height;
 
   float zoom = powf(2.0, float(zoomFactor) / (120.0f * 4.0f));
-  xDelta *= zoom;
-  yDelta *= zoom;
-  mXRange.x = xCursor - float(event->pos().x()) * xDelta / width;
-  mXRange.y = mXRange.x + xDelta;
-  mYRange.x = yCursor - float(event->pos().y()) * yDelta / height;
-  mYRange.y = mYRange.x + yDelta;
+  if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
+    yDelta *= zoom;
+    mYRange.x = yCursor - float(event->pos().y()) * yDelta / height;
+    mYRange.y = mYRange.x + yDelta;
+  } else {
+    xDelta *= zoom;
+    mXRange.x = xCursor - float(event->pos().x()) * xDelta / width;
+    mXRange.y = mXRange.x + xDelta;
+  }
   mSplineWidget->update();
   UpdateRangeLabels();
 }
 
+
+template<NodeType T>
+void SplineWatcher<T>::SelectPoint(int index) {
+  if (index < 0 && mSelectedPointIndex == index) return;
+  if (index >= GetSpline()->getNumPoints()) index = -1;
+  mSelectedPointIndex = index;
+  mUI.pointIndexLabel->setText(QString("Point #%1").arg(QString::number(index)));
+  if (index >= 0) {
+    const SSplinePoint& p = dynamic_cast<SSpline*>(GetNode())->getPoint(index);
+    mUI.pointTimeValueLabel->setText(QString("t:%1 v:%2").arg(
+      QString::number(p.time, 'f', 2), QString::number(p.value, 'f', 2)));
+    mUI.removePointButton->setEnabled(true);
+    mUI.linearCheckBox->setEnabled(true);
+    mUI.linearCheckBox->setChecked(p.isLinear);
+  } else {
+    mUI.pointTimeValueLabel->setText(QString(""));
+    mUI.removePointButton->setEnabled(false);
+    mUI.linearCheckBox->setEnabled(false);
+  }
+}
 
 template<NodeType T>
 void SplineWatcher<T>::UpdateRangeLabels() {
@@ -156,7 +257,26 @@ void SplineWatcher<T>::UpdateRangeLabels() {
 }
 
 
+template<NodeType T>
+QPointF SplineWatcher<T>::ToScreenCoord(float time, float value) {
+  QSize size = mSplineWidget->size();
+  float xCoord = (time - mXRange.x) * float(size.width()) / (mXRange.y - mXRange.x);
+  float yCoord = (value - mYRange.x) * float(size.height()) / (mYRange.y - mYRange.x);
+  return QPointF(xCoord, yCoord);
+}
+
+
+template<NodeType T>
+float SplineWatcher<T>::ScreenToTime(int xPos) {
+  return mXRange.x + (mXRange.y - mXRange.x) * float(xPos) / float(mSplineWidget->width());
+}
+
 static QPointF drawPoints[10000 * 2];
+
+// TODO: temp, remove it
+const float gBPM = 140.0f;
+const float gBeatTime = 60.0f / gBPM;
+const float gSection = 1.0 * gBeatTime;
 
 template<>
 void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
@@ -174,6 +294,25 @@ void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
   painter.drawLine(QPointF(xCenter, 0), QPointF(xCenter, height));
   painter.drawLine(QPointF(0, yCenter), QPointF(width, yCenter));
 
+  /// Draw beats
+  int beat = int(ScreenToTime(0) / gSection) - 1;
+  while (true) {
+    float beatCoord = ToScreenCoord(float(beat) * gSection, 0).x();
+    if (beatCoord > width) break;
+    painter.setPen(beat % 64 == 0 ? QColor(150, 150, 0)
+                   : beat % 16 == 0 ? QColor(160, 40, 40) 
+                   : beat % 4 == 0 ? QColor(0, 0, 0) 
+                   : QColor(40, 40, 40));
+    painter.drawLine(QPointF(beatCoord, 0), QPointF(beatCoord, height));
+    beat++;
+  }
+
+  /// Draw scene time
+  painter.setPen(QColor(80, 200, 80));
+  QPointF timePoint = ToScreenCoord(TheSceneTime->Get(), 0);
+  painter.drawLine(QPointF(timePoint.x(), 0), QPointF(timePoint.x(), height));
+
+
   /// Draw spline
   painter.setPen(QColor(192, 192, 192));
   UINT sampleCount = mSplineWidget->width();
@@ -185,7 +324,7 @@ void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
     float splineVal = spline->getValue(t);
     float y = height * (splineVal - mYRange.x) / (mYRange.y - mYRange.x);
     drawPoints[i * 2] = QPointF(float(i), y);
-    drawPoints[i * 2 + 1] = QPointF(float(i + 1), y);
+    drawPoints[i * 2 + 1] = QPointF(float(i), y);
     t += delta;
   }
   painter.drawLines(drawPoints + 1, sampleCount - 1);
@@ -193,7 +332,9 @@ void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
   /// Draw control points
   painter.setPen(QColor(255, 255, 255));
   for (UINT i = 0; i < spline->getNumPoints(); i++) {
-    painter.setBrush(i == mHoveredPointIndex ? QBrush(QColor(255, 255, 0)) : Qt::NoBrush);
+    painter.setBrush(i == mSelectedPointIndex
+                     ? QBrush(QColor(0, 255, 255))
+                     : (i == mHoveredPointIndex) ? QBrush(QColor(255, 255, 0)) : Qt::NoBrush);
     const SSplinePoint& point = spline->getPoint(i);
     float y = height * (point.value - mYRange.x) / (mYRange.y - mYRange.x);
     float x = width * (point.time - mXRange.x) / (mXRange.y - mXRange.x);
@@ -222,12 +363,8 @@ void SplineWidget::mousePressEvent(QMouseEvent* event) {
 
 void SplineWidget::mouseReleaseEvent(QMouseEvent* event) {
   OnMouseRelease(event);
-}
 
-void SplineWidget::keyPressEvent(QKeyEvent* event) {
-  OnKeyPress(event);
 }
-
 void SplineWidget::keyReleaseEvent(QKeyEvent* event) {
   OnKeyRelease(event);
 }

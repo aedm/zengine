@@ -14,6 +14,7 @@ class GraphWatcher: public Watcher {
 
 public:
   GraphWatcher(Graph* graph, GLWatcherWidget* Parent);
+  virtual ~GraphWatcher();
 
   NodeWidget* GetNodeWidget(Node* node);
 

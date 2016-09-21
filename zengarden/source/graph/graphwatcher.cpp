@@ -43,6 +43,10 @@ GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
 }
 
 
+GraphWatcher::~GraphWatcher() {
+  for (const auto& it : mWidgetMap) delete it.second;
+}
+
 void GraphWatcher::Paint(GLWidget* glWidget) {
   TheDrawingAPI->OnContextSwitch();
 
@@ -356,6 +360,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
         if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptType(
           mHoveredWidget->GetNode()->GetType())) {
+          /// TODO: check for graph cycles
           mIsConnectionValid = true;
         }
       }
@@ -367,6 +372,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
         if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptType(
           mClickedWidget->GetNode()->GetType())) {
+          /// TODO: check for graph cycles
           mIsConnectionValid = true;
         }
       }
@@ -422,6 +428,19 @@ bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
 
 
 void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
+  auto scanCode = event->nativeScanCode();
+  
+  if (scanCode == 41) {
+    /// The key over "tab", independent of input language
+    /// Open "add new node" window
+    Node* node = ThePrototypes->AskUser(mWatcherWidget, QCursor::pos());
+    if (node) {
+      TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
+      TheCommandStack->Execute(new MoveNodeCommand(node, mCurrentMousePos));
+    }
+    return;
+  }
+
   switch (event->key()) {
     case Qt::Key_Delete:
       if (mSelectedNodeWidgets.size() > 0) {
@@ -457,16 +476,6 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
           (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::BOTTOM_LEFT_TAB);
       }
       break;
-
-    case Qt::Key_Space:
-    {
-      Node* node = ThePrototypes->AskUser(mWatcherWidget, QCursor::pos());
-      if (node) {
-        TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
-        TheCommandStack->Execute(new MoveNodeCommand(node, mCurrentMousePos));
-      }
-      break;
-    }
     default: break;
   }
 }

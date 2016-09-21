@@ -19,8 +19,11 @@ SHADER
     pixel += clamp(texelFetch(gGBufferSourceA, coord, i).rgb, 0, 1);
   }
   
+  vec3 bPixel = clamp(bloomPixel, 0.0, 1.0);
+  
   float powfac = 1.0;
-  vec3 bloom = vec3(pow(bloomPixel.r, powfac), pow(bloomPixel.g, powfac), pow(bloomPixel.b, powfac));
-  FragColor = vec4(bloom * 2.0, 0.0) + vec4(pixel / float(sampleCount), 1.0);
+  vec3 bloom = vec3(pow(bPixel.r, powfac), pow(bPixel.g, powfac), pow(bPixel.b, powfac));
+  FragColor = vec4(bloom * 1.0, 0.0) + vec4(pixel / float(sampleCount), 1.0);
+  
 //  FragColor = vec4(pow(bloomPixel, 0.5), 0.0) * 40.0 + vec4(pixel / float(sampleCount), 1.0);
 }

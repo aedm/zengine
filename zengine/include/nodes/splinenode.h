@@ -31,7 +31,7 @@ class SSpline: public ValueNode<NodeType::FLOAT>
 {
 public:
 	SSpline();
-  virtual ~SSpline ();
+  virtual ~SSpline();
 
   FloatSlot mTimeSlot;
 
@@ -65,6 +65,8 @@ protected:
 
   /// Last queried point (cache)
 	int	lastIndex = 0;
+
+  virtual void Operate();
 };
 
 

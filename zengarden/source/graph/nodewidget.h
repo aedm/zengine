@@ -14,7 +14,7 @@ class NodeWidget: public Watcher {
 
 public:
   NodeWidget(Node* node, GraphWatcher* graphWatcher);
-  ~NodeWidget();
+  virtual ~NodeWidget();
 
   void Paint();
   Vec2 GetOutputPosition();

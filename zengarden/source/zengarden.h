@@ -47,10 +47,15 @@ private:
 
   /// Global time
   QTime mTime;
+  int mSceneStartTime;
+  bool mPlayScene = false;
+  void RestartSceneTimer();
 
   /// Engine shaders
   void LoadEngineShaders(QString& path);
   QFileSystemWatcher mEngineShadersFolderWatcher;
+
+  virtual void keyPressEvent(QKeyEvent* event) override;
 
 private slots:
   void InitModules();

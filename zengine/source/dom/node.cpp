@@ -233,8 +233,14 @@ void Node::CheckConnections() {
 void Node::Update() {
   if (!mIsUpToDate && mIsProperlyConnected) {
     for(Slot* slot : mPublicSlots) {
-      Node* node = slot->GetAbstractNode();
-      if (node) node->Update();
+      if (slot->mIsMultiSlot) {
+        for (Node* node : slot->GetMultiNodes()) {
+          node->Update();
+        }
+      } else {
+        Node* node = slot->GetAbstractNode();
+        if (node) node->Update();
+      }
     }
     Operate();
     mIsUpToDate = true;

@@ -33,16 +33,16 @@ void System::ReadFilesInFolder(const wchar_t* folder, const wchar_t* filter,
   wchar_t currentDir[512];
   _wgetcwd(currentDir, 511);
 
-  _wchdir(folder);
+  int err = _wchdir(folder);
 
   _wfinddata_t fileInfo;
-  long handle = long(_wfindfirst(filter, &fileInfo));
+  auto handle = _wfindfirst(filter, &fileInfo);
   if (handle == -1) {
     ERR(L"Cannot read folder: %s", folder);
     return;
   }
 
-  for (long ret = 0; ret == 0; ret = _wfindnext(handle, &fileInfo)) {
+  for (auto ret = 0; ret == 0; ret = _wfindnext(handle, &fileInfo)) {
     wstring fullName(folder);
     fullName.append(fileInfo.name);
     oFileList.push_back(fullName);

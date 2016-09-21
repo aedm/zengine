@@ -12,13 +12,16 @@ template<NodeType T>
 class SplineWatcher: public Watcher {
 public:
   SplineWatcher(Node* node, WatcherWidget* watcherWidget);
+  virtual ~SplineWatcher();
+
+  Event<> OnAdjustTime;
 
 protected:
   Ui::SplineEditor mUI;
   SplineWidget* mSplineWidget;
 
-private slots:
-  void DrawSpline(QPaintEvent* ev);
+  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
+                                    void* payload) override;
 
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);
@@ -27,10 +30,17 @@ private slots:
   void HandleMouseMove(QMouseEvent* event);
   void HandleMouseWheel(QWheelEvent* event);
 
+  void HandleTimeChange(NodeMessage, Slot*, void*);
+
+  typedef typename NodeTypes<T>::Type VType;
+  QPointF ToScreenCoord(float time, float value);
+  float ScreenToTime(int xPos);
+
   enum class State {
     DEFAULT,
     WINDOW_MOVE,
     POINT_MOVE,
+    TIME_MOVE,
   };
 
   State mState = State::DEFAULT;
@@ -40,13 +50,22 @@ private slots:
   
   float mOriginalTime;
   
-  typedef typename NodeTypes<T>::Type VType;
   VType mOriginalValue;
   int mHoveredPointIndex = -1;
+  int mSelectedPointIndex = -2;
 
   QPoint mOriginalMousePos;
 
   void UpdateRangeLabels();
+  void SelectPoint(int index);
+
+  SSpline* GetSpline();
+
+private slots:
+  void DrawSpline(QPaintEvent* ev);
+  void RemovePoint();
+  void AddPoint();
+  void ToggleLinear();
 };
 
 
@@ -69,7 +88,7 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent* event) override;
   virtual void mousePressEvent(QMouseEvent* event) override;
   virtual void mouseReleaseEvent(QMouseEvent* event) override;
-  virtual void keyPressEvent(QKeyEvent* event) override;
+  //virtual void keyPressEvent(QKeyEvent* event) override;
   virtual void keyReleaseEvent(QKeyEvent* event) override;
   virtual void wheelEvent(QWheelEvent * event) override;
 };

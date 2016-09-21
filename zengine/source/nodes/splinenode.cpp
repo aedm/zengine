@@ -1,6 +1,7 @@
 // general/SSpline.cpp
 
 #include <include/nodes/splinenode.h>
+#include <include/nodes/scenenode.h>
 #include <math.h>
 
 REGISTER_NODECLASS(SSpline, "Float Spline");
@@ -25,39 +26,23 @@ void SSplinePoint::setValue(float time, float value) {
 
 SSpline::SSpline()
   : ValueNode<NodeType::FLOAT>()
-  , mTimeSlot(this, TimeSlotName)
+  , mTimeSlot(this, TimeSlotName, false, false, false)
 {
-  addPoint(10, 2);
-  addPoint(20, -2);
-  addPoint(50, 4);
-  addPoint(80, -8);
+  mTimeSlot.Connect(TheSceneTime);
 }
 
 
-SSpline::~SSpline() {}
+SSpline::~SSpline() {
+  mTimeSlot.Disconnect(TheSceneTime);
+}
 
 
 const float& SSpline::Get() {
-  currentValue = getValue(mTimeSlot.Get());
+  Update();
   return currentValue;
 }
 
 float SSpline::getValue(float time) {
-  // search for the actual control point
-
-  /*int beforeIndex = points[lastIndex);
-  SSplinePoint& after = lastsel ? lastsel->next : points;
-  while (after && after->t<=t)
-  {
-    before = after;
-    after = after->next;
-  }
-  while (before && before->t>t)
-  {
-    after = before;
-    before = before->prev;
-  }*/
-
   if (points.size() == 0) return defaultValue;
 
   if (lastIndex >= int(points.size())) lastIndex = 0;
@@ -72,7 +57,6 @@ float SSpline::getValue(float time) {
   SSplinePoint* before = lastIndex >= 0 ? &points[lastIndex] : nullptr;
   SSplinePoint* after = lastIndex < int(points.size()) - 1 ? &points[lastIndex + 1] : nullptr;
 
-  float v = before ? before->value : after ? after->value : defaultValue;
   if (before && after)
     if (before->isLinear) {
       float dt = after->time - before->time;
@@ -84,13 +68,12 @@ float SSpline::getValue(float time) {
 
       float ea = before->value;
       float eb = dt * before->tangentAfter;
-      float ec = 3 * (after->value - before->value) - dt * (2 * before->tangentAfter + after->tangentBefore);
-      float ed = -2 * (after->value - before->value) + dt * (before->tangentAfter + after->tangentBefore);
+      float ec = 3.0f * (after->value - before->value) - dt * (2.0f * before->tangentAfter + after->tangentBefore);
+      float ed = -2.0f * (after->value - before->value) + dt * (before->tangentAfter + after->tangentBefore);
 
       return ea + ft*eb + ft*ft*ec + ft*ft*ft*ed;
     }
-
-  return v;
+  return before ? before->value : after ? after->value : defaultValue;
 }
 
 
@@ -111,6 +94,7 @@ int SSpline::addPoint(float time, float value) {
   calculateTangent(i);
   calculateTangent(i + 1);
 
+  ReceiveMessage(NodeMessage::VALUE_CHANGED);
   return i;
 }
 
@@ -128,6 +112,7 @@ void SSpline::setPointValue(int index, float time, float value) {
   calculateTangent(index - 1);
   calculateTangent(index);
   calculateTangent(index + 1);
+  ReceiveMessage(NodeMessage::VALUE_CHANGED);
 }
 
 void SSpline::setAutotangent(int index, bool autotangent) {
@@ -135,6 +120,7 @@ void SSpline::setAutotangent(int index, bool autotangent) {
     SSplinePoint& point = points[index];
     point.isAutoangent = autotangent;
     calculateTangent(index);
+    ReceiveMessage(NodeMessage::VALUE_CHANGED);
   }
 }
 
@@ -143,9 +129,17 @@ void SSpline::setBreakpoint(int index, bool breakpoint) {
     SSplinePoint& point = points[index];
     point.isBreakpoint = breakpoint;
     calculateTangent(index);
+    ReceiveMessage(NodeMessage::VALUE_CHANGED);
   }
 }
 
+void SSpline::setLinear(int index, bool linear) {
+  if (index >= 0 && index < int(points.size())) {
+    SSplinePoint& point = points[index];
+    point.isLinear = linear;
+    ReceiveMessage(NodeMessage::VALUE_CHANGED);
+  }
+}
 
 void SSpline::calculateTangent(int index) {
   if (index < 0 || index >= int(points.size())) return;
@@ -163,8 +157,13 @@ void SSpline::calculateTangent(int index) {
   }
 }
 
+void SSpline::Operate() {
+  currentValue = getValue(mTimeSlot.Get());
+}
+
 void SSpline::removePoint(int index) {
   points.erase(points.begin() + index);
+  ReceiveMessage(NodeMessage::VALUE_CHANGED);
 }
 
 UINT SSpline::getNumPoints() {
