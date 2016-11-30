@@ -245,7 +245,7 @@ void JSONSerializer::SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* no
 
 void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, SSpline* node) {
   rapidjson::Value pointArray(rapidjson::kArrayType);
-  for (int i = 0; i < node->getNumPoints(); i++) {
+  for (UINT i = 0; i < node->getNumPoints(); i++) {
     const SSplinePoint& point = node->getPoint(i);
     rapidjson::Value p(rapidjson::kObjectType);
     p.AddMember("time", point.time, *mAllocator);

@@ -4,7 +4,7 @@
 Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
 GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget) 
-  : Watcher(node, watcherWidget)
+  : WatcherUI(node, watcherWidget)
 {
   ASSERT(dynamic_cast<GLWatcherWidget*>(static_cast<QWidget*>(watcherWidget)) != nullptr);
 
@@ -21,11 +21,9 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
 
   mDefaultScene.mCamera.Connect(&mCamera);
   mScene = &mDefaultScene;
-  mDefaultScene.onSniffMessage += Delegate(this, &GeneralSceneWatcher::SniffMessage);
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
-  mDefaultScene.onSniffMessage -= Delegate(this, &GeneralSceneWatcher::SniffMessage);
   SafeDelete(mDrawable);
   SafeDelete(mRenderTarget);
 }
@@ -36,13 +34,8 @@ void GeneralSceneWatcher::Paint(GLWidget* widget) {
   mScene->Draw(mRenderTarget);
 }
 
-void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot, 
-                                               void* payload) 
-{
-  if (message == NodeMessage::NEEDS_REDRAW) {
-    /// HACK
-    if (GetGLWidget()) GetGLWidget()->update();
-  }
+void GeneralSceneWatcher::OnRedraw() {
+  GetGLWidget()->update();
 }
 
 void GeneralSceneWatcher::Init()

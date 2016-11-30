@@ -121,7 +121,7 @@
     <ClCompile Include="source\watchers\stubwatcher.cpp" />
     <ClCompile Include="source\watchers\textwatcher.cpp" />
     <ClCompile Include="source\watchers\watcherwidget.cpp" />
-    <ClCompile Include="source\watchers\watcher.cpp" />
+    <ClCompile Include="source\watchers\watcherui.cpp" />
     <ClCompile Include="source\zengarden.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,7 +197,7 @@
     <ClInclude Include="source\watchers\splinewatcher.h" />
     <ClInclude Include="source\watchers\stubwatcher.h" />
     <ClInclude Include="source\watchers\textwatcher.h" />
-    <ClInclude Include="source\watchers\watcher.h" />
+    <ClInclude Include="source\watchers\watcherui.h" />
     <CustomBuild Include="source\propertyeditor\propertyeditor.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </Message>

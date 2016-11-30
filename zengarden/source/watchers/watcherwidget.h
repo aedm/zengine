@@ -4,7 +4,7 @@
 #include <QtWidgets/QWidget>
 #include <QtOpenGL/QGLWidget>
 
-class Watcher;
+class WatcherUI;
 class GLWidget;
 class QTabWidget;
 
@@ -16,7 +16,7 @@ enum class WatcherPosition {
 };
 
 class WatcherWidget: public QWidget {
-  friend class Watcher;
+  friend class WatcherUI;
 
 public:
   WatcherWidget(QWidget* parent, WatcherPosition position, 
@@ -39,7 +39,7 @@ public:
   QTabWidget* mTabWidget;
 
 protected:
-  Watcher* mWatcher;
+  WatcherUI* mWatcher;
 
   void SetTabLabel(const QString& text);
 

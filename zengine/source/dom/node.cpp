@@ -1,7 +1,7 @@
 #include <include/dom/node.h>
+#include <include/dom/watcher.h>
 #include <include/base/helpers.h>
 #include <algorithm>
-
 
 /// Array for variable sizes in bytes
 const int gVariableByteSizes[] = {
@@ -249,20 +249,7 @@ void Node::Update() {
 
 
 Node::~Node() {
-  /// Remove all watchers. Create a copy of the event hook, because watchers remove
-  /// themselves from the callback list while the Event object iterates through it.
-  //auto eventCopy = onSniffMessage;
-  //eventCopy(NodeMessage::NODE_REMOVED, nullptr, nullptr); 
-    
-  /// Remove all watchers.
-  while (onSniffMessage.mDelegates.size()) {
-    auto callback = *onSniffMessage.mDelegates.begin();
-    callback(NodeMessage::NODE_REMOVED, nullptr, nullptr);
-
-    /// Check whether the watcher was removed. 
-    ASSERT(onSniffMessage.mDelegates.size() == 0 || 
-           *onSniffMessage.mDelegates.begin() != callback);
-  }
+  while (mWatchers.size()) delete *mWatchers.begin();
 
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
@@ -316,6 +303,10 @@ void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable) {
 void Node::ClearSlots() {
   mPublicSlots.clear();
   mSerializableSlotsByName.clear();
+}
+
+void Node::OnWatcherValueChange() {
+  for (Watcher* watcher : mWatchers) watcher->OnRedraw();
 }
 
 const vector<Slot*>& Node::GetPublicSlots() {

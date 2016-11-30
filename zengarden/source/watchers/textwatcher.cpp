@@ -2,7 +2,7 @@
 #include <QtWidgets/QPushButton>
 
 TextWatcher::TextWatcher(StringNode* node, WatcherWidget* watcherWidget)
-  : Watcher(node, watcherWidget)
+  : WatcherUI(node, watcherWidget)
 {
   /// Vertical layout
   mLayout = new QVBoxLayout(watcherWidget);

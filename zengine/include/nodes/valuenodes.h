@@ -81,7 +81,7 @@ template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
   mValue = newValue;
   SendMsg(NodeMessage::VALUE_CHANGED);
-  onSniffMessage(NodeMessage::VALUE_CHANGED, nullptr, nullptr);
+  OnWatcherValueChange();
 }
 
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zengine.h>
-#include "../watchers/watcher.h"
+#include "../watchers/watcherui.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QBoxLayout>
 #include <map>
@@ -9,7 +9,7 @@
 class TextBox;
 
 /// General node editor, displays name and type of the Node
-class PropertyEditor: public Watcher {
+class PropertyEditor: public WatcherUI {
 public:
   PropertyEditor(Node* node, WatcherWidget* panel);
   virtual ~PropertyEditor() {}
@@ -29,10 +29,9 @@ public:
   virtual ~DefaultPropertyEditor() {}
 
 private:
-  map<Slot*, Watcher*> mSlotWatchers;
+  map<Slot*, WatcherUI*> mSlotWatchers;
 
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnSlotConnectionChanged(Slot* slot) override;
 
   void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 

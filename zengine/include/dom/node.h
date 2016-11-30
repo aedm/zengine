@@ -5,6 +5,7 @@
 #include "../base/fastdelegate.h"
 #include "../base/helpers.h"
 #include <vector>
+#include <set>
 #include <memory>
 
 using namespace std;
@@ -52,8 +53,9 @@ enum class NodeMessage {
 };
 
 class Node;
+class Watcher;
 
-/// Nodes can have multiple input slots, which connects it to other slots.
+/// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
   Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot = false,
@@ -120,6 +122,7 @@ protected:
 /// An operation that takes its slot values as input and computes an output
 class Node {
   friend class Slot;
+  friend class Watcher;
   template<NodeType T> friend class ValueSlot;
 
 public:
@@ -190,7 +193,7 @@ public:
   const unordered_map<SharedString, Slot*>& GetSerializableSlots();
 
   /// Hook for watchers (UI only). This way watchers get all messages emitted by nodes.
-  Event<NodeMessage, Slot*, void*> onSniffMessage;
+  //Event<NodeMessage, Slot*, void*> onSniffMessage;
 
 protected:
   /// Registers a new slot
@@ -198,6 +201,9 @@ protected:
   
   /// Removes public and serializable slots
   void ClearSlots();
+
+  /// Notifies all watchers about value change
+  void OnWatcherValueChange();
 
 private:
   /// Custom name of the node
@@ -212,6 +218,9 @@ private:
 
   /// Slots that need to be serialized when saving / loading.
   unordered_map<SharedString, Slot*> mSerializableSlotsByName;
+
+  /// Watchers
+  set<Watcher*> mWatchers;
 };
 
 

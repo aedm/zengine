@@ -1,19 +1,19 @@
 #pragma once
 
-#include "watcher.h"
+#include "watcherui.h"
 #include <zengine.h>
 #include <QtWidgets/QListView>
 #include <QtGui/QStandardItemModel>
 
-class DocumentWatcher : public Watcher
+class DocumentWatcher : public WatcherUI
 {
 public:
 	DocumentWatcher(QListView* listView, Document* documentNode);
 	virtual ~DocumentWatcher();
 
 protected:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) override;
+  virtual void OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) override;
 
   void RefreshGraphList();
 

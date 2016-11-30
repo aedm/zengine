@@ -1,5 +1,5 @@
 #include "watcherwidget.h"
-#include "watcher.h"
+#include "watcherui.h"
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTabWidget>
 
@@ -12,6 +12,8 @@ WatcherWidget::WatcherWidget(QWidget* parent, WatcherPosition position,
 {}
 
 WatcherWidget::~WatcherWidget() {
+  /// Don't let the Watcher delete the WatcherWidget
+  mWatcher->mWatcherWidget = nullptr;
   SafeDelete(mWatcher);
 }
 

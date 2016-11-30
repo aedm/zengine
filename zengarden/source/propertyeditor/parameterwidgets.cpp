@@ -18,9 +18,8 @@ Slider::Slider(QWidget* Parent, QString text, float value, float minimum, float 
   , mValue(value)
   , mMinimum(minimum)
   , mMaximum(maximum)
-  , mText(text) 
-  , mIsReadOnly(false)
-{}
+  , mText(text)
+  , mIsReadOnly(false) {}
 
 void Slider::paintEvent(QPaintEvent *e) {
   QPainter painter(this);
@@ -163,10 +162,9 @@ void FloatEditor::SetReadOnly(bool readOnly) {
 }
 
 
-FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, 
+FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget,
                            QString name, bool readOnly)
-  : Watcher(node, widget)
-{
+  : WatcherUI(node, widget) {
   QVBoxLayout* layout = new QVBoxLayout(widget);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -179,26 +177,14 @@ FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widg
 }
 
 
-void FloatWatcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
-  switch (message) {
-    case NodeMessage::VALUE_CHANGED: {
-      float value = static_cast<ValueNode<NodeType::FLOAT>*>(mNode)->Get();
-      mEditorX->Set(value);
-      break;
-    }
-    default: break;
-  }
+void FloatWatcher::OnRedraw() {
+  float value = static_cast<ValueNode<NodeType::FLOAT>*>(mNode)->Get();
+  mEditorX->Set(value);
 }
 
 
 void FloatWatcher::SetReadOnly(bool readOnly) {
   mEditorX->SetReadOnly(readOnly);
-}
-
-
-void FloatWatcher::HandleChangedNode(Node* node) {
-  float value = node ? static_cast<ValueNode<NodeType::FLOAT>*>(node)->Get() : 0.0f;
-  mEditorX->Set(value);
 }
 
 
@@ -210,11 +196,9 @@ void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
 }
 
 
-
 Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget,
                          QString name, bool readOnly)
-  : Watcher(node, widget) 
-{
+  : WatcherUI(node, widget) {
   QVBoxLayout* layout = new QVBoxLayout(widget);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -237,17 +221,11 @@ Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget,
 }
 
 
-void Vec3Watcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
-  switch (message) {
-    case NodeMessage::VALUE_CHANGED: {
-      Vec3 value = static_cast<ValueNode<NodeType::VEC3>*>(mNode)->Get();
-      mEditorX->Set(value.x);
-      mEditorY->Set(value.y);
-      mEditorZ->Set(value.z);
-      break;
-    }
-    default: break;
-  }
+void Vec3Watcher::OnRedraw() {
+  Vec3 value = static_cast<ValueNode<NodeType::VEC3>*>(mNode)->Get();
+  mEditorX->Set(value.x);
+  mEditorY->Set(value.y);
+  mEditorZ->Set(value.z);
 }
 
 
@@ -255,15 +233,6 @@ void Vec3Watcher::SetReadOnly(bool readOnly) {
   mEditorX->SetReadOnly(readOnly);
   mEditorY->SetReadOnly(readOnly);
   mEditorZ->SetReadOnly(readOnly);
-}
-
-
-void Vec3Watcher::HandleChangedNode(Node* node) {
-  Vec3 value = 
-    node ? static_cast<ValueNode<NodeType::VEC3>*>(node)->Get() : Vec3(0, 0, 0);
-  mEditorX->Set(value.x);
-  mEditorY->Set(value.y);
-  mEditorZ->Set(value.z);
 }
 
 
@@ -282,8 +251,7 @@ void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
 
 Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget,
                          QString name, bool readOnly)
-  : Watcher(node, widget) 
-{
+  : WatcherUI(node, widget) {
   QVBoxLayout* layout = new QVBoxLayout(widget);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -310,18 +278,12 @@ Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget,
 }
 
 
-void Vec4Watcher::HandleSniffedMessage(NodeMessage message, Slot*, void* payload) {
-  switch (message) {
-    case NodeMessage::VALUE_CHANGED: {
-      Vec4 value = static_cast<ValueNode<NodeType::VEC4>*>(mNode)->Get();
-      mEditorX->Set(value.x);
-      mEditorY->Set(value.y);
-      mEditorZ->Set(value.z);
-      mEditorW->Set(value.w);
-      break;
-    }
-    default: break;
-  }
+void Vec4Watcher::OnRedraw() {
+  Vec4 value = static_cast<ValueNode<NodeType::VEC4>*>(mNode)->Get();
+  mEditorX->Set(value.x);
+  mEditorY->Set(value.y);
+  mEditorZ->Set(value.z);
+  mEditorW->Set(value.w);
 }
 
 
@@ -330,16 +292,6 @@ void Vec4Watcher::SetReadOnly(bool readOnly) {
   mEditorY->SetReadOnly(readOnly);
   mEditorZ->SetReadOnly(readOnly);
   mEditorW->SetReadOnly(readOnly);
-}
-
-
-void Vec4Watcher::HandleChangedNode(Node* node) {
-  Vec4 value =
-    node ? static_cast<ValueNode<NodeType::VEC4>*>(node)->Get() : Vec4(0, 0, 0, 0);
-  mEditorX->Set(value.x);
-  mEditorY->Set(value.y);
-  mEditorZ->Set(value.z);
-  mEditorW->Set(value.w);
 }
 
 

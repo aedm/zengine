@@ -179,6 +179,9 @@
     <ClInclude Include="include\nodes\splinenode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\dom\watcher.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -282,6 +285,9 @@
     </ClCompile>
     <ClCompile Include="source\nodes\splinenode.cpp">
       <Filter>source\nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\watcher.cpp">
+      <Filter>source\dom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

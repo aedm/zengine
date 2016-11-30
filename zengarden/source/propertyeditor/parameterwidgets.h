@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zengine.h>
-#include "../watchers/watcher.h"
+#include "../watchers/watcherui.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/qlineedit.h>
 
@@ -89,7 +89,7 @@ protected:
 
 
 /// A parameter panel item for FloatNodes
-class FloatWatcher: public Watcher {
+class FloatWatcher: public WatcherUI {
 public:
   FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, QString name,
                bool readOnly);
@@ -98,13 +98,8 @@ public:
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-protected:
-  /// This method will be called when the watched node was changed
-  virtual void HandleChangedNode(Node* node) override;
-
 private:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot, 
-                                    void* payload) override;
+  virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
 
@@ -113,7 +108,7 @@ private:
 
 
 /// A parameter panel item for Vec3Nodes
-class Vec3Watcher: public Watcher {
+class Vec3Watcher: public WatcherUI {
 public:
   Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget, QString name,
               bool readOnly);
@@ -122,13 +117,8 @@ public:
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-protected:
-  /// This method will be called when the watched node was changed
-  virtual void HandleChangedNode(Node* node) override;
-
 private:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
   FloatEditor* mEditorY = nullptr;
@@ -139,7 +129,7 @@ private:
 
 
 /// A parameter panel item for Vec4Nodes
-class Vec4Watcher: public Watcher {
+class Vec4Watcher: public WatcherUI {
 public:
   Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget, QString name,
               bool readOnly);
@@ -148,13 +138,8 @@ public:
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-protected:
-  /// This method will be called when the watched node was changed
-  virtual void HandleChangedNode(Node* node) override;
-
 private:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
   FloatEditor* mEditorY = nullptr;

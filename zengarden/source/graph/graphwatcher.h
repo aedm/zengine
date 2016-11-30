@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../watchers/watcherwidget.h"
-#include "../watchers/watcher.h"
+#include "../watchers/watcherui.h"
 #include <zengine.h>
 #include <vector>
 
@@ -9,7 +9,7 @@ using namespace std;
 class NodeWidget;
 class Graph;
 
-class GraphWatcher: public Watcher {
+class GraphWatcher: public WatcherUI {
   friend class NodeWidget;
 
 public:
@@ -30,9 +30,9 @@ private:
   void HandleMouseRightUp(QMouseEvent* event);
   void HandleKeyPress(GLWidget*, QKeyEvent* event);
 
-  /// This method will be callen when the watched graph receives an internal message
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  /// Watcher callbacks
+  virtual void OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) override;
+  virtual void OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) override;
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.
   void Update();

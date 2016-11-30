@@ -1,9 +1,9 @@
 #pragma once
 
-#include "watcher.h"
+#include "watcherui.h"
 #include <zengine.h>
 
-class StubWatcher : public Watcher
+class StubWatcher : public WatcherUI
 {
 public:
 	StubWatcher(StubNode* Stub, WatcherWidget* Widget);

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "watcher.h"
+#include "watcherui.h"
 #include "watcherwidget.h"
 #include <zengine.h>
 
-class GeneralSceneWatcher: public Watcher {
+class GeneralSceneWatcher: public WatcherUI {
 public:
   GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget);
   virtual ~GeneralSceneWatcher();
@@ -12,10 +12,11 @@ public:
   /// Initializes resources needed for scene watchers
   static void Init();
 
+  /// Called when the watcher needs to be rerendered
+  virtual void OnRedraw() override;
+
 protected:
   void Paint(GLWidget* widget);
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
 
   RenderTarget* mRenderTarget;
 

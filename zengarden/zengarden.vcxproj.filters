@@ -98,9 +98,6 @@
     <ClCompile Include="source\propertyeditor\propertyeditor.cpp">
       <Filter>source\propertyeditor</Filter>
     </ClCompile>
-    <ClCompile Include="source\watchers\watcher.cpp">
-      <Filter>source\watchers</Filter>
-    </ClCompile>
     <ClCompile Include="source\propertyeditor\parameterwidgets.cpp">
       <Filter>source\propertyeditor</Filter>
     </ClCompile>
@@ -165,6 +162,9 @@
       <Filter>source\watchers</Filter>
     </ClCompile>
     <ClCompile Include="source\watchers\splinewatcher.cpp">
+      <Filter>source\watchers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\watchers\watcherui.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -234,9 +234,6 @@
     <ClInclude Include="source\watchers\logwatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
-    <ClInclude Include="source\watchers\watcher.h">
-      <Filter>source\watchers</Filter>
-    </ClInclude>
     <ClInclude Include="source\watchers\passwatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
@@ -263,6 +260,9 @@
     </ClInclude>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_splineeditor.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\watcherui.h">
+      <Filter>source\watchers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

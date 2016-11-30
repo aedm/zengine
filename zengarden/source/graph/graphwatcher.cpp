@@ -16,7 +16,7 @@
 #include <QImage>
 
 GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
-  : Watcher(graph, parent) 
+  : WatcherUI(graph, parent) 
 {
   GetGLWidget()->setMouseTracking(true);
   GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
@@ -486,39 +486,22 @@ Graph* GraphWatcher::GetGraph() {
 }
 
 
-void GraphWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                        void* payload) {
-  switch (message) {
-    case NodeMessage::MULTISLOT_CONNECTION_ADDED: {
-        Node* node = static_cast<Node*>(payload);
-        NodeWidget* widget = new NodeWidget(node, this);
-        mWidgetMap[node] = widget;
-        GetGLWidget()->update();
-      }
-      break;
-    case NodeMessage::MULTISLOT_CONNECTION_REMOVED: {
-        Node* node = static_cast<Node*>(payload);
-        auto it = mWidgetMap.find(node);
-        DeselectAll();
-        if (it != mWidgetMap.end()) {
-          delete it->second;
-          mWidgetMap.erase(it);
-        }
-        UpdateHoveredWidget(mCurrentMousePos);
-        Update();
-    }
-      break;
-    case NodeMessage::MULTISLOT_CLEARED:
-      break;
-    case NodeMessage::NEEDS_REDRAW:
-      break;
-    case NodeMessage::NODE_NAME_CHANGED:
-      break;
-    case NodeMessage::NODE_POSITION_CHANGED:
-      break;
-    default:
-      break;
+void GraphWatcher::OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) {
+  NodeWidget* widget = new NodeWidget(addedNode, this);
+  mWidgetMap[addedNode] = widget;
+  GetGLWidget()->update();
+}
+
+
+void GraphWatcher::OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) {
+  auto it = mWidgetMap.find(removedNode);
+  DeselectAll();
+  if (it != mWidgetMap.end()) {
+    delete it->second;
+    mWidgetMap.erase(it);
   }
+  UpdateHoveredWidget(mCurrentMousePos);
+  Update();
 }
 
 

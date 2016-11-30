@@ -193,7 +193,7 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   }
 
   WatcherWidget* watcherWidget = nullptr;
-  Watcher* watcher = nullptr;
+  WatcherUI* watcher = nullptr;
 
   /// Non-3D watchers
   switch (node->GetType()) {

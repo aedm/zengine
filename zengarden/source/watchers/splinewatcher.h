@@ -1,6 +1,6 @@
 #pragma once
 
-#include "watcher.h"
+#include "watcherui.h"
 #include "watcherwidget.h"
 #include "ui_splineeditor.h"
 
@@ -9,7 +9,7 @@
 class SplineWidget;
 
 template<NodeType T>
-class SplineWatcher: public Watcher {
+class SplineWatcher: public WatcherUI {
 public:
   SplineWatcher(Node* node, WatcherWidget* watcherWidget);
   virtual ~SplineWatcher();
@@ -20,8 +20,9 @@ protected:
   Ui::SplineEditor mUI;
   SplineWidget* mSplineWidget;
 
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnRedraw() override;
+  virtual void OnSplineControlPointsChanged() override;
+  virtual void OnSplineTimeChanged() override;
 
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);
@@ -29,8 +30,6 @@ protected:
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseMove(QMouseEvent* event);
   void HandleMouseWheel(QWheelEvent* event);
-
-  void HandleTimeChange(NodeMessage, Slot*, void*);
 
   typedef typename NodeTypes<T>::Type VType;
   QPointF ToScreenCoord(float time, float value);
@@ -67,7 +66,6 @@ private slots:
   void AddPoint();
   void ToggleLinear();
 };
-
 
 typedef SplineWatcher<NodeType::FLOAT> FloatSplineWatcher;
 

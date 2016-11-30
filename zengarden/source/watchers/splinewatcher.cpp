@@ -5,7 +5,7 @@ template class SplineWatcher<NodeType::FLOAT>;
 
 template<NodeType T>
 SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
-  : Watcher(node, watcherWidget)
+  : WatcherUI(node, watcherWidget)
   , mXRange(0, 10)
   , mYRange(5, -5) {
   mUI.setupUi(watcherWidget);
@@ -23,10 +23,6 @@ SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
 
   UpdateRangeLabels();
   SelectPoint(-1);
-  TheSceneTime->onSniffMessage += Delegate(this, &SplineWatcher<T>::HandleTimeChange);
-
-  //mUI->connect(mUI.addPointButton, SIGNAL(clicked()), this, SLOT(AddPoint()));
-  //mUI->connect(mUI.removePointButton, SIGNAL(clicked()), this, SLOT(RemovePoint()));
 
   watcherWidget->connect(mUI.addPointButton, &QPushButton::pressed, [=]() { AddPoint(); });
   watcherWidget->connect(mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
@@ -35,19 +31,18 @@ SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
 }
 
 template<NodeType T>
-SplineWatcher<T>::~SplineWatcher() {
-  TheSceneTime->onSniffMessage -= Delegate(this, &SplineWatcher<T>::HandleTimeChange);
+SplineWatcher<T>::~SplineWatcher() {}
+
+
+template<NodeType T>
+void SplineWatcher<T>::OnRedraw() {
+  mSplineWidget->update();
 }
 
 
 template<NodeType T>
-void SplineWatcher<T>::HandleSniffedMessage(NodeMessage message, Slot* slot, void* payload) {
-  if (message == NodeMessage::VALUE_CHANGED) {
-    mSplineWidget->update();
-  } 
-  if (message == NodeMessage::NEEDS_REDRAW) {
-    SelectPoint(mSelectedPointIndex);
-  }
+void SplineWatcher<T>::OnSplineControlPointsChanged() {
+  SelectPoint(mSelectedPointIndex);
 }
 
 
@@ -83,8 +78,9 @@ SSpline* SplineWatcher<T>::GetSpline() {
   return dynamic_cast<SSpline*>(GetNode());
 }
 
+
 template<NodeType T>
-void SplineWatcher<T>::HandleTimeChange(NodeMessage, Slot*, void*) {
+void SplineWatcher<T>::OnSplineTimeChanged() {
   mSplineWidget->update();
 }
 
