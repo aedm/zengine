@@ -39,6 +39,8 @@ private:
   /// Layout
   void CalculateLayout();
 
+  void UpdateGraph();
+
   //Vec2 mPosition;
   //Vec2 mSize;
   Vec2 mOutputPosition;

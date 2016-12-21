@@ -3,23 +3,23 @@
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTabWidget>
 
-WatcherWidget::WatcherWidget(QWidget* parent, WatcherPosition position, 
+WatcherWidget::WatcherWidget(QWidget* parent, WatcherPosition position,
                              QTabWidget* tabWidget)
   : QWidget(parent)
   , mPosition(position)
   , mWatcher(nullptr)
-  , mTabWidget(tabWidget)
-{}
+  , mTabWidget(tabWidget) {}
 
 WatcherWidget::~WatcherWidget() {
   /// Don't let the Watcher delete the WatcherWidget
+  if (!mWatcher) return;
   mWatcher->mWatcherWidget = nullptr;
   SafeDelete(mWatcher);
 }
 
 GLWidget* WatcherWidget::GetGLWidget() {
   /// TODO: fix this.
-  /// SHOULDNT_HAPPEN;
+  SHOULDNT_HAPPEN;
   return nullptr;
 }
 
@@ -38,11 +38,10 @@ void WatcherWidget::dropEvent(QDropEvent *event) {
   mWatcher->HandleDropEvent(event);
 }
 
-GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget, 
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget,
                                  WatcherPosition position, QTabWidget* tabWidget)
-  : WatcherWidget(parent, position, tabWidget) 
-  , mShareWidget(shareWidget)
-{
+  : WatcherWidget(parent, position, tabWidget)
+  , mShareWidget(shareWidget) {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
 

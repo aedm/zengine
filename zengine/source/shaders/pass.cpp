@@ -34,6 +34,7 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
         SafeDelete(mVertexShaderMetadata);
         mIsUpToDate = false;
         ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+        NotifyWatchers(&Watcher::OnRedraw);
       }
       else if (slot == &mFragmentStub) {
         SafeDelete(mFragmentShaderMetadata);

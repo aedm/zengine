@@ -44,8 +44,9 @@ GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
 
 
 GraphWatcher::~GraphWatcher() {
-  for (const auto& it : mWidgetMap) delete it.second;
+  for (auto& it : mWidgetMap) it.second->mGraphWatcher = nullptr;
 }
+
 
 void GraphWatcher::Paint(GLWidget* glWidget) {
   TheDrawingAPI->OnContextSwitch();
@@ -404,8 +405,9 @@ void GraphWatcher::HandleMouseWheel(GLWidget*, QWheelEvent* event) {
 bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
   NodeWidget* hovered = nullptr;
   int slot = -1;
-  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
-    NodeWidget* widget = mWidgetMap.at(node);
+  for (auto& it : mWidgetMap) {
+    Node* node = it.first;
+    NodeWidget* widget = it.second;
     if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
       hovered = widget;
       for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
@@ -493,11 +495,10 @@ void GraphWatcher::OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) {
 }
 
 
-void GraphWatcher::OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) {
-  auto it = mWidgetMap.find(removedNode);
+void GraphWatcher::RemoveNodeWidget(Node* node) {
+  auto it = mWidgetMap.find(node);
   DeselectAll();
   if (it != mWidgetMap.end()) {
-    delete it->second;
     mWidgetMap.erase(it);
   }
   UpdateHoveredWidget(mCurrentMousePos);

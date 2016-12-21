@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nodetype.h"
+#include "watcher.h"
 #include "../base/vectormath.h"
 #include "../base/fastdelegate.h"
 #include "../base/helpers.h"
@@ -176,9 +177,9 @@ private:
   void DisconnectFromSlot(Slot* slot);
 
 
-/// ---------------- Editor-specific parts ----------------
-/// This section can be disabled without hurting the engine.
-public: 
+  /// ---------------- Editor-specific parts ----------------
+  /// This section can be disabled without hurting the engine.
+public:
   virtual void SetName(const string& name);
   virtual const string& GetName() const;
   virtual void SetPosition(const Vec2 position);
@@ -198,12 +199,14 @@ public:
 protected:
   /// Registers a new slot
   void AddSlot(Slot* slot, bool isPublic, bool isSerializable);
-  
+
   /// Removes public and serializable slots
   void ClearSlots();
 
-  /// Notifies all watchers about value change
-  void OnWatcherValueChange();
+  template <class ...B>
+  inline void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
+    for (Watcher* watcher : mWatchers) (watcher->*M)(args...);
+  }
 
 private:
   /// Custom name of the node
@@ -224,16 +227,21 @@ private:
 };
 
 
+//template <class ...B>
+//inline void Watch(void (Watcher::*M)(B...), B... args) {
+//  for (Watcher* watcher : mWatchers) watcher->*M(...args);
+//}
+
 
 /// Typed slot macro, syntactic sugar. 
 template<NodeType T, class N>
 class TypedSlot: public Slot {
 public:
-  TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,          
+  TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true)
-            : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}     
+    : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}
 
-  N* GetNode() { 
-    return static_cast<N*>(GetAbstractNode()); 
-  } 
+  N* GetNode() {
+    return static_cast<N*>(GetAbstractNode());
+  }
 };

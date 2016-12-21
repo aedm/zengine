@@ -46,7 +46,9 @@
     <IntDir>$(ProjectDir)\.msbuild\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>zengine-release</TargetName>
+    <TargetName>zengine-release64</TargetName>
+    <IntDir>$(ProjectDir)\.msbuild\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)\lib\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

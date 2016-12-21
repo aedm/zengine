@@ -49,6 +49,7 @@ NodeWidget::NodeWidget(Node* node, GraphWatcher* graphWatcher)
 
 
 NodeWidget::~NodeWidget() {
+  if (mGraphWatcher) mGraphWatcher->RemoveNodeWidget(mNode);
   SafeDelete(mTitleTexture);
 }
 
@@ -87,6 +88,10 @@ void NodeWidget::CalculateLayout()
   mNode->SetSize(size);
 }
 
+
+void NodeWidget::UpdateGraph() {
+  if (mGraphWatcher) mGraphWatcher->Update();
+}
 
 void NodeWidget::Paint()
 {
@@ -171,7 +176,7 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 
 void NodeWidget::OnSlotStructureChanged() {
   CreateWidgetSlots();
-  mGraphWatcher->Update();
+  UpdateGraph();
 }
 
 
@@ -197,15 +202,15 @@ void NodeWidget::OnNameChange() {
   }
   mTitleTexture = new TextTexture();
   mTitleTexture->SetText(text, ThePainter->mTitleFont);
-  mGraphWatcher->Update();
+  UpdateGraph();
 }
 
 
 void NodeWidget::OnGraphPositionChanged() {
-  mGraphWatcher->Update();
+  UpdateGraph();
 }
 
 
 void NodeWidget::OnSlotConnectionChanged(Slot* slot) {
-  mGraphWatcher->Update();
+  UpdateGraph();
 }

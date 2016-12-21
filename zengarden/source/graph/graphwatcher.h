@@ -32,7 +32,9 @@ private:
 
   /// Watcher callbacks
   virtual void OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) override;
-  virtual void OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) override;
+
+  /// Remove node widget when it's deleted
+  void RemoveNodeWidget(Node* node);
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.
   void Update();

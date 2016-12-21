@@ -1,4 +1,5 @@
 #include <include/dom/watcher.h>
+#include <include/dom/node.h>
 
 Watcher::Watcher(Node* node)
   : mNode(node)

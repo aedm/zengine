@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../dom/node.h"
+class Node;
+class Slot;
 
 class Watcher {
 public:

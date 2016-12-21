@@ -46,13 +46,17 @@ bool Slot::Connect(Node* target) {
     }
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
+    /// TODO: merge these
     mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_ADDED, this, target);
+    mOwner->NotifyWatchers(&Watcher::OnMultiSlotConnectionAdded, this, target);
   } else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
+      /// TODO: merge these
       mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
   }
   return true;
@@ -66,6 +70,7 @@ void Slot::Disconnect(Node* target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
         mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_REMOVED, this, target);
+        mOwner->NotifyWatchers(&Watcher::OnMultiSlotConnectionRemoved, this, target);
         return;
       }
     }
@@ -82,6 +87,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
   if (mIsMultiSlot) {
     for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
       (*it)->DisconnectFromSlot(this);
+      mOwner->NotifyWatchers(&Watcher::OnMultiSlotConnectionRemoved, this, *it);
     }
     mMultiNodes.clear();
     if (notifyOwner) {
@@ -92,6 +98,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
     mNode = nullptr;
     if (notifyOwner) {
       mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
   }
 }
@@ -174,6 +181,7 @@ void Node::ConnectToSlot(Slot* slot) {
 void Node::DisconnectFromSlot(Slot* slot) {
   mDependants.erase(std::remove(mDependants.begin(), mDependants.end(), slot), 
                     mDependants.end());
+  NotifyWatchers(&Watcher::OnSlotConnectionChanged, slot);
 }
 
 
@@ -214,7 +222,7 @@ void Node::SendMsg(NodeMessage message, void* payload) {
 
 void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
   HandleMessage(message, slot, payload);
-  onSniffMessage(message, slot, payload);
+  //onSniffMessage(message, slot, payload);
 }
 
 
@@ -271,7 +279,7 @@ const string& Node::GetName() const {
 void Node::SetPosition(const Vec2 position) {
   mPosition.x = floorf(position.x);
   mPosition.y = floorf(position.y);
-  ReceiveMessage(NodeMessage::NODE_POSITION_CHANGED);
+  NotifyWatchers(&Watcher::OnGraphPositionChanged);
 }
 
 const Vec2 Node::GetPosition() const {
@@ -303,10 +311,6 @@ void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable) {
 void Node::ClearSlots() {
   mPublicSlots.clear();
   mSerializableSlotsByName.clear();
-}
-
-void Node::OnWatcherValueChange() {
-  for (Watcher* watcher : mWatchers) watcher->OnRedraw();
 }
 
 const vector<Slot*>& Node::GetPublicSlots() {

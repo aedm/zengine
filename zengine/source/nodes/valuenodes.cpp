@@ -17,3 +17,5 @@ template<> StaticValueNode<NodeType::VEC4>::StaticValueNode()
 {
   mValue = Vec4(0, 0, 0, 0);
 }
+
+static FloatNode a;
