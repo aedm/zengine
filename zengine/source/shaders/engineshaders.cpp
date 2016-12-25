@@ -41,8 +41,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   UINT newHeight = height;
   for (UINT i = 0; i <= downsampleCount; i++) {
     FrameBufferId target = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    glBlitNamedFramebuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight, 
-                           GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    TheDrawingAPI->BlitFrameBuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight);
     auto error = glGetError();  ASSERT(error == GL_NO_ERROR);
     width = newWidth;
     height = newHeight;

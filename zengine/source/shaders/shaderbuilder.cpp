@@ -147,7 +147,7 @@ void ShaderBuilder::GenerateSlots() {
 }
 
 void ShaderBuilder::GenerateSource() {
-  sourceStream << "#version 450 core" << endl;
+  sourceStream << "#version 430 core" << endl;
   GenerateSourceHeader(sourceStream);
   GenerateSourceFunctions(sourceStream);
   GenerateSourceMain(sourceStream);

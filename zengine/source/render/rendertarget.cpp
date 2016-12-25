@@ -17,6 +17,7 @@ RenderTarget::~RenderTarget() {
 void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   globals->DepthBufferSource = 0;
   globals->GBufferSourceA = 0;
+  globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
   TheDrawingAPI->SetFrameBuffer(mGBufferId);
 }
 
