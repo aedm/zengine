@@ -22,8 +22,6 @@ void Watcher::ChangeNode(Node* node) {
 
 void Watcher::OnRedraw() {}
 void Watcher::OnNameChange() {}
-void Watcher::OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) {}
-void Watcher::OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) {}
 void Watcher::OnSlotConnectionChanged(Slot* slot) {}
 void Watcher::OnSlotStructureChanged() {}
 void Watcher::OnGraphPositionChanged() {}

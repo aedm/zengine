@@ -17,10 +17,8 @@ public:
   virtual void OnNameChange();
 
   /// Called when slot connections change
-  virtual void OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode);
-  virtual void OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode);
   virtual void OnSlotConnectionChanged(Slot* slot);
-
+  
   /// Called when the list of slots changed
   virtual void OnSlotStructureChanged();
 

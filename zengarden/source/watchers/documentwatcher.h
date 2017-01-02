@@ -12,8 +12,7 @@ public:
 	virtual ~DocumentWatcher();
 
 protected:
-  virtual void OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) override;
-  virtual void OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) override;
+  virtual void OnSlotConnectionChanged(Slot* slot);
 
   void RefreshGraphList();
 

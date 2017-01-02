@@ -31,10 +31,7 @@ private:
   void HandleKeyPress(GLWidget*, QKeyEvent* event);
 
   /// Watcher callbacks
-  virtual void OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) override;
-
-  /// Remove node widget when it's deleted
-  void RemoveNodeWidget(Node* node);
+  virtual void OnSlotConnectionChanged(Slot* slot);
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.
   void Update();

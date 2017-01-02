@@ -488,21 +488,32 @@ Graph* GraphWatcher::GetGraph() {
 }
 
 
-void GraphWatcher::OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) {
-  NodeWidget* widget = new NodeWidget(addedNode, this);
-  mWidgetMap[addedNode] = widget;
-  GetGLWidget()->update();
-}
-
-
-void GraphWatcher::RemoveNodeWidget(Node* node) {
-  auto it = mWidgetMap.find(node);
-  DeselectAll();
-  if (it != mWidgetMap.end()) {
-    mWidgetMap.erase(it);
+void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
+  /// Create widgets for newly added nodes
+  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+    auto it = mWidgetMap.find(node);
+    if (it == mWidgetMap.end()) {
+      NodeWidget* widget = new NodeWidget(node, this);
+      mWidgetMap[node] = widget;
+      GetGLWidget()->update();
+    }
   }
-  UpdateHoveredWidget(mCurrentMousePos);
-  Update();
+
+  /// Remove widgets of removed nodes
+  auto& nodes = GetGraph()->mNodes.GetMultiNodes();
+  while (true) {
+    bool found = false;
+    for (auto it : mWidgetMap) {
+      Node* node = it.first;
+      if (find(nodes.begin(), nodes.end(), node) == nodes.end()) {
+        NodeWidget* widget = it.second;
+        mWidgetMap.erase(node);
+        found = true;
+        break;
+      }
+    }
+    if (!found) break;
+  }
 }
 
 

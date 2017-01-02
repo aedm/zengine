@@ -106,7 +106,7 @@ UiPainter::~UiPainter() {
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
   VertexPos vertices[] = {{Vec3(x1 + 0.5f, y1 + 0.5f, 0)}, {Vec3(x2 + 0.5f, y2 + 0.5f, 0)}};
   mLineMeshNode->GetMesh()->SetVertices(vertices);
-  mSolidLine->Draw(&mGlobals, PRIMITIVE_LINES);
+  mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
 
 void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
@@ -114,7 +114,7 @@ void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
     {Vec3(From.x + 0.5f, From.y + 0.5f, 0)},
     {Vec3(To.x + 0.5f, To.y + 0.5f, 0)}};
   mLineMeshNode->GetMesh()->SetVertices(vertices);
-  mSolidLine->Draw(&mGlobals, PRIMITIVE_LINES);
+  mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
 
 void UiPainter::DrawRect(const Vec2& TopLeft, const Vec2& Size) {
@@ -127,7 +127,7 @@ void UiPainter::DrawRect(const Vec2& TopLeft, const Vec2& Size) {
     {pos},
   };
   mRectMeshNode->GetMesh()->SetVertices(vertices);
-  mSolidRect->Draw(&mGlobals, PRIMITIVE_LINE_STRIP);
+  mSolidRect->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINE_STRIP);
 }
 
 
@@ -139,7 +139,7 @@ void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
     {Vec3(TopLeft.x + Size.x, TopLeft.y + Size.y, 0)},
   };
   mBoxMeshNode->GetMesh()->SetVertices(vertices);
-  mSolidBox->Draw(&mGlobals, PRIMITIVE_TRIANGLES);
+  mSolidBox->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_TRIANGLES);
 }
 
 void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
@@ -154,7 +154,7 @@ void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
 
   mTextureNode.Set(Tex);
   mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
-  mTexturedBox->Draw(&mGlobals);
+  mTexturedBox->Draw(&mGlobals, PassType::SOLID);
 }
 
 
@@ -172,7 +172,7 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
 
   mTextureNode.Set(Tex->TheTexture);
   mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
-  mTextBox->Draw(&mGlobals);
+  mTextBox->Draw(&mGlobals, PassType::SOLID);
 }
 
 

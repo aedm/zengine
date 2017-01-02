@@ -22,15 +22,9 @@ DocumentWatcher::~DocumentWatcher() {
 }
 
 
-void DocumentWatcher::OnMultiSlotConnectionAdded(Slot* slot, Node* addedNode) {
+void DocumentWatcher::OnSlotConnectionChanged(Slot* slot) {
   RefreshGraphList();
 }
-
-
-void DocumentWatcher::OnMultiSlotConnectionRemoved(Slot* slot, Node* removedNode) {
-  RefreshGraphList();
-}
-
 
 void DocumentWatcher::RefreshGraphList() {
   Document* doc = static_cast<Document*>(mNode);

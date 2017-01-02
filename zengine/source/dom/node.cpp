@@ -48,7 +48,7 @@ bool Slot::Connect(Node* target) {
     target->ConnectToSlot(this);
     /// TODO: merge these
     mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_ADDED, this, target);
-    mOwner->NotifyWatchers(&Watcher::OnMultiSlotConnectionAdded, this, target);
+    mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
   } else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
@@ -70,7 +70,7 @@ void Slot::Disconnect(Node* target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
         mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_REMOVED, this, target);
-        mOwner->NotifyWatchers(&Watcher::OnMultiSlotConnectionRemoved, this, target);
+        mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
         return;
       }
     }
@@ -87,7 +87,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
   if (mIsMultiSlot) {
     for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
       (*it)->DisconnectFromSlot(this);
-      mOwner->NotifyWatchers(&Watcher::OnMultiSlotConnectionRemoved, this, *it);
+      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
     mMultiNodes.clear();
     if (notifyOwner) {

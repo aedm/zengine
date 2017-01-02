@@ -49,7 +49,6 @@ NodeWidget::NodeWidget(Node* node, GraphWatcher* graphWatcher)
 
 
 NodeWidget::~NodeWidget() {
-  if (mGraphWatcher) mGraphWatcher->RemoveNodeWidget(mNode);
   SafeDelete(mTitleTexture);
 }
 

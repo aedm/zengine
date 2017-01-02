@@ -17,6 +17,7 @@ namespace Shaders {
 	ITEM(mat4)				      \
 	ITEM(sampler2D)			    \
 	ITEM(sampler2DMS)  	    \
+	ITEM(sampler2DShadow)   \
 	ITEM(void)				      \
 	ITEM(name)				      \
 	ITEM(returns)			      \

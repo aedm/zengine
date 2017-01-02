@@ -7,6 +7,11 @@
 
 using namespace std;
 
+enum class PassType {
+  SHADOW,
+  SOLID,
+};
+
 struct PassUniform {
   UniformId handle;
   Node* node;

@@ -10,8 +10,6 @@ void CheckGLError() {
 #	define CheckGLError()
 #endif
 
-const int RenderTargetMultiSampleCount = 8;
-
 struct GLVersion { GLboolean* version; const wchar_t* name; };
 
 static GLVersion gOpenGLVersions[] = {
@@ -32,6 +30,8 @@ static GLVersion gOpenGLVersions[] = {
   {&__GLEW_VERSION_4_1, L"4.1"},
   {&__GLEW_VERSION_4_2, L"4.2"},
   {&__GLEW_VERSION_4_3, L"4.3"},
+  {&__GLEW_VERSION_4_4, L"4.4"},
+  {&__GLEW_VERSION_4_5, L"4.5"},
   {NULL, NULL}
 };
 
@@ -50,8 +50,8 @@ DrawingOpenGL::DrawingOpenGL() {
     if (versionName == NULL) ERR(L"OpenGL not found at all.");
     else INFO(L"OpenGL version %s found.", versionName);
 
-    if (!GLEW_VERSION_2_0) {
-      ERR(L"Sorry, OpenGL 2.0 needed at least.");
+    if (!GLEW_VERSION_4_3) {
+      ERR(L"Sorry, OpenGL 4.3 needed at least.");
     }
     CheckGLError();
   }
@@ -83,13 +83,15 @@ void DrawingOpenGL::OnContextSwitch() {
   BoundVertexBufferShadow = -1;
   BoundIndexBufferShadow = -1;
   BoundFrameBufferShadow = -1;
+  BoundFrameBufferReadBuffer = -1;
+  BoundFrameBufferDrawBuffer = -1;
   for (int i = 0; i < MAX_COMBINED_TEXTURE_SLOTS; i++) {
     BoundTextureShadow[i] = (GLuint)-1;
     BoundMultisampleTextureShadow[i] = (GLuint)-1;
   }
 }
 
-static bool CompileAndAttachShader(GLuint program, GLuint shaderType, 
+static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
                                    const char* source) {
   /// Create shader object, set the source, and compile
   GLuint shader = glCreateShader(shaderType);
@@ -119,7 +121,7 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
 }
 
 OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
-    const char* vertexSource, const char* fragmentSource) {
+  const char* vertexSource, const char* fragmentSource) {
   GLuint program = glCreateProgram();
 
   /// Compile shaders
@@ -178,7 +180,7 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
     glGetActiveUniform(program, i, uniformNameMaxLength, &nameLength, &size, &type, name);
     GLint location = glGetUniformLocation(program, name);
     //ASSERT(i == location);
-    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE) {
+    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE || type == GL_SAMPLER_2D_SHADOW) {
       ShaderSamplerDesc sampler;
       sampler.Handle = location;
       sampler.Name = name;
@@ -217,15 +219,15 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
     GLenum type;
 
     glGetActiveAttrib(program, i, attributeNameMaxLength, &nameLength, &size, &type, name);
-    
+
     /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
     AttributeId location = glGetAttribLocation(program, name);
-    
+
     /// Shader compiler reports gl_InstanceID as an attribute at -1, who knows why.
     if (location < 0) continue;
 
     ShaderAttributeDesc attribute;
-    attribute.Handle = location; 
+    attribute.Handle = location;
     attribute.Name = name;
     switch (type) {
       case GL_FLOAT:		attribute.Type = NodeType::FLOAT;		break;
@@ -363,7 +365,7 @@ void DrawingOpenGL::BindFrameBuffer(GLuint frameBufferID) {
 }
 
 AttributeMapper* DrawingOpenGL::CreateAttributeMapper(
-  const vector<VertexAttribute>& bufferAttribs, 
+  const vector<VertexAttribute>& bufferAttribs,
   const vector<ShaderAttributeDesc>& shaderAttribs, UINT stride) {
   AttributeMapperOpenGL* mapper = new AttributeMapperOpenGL();
   mapper->Stride = stride;
@@ -409,7 +411,7 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
 }
 
 void DrawingOpenGL::RenderIndexedMesh(IndexBufferHandle indexHandle,
-                                      UINT indexCount, VertexBufferHandle vertexHandle, 
+                                      UINT indexCount, VertexBufferHandle vertexHandle,
                                       const AttributeMapper* mapper,
                                       PrimitiveTypeEnum primitiveType) {
   BindVertexBuffer(vertexHandle);
@@ -421,7 +423,7 @@ void DrawingOpenGL::RenderIndexedMesh(IndexBufferHandle indexHandle,
 }
 
 void DrawingOpenGL::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
-                               const AttributeMapper* mapper, 
+                               const AttributeMapper* mapper,
                                PrimitiveTypeEnum primitiveType) {
   BindVertexBuffer(vertexHandle);
   static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
@@ -429,7 +431,7 @@ void DrawingOpenGL::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount
   CheckGLError();
 }
 
-void DrawingOpenGL::Render(IndexBufferHandle indexBuffer, UINT count, 
+void DrawingOpenGL::Render(IndexBufferHandle indexBuffer, UINT count,
                            PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
   if (indexBuffer != 0) {
     BindIndexBuffer(indexBuffer);
@@ -442,7 +444,7 @@ void DrawingOpenGL::Render(IndexBufferHandle indexBuffer, UINT count,
   }
 }
 
-void DrawingOpenGL::SetViewport(int x, int y, int width, int height, 
+void DrawingOpenGL::SetViewport(int x, int y, int width, int height,
                                 float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
   glViewport(x, y, width, height);
   glDepthRange(depthMin, depthMax);
@@ -452,7 +454,7 @@ void DrawingOpenGL::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 
   SetClearColor(rgbColor);
   CheckGLError();
   glClear((colorBuffer ? GL_COLOR_BUFFER_BIT : 0) |
-          (depthBuffer ? GL_DEPTH_BUFFER_BIT : 0));
+    (depthBuffer ? GL_DEPTH_BUFFER_BIT : 0));
   CheckGLError();
 }
 
@@ -485,6 +487,28 @@ void DrawingOpenGL::SetBlendMode(RenderState::BlendModeEnum blendMode) {
       break;
   }
   BlendModeShadow = blendMode;
+}
+
+void DrawingOpenGL::BindReadFramebuffer(GLuint framebuffer) {
+  if (BoundFrameBufferReadBuffer == framebuffer) return;
+  BoundFrameBufferReadBuffer = framebuffer;
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+}
+
+void DrawingOpenGL::BindDrawFramebuffer(GLuint framebuffer) {
+  if (BoundFrameBufferDrawBuffer == framebuffer) return;
+  BoundFrameBufferDrawBuffer = framebuffer;
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+}
+
+void DrawingOpenGL::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
+  BindReadFramebuffer(framebuffer);
+  glReadBuffer(mode);
+}
+
+void DrawingOpenGL::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
+  BindDrawFramebuffer(framebuffer);
+  glDrawBuffer(mode);
 }
 
 void DrawingOpenGL::SetBlending(bool enable) {
@@ -521,7 +545,7 @@ void DrawingOpenGL::SetClearColor(UINT clearColor) {
   glClearColor(
     IntColorToFloat((clearColor >> 16) & 0xff),
     IntColorToFloat((clearColor >> 8) & 0xff),
-    IntColorToFloat((clearColor)& 0xff),
+    IntColorToFloat((clearColor) & 0xff),
     1.0f);
   ClearColorShadow = clearColor;
 }
@@ -529,7 +553,7 @@ void DrawingOpenGL::SetClearColor(UINT clearColor) {
 
 /// Converts a single TexelType to OpenGL enums
 static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format,
-                    GLenum &glType) {
+                           GLenum &glType) {
   switch (type) {
     case TexelType::ARGB8:
       internalFormat = GL_RGBA;
@@ -563,8 +587,8 @@ static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format
 }
 
 
-TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type, 
-                                           bool isMultiSample, bool doesRepeat) {
+TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type,
+                                           bool isMultiSample, bool doesRepeat, bool mipmap) {
   CheckGLError();
   GLuint texture;
   glGenTextures(1, &texture);
@@ -577,35 +601,35 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type
     GLint internalFormat;
     GLenum format, glType;
     GetTextureType(type, internalFormat, format, glType);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, RenderTargetMultiSampleCount,
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
                             internalFormat, width, height, false);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
   } else {
     BindTexture(texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-    SetTextureData(width, height, type, NULL);
+    SetTextureData(width, height, type, NULL, mipmap);
   }
   CheckGLError();
   return texture;
 }
 
 
-void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type, 
-                                   void* texelData) {
+void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type,
+                                   void* texelData, bool generateMipmap) {
   GLint internalFormat;
   GLenum format;
   GLenum glType;
   GetTextureType(type, internalFormat, format, glType);
   glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType, texelData);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  if (generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
   CheckGLError();
 }
 
-void DrawingOpenGL::SetTextureSubData(UINT x, UINT y, UINT width, UINT height, 
+void DrawingOpenGL::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
                                       TexelType type, void* texelData) {
   GLint internalFormat;
   GLenum format;
@@ -621,14 +645,14 @@ void DrawingOpenGL::DeleteTexture(TextureHandle handle) {
   glDeleteTextures(1, &handle);
 }
 
-void DrawingOpenGL::UploadTextureData(TextureHandle handle, int width, int height, 
+void DrawingOpenGL::UploadTextureData(TextureHandle handle, int width, int height,
                                       TexelType type, void* texelData) {
   BindTexture(handle);
-  SetTextureData(width, height, type, texelData);
+  SetTextureData(width, height, type, texelData, true);
 }
 
-void DrawingOpenGL::UploadTextureSubData(TextureHandle handle, UINT x, UINT y, 
-                                         int width, int height, TexelType type, 
+void DrawingOpenGL::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
+                                         int width, int height, TexelType type,
                                          void* texelData) {
   BindTexture(handle);
   SetTextureSubData(width, x, y, height, type, texelData);
@@ -643,8 +667,8 @@ void DrawingOpenGL::SetTexture(SamplerId sampler, TextureHandle texture, UINT sl
   CheckGLError();
 }
 
-FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer, 
-                                               TextureHandle targetBufferA, 
+FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
+                                               TextureHandle targetBufferA,
                                                TextureHandle targetBufferB,
                                                bool isMultiSample) {
   CheckGLError();
@@ -661,7 +685,6 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
 
   if (!targetBufferA) {
     /// No target buffer
-    SHOULDNT_HAPPEN;
   } else if (!targetBufferB) {
     CheckGLError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, targetBufferA, 0);
@@ -677,8 +700,15 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
   }
   CheckGLError();
 
-  glNamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
-  glNamedFramebufferDrawBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+  if (targetBufferA) {
+    NamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+    NamedFramebufferDrawBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+  }
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE) {
+    ERR("Framebuffer incomplete, status: 0x%x\n", status);
+  }
 
   return bufferId;
 }
@@ -690,6 +720,16 @@ void DrawingOpenGL::DeleteFrameBuffer(FrameBufferId frameBufferId) {
 void DrawingOpenGL::SetFrameBuffer(FrameBufferId frameBufferid) {
   BindFrameBuffer(frameBufferid);
   CheckGLError();
+}
+
+void DrawingOpenGL::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
+                                    int srcX0, int srcY0, int srcX1, int srcY1,
+                                    int dstX0, int dstY0, int dstX1, int dstY1) {
+  BindReadFramebuffer(source);
+  BindDrawFramebuffer(target);
+  glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
+                    dstX0, dstY0, dstX1, dstY1,
+                    GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
 
 void DrawingOpenGL::SetActiveTexture(GLuint activeTextureIndex) {
@@ -720,7 +760,7 @@ void DrawingOpenGL::SetIndexBuffer(IndexBufferHandle handle) {
   BindIndexBuffer(handle);
 }
 
-void DrawingOpenGL::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset, 
+void DrawingOpenGL::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset,
                                           UINT stride) {
   GLint size = 0;
   GLenum type = 0;

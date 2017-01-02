@@ -109,6 +109,7 @@
     <ClInclude Include="include\dom\watcher.h" />
     <ClInclude Include="include\nodes\cameranode.h" />
     <ClInclude Include="include\nodes\drawable.h" />
+    <ClInclude Include="include\nodes\meshgenerators.h" />
     <ClInclude Include="include\nodes\meshnode.h" />
     <ClInclude Include="include\nodes\scenenode.h" />
     <ClInclude Include="include\nodes\splinenode.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="source\dom\watcher.cpp" />
     <ClCompile Include="source\nodes\cameranode.cpp" />
     <ClCompile Include="source\nodes\drawable.cpp" />
+    <ClCompile Include="source\nodes\meshgenerators.cpp" />
     <ClCompile Include="source\nodes\meshnode.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
     <ClCompile Include="source\nodes\splinenode.cpp" />

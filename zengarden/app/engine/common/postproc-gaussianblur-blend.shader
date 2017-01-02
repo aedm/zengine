@@ -3,6 +3,7 @@
 :input vec2 vTexCoord
 :global sampler2D gPPGauss
 :global sampler2DMS gGBufferSourceA
+:global float gGBufferSampleCount
 :global vec2 gPPGaussPixelSize
 :global vec2 gPPGaussRelativeSize
 :output vec4 FragColor
@@ -14,7 +15,11 @@ SHADER
   
   vec3 pixel = vec3(0.0, 0.0, 0.0);
   ivec2 coord = ivec2(textureSize(gGBufferSourceA) * vTexCoord);
-  int sampleCount = textureSamples(gGBufferSourceA);
+  
+  // Intel doesn't fckn support "textureSamples", which is OpenGL 4.5 
+  // int sampleCount = textureSamples(gGBufferSourceA);
+  int sampleCount = int(gGBufferSampleCount);
+  
   for (int i = 0; i < sampleCount; i++) {
     pixel += clamp(texelFetch(gGBufferSourceA, coord, i).rgb, 0, 1);
   }
