@@ -39,7 +39,7 @@ private:
   void GenerateSourceFunctions(stringstream& stream);
   void GenerateSourceMain(stringstream& stream);
 
-  static const string& GetTypeString(NodeType type, bool isMultiSampler = false);
+  static const string& GetTypeString(NodeType type, bool isMultiSampler = false, bool isShadow = false);
 
   string prefix;
 

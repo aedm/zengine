@@ -180,7 +180,7 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
     glGetActiveUniform(program, i, uniformNameMaxLength, &nameLength, &size, &type, name);
     GLint location = glGetUniformLocation(program, name);
     //ASSERT(i == location);
-    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE) {
+    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE || type == GL_SAMPLER_2D_SHADOW) {
       ShaderSamplerDesc sampler;
       sampler.Handle = location;
       sampler.Name = name;
@@ -588,7 +588,7 @@ static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format
 
 
 TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type,
-                                           bool isMultiSample, bool doesRepeat) {
+                                           bool isMultiSample, bool doesRepeat, bool mipmap) {
   CheckGLError();
   GLuint texture;
   glGenTextures(1, &texture);
@@ -606,12 +606,12 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
   } else {
     BindTexture(texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-    SetTextureData(width, height, type, NULL);
+    SetTextureData(width, height, type, NULL, mipmap);
   }
   CheckGLError();
   return texture;
@@ -619,13 +619,13 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type
 
 
 void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type,
-                                   void* texelData) {
+                                   void* texelData, bool generateMipmap) {
   GLint internalFormat;
   GLenum format;
   GLenum glType;
   GetTextureType(type, internalFormat, format, glType);
   glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType, texelData);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  if (generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
   CheckGLError();
 }
 
@@ -648,7 +648,7 @@ void DrawingOpenGL::DeleteTexture(TextureHandle handle) {
 void DrawingOpenGL::UploadTextureData(TextureHandle handle, int width, int height,
                                       TexelType type, void* texelData) {
   BindTexture(handle);
-  SetTextureData(width, height, type, texelData);
+  SetTextureData(width, height, type, texelData, true);
 }
 
 void DrawingOpenGL::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
@@ -685,7 +685,6 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
 
   if (!targetBufferA) {
     /// No target buffer
-    SHOULDNT_HAPPEN;
   } else if (!targetBufferB) {
     CheckGLError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, targetBufferA, 0);
@@ -701,8 +700,15 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
   }
   CheckGLError();
 
-  NamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
-  NamedFramebufferDrawBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+  if (targetBufferA) {
+    NamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+    NamedFramebufferDrawBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+  }
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE) {
+    ERR("Framebuffer incomplete, status: 0x%x\n", status);
+  }
 
   return bufferId;
 }

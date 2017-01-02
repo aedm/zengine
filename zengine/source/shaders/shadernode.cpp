@@ -28,9 +28,10 @@ ShaderVariable::ShaderVariable(NodeType _type, const string& _name, int _layout)
 
 
 ShaderUniform::ShaderUniform(NodeType _type, const string& _name, Node* _node,
-                                         ShaderGlobalType _globalType, bool _isMultiSampler)
+                                         ShaderGlobalType _globalType, bool _isMultiSampler, bool _isShadow)
   : type(_type)
   , name(_name)
   , node(_node)
   , globalType(_globalType) 
-  , isMultiSampler(_isMultiSampler) {}
+  , isMultiSampler(_isMultiSampler)
+  , isShadow(_isShadow) {}

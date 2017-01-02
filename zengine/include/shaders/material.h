@@ -8,8 +8,9 @@ public:
   virtual ~Material();
 
   PassSlot mSolidPass;
+  PassSlot mShadowPass;
 
-  Pass* GetPass();
+  Pass* GetPass(PassType passType);
 
 protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;

@@ -30,6 +30,7 @@
 #include "nodes/vectornodes.h"
 #include "nodes/splinenode.h"
 #include "nodes/cameranode.h"
+#include "nodes/meshgenerators.h"
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();

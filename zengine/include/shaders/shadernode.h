@@ -20,13 +20,14 @@ struct ShaderVariable {
 /// Uniforms of the shader program
 struct ShaderUniform {
   ShaderUniform(NodeType type, const string& name, Node* node,
-                      ShaderGlobalType globalType, bool isMultiSampler);
+                      ShaderGlobalType globalType, bool isMultiSampler, bool isShadow);
 
   NodeType type;
   string name;
   Node* node;
   ShaderGlobalType globalType;
   bool isMultiSampler; // type is "sampler2DMS"
+  bool isShadow; // type is "sampler2DShadow"
 };
 
 

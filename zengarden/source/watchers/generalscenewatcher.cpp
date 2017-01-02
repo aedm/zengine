@@ -39,7 +39,7 @@ void GeneralSceneWatcher::Paint(GLWidget* widget) {
 void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot, 
                                                void* payload) 
 {
-  if (message == NodeMessage::NEEDS_REDRAW) {
+  if (message == NodeMessage::NEEDS_REDRAW || message == NodeMessage::VALUE_CHANGED) {
     /// HACK
     if (GetGLWidget()) GetGLWidget()->update();
   }

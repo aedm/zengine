@@ -39,6 +39,11 @@ public:
   /// R32: previous A-buffer link index
   Texture* mABuffer = nullptr;
 
+  /// Skylight shadow
+  FrameBufferId mShadowBufferId = 0;
+  Texture* mShadowTexture = nullptr;
+  Texture* mShadowColorBuffer = nullptr;
+
 private:
   Vec2 mSize;
 

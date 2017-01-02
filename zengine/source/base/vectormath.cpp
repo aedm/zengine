@@ -296,6 +296,19 @@ Matrix Matrix::Ortho(float x1, float y1, float x2, float y2) {
   return m;
 }
 
+Matrix Matrix::Ortho(float x1, float y1, float x2, float y2, float near, float far) {
+  float rx = 1.0f / (x2 - x1);
+  float ry = 1.0f / (y2 - y1);
+  float rz = 1.0f / (far - near);
+  Matrix m;
+  m.m[0] = 2.0f*rx;	m.m[1] = 0;		      m.m[2] = 0;	      m.m[3] = -(x1 + x2) * rx;
+  m.m[4] = 0;		    m.m[5] = 2.0f*ry;	  m.m[6] = 0;	      m.m[7] = -(y1 + y2) * ry;
+  m.m[8] = 0;		    m.m[9] = 0;		      m.m[10] = -2*rz;	m.m[11] = -(far + near) * rz;
+  m.m[12] = 0;		  m.m[13] = 0;		    m.m[14] = 0;	    m.m[15] = 1;
+  return m;
+}
+
+
 Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio)
 {
   /// Create projection matrix

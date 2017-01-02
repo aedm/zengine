@@ -25,6 +25,9 @@ using namespace std;
   ITEM(USAGE_DEPTH_BUFFER,				    TEXTURE,		DepthBufferSource)		  \
   ITEM(USAGE_GBUFFER_SOURCE_A,        TEXTURE,		GBufferSourceA)	        \
   ITEM(USAGE_GBUFFER_SAMPLE_COUNT,		FLOAT,      GBufferSampleCount)     \
+  ITEM(USAGE_SKYLIGHT_TEXTURE,        TEXTURE,		SkylightTexture)        \
+  ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,        TEXTURE,		SkylightColorTexture)       \
+  ITEM(USAGE_SKYLIGHT_PROJECTION,     MATRIX44,		SkylightMatrix)         \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,    TEXTURE,    PPGauss)		            \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE, VEC2, PPGaussPixelSize)		  \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE, VEC2, PPGaussRelativeSize)		\
@@ -69,7 +72,8 @@ struct StubGlobal {
 	NodeType type;
 	string name;
 	ShaderGlobalType usage;
-	bool isMultiSampler; // type is "sampler2DMS"
+  bool isMultiSampler; // type is "sampler2DMS"
+  bool isShadow; // type is "sampler2DShadow"
 };
 
 
