@@ -6,7 +6,7 @@
 
 class GeneralSceneWatcher: public WatcherUI {
 public:
-  GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget);
+  GeneralSceneWatcher(Node* node);
   virtual ~GeneralSceneWatcher();
 
   /// Initializes resources needed for scene watchers
@@ -18,10 +18,10 @@ public:
 protected:
   void Paint(GLWidget* widget);
 
-  RenderTarget* mRenderTarget;
+  RenderTarget* mRenderTarget = nullptr;
 
   /// Scene node to be drawn.
-  SceneNode* mScene;
+  SceneNode* mScene = nullptr;
   
   /// Default scene node, might be unused
   SceneNode mDefaultScene;

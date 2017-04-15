@@ -8,15 +8,19 @@
 using namespace std;
 class NodeWidget;
 class Graph;
+class Node;
 
 class GraphWatcher: public WatcherUI {
   friend class NodeWidget;
+  friend class Node; 
 
 public:
-  GraphWatcher(Graph* graph, GLWatcherWidget* Parent);
+  GraphWatcher(Graph* graph);
   virtual ~GraphWatcher();
 
   NodeWidget* GetNodeWidget(Node* node);
+
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   /// Qt widget event handlers

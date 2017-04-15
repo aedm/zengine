@@ -4,6 +4,7 @@
 #include "../util/util.h"
 #include "../commands/graphcommands.h"
 #include "prototypes.h"
+#include "../zengarden.h"
 #include <zengine.h>
 #include <QBoxLayout>
 #include <QPainter>
@@ -15,31 +16,13 @@
 #include <QFileInfo>
 #include <QImage>
 
-GraphWatcher::GraphWatcher(Graph* graph, GLWatcherWidget* parent)
-  : WatcherUI(graph, parent) 
+GraphWatcher::GraphWatcher(Graph* graph)
+  : WatcherUI(graph) 
 {
-  GetGLWidget()->setMouseTracking(true);
-  GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
-
-  parent->setAcceptDrops(true);
-
   mCurrentState = State::DEFAULT;
   mClickedWidget = NULL;
   mHoveredWidget = NULL;
   mHoveredSlotIndex = -1;
-
-  parent->mShareWidget->makeCurrent();
-  for (Node* node : graph->mNodes.GetMultiNodes()) {
-    NodeWidget* widget = new NodeWidget(node, this);
-    mWidgetMap[node] = widget;
-  }
-
-  GetGLWidget()->OnPaint += Delegate(this, &GraphWatcher::Paint);
-  GetGLWidget()->OnMousePress += Delegate(this, &GraphWatcher::HandleMousePress);
-  GetGLWidget()->OnMouseRelease += Delegate(this, &GraphWatcher::HandleMouseRelease);
-  GetGLWidget()->OnMouseMove += Delegate(this, &GraphWatcher::HandleMouseMove);
-  GetGLWidget()->OnKeyPress += Delegate(this, &GraphWatcher::HandleKeyPress);
-  GetGLWidget()->OnMouseWheel += Delegate(this, &GraphWatcher::HandleMouseWheel);
 }
 
 
@@ -149,6 +132,29 @@ NodeWidget* GraphWatcher::GetNodeWidget(Node* node) {
 }
 
 
+void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
+
+  watcherWidget->setMouseTracking(true);
+  watcherWidget->setFocusPolicy(Qt::ClickFocus);
+
+  GLWatcherWidget* glWatcherWidget = dynamic_cast<GLWatcherWidget*>(mWatcherWidget);
+  Graph* graph = dynamic_cast<Graph*>(mNode);
+
+  glWatcherWidget->mShareWidget->makeCurrent();
+  for (Node* node : graph->mNodes.GetMultiNodes()) {
+    NodeWidget* widget = new NodeWidget(node, this);
+    mWidgetMap[node] = widget;
+  }
+
+  GetGLWidget()->OnPaint += Delegate(this, &GraphWatcher::Paint);
+  GetGLWidget()->OnMousePress += Delegate(this, &GraphWatcher::HandleMousePress);
+  GetGLWidget()->OnMouseRelease += Delegate(this, &GraphWatcher::HandleMouseRelease);
+  GetGLWidget()->OnMouseMove += Delegate(this, &GraphWatcher::HandleMouseMove);
+  GetGLWidget()->OnKeyPress += Delegate(this, &GraphWatcher::HandleKeyPress);
+  GetGLWidget()->OnMouseWheel += Delegate(this, &GraphWatcher::HandleMouseWheel);
+}
+
 bool IsInsideRect(Vec2 position, Vec2 topleft, Vec2 size) {
   return (position.x >= topleft.x && position.x <= topleft.x + size.x
           && position.y >= topleft.y && position.y <= topleft.y + size.y);
@@ -226,7 +232,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
             DeselectAll();
             mHoveredWidget->mIsSelected = true;
             mSelectedNodeWidgets.insert(mHoveredWidget);
-            mWatcherWidget->onSelectNode(mHoveredWidget->GetNode());
+            ZenGarden::GetInstance()->SetNodeForPropertyEditor(mHoveredWidget->GetNode());
           }
           StorePositionOfSelectedNodes();
           mAreNodesMoved = false;
@@ -240,7 +246,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
         /// No widget was pressed, start rectangular selection
         mCurrentState = State::SELECT_RECTANGLE;
         DeselectAll();
-        mWatcherWidget->onSelectNode(nullptr);
+        ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
       }
       break;
     case State::CONNECT_TO_NODE:
@@ -451,22 +457,23 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
           selectedNodes->insert(nodeWidget->GetNode());
         }
         TheCommandStack->Execute(new DeleteNodeCommand(selectedNodes));
-        mWatcherWidget->onSelectNode(nullptr);
+        ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
       }
       break;
 
     /// 1 opens watcher on upper left panel
     case Qt::Key_1:
       if (mSelectedNodeWidgets.size() == 1) {
-        mWatcherWidget->onWatchNode(
+        ZenGarden::GetInstance()->Watch(
           (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::UPPER_LEFT_TAB);
+
       }
       break;
 
     /// 2 opens watcher on right panel
     case Qt::Key_2:
       if (mSelectedNodeWidgets.size() == 1) {
-        mWatcherWidget->onWatchNode(
+        ZenGarden::GetInstance()->Watch(
           (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::RIGHT_TAB);
       }
       break;
@@ -474,7 +481,7 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
     /// 3 opens watcher on bottom left panel
     case Qt::Key_3:
       if (mSelectedNodeWidgets.size() == 1) {
-        mWatcherWidget->onWatchNode(
+        ZenGarden::GetInstance()->Watch(
           (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::BOTTOM_LEFT_TAB);
       }
       break;

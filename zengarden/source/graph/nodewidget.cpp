@@ -38,7 +38,7 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
 NodeWidget::NodeWidget(Node* node, GraphWatcher* graphWatcher)
-	: WatcherUI(node, nullptr, NodeType::WIDGET)
+	: WatcherUI(node)
 	, mTitleTexture(nullptr)
   , mGraphWatcher(graphWatcher)
 {

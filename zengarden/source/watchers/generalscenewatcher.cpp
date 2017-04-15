@@ -3,21 +3,15 @@
 
 Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
-GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget) 
-  : WatcherUI(node, watcherWidget)
+GeneralSceneWatcher::GeneralSceneWatcher(Node* node) 
+  : WatcherUI(node)
 {
-  ASSERT(dynamic_cast<GLWatcherWidget*>(static_cast<QWidget*>(watcherWidget)) != nullptr);
-
   GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
   GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
   GetGLWidget()->OnMouseRelease += Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
   GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
   GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
-
-  GetGLWidget()->makeCurrent();
-  mRenderTarget =
-    new RenderTarget(Vec2(float(watcherWidget->width()), float(watcherWidget->height())));
 
   mDefaultScene.mCamera.Connect(&mCamera);
   mScene = &mDefaultScene;
@@ -29,6 +23,13 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 }
 
 void GeneralSceneWatcher::Paint(GLWidget* widget) {
+  if (!mWatcherWidget) return;
+  if (!mRenderTarget) {
+    GetGLWidget()->makeCurrent();
+    mRenderTarget =
+      new RenderTarget(Vec2(float(mWatcherWidget->width()), float(mWatcherWidget->height())));
+  }
+
   Vec2 size = Vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
   mScene->Draw(mRenderTarget);

@@ -1,12 +1,11 @@
 #include "watcherui.h"
 #include "watcherwidget.h"
 #include "../graph/prototypes.h"
+#include "../zengarden.h"
 
-WatcherUI::WatcherUI(Node* node, WatcherWidget* watcherWidget, NodeType type)
+WatcherUI::WatcherUI(Node* node)
     : Watcher(node)
-    , mWatcherWidget(watcherWidget) 
 {
-  if (watcherWidget) watcherWidget->mWatcher = this;
   MakeDisplayedName();
 }
 
@@ -19,20 +18,11 @@ void WatcherUI::OnNameChange() {
 
 WatcherUI::~WatcherUI() {
   if (mWatcherWidget) {
-    /// Make sure someone will delete the WatcherWidget
-    ASSERT(!mWatcherWidget->onWatcherDeath.empty());
-    
-    /// Don't let the WatcherWidget delete the Watcher.
     mWatcherWidget->mWatcher = nullptr;
 
     /// Let the UI delete the WatcherWidget
-    mWatcherWidget->onWatcherDeath(mWatcherWidget);
+    ZenGarden::GetInstance()->DeleteWatcherWidget(mWatcherWidget);
   }
-}
-
-
-Node* WatcherUI::GetNode() {
-  return mNode;
 }
 
 
@@ -64,4 +54,17 @@ void WatcherUI::MakeDisplayedName() {
 
 const QString& WatcherUI::GetDisplayedName() {
   return mDisplayedName;
+}
+
+void WatcherUI::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  /// This can only be set once
+  ASSERT(!mWatcherWidget);
+  mWatcherWidget = watcherWidget;
+}
+
+void WatcherUI::Destroy() {
+  Watcher::Destroy();
+
+  // Point of no return -- "this" pointer isn't valid after deleting the widget
+  SafeDelete(mWatcherWidget);
 }

@@ -162,17 +162,10 @@ void FloatEditor::SetReadOnly(bool readOnly) {
 }
 
 
-FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget,
-                           QString name, bool readOnly)
-  : WatcherUI(node, widget) {
-  QVBoxLayout* layout = new QVBoxLayout(widget);
-  layout->setSpacing(4);
-  layout->setContentsMargins(0, 0, 0, 0);
-
-  mEditorX = new FloatEditor(widget, name, node->Get());
-  mEditorX->onValueChange += Delegate(this, &FloatWatcher::HandleValueChange);
-  layout->addWidget(mEditorX);
-
+FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, QString name, bool readOnly)
+  : WatcherUI(node) 
+  , mName(name)
+{
   SetReadOnly(readOnly);
 }
 
@@ -188,6 +181,20 @@ void FloatWatcher::SetReadOnly(bool readOnly) {
 }
 
 
+void FloatWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
+
+  QVBoxLayout* layout = new QVBoxLayout(watcherWidget);
+  layout->setSpacing(4);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  auto valueNode = dynamic_cast<ValueNode<NodeType::FLOAT>*>(mNode);
+  mEditorX = new FloatEditor(watcherWidget, mName, valueNode->Get());
+  mEditorX->onValueChange += Delegate(this, &FloatWatcher::HandleValueChange);
+  layout->addWidget(mEditorX);
+
+}
+
 void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
   if (mNode == nullptr) return;
   ASSERT(dynamic_cast<FloatNode*>(mNode) != nullptr);
@@ -196,27 +203,10 @@ void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
 }
 
 
-Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget,
-                         QString name, bool readOnly)
-  : WatcherUI(node, widget) {
-  QVBoxLayout* layout = new QVBoxLayout(widget);
-  layout->setSpacing(4);
-  layout->setContentsMargins(0, 0, 0, 0);
-
-  Vec3 value = node->Get();
-
-  mEditorX = new FloatEditor(widget, name + ".x", value.x);
-  mEditorX->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
-  layout->addWidget(mEditorX);
-
-  mEditorY = new FloatEditor(widget, name + ".y", value.y);
-  mEditorY->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
-  layout->addWidget(mEditorY);
-
-  mEditorZ = new FloatEditor(widget, name + ".z", value.z);
-  mEditorZ->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
-  layout->addWidget(mEditorZ);
-
+Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, QString name, bool readOnly)
+  : WatcherUI(node) 
+  , mName(name)
+{
   SetReadOnly(readOnly);
 }
 
@@ -236,6 +226,29 @@ void Vec3Watcher::SetReadOnly(bool readOnly) {
 }
 
 
+void Vec3Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
+
+  QVBoxLayout* layout = new QVBoxLayout(watcherWidget);
+  layout->setSpacing(4);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  auto valueNode = dynamic_cast<ValueNode<NodeType::VEC3>*>(mNode);
+  Vec3 value = valueNode->Get();
+
+  mEditorX = new FloatEditor(watcherWidget, mName + ".x", value.x);
+  mEditorX->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+  layout->addWidget(mEditorX);
+
+  mEditorY = new FloatEditor(watcherWidget, mName + ".y", value.y);
+  mEditorY->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+  layout->addWidget(mEditorY);
+
+  mEditorZ = new FloatEditor(watcherWidget, mName + ".z", value.z);
+  mEditorZ->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+  layout->addWidget(mEditorZ);
+}
+
 void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
   if (mNode == nullptr) return;
   ASSERT(dynamic_cast<Vec3Node*>(mNode) != nullptr);
@@ -249,31 +262,10 @@ void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
 
 
 
-Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget,
-                         QString name, bool readOnly)
-  : WatcherUI(node, widget) {
-  QVBoxLayout* layout = new QVBoxLayout(widget);
-  layout->setSpacing(4);
-  layout->setContentsMargins(0, 0, 0, 0);
-
-  Vec4 value = node->Get();
-
-  mEditorX = new FloatEditor(widget, name + ".x", value.x);
-  mEditorX->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
-  layout->addWidget(mEditorX);
-
-  mEditorY = new FloatEditor(widget, name + ".y", value.y);
-  mEditorY->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
-  layout->addWidget(mEditorY);
-
-  mEditorZ = new FloatEditor(widget, name + ".z", value.z);
-  mEditorZ->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
-  layout->addWidget(mEditorZ);
-
-  mEditorW = new FloatEditor(widget, name + ".w", value.w);
-  mEditorW->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
-  layout->addWidget(mEditorW);
-
+Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, QString name, bool readOnly)
+  : WatcherUI(node) 
+  , mName(name)
+{
   SetReadOnly(readOnly);
 }
 
@@ -294,6 +286,34 @@ void Vec4Watcher::SetReadOnly(bool readOnly) {
   mEditorW->SetReadOnly(readOnly);
 }
 
+
+void Vec4Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
+
+
+  QVBoxLayout* layout = new QVBoxLayout(watcherWidget);
+  layout->setSpacing(4);
+  layout->setContentsMargins(0, 0, 0, 0);
+
+  auto node = dynamic_cast<ValueNode<NodeType::VEC4>*>(mNode);
+  Vec4 value = node->Get();
+
+  mEditorX = new FloatEditor(watcherWidget, mName + ".x", value.x);
+  mEditorX->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorX);
+
+  mEditorY = new FloatEditor(watcherWidget, mName + ".y", value.y);
+  mEditorY->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorY);
+
+  mEditorZ = new FloatEditor(watcherWidget, mName + ".z", value.z);
+  mEditorZ->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorZ);
+
+  mEditorW = new FloatEditor(watcherWidget, mName + ".w", value.w);
+  mEditorW->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
+  layout->addWidget(mEditorW);
+}
 
 void Vec4Watcher::HandleValueChange(FloatEditor* editor, float value) {
   if (mNode == nullptr) return;

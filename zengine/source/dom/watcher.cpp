@@ -3,22 +3,31 @@
 
 Watcher::Watcher(Node* node)
   : mNode(node)
-{
-  mNode->mWatchers.insert(this);
-}
+{}
 
 Watcher::~Watcher() {
-  if (mNode) mNode->mWatchers.erase(this);
+  ResetNode(false);
 }
 
+Node* Watcher::GetNode() {
+  return mNode;
+}
+
+void Watcher::ResetNode(bool repaintUI) {
+  if (!mNode) return;
+  mNode->RemoveWatcher(this);
+  mNode = nullptr;
+  if (repaintUI) OnRedraw();
+}
+
+void Watcher::Destroy() {
+  ResetNode(false);
+}
 
 void Watcher::ChangeNode(Node* node) {
-  if (mNode) mNode->mWatchers.erase(this);
   mNode = node;
-  if (mNode) mNode->mWatchers.insert(this);
   OnRedraw();
 }
-
 
 void Watcher::OnRedraw() {}
 void Watcher::OnNameChange() {}

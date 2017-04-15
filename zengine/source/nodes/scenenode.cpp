@@ -60,11 +60,12 @@ void SceneNode::RenderDrawables(PassType passType) {
 }
 
 void SceneNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  Node::HandleMessage(message, slot, payload);
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:
     case NodeMessage::NEEDS_REDRAW:
-      SendMsg(NodeMessage::NEEDS_REDRAW);
+      NotifyWatchers(&Watcher::OnRedraw);
       break;
     default: break;
   }

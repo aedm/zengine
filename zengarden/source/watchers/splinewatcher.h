@@ -11,11 +11,13 @@ class SplineWidget;
 template<NodeType T>
 class SplineWatcher: public WatcherUI {
 public:
-  SplineWatcher(Node* node, WatcherWidget* watcherWidget);
+  SplineWatcher(Node* node);
   virtual ~SplineWatcher();
 
-  Event<> OnAdjustTime;
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
+  Event<> OnAdjustTime;
+  
 protected:
   Ui::SplineEditor mUI;
   SplineWidget* mSplineWidget;

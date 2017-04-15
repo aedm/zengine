@@ -257,7 +257,10 @@ void Node::Update() {
 
 
 Node::~Node() {
-  while (mWatchers.size()) delete *mWatchers.begin();
+  //while (mWatchers.size()) delete *mWatchers.begin();
+  //for (auto watcher : mWatchers) watcher->ChangeNode(nullptr);
+  while (mWatchers.size()) (*mWatchers.begin())->Destroy();
+  mWatchers.clear();
 
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
@@ -319,5 +322,19 @@ const vector<Slot*>& Node::GetPublicSlots() {
 
 const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
   return mSerializableSlotsByName;
+}
+
+void Node::RemoveWatcher(Watcher* watcher) {
+  for (auto it = mWatchers.begin(); it != mWatchers.end(); it++) {
+    if (it->get() == watcher) {
+      mWatchers.erase(it);
+      return;
+    }
+  }
+}
+
+void Node::AssignWatcher(shared_ptr<Watcher> watcher) {
+  mWatchers.insert(watcher);
+  watcher->ChangeNode(this);
 }
 

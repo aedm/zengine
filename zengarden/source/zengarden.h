@@ -19,14 +19,19 @@ public:
   ZenGarden(QWidget *parent = 0);
   ~ZenGarden();
 
-private:
-  /// Open and close viewers
+  static ZenGarden* GetInstance();
+
+  /// Open a watcher
   void Watch(Node* node, WatcherPosition watcherPosition);
-  void CloseWatcherTab(WatcherWidget* widget);
 
   /// Property editor related
   void SetNodeForPropertyEditor(Node* node);
-  void RemovePropertyEditor(WatcherWidget* watcherWidget);
+
+  /// Closes a watcher tab
+  void DeleteWatcherWidget(WatcherWidget* widget);
+
+private:
+
   WatcherWidget* mPropertyEditor;
   QBoxLayout* mPropertyLayout;
 
@@ -61,13 +66,11 @@ private slots:
   void InitModules();
   void DisposeModules();
   void NewGraph();
+  void UpdateTimeNode();
+  void DeleteDocument();
 
   /// Loads an engine-level shader file
   void LoadEngineShader(const QString& path);
-
-  void UpdateTimeNode();
-
-  void DeleteDocument();
 
   /// Menu buttons
   void HandleMenuSaveAs();

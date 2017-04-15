@@ -7,8 +7,10 @@
 
 class TextWatcher: public WatcherUI {
 public:
-  TextWatcher(StringNode* node, WatcherWidget* watcherWidget);
+  TextWatcher(StringNode* node);
   virtual ~TextWatcher();
+
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   QBoxLayout*	mLayout;

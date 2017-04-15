@@ -40,7 +40,7 @@ DrawingOpenGL::DrawingOpenGL() {
   ASSERT(err == GLEW_OK);
   if (err != GLEW_OK) {
     ERR(L"Cannot initialize OpenGL.");
-    SHOULDNT_HAPPEN;
+    SHOULD_NOT_HAPPEN;
   } else {
     const wchar_t* versionName = NULL;
     for (GLVersion* version = gOpenGLVersions; version->version != NULL; version++) {
@@ -406,7 +406,7 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
     case PRIMITIVE_LINE_STRIP:	return GL_LINE_STRIP;
     case PRIMITIVE_TRIANGLES:	return GL_TRIANGLES;
   }
-  SHOULDNT_HAPPEN;
+  SHOULD_NOT_HAPPEN;
   return 0;
 }
 
@@ -693,7 +693,7 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
     glDrawBuffers(1, attachments);
     CheckGLError();
   } else {
-    SHOULDNT_HAPPEN;
+    SHOULD_NOT_HAPPEN;
     GLuint attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
     glDrawBuffers(2, attachments);
     CheckGLError();

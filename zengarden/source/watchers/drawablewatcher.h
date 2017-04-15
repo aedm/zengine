@@ -4,6 +4,5 @@
 
 class DrawableWatcher: public GeneralSceneWatcher {
 public:
-  DrawableWatcher(Drawable* drawable, GLWatcherWidget* watcherWidget);
-
+  DrawableWatcher(Drawable* drawable);
 };

@@ -4,10 +4,19 @@
 template class SplineWatcher<NodeType::FLOAT>;
 
 template<NodeType T>
-SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
-  : WatcherUI(node, watcherWidget)
+SplineWatcher<T>::SplineWatcher(Node* node)
+  : WatcherUI(node)
   , mXRange(0, 10)
-  , mYRange(5, -5) {
+  , mYRange(5, -5) 
+{}
+
+template<NodeType T>
+SplineWatcher<T>::~SplineWatcher() {}
+
+template<NodeType T>
+void SplineWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
+
   mUI.setupUi(watcherWidget);
 
   QVBoxLayout* layout = new QVBoxLayout(mUI.splineFrame);
@@ -27,11 +36,7 @@ SplineWatcher<T>::SplineWatcher(Node* node, WatcherWidget* watcherWidget)
   watcherWidget->connect(mUI.addPointButton, &QPushButton::pressed, [=]() { AddPoint(); });
   watcherWidget->connect(mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
   watcherWidget->connect(mUI.linearCheckBox, &QPushButton::pressed, [=]() { ToggleLinear(); });
-
 }
-
-template<NodeType T>
-SplineWatcher<T>::~SplineWatcher() {}
 
 
 template<NodeType T>

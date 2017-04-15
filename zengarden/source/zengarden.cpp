@@ -17,11 +17,15 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 
+static ZenGarden* gZengarden;
+
 ZenGarden::ZenGarden(QWidget *parent)
   : QMainWindow(parent)
   , mNextGraphIndex(0)
   , mPropertyEditor(nullptr)
-  , mPropertyLayout(nullptr) {
+  , mPropertyLayout(nullptr) 
+{
+  gZengarden = this;
   mUI.setupUi(this);
 
   connect(mUI.upperLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
@@ -43,6 +47,10 @@ ZenGarden::ZenGarden(QWidget *parent)
 
 ZenGarden::~ZenGarden() {
   DisposeModules();
+}
+
+ZenGarden* ZenGarden::GetInstance() {
+  return gZengarden;
 }
 
 void ZenGarden::InitModules() {
@@ -152,28 +160,22 @@ void ZenGarden::LoadEngineShader(const QString& path) {
 void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
-    mPropertyEditor =
-      new WatcherWidget(mUI.propertyPanel, WatcherPosition::PROPERTY_PANEL);
-    mPropertyEditor->onWatchNode += Delegate(this, &ZenGarden::Watch);
-    mPropertyEditor->onWatcherDeath = Delegate(this, &ZenGarden::RemovePropertyEditor);
-    mPropertyLayout->addWidget(mPropertyEditor);
-
+    shared_ptr<WatcherUI> watcher;
     if (IsInstanceOf<FloatNode>(node)) {
-      new StaticFloatEditor(static_cast<FloatNode*>(node), mPropertyEditor);
+      watcher = node->Watch<StaticFloatEditor>(static_cast<FloatNode*>(node));
     } else if (IsInstanceOf<Vec3Node>(node)) {
-      new StaticVec3Editor(static_cast<Vec3Node*>(node), mPropertyEditor);
+      watcher = node->Watch<StaticVec3Editor>(static_cast<Vec3Node*>(node));
     } else if (IsInstanceOf<Vec4Node>(node)) {
-      new StaticVec4Editor(static_cast<Vec4Node*>(node), mPropertyEditor);
+      watcher = node->Watch<StaticVec4Editor>(static_cast<Vec4Node*>(node));
     } else {
-      new DefaultPropertyEditor(node, mPropertyEditor);
+      watcher = node->Watch<DefaultPropertyEditor>(node);
+    }
+    if (watcher) {
+      mPropertyEditor =
+        new WatcherWidget(mUI.propertyPanel, watcher, WatcherPosition::PROPERTY_PANEL);
+      mPropertyLayout->addWidget(mPropertyEditor);
     }
   }
-}
-
-
-void ZenGarden::RemovePropertyEditor(WatcherWidget* watcherWidget) {
-  ASSERT(watcherWidget == mPropertyEditor);
-  SafeDelete(mPropertyEditor);
 }
 
 
@@ -189,71 +191,94 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
     case WatcherPosition::RIGHT_TAB:
       tabWidget = mUI.rightPanel;
       break;
-    default: SHOULDNT_HAPPEN; break;
+    default: SHOULD_NOT_HAPPEN; break;
   }
 
   WatcherWidget* watcherWidget = nullptr;
-  WatcherUI* watcher = nullptr;
+  shared_ptr<WatcherUI> watcher;
 
   /// Non-3D watchers
   switch (node->GetType()) {
     case NodeType::STRING:
-      watcherWidget = new WatcherWidget(tabWidget, watcherPosition, tabWidget);
-      watcher = new TextWatcher(dynamic_cast<StringNode*>(node), watcherWidget);
+    {
+      auto stringNode = dynamic_cast<StringNode*>(node);
+      watcher = stringNode->Watch<TextWatcher>(stringNode);
+      watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
       break;
+    }
     default: break;
   }
 
   if (watcherWidget == nullptr) {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
-      watcherWidget = new WatcherWidget(tabWidget, watcherPosition, tabWidget);
-      FloatSplineWatcher* splineWatcher =
-        new FloatSplineWatcher(dynamic_cast<SSpline*>(node), watcherWidget);
-      splineWatcher->OnAdjustTime += Delegate(this, &ZenGarden::RestartSceneTimer);
-      watcher = splineWatcher;
+      watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<SSpline*>(node));
+      watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
+      dynamic_pointer_cast<FloatSplineWatcher>(watcher)->OnAdjustTime +=
+        Delegate(this, &ZenGarden::RestartSceneTimer);
     }
   }
 
   /// 3D watchers
   if (watcherWidget == nullptr) {
-    GLWatcherWidget* glWatcherWidget =
-      new GLWatcherWidget(tabWidget, mCommonGLWidget, watcherPosition, tabWidget);
-    watcherWidget = glWatcherWidget;
     switch (node->GetType()) {
       case NodeType::PASS:
-        watcher = new PassWatcher(dynamic_cast<Pass*>(node), glWatcherWidget);
-        break;
+      {
+        auto passNode = dynamic_cast<Pass*>(node);
+        watcher = static_pointer_cast<WatcherUI>(passNode->Watch<PassWatcher>(passNode));
+      }
+      break;
       case NodeType::MESH:
-        watcher = new MeshWatcher(dynamic_cast<MeshNode*>(node), glWatcherWidget);
-        break;
+      {
+        auto meshNode = dynamic_cast<MeshNode*>(node);
+        watcher = static_pointer_cast<WatcherUI>(meshNode->Watch<MeshWatcher>(meshNode));
+      }
+      break;
       case NodeType::DRAWABLE:
-        watcher = new DrawableWatcher(dynamic_cast<Drawable*>(node), glWatcherWidget);
-        break;
+      {
+        auto drawableNode = dynamic_cast<Drawable*>(node);
+        watcher =
+          static_pointer_cast<WatcherUI>(drawableNode->Watch<DrawableWatcher>(drawableNode));
+      }
+      break;
       case NodeType::SCENE:
-        watcher = new SceneWatcher(dynamic_cast<SceneNode*>(node), glWatcherWidget);
-        break;
+      {
+        auto sceneNode = dynamic_cast<SceneNode*>(node);
+        watcher = static_pointer_cast<WatcherUI>(sceneNode->Watch<SceneWatcher>(sceneNode));
+      }
+      break;
       case NodeType::GRAPH:
-        glWatcherWidget->onSelectNode += Delegate(this, &ZenGarden::SetNodeForPropertyEditor);
-        glWatcherWidget->onWatchNode += Delegate(this, &ZenGarden::Watch);
-        glWatcherWidget->onWatcherDeath = Delegate(this, &ZenGarden::CloseWatcherTab);
-        watcher = new GraphWatcher(dynamic_cast<Graph*>(node), glWatcherWidget);
-        break;
+      {
+        auto graphNode = dynamic_cast<Graph*>(node);
+        watcher = static_pointer_cast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
+      }
+      break;
       default: return;
+    }
+    watcherWidget = 
+      new GLWatcherWidget(tabWidget, watcher, mCommonGLWidget, watcherPosition, tabWidget);
+
+    // Graph editors accept drag&drop events
+    if (node->GetType() == NodeType::GRAPH) {
+      watcherWidget->setAcceptDrops(true);
     }
   }
 
   int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
   tabWidget->setCurrentIndex(index);
-  watcherWidget->onWatcherDeath = Delegate(this, &ZenGarden::CloseWatcherTab);
+  watcher->SetWatcherWidget(watcherWidget);
 }
 
 
-void ZenGarden::CloseWatcherTab(WatcherWidget* widget) {
-  ASSERT(widget->mTabWidget);
-  int index = widget->mTabWidget->indexOf(widget);
-  ASSERT(index >= 0);
-  widget->mTabWidget->removeTab(index);
+void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
+  if (widget->mTabWidget) {
+    int index = widget->mTabWidget->indexOf(widget);
+    ASSERT(index >= 0);
+    widget->mTabWidget->removeTab(index);
+  }
+  if (widget == mPropertyEditor) {
+    mPropertyEditor = nullptr;
+  }
   delete widget;
 }
 

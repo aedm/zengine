@@ -184,7 +184,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
 
 template<NodeType T>
 void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
-  SHOULDNT_HAPPEN;
+  SHOULD_NOT_HAPPEN;
   if (mNode == &mDefault) return;
   mDefault.ConnectToSlot(this);
   if (notifyOwner) {

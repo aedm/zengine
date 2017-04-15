@@ -1,7 +1,7 @@
 #include "passwatcher.h"
 
-PassWatcher::PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget)
-  : GeneralSceneWatcher(pass, watcherWidget) 
+PassWatcher::PassWatcher(Pass* pass)
+  : GeneralSceneWatcher(pass) 
 {
   mMaterial.mSolidPass.Connect(pass);
 

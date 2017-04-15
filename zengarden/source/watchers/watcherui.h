@@ -12,11 +12,10 @@ class GLWidget;
 /// the ui, or as a property panel item, etc. Watchers belong to their WatcherWidgets, 
 /// and are destroyed by them.
 class WatcherUI: public Watcher {
+  friend class WatcherWidget;
+
 public:
   virtual ~WatcherUI();
-
-  /// Returns the node being watched
-  Node*	GetNode();
 
   /// Get the OpenGL widget, if any
   GLWidget* GetGLWidget();
@@ -28,11 +27,17 @@ public:
   virtual void HandleDragEnterEvent(QDragEnterEvent* event) {}
   virtual void HandleDropEvent(QDropEvent* event) {}
 
-  /// The watcher widget that contains this watcher
-  WatcherWidget* mWatcherWidget;
+  /// Set WatcherWidget that draws contents
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
+
+  /// Destorys the watcher and its UI elements
+  virtual void Destroy() override;
 
 protected:
-  WatcherUI(Node* node, WatcherWidget* watcherWidget, NodeType type = NodeType::UI);
+  WatcherUI(Node* node);
+
+  /// The watcher widget that contains this watcher
+  WatcherWidget* mWatcherWidget = nullptr;
 
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;

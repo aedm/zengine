@@ -19,7 +19,7 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   globals->GBufferSourceA = 0;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
   TheDrawingAPI->SetFrameBuffer(mGBufferId);
-  TheDrawingAPI->SetViewport(0, 0, mSize.x, mSize.y);
+  TheDrawingAPI->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
 void RenderTarget::SetColorBufferAsTarget(Globals* globals) {

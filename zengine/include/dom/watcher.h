@@ -4,11 +4,19 @@ class Node;
 class Slot;
 
 class Watcher {
+  friend class Node;
+
 public:
   virtual ~Watcher();
 
-  /// Changes the node being watched
-  virtual void ChangeNode(Node* node);
+  /// Returns the node being watched
+  Node*	GetNode();
+
+  /// Sets the node being watched to nullptr and redraws the UI.
+  void ResetNode(bool repaintUI = true);
+
+  /// Destorys the watcher and its UI elements
+  virtual void Destroy();
 
   /// Called when the watcher needs to be rerendered
   virtual void OnRedraw();
@@ -35,4 +43,8 @@ protected:
   Watcher(Node* node);
 
   Node* mNode;
+
+private:
+  /// Changes the node being watched. Only a Node should call this.
+  void ChangeNode(Node* node);
 };

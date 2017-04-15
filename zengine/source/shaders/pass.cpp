@@ -187,7 +187,7 @@ void Pass::Set(Globals* globals) {
 					break;
         VALUETYPE_LIST
 
-        default: SHOULDNT_HAPPEN; break;
+        default: SHOULD_NOT_HAPPEN; break;
       }
     } else {
       /// Global uniform, takes value from the Globals object

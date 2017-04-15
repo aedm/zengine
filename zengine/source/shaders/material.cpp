@@ -29,6 +29,6 @@ Pass* Material::GetPass(PassType passType) {
     case PassType::SHADOW: return mShadowPass.GetNode();
     case PassType::SOLID: return mSolidPass.GetNode();
   }
-  SHOULDNT_HAPPEN;
+  SHOULD_NOT_HAPPEN;
   return nullptr;
 }

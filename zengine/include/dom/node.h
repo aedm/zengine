@@ -179,6 +179,7 @@ private:
 
   /// ---------------- Editor-specific parts ----------------
   /// This section can be disabled without hurting the engine.
+  /// --------------------------------------------------------
 public:
   virtual void SetName(const string& name);
   virtual const string& GetName() const;
@@ -193,20 +194,12 @@ public:
   /// Returns the slots that need to be serialized when saving / loading
   const unordered_map<SharedString, Slot*>& GetSerializableSlots();
 
-  /// Hook for watchers (UI only). This way watchers get all messages emitted by nodes.
-  //Event<NodeMessage, Slot*, void*> onSniffMessage;
-
 protected:
   /// Registers a new slot
   void AddSlot(Slot* slot, bool isPublic, bool isSerializable);
 
   /// Removes public and serializable slots
   void ClearSlots();
-
-  template <class ...B>
-  inline void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
-    for (Watcher* watcher : mWatchers) (watcher->*M)(args...);
-  }
 
 private:
   /// Custom name of the node
@@ -222,8 +215,34 @@ private:
   /// Slots that need to be serialized when saving / loading.
   unordered_map<SharedString, Slot*> mSerializableSlotsByName;
 
+  
+  /// ------------------ Watcher operations ------------------
+  /// This section can be disabled without hurting the engine.
+  /// --------------------------------------------------------
+public:
+  template <typename T, typename ...P>
+  inline shared_ptr<T> Watch(P... args) {
+    static_assert(std::is_base_of<Watcher, T>::value, "T must be a Watcher");
+    shared_ptr<T> watcher = make_shared<T>(args...);
+    mWatchers.insert(watcher);
+    return watcher;
+  }
+
+  /// Removes a Watcher from the watchers list
+  void RemoveWatcher(Watcher* watcher);
+
+  /// Adds a new Watcher to the watchers list
+  void AssignWatcher(shared_ptr<Watcher> watcher);
+
+protected:
+  template <class ...B>
+  inline void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
+    for (auto watcher : mWatchers) ((watcher.get())->*M)(args...);
+  }
+
+private:
   /// Watchers
-  set<Watcher*> mWatchers;
+  set<shared_ptr<Watcher>> mWatchers;
 };
 
 

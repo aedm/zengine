@@ -1,8 +1,8 @@
 #include "scenewatcher.h"
 
 
-SceneWatcher::SceneWatcher(SceneNode* scene, GLWatcherWidget* watcherWidget) 
-  : GeneralSceneWatcher(scene, watcherWidget)
+SceneWatcher::SceneWatcher(SceneNode* scene) 
+  : GeneralSceneWatcher(scene)
 {
   mScene = scene;
 }
