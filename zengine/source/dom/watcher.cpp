@@ -6,22 +6,21 @@ Watcher::Watcher(Node* node)
 {}
 
 Watcher::~Watcher() {
-  ResetNode(false);
+  ResetNode();
 }
 
 Node* Watcher::GetNode() {
   return mNode;
 }
 
-void Watcher::ResetNode(bool repaintUI) {
+void Watcher::ResetNode() {
   if (!mNode) return;
   mNode->RemoveWatcher(this);
   mNode = nullptr;
-  if (repaintUI) OnRedraw();
 }
 
-void Watcher::Destroy() {
-  ResetNode(false);
+void Watcher::Unwatch() {
+  ResetNode();
 }
 
 void Watcher::ChangeNode(Node* node) {

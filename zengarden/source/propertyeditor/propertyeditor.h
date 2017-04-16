@@ -19,8 +19,8 @@ public:
 protected:
   void HandleNameTexBoxChanged();
 
-  QBoxLayout*	mLayout;
-  TextBox* mNameTextBox;
+  QBoxLayout*	mLayout = nullptr;
+  TextBox* mNameTextBox = nullptr;
 };
 
 
@@ -33,7 +33,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  map<Slot*, weak_ptr<WatcherUI>> mSlotWatchers;
+  map<Slot*, shared_ptr<WatcherUI>> mSlotWatchers;
 
   virtual void OnSlotConnectionChanged(Slot* slot) override;
 

@@ -4,6 +4,16 @@
 #include "watcherwidget.h"
 #include <zengine.h>
 
+class SceneNode;
+
+class RenderForwarder: public Watcher {
+public:
+  RenderForwarder(SceneNode* node);
+  virtual ~RenderForwarder() {}
+  virtual void OnRedraw();
+  FastDelegate<void()> mOnRedraw;
+};
+
 class GeneralSceneWatcher: public WatcherUI {
 public:
   GeneralSceneWatcher(Node* node);
@@ -14,6 +24,8 @@ public:
 
   /// Called when the watcher needs to be rerendered
   virtual void OnRedraw() override;
+
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
   void Paint(GLWidget* widget);
@@ -28,6 +40,9 @@ protected:
 
   /// Default camera
   CameraNode mCamera;
+
+  /// Forwarder that catches render events for the default scene
+  shared_ptr<RenderForwarder> mRenderForwarder;
 
   /// Qt widget event handlers
   void HandleMousePress(GLWidget*, QMouseEvent* event);
@@ -52,3 +67,5 @@ private:
   /// The Drawable supplied by an implementation
   Drawable* mDrawable = nullptr;
 };
+
+

@@ -27,10 +27,9 @@ public:
   /// Property editor related
   void SetNodeForPropertyEditor(Node* node);
 
+private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);
-
-private:
 
   WatcherWidget* mPropertyEditor;
   QBoxLayout* mPropertyLayout;

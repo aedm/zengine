@@ -23,8 +23,7 @@ ZenGarden::ZenGarden(QWidget *parent)
   : QMainWindow(parent)
   , mNextGraphIndex(0)
   , mPropertyEditor(nullptr)
-  , mPropertyLayout(nullptr) 
-{
+  , mPropertyLayout(nullptr) {
   gZengarden = this;
   mUI.setupUi(this);
 
@@ -84,7 +83,7 @@ void ZenGarden::InitModules() {
   /// Load Zengine files
   QString engineShadersFolder("engine/common/");
   connect(&mEngineShadersFolderWatcher, SIGNAL(fileChanged(const QString&)),
-          this, SLOT(LoadEngineShader(const QString&)));
+    this, SLOT(LoadEngineShader(const QString&)));
   LoadEngineShaders(engineShadersFolder);
 
   InitPainter();
@@ -154,7 +153,7 @@ void ZenGarden::LoadEngineShader(const QString& path) {
   INFO("loading '%s'", fileInfo.fileName().toLatin1().data());
   unique_ptr<char> stubSource(Util::ReadFileQt(path));
   TheEngineStubs->SetStubSource(fileInfo.baseName().toStdString(),
-                                string(stubSource.get()));
+    string(stubSource.get()));
 }
 
 void ZenGarden::SetNodeForPropertyEditor(Node* node) {
@@ -171,8 +170,10 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
       watcher = node->Watch<DefaultPropertyEditor>(node);
     }
     if (watcher) {
+      watcher->onUnwatch = Delegate(this, &ZenGarden::DeleteWatcherWidget);
       mPropertyEditor =
         new WatcherWidget(mUI.propertyPanel, watcher, WatcherPosition::PROPERTY_PANEL);
+      watcher->SetWatcherWidget(mPropertyEditor);
       mPropertyLayout->addWidget(mPropertyEditor);
     }
   }
@@ -255,18 +256,14 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
       break;
       default: return;
     }
-    watcherWidget = 
+    watcherWidget =
       new GLWatcherWidget(tabWidget, watcher, mCommonGLWidget, watcherPosition, tabWidget);
-
-    // Graph editors accept drag&drop events
-    if (node->GetType() == NodeType::GRAPH) {
-      watcherWidget->setAcceptDrops(true);
-    }
   }
 
   int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
   tabWidget->setCurrentIndex(index);
   watcher->SetWatcherWidget(watcherWidget);
+  watcher->onUnwatch = Delegate(this, &ZenGarden::DeleteWatcherWidget);
 }
 
 
@@ -285,7 +282,7 @@ void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
 
 void ZenGarden::HandleMenuSaveAs() {
   QString fileName = QFileDialog::getSaveFileName(this,
-                                                  tr("Open project"), "app", tr("Zengine project (*.zen)"));
+    tr("Open project"), "app", tr("Zengine project (*.zen)"));
 
   INFO("Saving document...");
   QTime myTimer;
@@ -319,7 +316,7 @@ void ZenGarden::HandleMenuNew() {
 
 void ZenGarden::HandleMenuOpen() {
   QString fileName = QFileDialog::getOpenFileName(this,
-                                                  tr("Open project"), "app", tr("Zengine project (*.zen)"));
+    tr("Open project"), "app", tr("Zengine project (*.zen)"));
   if (fileName.isEmpty()) return;
 
   /// Measure load time

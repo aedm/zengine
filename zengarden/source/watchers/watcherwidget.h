@@ -23,15 +23,6 @@ public:
                 QTabWidget* tabWidget = nullptr);
   virtual ~WatcherWidget();
 
-  /// Triggered when a new node needs to be watched
-  //Event<Node*, WatcherPosition> onWatchNode;
-
-  /// Triggered when a node is selected (eg. in graph editor)
-  //Event<Node*> onSelectNode;
-
-  /// Triggered when the watcher needs to be removed
-  //FastDelegate<void(WatcherWidget*)> onWatcherDeath;
-
   /// Get the OpenGL widget, if any
   virtual GLWidget* GetGLWidget();
 

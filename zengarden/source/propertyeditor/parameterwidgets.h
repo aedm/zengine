@@ -103,6 +103,7 @@ private:
   virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
+  bool mIsReadOnly = false;
   QString mName;
 
   void HandleValueChange(FloatEditor* editor, float value);
@@ -126,6 +127,7 @@ private:
   FloatEditor* mEditorX = nullptr;
   FloatEditor* mEditorY = nullptr;
   FloatEditor* mEditorZ = nullptr;
+  bool mIsReadOnly = false;
   QString mName;
 
   void HandleValueChange(FloatEditor* editor, float value);
@@ -150,6 +152,7 @@ private:
   FloatEditor* mEditorY = nullptr;
   FloatEditor* mEditorZ = nullptr;
   FloatEditor* mEditorW = nullptr;
+  bool mIsReadOnly = false;
   QString mName;
 
   void HandleValueChange(FloatEditor* editor, float value);

@@ -17,8 +17,7 @@
 #include <QImage>
 
 GraphWatcher::GraphWatcher(Graph* graph)
-  : WatcherUI(graph) 
-{
+  : WatcherUI(graph) {
   mCurrentState = State::DEFAULT;
   mClickedWidget = NULL;
   mHoveredWidget = NULL;
@@ -135,13 +134,12 @@ NodeWidget* GraphWatcher::GetNodeWidget(Node* node) {
 void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
 
-  watcherWidget->setMouseTracking(true);
-  watcherWidget->setFocusPolicy(Qt::ClickFocus);
+  watcherWidget->setAcceptDrops(true);
+  GetGLWidget()->setMouseTracking(true);
+  GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
 
-  GLWatcherWidget* glWatcherWidget = dynamic_cast<GLWatcherWidget*>(mWatcherWidget);
+  GetGLWidget()->makeCurrent();
   Graph* graph = dynamic_cast<Graph*>(mNode);
-
-  glWatcherWidget->mShareWidget->makeCurrent();
   for (Node* node : graph->mNodes.GetMultiNodes()) {
     NodeWidget* widget = new NodeWidget(node, this);
     mWidgetMap[node] = widget;
@@ -157,7 +155,7 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
 bool IsInsideRect(Vec2 position, Vec2 topleft, Vec2 size) {
   return (position.x >= topleft.x && position.x <= topleft.x + size.x
-          && position.y >= topleft.y && position.y <= topleft.y + size.y);
+    && position.y >= topleft.y && position.y <= topleft.y + size.y);
 }
 
 
@@ -315,8 +313,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
       if (slot->mIsMultiSlot) {
         /// HACK HACK HACK
         slot->DisconnectAll(true);
-      }
-      else if (slot->GetAbstractNode()) {
+      } else if (slot->GetAbstractNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
     }
@@ -357,7 +354,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
         NodeWidget* widget = mWidgetMap.at(node);
         widget->mIsSelected = HasIntersection(mOriginalMousePos,
-            mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
+          mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
       }
       GetGLWidget()->update();
       break;
@@ -386,13 +383,13 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       GetGLWidget()->update();
       break;
     case State::PAN_CANVAS:
-      {
-        Vec2 mousePixelPos(event->x(), event->y());
-        Vec2 diff = mousePixelPos - mOriginalMousePos;
-        mCenter = mOriginalCenter - diff * mZoomFactor;
-        GetGLWidget()->update();
-      }
-      break;
+    {
+      Vec2 mousePixelPos(event->x(), event->y());
+      Vec2 diff = mousePixelPos - mOriginalMousePos;
+      mCenter = mOriginalCenter - diff * mZoomFactor;
+      GetGLWidget()->update();
+    }
+    break;
     default:
       if (UpdateHoveredWidget(mousePos)) GetGLWidget()->update();
       break;
@@ -437,7 +434,7 @@ bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
 
 void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
   auto scanCode = event->nativeScanCode();
-  
+
   if (scanCode == 41) {
     /// The key over "tab", independent of input language
     /// Open "add new node" window
@@ -461,7 +458,7 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
       }
       break;
 
-    /// 1 opens watcher on upper left panel
+      /// 1 opens watcher on upper left panel
     case Qt::Key_1:
       if (mSelectedNodeWidgets.size() == 1) {
         ZenGarden::GetInstance()->Watch(
@@ -470,7 +467,7 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
       }
       break;
 
-    /// 2 opens watcher on right panel
+      /// 2 opens watcher on right panel
     case Qt::Key_2:
       if (mSelectedNodeWidgets.size() == 1) {
         ZenGarden::GetInstance()->Watch(
@@ -478,7 +475,7 @@ void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
       }
       break;
 
-    /// 3 opens watcher on bottom left panel
+      /// 3 opens watcher on bottom left panel
     case Qt::Key_3:
       if (mSelectedNodeWidgets.size() == 1) {
         ZenGarden::GetInstance()->Watch(
@@ -554,7 +551,7 @@ void GraphWatcher::HandleDragEnterEvent(QDragEnterEvent* event) {
 
   QString fileName = urlList.at(0).toLocalFile();
   if (fileName.endsWith(".obj") || fileName.endsWith(".png")
-      || fileName.endsWith(".jpg")) {
+    || fileName.endsWith(".jpg")) {
     event->acceptProposedAction();
   }
 }

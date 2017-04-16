@@ -259,8 +259,8 @@ void Node::Update() {
 Node::~Node() {
   //while (mWatchers.size()) delete *mWatchers.begin();
   //for (auto watcher : mWatchers) watcher->ChangeNode(nullptr);
-  while (mWatchers.size()) (*mWatchers.begin())->Destroy();
-  mWatchers.clear();
+  //mWatchers.clear();
+  while (mWatchers.size()) (*mWatchers.begin())->Unwatch();
 
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {

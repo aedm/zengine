@@ -1,7 +1,7 @@
 #include "meshwatcher.h"
 
 MeshWatcher::MeshWatcher(MeshNode* meshNode)
-  : GeneralSceneWatcher(&mDefaultScene)
+  : GeneralSceneWatcher(meshNode)
 {
   mDrawable.mMaterial.Connect(mDefaultMaterial);
   mDrawable.mMesh.Connect(meshNode);

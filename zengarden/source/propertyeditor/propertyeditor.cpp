@@ -9,8 +9,7 @@
 #include <QtWidgets/QPushButton>
 
 PropertyEditor::PropertyEditor(Node* node)
-  : WatcherUI(node) 
-{}
+  : WatcherUI(node) {}
 
 
 void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
@@ -54,12 +53,11 @@ void PropertyEditor::HandleNameTexBoxChanged() {
 
 
 DefaultPropertyEditor::DefaultPropertyEditor(Node* node)
-  : PropertyEditor(node) 
-{}
+  : PropertyEditor(node) {}
 
 
 void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  PropertyEditor::SetWatcherWidget(watcherWidget);
 
   /// Slots
   for (Slot* slot : mNode->GetPublicSlots()) {
@@ -91,6 +89,7 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
       //widget->onWatcherDeath =
       //  Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
       mLayout->addWidget(widget);
+      watcher->SetWatcherWidget(widget);
       mSlotWatchers[slot] = watcher;
     } else {
       /// General slots, just add a label
@@ -115,22 +114,21 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 void DefaultPropertyEditor::OnSlotConnectionChanged(Slot* slot) {
   auto it = mSlotWatchers.find(slot);
   if (it != mSlotWatchers.end()) {
-    if (auto watcher = it->second.lock())       {
-      if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
-        watcher->ResetNode();
-      } else {
-        slot->GetAbstractNode()->AssignWatcher(watcher);
-        WatcherUI* watcherPtr = watcher.get();
-        if (slot->DoesAcceptType(NodeType::FLOAT)) {
-          ASSERT(dynamic_cast<FloatWatcher*>(watcherPtr));
-          static_cast<FloatWatcher*>(watcherPtr)->SetReadOnly(!slot->IsDefaulted());
-        } else if (slot->DoesAcceptType(NodeType::VEC3)) {
-          ASSERT(dynamic_cast<Vec3Watcher*>(watcherPtr));
-          static_cast<Vec3Watcher*>(watcherPtr)->SetReadOnly(!slot->IsDefaulted());
-        } else if (slot->DoesAcceptType(NodeType::VEC4)) {
-          ASSERT(dynamic_cast<Vec4Watcher*>(watcherPtr));
-          static_cast<Vec4Watcher*>(watcherPtr)->SetReadOnly(!slot->IsDefaulted());
-        }
+    shared_ptr<WatcherUI> watcher = it->second;
+    if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
+      watcher->Unwatch();
+    } else {
+      slot->GetAbstractNode()->AssignWatcher(watcher);
+      WatcherUI* watcherPtr = watcher.get();
+      if (slot->DoesAcceptType(NodeType::FLOAT)) {
+        ASSERT(dynamic_cast<FloatWatcher*>(watcherPtr));
+        static_cast<FloatWatcher*>(watcherPtr)->SetReadOnly(!slot->IsDefaulted());
+      } else if (slot->DoesAcceptType(NodeType::VEC3)) {
+        ASSERT(dynamic_cast<Vec3Watcher*>(watcherPtr));
+        static_cast<Vec3Watcher*>(watcherPtr)->SetReadOnly(!slot->IsDefaulted());
+      } else if (slot->DoesAcceptType(NodeType::VEC4)) {
+        ASSERT(dynamic_cast<Vec4Watcher*>(watcherPtr));
+        static_cast<Vec4Watcher*>(watcherPtr)->SetReadOnly(!slot->IsDefaulted());
       }
     }
   }
@@ -143,12 +141,11 @@ void DefaultPropertyEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
 
 
 StaticFloatEditor::StaticFloatEditor(FloatNode* node)
-  : PropertyEditor(node) 
-{}
+  : PropertyEditor(node) {}
 
 
 void StaticFloatEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  PropertyEditor::SetWatcherWidget(watcherWidget);
 
   static const QString valueString("value");
   auto watcher = mNode->Watch<FloatWatcher>(static_cast<FloatNode*>(mNode), valueString, false);
@@ -164,12 +161,11 @@ void StaticFloatEditor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
 
 
 StaticVec3Editor::StaticVec3Editor(Vec3Node* node)
-  : PropertyEditor(node) 
-{}
+  : PropertyEditor(node) {}
 
 
 void StaticVec3Editor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  PropertyEditor::SetWatcherWidget(watcherWidget);
 
   static const QString valueString("value");
   auto watcher = mNode->Watch<Vec3Watcher>(static_cast<Vec3Node*>(mNode), valueString, false);
@@ -186,12 +182,11 @@ void StaticVec3Editor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
 
 
 StaticVec4Editor::StaticVec4Editor(Vec4Node* node)
-  : PropertyEditor(node) 
-{}
+  : PropertyEditor(node) {}
 
 
 void StaticVec4Editor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  PropertyEditor::SetWatcherWidget(watcherWidget);
 
   static const QString valueString("value");
   auto watcher = mNode->Watch<Vec4Watcher>(static_cast<Vec4Node*>(mNode), valueString, false);

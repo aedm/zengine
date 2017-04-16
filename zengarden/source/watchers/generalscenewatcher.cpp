@@ -6,18 +6,16 @@ Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 GeneralSceneWatcher::GeneralSceneWatcher(Node* node) 
   : WatcherUI(node)
 {
-  GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
-  GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
-  GetGLWidget()->OnMouseRelease += Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
-  GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
-  GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
-  GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
-
-  mDefaultScene.mCamera.Connect(&mCamera);
-  mScene = &mDefaultScene;
+  if (node->GetType() != NodeType::SCENE) {
+    mDefaultScene.mCamera.Connect(&mCamera);
+    mScene = &mDefaultScene;
+    mRenderForwarder = mDefaultScene.Watch<RenderForwarder>(&mDefaultScene);
+    mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
+  }
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
+  if (mRenderForwarder) mRenderForwarder->Unwatch();
   SafeDelete(mDrawable);
   SafeDelete(mRenderTarget);
 }
@@ -37,6 +35,17 @@ void GeneralSceneWatcher::Paint(GLWidget* widget) {
 
 void GeneralSceneWatcher::OnRedraw() {
   GetGLWidget()->update();
+}
+
+void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
+
+  GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
+  GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
+  GetGLWidget()->OnMouseRelease += Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
+  GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
+  GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
+  GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
 }
 
 void GeneralSceneWatcher::Init()
@@ -112,5 +121,13 @@ void GeneralSceneWatcher::HandleMouseRightUp(QMouseEvent* event) {
 
 void GeneralSceneWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
 
+}
+
+RenderForwarder::RenderForwarder(SceneNode* node)
+  : Watcher(node)
+{}
+
+void RenderForwarder::OnRedraw() {
+  mOnRedraw();
 }
 

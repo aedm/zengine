@@ -165,9 +165,8 @@ void FloatEditor::SetReadOnly(bool readOnly) {
 FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, QString name, bool readOnly)
   : WatcherUI(node) 
   , mName(name)
-{
-  SetReadOnly(readOnly);
-}
+  , mIsReadOnly(readOnly)
+{}
 
 
 void FloatWatcher::OnRedraw() {
@@ -177,6 +176,7 @@ void FloatWatcher::OnRedraw() {
 
 
 void FloatWatcher::SetReadOnly(bool readOnly) {
+  mIsReadOnly = readOnly;
   mEditorX->SetReadOnly(readOnly);
 }
 
@@ -193,6 +193,7 @@ void FloatWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mEditorX->onValueChange += Delegate(this, &FloatWatcher::HandleValueChange);
   layout->addWidget(mEditorX);
 
+  SetReadOnly(mIsReadOnly);
 }
 
 void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
@@ -206,9 +207,8 @@ void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
 Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, QString name, bool readOnly)
   : WatcherUI(node) 
   , mName(name)
-{
-  SetReadOnly(readOnly);
-}
+  , mIsReadOnly(readOnly)
+{}
 
 
 void Vec3Watcher::OnRedraw() {
@@ -220,6 +220,7 @@ void Vec3Watcher::OnRedraw() {
 
 
 void Vec3Watcher::SetReadOnly(bool readOnly) {
+  mIsReadOnly = readOnly;
   mEditorX->SetReadOnly(readOnly);
   mEditorY->SetReadOnly(readOnly);
   mEditorZ->SetReadOnly(readOnly);
@@ -247,6 +248,8 @@ void Vec3Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mEditorZ = new FloatEditor(watcherWidget, mName + ".z", value.z);
   mEditorZ->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
   layout->addWidget(mEditorZ);
+
+  SetReadOnly(mIsReadOnly);
 }
 
 void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
@@ -265,9 +268,8 @@ void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
 Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, QString name, bool readOnly)
   : WatcherUI(node) 
   , mName(name)
-{
-  SetReadOnly(readOnly);
-}
+  , mIsReadOnly(readOnly)
+{}
 
 
 void Vec4Watcher::OnRedraw() {
@@ -280,10 +282,11 @@ void Vec4Watcher::OnRedraw() {
 
 
 void Vec4Watcher::SetReadOnly(bool readOnly) {
-  mEditorX->SetReadOnly(readOnly);
-  mEditorY->SetReadOnly(readOnly);
-  mEditorZ->SetReadOnly(readOnly);
-  mEditorW->SetReadOnly(readOnly);
+  mIsReadOnly = readOnly;
+  mEditorX->SetReadOnly(mIsReadOnly);
+  mEditorY->SetReadOnly(mIsReadOnly);
+  mEditorZ->SetReadOnly(mIsReadOnly);
+  mEditorW->SetReadOnly(mIsReadOnly);
 }
 
 
@@ -313,6 +316,8 @@ void Vec4Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mEditorW = new FloatEditor(watcherWidget, mName + ".w", value.w);
   mEditorW->onValueChange += Delegate(this, &Vec4Watcher::HandleValueChange);
   layout->addWidget(mEditorW);
+
+  SetReadOnly(mIsReadOnly);
 }
 
 void Vec4Watcher::HandleValueChange(FloatEditor* editor, float value) {

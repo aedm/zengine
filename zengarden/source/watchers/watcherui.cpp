@@ -17,12 +17,8 @@ void WatcherUI::OnNameChange() {
 
 
 WatcherUI::~WatcherUI() {
-  if (mWatcherWidget) {
-    mWatcherWidget->mWatcher = nullptr;
-
-    /// Let the UI delete the WatcherWidget
-    ZenGarden::GetInstance()->DeleteWatcherWidget(mWatcherWidget);
-  }
+  ASSERT(mWatcherWidget == nullptr);
+  ASSERT(mNode == nullptr);
 }
 
 
@@ -62,9 +58,10 @@ void WatcherUI::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mWatcherWidget = watcherWidget;
 }
 
-void WatcherUI::Destroy() {
-  Watcher::Destroy();
+void WatcherUI::Unwatch() {
+  Watcher::Unwatch();
+  if (!mWatcherWidget) return;
 
-  // Point of no return -- "this" pointer isn't valid after deleting the widget
-  SafeDelete(mWatcherWidget);
+  // Point of no return -- "this" pointer might be invalid after calling onUnwatch
+  onUnwatch(mWatcherWidget);
 }

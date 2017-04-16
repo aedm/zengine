@@ -13,8 +13,8 @@ WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, Wat
 
 WatcherWidget::~WatcherWidget() {
   if (mWatcher) {
-    mWatcher->ResetNode(false);
     mWatcher->mWatcherWidget = nullptr;
+    mWatcher->Unwatch();
   }
   //ASSERT(mWatcher.use_count() == 1);
 }
@@ -39,8 +39,9 @@ void WatcherWidget::dropEvent(QDropEvent *event) {
   mWatcher->HandleDropEvent(event);
 }
 
-GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, QGLWidget* shareWidget,
-                                 WatcherPosition position, QTabWidget* tabWidget)
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, 
+                                 QGLWidget* shareWidget, WatcherPosition position, 
+                                 QTabWidget* tabWidget)
   : WatcherWidget(parent, watcher, position, tabWidget)
   , mShareWidget(shareWidget) 
 {
