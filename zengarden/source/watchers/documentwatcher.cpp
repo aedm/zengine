@@ -8,7 +8,7 @@ enum MyRoles {
 
 
 DocumentWatcher::DocumentWatcher(QListView* listView, Document* document)
-  : Watcher(document, nullptr)
+  : WatcherUI(document)
   , mListView(listView) 
 {
   mModel = new QStandardItemModel();
@@ -22,17 +22,8 @@ DocumentWatcher::~DocumentWatcher() {
 }
 
 
-void DocumentWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                           void* payload) {
-  switch (message) {
-    case NodeMessage::MULTISLOT_CONNECTION_ADDED:
-    case NodeMessage::MULTISLOT_CONNECTION_REMOVED:
-    case NodeMessage::MULTISLOT_CLEARED:
-      RefreshGraphList();
-      break;
-    default:
-      break;
-  }
+void DocumentWatcher::OnSlotConnectionChanged(Slot* slot) {
+  RefreshGraphList();
 }
 
 void DocumentWatcher::RefreshGraphList() {

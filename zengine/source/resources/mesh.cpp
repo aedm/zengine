@@ -80,7 +80,7 @@ void Mesh::Render(const vector<ShaderAttributeDesc>& usedAttributes,
                                              attribute->Offset,
                                              mFormat->mStride);
       } else {
-        SHOULDNT_HAPPEN;
+        SHOULD_NOT_HAPPEN;
       }
     }
 

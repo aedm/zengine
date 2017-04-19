@@ -9,6 +9,7 @@
 #include "dom/node.h"
 #include "dom/graph.h"
 #include "dom/document.h"
+#include "dom/watcher.h"
 
 #include "resources/mesh.h"
 #include "resources/texture.h"
@@ -30,6 +31,7 @@
 #include "nodes/vectornodes.h"
 #include "nodes/splinenode.h"
 #include "nodes/cameranode.h"
+#include "nodes/meshgenerators.h"
 
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();

@@ -1,32 +1,48 @@
 #pragma once
 
-#include "watcher.h"
+#include "watcherui.h"
 #include "watcherwidget.h"
 #include <zengine.h>
 
-class GeneralSceneWatcher: public Watcher {
+class SceneNode;
+
+class RenderForwarder: public Watcher {
 public:
-  GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget);
+  RenderForwarder(SceneNode* node);
+  virtual ~RenderForwarder() {}
+  virtual void OnRedraw();
+  FastDelegate<void()> mOnRedraw;
+};
+
+class GeneralSceneWatcher: public WatcherUI {
+public:
+  GeneralSceneWatcher(Node* node);
   virtual ~GeneralSceneWatcher();
 
   /// Initializes resources needed for scene watchers
   static void Init();
 
+  /// Called when the watcher needs to be rerendered
+  virtual void OnRedraw() override;
+
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+
 protected:
   void Paint(GLWidget* widget);
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
 
-  RenderTarget* mRenderTarget;
+  RenderTarget* mRenderTarget = nullptr;
 
   /// Scene node to be drawn.
-  SceneNode* mScene;
+  SceneNode* mScene = nullptr;
   
   /// Default scene node, might be unused
   SceneNode mDefaultScene;
 
   /// Default camera
   CameraNode mCamera;
+
+  /// Forwarder that catches render events for the default scene
+  shared_ptr<RenderForwarder> mRenderForwarder;
 
   /// Qt widget event handlers
   void HandleMousePress(GLWidget*, QMouseEvent* event);
@@ -51,3 +67,5 @@ private:
   /// The Drawable supplied by an implementation
   Drawable* mDrawable = nullptr;
 };
+
+

@@ -2,13 +2,13 @@
 
 #include "../util/textTexture.h"
 #include "graphwatcher.h"
-#include "../watchers/watcher.h"
+#include "../watchers/watcherui.h"
 #include <zengine.h>
 
 /// NodeWidget is a Watcher for a Node on a Graph. Every Node has a NodeWidget associated
 /// to it.
 
-class NodeWidget: public Watcher {
+class NodeWidget: public WatcherUI {
   friend class MoveNodeCommand;
   friend class GraphWatcher;
 
@@ -31,14 +31,15 @@ public:
   vector<WidgetSlot*>	mWidgetSlots;
 
 private:
-  virtual void HandleSniffedMessage(NodeMessage Message, Slot* S,
-                                    void* Payload) override;
-
-  /// Handles node title change
-  void HandleTitleChange();
+  virtual void OnSlotStructureChanged() override;
+  virtual void OnNameChange() override;
+  virtual void OnGraphPositionChanged() override;
+  virtual void OnSlotConnectionChanged(Slot* slot) override;
 
   /// Layout
   void CalculateLayout();
+
+  void UpdateGraph();
 
   //Vec2 mPosition;
   //Vec2 mSize;

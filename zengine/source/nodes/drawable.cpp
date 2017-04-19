@@ -23,7 +23,7 @@ Drawable::Drawable()
 
 Drawable::~Drawable() {}
 
-void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
+void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Primitive) {
   if (!mIsProperlyConnected) return;
   Material* material = mMaterial.GetNode();
   MeshNode* meshNode = mMesh.GetNode();
@@ -45,10 +45,11 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
   if (retransform) globals.Transformation = globals.Projection * globals.View;
 
   if (material && meshNode) {
+    meshNode->Update();
     const Mesh* mesh = meshNode->GetMesh();
 
     /// Set pass (pipeline state)
-    Pass* pass = material->GetPass();
+    Pass* pass = material->GetPass(passType);
     if (!pass) return;
     pass->Update();
 
@@ -83,7 +84,7 @@ void Drawable::Draw(Globals* oldGlobals, PrimitiveTypeEnum Primitive) {
   }
 
   for (Node* node : mChildren.GetMultiNodes()) {
-    static_cast<Drawable*>(node)->Draw(&globals);
+    static_cast<Drawable*>(node)->Draw(&globals, passType);
   }
 }
 

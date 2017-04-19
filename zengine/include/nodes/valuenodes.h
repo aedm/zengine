@@ -81,7 +81,7 @@ template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
   mValue = newValue;
   SendMsg(NodeMessage::VALUE_CHANGED);
-  onSniffMessage(NodeMessage::VALUE_CHANGED, nullptr, nullptr);
+  NotifyWatchers(&Watcher::OnRedraw);
 }
 
 
@@ -184,7 +184,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
 
 template<NodeType T>
 void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
-  SHOULDNT_HAPPEN;
+  SHOULD_NOT_HAPPEN;
   if (mNode == &mDefault) return;
   mDefault.ConnectToSlot(this);
   if (notifyOwner) {
@@ -222,9 +222,10 @@ typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
 
 ///// Explicit template type instantiations
 //template class StaticValueNode < NodeType::FLOAT >;
+//template class StaticValueNode < NodeType::VEC2 >;
+//template class StaticValueNode < NodeType::VEC3 >;
 //template class StaticValueNode < NodeType::VEC4 >;
 //template class StaticValueNode < NodeType::MATRIX44 >;
-//template class StaticValueNode<NodeType::TEXTURE>;
 
 
 /// Define texture type

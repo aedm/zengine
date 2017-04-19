@@ -17,7 +17,9 @@ RenderTarget::~RenderTarget() {
 void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   globals->DepthBufferSource = 0;
   globals->GBufferSourceA = 0;
+  globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
   TheDrawingAPI->SetFrameBuffer(mGBufferId);
+  TheDrawingAPI->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
 void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
@@ -40,6 +42,13 @@ void RenderTarget::Resize(Vec2 size) {
   mGBufferA = TheResourceManager->CreateGPUTexture(
     width, height, TexelType::ARGB16F, nullptr, true, false);
   mGBufferId = TheDrawingAPI->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
+
+  /// Create shadow map
+  mShadowTexture = TheResourceManager->CreateGPUTexture(
+    512, 512, TexelType::DEPTH32F, nullptr, false, false);
+  mShadowColorBuffer = TheResourceManager->CreateGPUTexture(
+    512, 512, TexelType::ARGB16F, nullptr, false, false);
+  mShadowBufferId = TheDrawingAPI->CreateFrameBuffer(mShadowTexture->mHandle, mShadowColorBuffer->mHandle, 0, false);
 
   /// Create gaussian ping-pong textures
   for (int i = 0; i < 3; i++) {

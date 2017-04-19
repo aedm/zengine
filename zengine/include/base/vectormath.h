@@ -92,7 +92,8 @@ public:
 	static Matrix	Scale(const Vec3& scaleVector);
 
 	/// Ortho matrix where (0,0) is the top left
-	static Matrix	Ortho(float x1, float y1, float x2, float y2);
+  static Matrix	Ortho(float x1, float y1, float x2, float y2);
+  static Matrix	Ortho(float x1, float y1, float x2, float y2, float near, float far);
 
   /// Projection matrix
   static Matrix Projection(float fovY, float zFar, float zNear, float aspectRatio);

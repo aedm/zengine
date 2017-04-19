@@ -1,7 +1,7 @@
 #include <include/dom/node.h>
+#include <include/dom/watcher.h>
 #include <include/base/helpers.h>
 #include <algorithm>
-
 
 /// Array for variable sizes in bytes
 const int gVariableByteSizes[] = {
@@ -46,13 +46,17 @@ bool Slot::Connect(Node* target) {
     }
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
+    /// TODO: merge these
     mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_ADDED, this, target);
+    mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
   } else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
+      /// TODO: merge these
       mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
   }
   return true;
@@ -66,6 +70,7 @@ void Slot::Disconnect(Node* target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
         mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_REMOVED, this, target);
+        mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
         return;
       }
     }
@@ -82,6 +87,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
   if (mIsMultiSlot) {
     for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
       (*it)->DisconnectFromSlot(this);
+      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
     mMultiNodes.clear();
     if (notifyOwner) {
@@ -92,6 +98,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
     mNode = nullptr;
     if (notifyOwner) {
       mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
   }
 }
@@ -174,6 +181,7 @@ void Node::ConnectToSlot(Slot* slot) {
 void Node::DisconnectFromSlot(Slot* slot) {
   mDependants.erase(std::remove(mDependants.begin(), mDependants.end(), slot), 
                     mDependants.end());
+  NotifyWatchers(&Watcher::OnSlotConnectionChanged, slot);
 }
 
 
@@ -214,7 +222,7 @@ void Node::SendMsg(NodeMessage message, void* payload) {
 
 void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
   HandleMessage(message, slot, payload);
-  onSniffMessage(message, slot, payload);
+  //onSniffMessage(message, slot, payload);
 }
 
 
@@ -249,20 +257,10 @@ void Node::Update() {
 
 
 Node::~Node() {
-  /// Remove all watchers. Create a copy of the event hook, because watchers remove
-  /// themselves from the callback list while the Event object iterates through it.
-  //auto eventCopy = onSniffMessage;
-  //eventCopy(NodeMessage::NODE_REMOVED, nullptr, nullptr); 
-    
-  /// Remove all watchers.
-  while (onSniffMessage.mDelegates.size()) {
-    auto callback = *onSniffMessage.mDelegates.begin();
-    callback(NodeMessage::NODE_REMOVED, nullptr, nullptr);
-
-    /// Check whether the watcher was removed. 
-    ASSERT(onSniffMessage.mDelegates.size() == 0 || 
-           *onSniffMessage.mDelegates.begin() != callback);
-  }
+  //while (mWatchers.size()) delete *mWatchers.begin();
+  //for (auto watcher : mWatchers) watcher->ChangeNode(nullptr);
+  //mWatchers.clear();
+  while (mWatchers.size()) (*mWatchers.begin())->Unwatch();
 
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
@@ -284,7 +282,7 @@ const string& Node::GetName() const {
 void Node::SetPosition(const Vec2 position) {
   mPosition.x = floorf(position.x);
   mPosition.y = floorf(position.y);
-  ReceiveMessage(NodeMessage::NODE_POSITION_CHANGED);
+  NotifyWatchers(&Watcher::OnGraphPositionChanged);
 }
 
 const Vec2 Node::GetPosition() const {
@@ -324,5 +322,19 @@ const vector<Slot*>& Node::GetPublicSlots() {
 
 const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
   return mSerializableSlotsByName;
+}
+
+void Node::RemoveWatcher(Watcher* watcher) {
+  for (auto it = mWatchers.begin(); it != mWatchers.end(); it++) {
+    if (it->get() == watcher) {
+      mWatchers.erase(it);
+      return;
+    }
+  }
+}
+
+void Node::AssignWatcher(shared_ptr<Watcher> watcher) {
+  mWatchers.insert(watcher);
+  watcher->ChangeNode(this);
 }
 

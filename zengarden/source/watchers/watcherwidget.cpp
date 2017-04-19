@@ -1,23 +1,26 @@
 #include "watcherwidget.h"
-#include "watcher.h"
+#include "watcherui.h"
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTabWidget>
 
-WatcherWidget::WatcherWidget(QWidget* parent, WatcherPosition position, 
+WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, WatcherPosition position,
                              QTabWidget* tabWidget)
   : QWidget(parent)
   , mPosition(position)
-  , mWatcher(nullptr)
   , mTabWidget(tabWidget)
+  , mWatcher(watcher)
 {}
 
 WatcherWidget::~WatcherWidget() {
-  SafeDelete(mWatcher);
+  if (mWatcher) {
+    mWatcher->mWatcherWidget = nullptr;
+    mWatcher->Unwatch();
+  }
+  //ASSERT(mWatcher.use_count() == 1);
 }
 
 GLWidget* WatcherWidget::GetGLWidget() {
-  /// TODO: fix this.
-  /// SHOULDNT_HAPPEN;
+  SHOULD_NOT_HAPPEN;
   return nullptr;
 }
 
@@ -36,10 +39,11 @@ void WatcherWidget::dropEvent(QDropEvent *event) {
   mWatcher->HandleDropEvent(event);
 }
 
-GLWatcherWidget::GLWatcherWidget(QWidget* parent, QGLWidget* shareWidget, 
-                                 WatcherPosition position, QTabWidget* tabWidget)
-  : WatcherWidget(parent, position, tabWidget) 
-  , mShareWidget(shareWidget)
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, 
+                                 QGLWidget* shareWidget, WatcherPosition position, 
+                                 QTabWidget* tabWidget)
+  : WatcherWidget(parent, watcher, position, tabWidget)
+  , mShareWidget(shareWidget) 
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -85,7 +89,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent* event) {
 
 void GLWidget::paintGL() {
   TheDrawingAPI->OnContextSwitch();
-  TheDrawingAPI->SetViewport(0, 0, width(), height());
+  //TheDrawingAPI->SetViewport(0, 0, width(), height());
   OnPaint(this);
 }
 

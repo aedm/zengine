@@ -27,6 +27,6 @@ UINT Texture::GetTexelByteCount(TexelType type) {
     case TexelType::ARGB32F:
       return 16;
   }
-  SHOULDNT_HAPPEN;
+  SHOULD_NOT_HAPPEN;
   return 0;
 }

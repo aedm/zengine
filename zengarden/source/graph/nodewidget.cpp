@@ -38,13 +38,12 @@ static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
 NodeWidget::NodeWidget(Node* node, GraphWatcher* graphWatcher)
-	: Watcher(node, nullptr, NodeType::WIDGET)
+	: WatcherUI(node)
 	, mTitleTexture(nullptr)
   , mGraphWatcher(graphWatcher)
 {
 	mIsSelected = false;
-  HandleTitleChange();
-  
+  OnNameChange();
 	CreateWidgetSlots();
 }
 
@@ -88,6 +87,10 @@ void NodeWidget::CalculateLayout()
   mNode->SetSize(size);
 }
 
+
+void NodeWidget::UpdateGraph() {
+  if (mGraphWatcher) mGraphWatcher->Update();
+}
 
 void NodeWidget::Paint()
 {
@@ -156,8 +159,27 @@ void NodeWidget::Paint()
 	ThePainter->DrawRect(position, size);
 }
 
-void NodeWidget::HandleTitleChange()
+
+Vec2 NodeWidget::GetOutputPosition()
 {
+  return mNode->GetPosition() + mOutputPosition;
+}
+
+
+Vec2 NodeWidget::GetInputPosition( int SlotIndex )
+{
+	WidgetSlot* sw = mWidgetSlots[SlotIndex];
+  return mNode->GetPosition() + sw->mSpotPos;
+}
+
+
+void NodeWidget::OnSlotStructureChanged() {
+  CreateWidgetSlots();
+  UpdateGraph();
+}
+
+
+void NodeWidget::OnNameChange() {
   static const QString stubLabel(" [stub]");
 
   QString text;
@@ -176,47 +198,18 @@ void NodeWidget::HandleTitleChange()
         text = QString::fromStdString(metaData->name);
       }
     }
-  } 
-	mTitleTexture = new TextTexture();
-	mTitleTexture->SetText(text, ThePainter->mTitleFont);
-  mGraphWatcher->Update();
+  }
+  mTitleTexture = new TextTexture();
+  mTitleTexture->SetText(text, ThePainter->mTitleFont);
+  UpdateGraph();
 }
 
-Vec2 NodeWidget::GetOutputPosition()
-{
-  return mNode->GetPosition() + mOutputPosition;
+
+void NodeWidget::OnGraphPositionChanged() {
+  UpdateGraph();
 }
 
-Vec2 NodeWidget::GetInputPosition( int SlotIndex )
-{
-	WidgetSlot* sw = mWidgetSlots[SlotIndex];
-  return mNode->GetPosition() + sw->mSpotPos;
-}
 
-void NodeWidget::HandleSniffedMessage(NodeMessage message, Slot* slot, void*)
-{
-	switch (message)
-	{
-	case NodeMessage::SLOT_STRUCTURE_CHANGED:
-		CreateWidgetSlots();
-    mGraphWatcher->Update();
-    break;
-  case NodeMessage::VALUE_CHANGED:
-    if (mNode->GetType() == NodeType::SHADER_STUB) {
-      StubNode* stub = static_cast<StubNode*>(mNode);
-      if (slot == &stub->mSource) {
-        CreateWidgetSlots();
-        mGraphWatcher->Update();
-      }
-    }
-    break;
-  case NodeMessage::NODE_NAME_CHANGED:
-    HandleTitleChange();
-    break;
-  case NodeMessage::SLOT_CONNECTION_CHANGED:
-  case NodeMessage::NODE_POSITION_CHANGED:
-    mGraphWatcher->Update();
-    break;
-	default: break;
-	}
+void NodeWidget::OnSlotConnectionChanged(Slot* slot) {
+  UpdateGraph();
 }

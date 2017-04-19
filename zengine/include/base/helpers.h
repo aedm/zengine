@@ -15,7 +15,7 @@
 #endif
 
 #define NOT_IMPLEMENTED ASSERT(false);
-#define SHOULDNT_HAPPEN ASSERT(false);
+#define SHOULD_NOT_HAPPEN ASSERT(false);
 
 /// Logging facility 
 

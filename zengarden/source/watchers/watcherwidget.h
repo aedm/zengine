@@ -4,7 +4,7 @@
 #include <QtWidgets/QWidget>
 #include <QtOpenGL/QGLWidget>
 
-class Watcher;
+class WatcherUI;
 class GLWidget;
 class QTabWidget;
 
@@ -16,30 +16,21 @@ enum class WatcherPosition {
 };
 
 class WatcherWidget: public QWidget {
-  friend class Watcher;
+  friend class WatcherUI;
 
 public:
-  WatcherWidget(QWidget* parent, WatcherPosition position, 
+  WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, WatcherPosition position,
                 QTabWidget* tabWidget = nullptr);
   virtual ~WatcherWidget();
-
-  /// Triggered when a new node needs to be watched
-  Event<Node*, WatcherPosition> onWatchNode;
-
-  /// Triggered when a node is selected (eg. in graph editor)
-  Event<Node*> onSelectNode;
-
-  /// Triggered when the watcher needs to be removed
-  FastDelegate<void(WatcherWidget*)> onWatcherDeath;
 
   /// Get the OpenGL widget, if any
   virtual GLWidget* GetGLWidget();
 
   const WatcherPosition	mPosition;
-  QTabWidget* mTabWidget;
+  QTabWidget* mTabWidget = nullptr;
 
+  shared_ptr<WatcherUI> mWatcher;
 protected:
-  Watcher* mWatcher;
 
   void SetTabLabel(const QString& text);
 
@@ -77,8 +68,8 @@ protected:
 
 class GLWatcherWidget: public WatcherWidget {
 public:
-  GLWatcherWidget(QWidget* Parent, QGLWidget* ShareWidget, WatcherPosition Position,
-                  QTabWidget* tabWidget = nullptr);
+  GLWatcherWidget(QWidget* Parent, shared_ptr<WatcherUI> watcher, QGLWidget* ShareWidget, 
+                  WatcherPosition Position, QTabWidget* tabWidget = nullptr);
   virtual ~GLWatcherWidget();
 
   virtual GLWidget* GetGLWidget() override;

@@ -2,6 +2,7 @@
 
 #include "meshnode.h"
 #include "../shaders/material.h"
+#include "../shaders/pass.h"
 
 class Drawable;
 typedef TypedSlot<NodeType::DRAWABLE, Drawable> DrawableSlot;
@@ -19,7 +20,7 @@ public:
   Vec3Slot mRotate;
   FloatSlot mInstances;
 
-  void Draw(Globals* globals, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
+  void Draw(Globals* globals, PassType passType, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
 
 protected:
   /// Handle received messages

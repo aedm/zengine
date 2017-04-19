@@ -1,10 +1,12 @@
 #pragma once
 
 #include "nodetype.h"
+#include "watcher.h"
 #include "../base/vectormath.h"
 #include "../base/fastdelegate.h"
 #include "../base/helpers.h"
 #include <vector>
+#include <set>
 #include <memory>
 
 using namespace std;
@@ -52,8 +54,9 @@ enum class NodeMessage {
 };
 
 class Node;
+class Watcher;
 
-/// Nodes can have multiple input slots, which connects it to other slots.
+/// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
   Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot = false,
@@ -120,6 +123,7 @@ protected:
 /// An operation that takes its slot values as input and computes an output
 class Node {
   friend class Slot;
+  friend class Watcher;
   template<NodeType T> friend class ValueSlot;
 
 public:
@@ -173,9 +177,10 @@ private:
   void DisconnectFromSlot(Slot* slot);
 
 
-/// ---------------- Editor-specific parts ----------------
-/// This section can be disabled without hurting the engine.
-public: 
+  /// ---------------- Editor-specific parts ----------------
+  /// This section can be disabled without hurting the engine.
+  /// --------------------------------------------------------
+public:
   virtual void SetName(const string& name);
   virtual const string& GetName() const;
   virtual void SetPosition(const Vec2 position);
@@ -189,13 +194,10 @@ public:
   /// Returns the slots that need to be serialized when saving / loading
   const unordered_map<SharedString, Slot*>& GetSerializableSlots();
 
-  /// Hook for watchers (UI only). This way watchers get all messages emitted by nodes.
-  Event<NodeMessage, Slot*, void*> onSniffMessage;
-
 protected:
   /// Registers a new slot
   void AddSlot(Slot* slot, bool isPublic, bool isSerializable);
-  
+
   /// Removes public and serializable slots
   void ClearSlots();
 
@@ -212,19 +214,53 @@ private:
 
   /// Slots that need to be serialized when saving / loading.
   unordered_map<SharedString, Slot*> mSerializableSlotsByName;
+
+  
+  /// ------------------ Watcher operations ------------------
+  /// This section can be disabled without hurting the engine.
+  /// --------------------------------------------------------
+public:
+  template <typename T, typename ...P>
+  inline shared_ptr<T> Watch(P... args) {
+    static_assert(std::is_base_of<Watcher, T>::value, "T must be a Watcher");
+    shared_ptr<T> watcher = make_shared<T>(args...);
+    mWatchers.insert(watcher);
+    return watcher;
+  }
+
+  /// Removes a Watcher from the watchers list
+  void RemoveWatcher(Watcher* watcher);
+
+  /// Adds a new Watcher to the watchers list
+  void AssignWatcher(shared_ptr<Watcher> watcher);
+
+protected:
+  template <class ...B>
+  inline void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
+    for (auto watcher : mWatchers) ((watcher.get())->*M)(args...);
+  }
+
+private:
+  /// Watchers
+  set<shared_ptr<Watcher>> mWatchers;
 };
 
+
+//template <class ...B>
+//inline void Watch(void (Watcher::*M)(B...), B... args) {
+//  for (Watcher* watcher : mWatchers) watcher->*M(...args);
+//}
 
 
 /// Typed slot macro, syntactic sugar. 
 template<NodeType T, class N>
 class TypedSlot: public Slot {
 public:
-  TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,          
+  TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true)
-            : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}     
+    : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}
 
-  N* GetNode() { 
-    return static_cast<N*>(GetAbstractNode()); 
-  } 
+  N* GetNode() {
+    return static_cast<N*>(GetAbstractNode());
+  }
 };

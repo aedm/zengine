@@ -93,7 +93,7 @@ void StubNode::HandleSourceChange() {
           slot = new TextureSlot(this, param->mName);
           break;
         default:
-          SHOULDNT_HAPPEN;
+          SHOULD_NOT_HAPPEN;
           break;
       }
       mParameterSlotMap[param] = slot;

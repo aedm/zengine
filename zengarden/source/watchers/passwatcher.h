@@ -5,7 +5,7 @@
 class PassWatcher : public GeneralSceneWatcher
 {
 public:
-	PassWatcher(Pass* pass, GLWatcherWidget* watcherWidget);
+  PassWatcher(Pass* pass);
 	virtual ~PassWatcher();
 
 protected:

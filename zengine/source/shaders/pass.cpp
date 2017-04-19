@@ -34,6 +34,7 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
         SafeDelete(mVertexShaderMetadata);
         mIsUpToDate = false;
         ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+        NotifyWatchers(&Watcher::OnRedraw);
       }
       else if (slot == &mFragmentStub) {
         SafeDelete(mFragmentShaderMetadata);
@@ -186,7 +187,7 @@ void Pass::Set(Globals* globals) {
 					break;
         VALUETYPE_LIST
 
-        default: SHOULDNT_HAPPEN; break;
+        default: SHOULD_NOT_HAPPEN; break;
       }
     } else {
       /// Global uniform, takes value from the Globals object

@@ -27,6 +27,8 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<CameraNode>());
   AddPrototype(registry->GetNodeClass<SceneNode>());
   AddPrototype(registry->GetNodeClass<SSpline>());
+  
+  AddPrototype(registry->GetNodeClass<CubeMeshNode>());
 
   SSpline x;
   x.getNumPoints();
@@ -35,6 +37,7 @@ Prototypes::Prototypes() {
 
   /// Hack to force linking
   FloatsToVec3Node tmp;
+  CubeMeshNode cubeTmp;
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {

@@ -4,7 +4,6 @@
 
 class SceneWatcher: public GeneralSceneWatcher {
 public:
-  SceneWatcher(SceneNode* scene, GLWatcherWidget* watcherWidget);
+  SceneWatcher(SceneNode* scene);
   virtual ~SceneWatcher();
-
 };

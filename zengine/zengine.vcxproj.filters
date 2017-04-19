@@ -179,6 +179,10 @@
     <ClInclude Include="include\nodes\splinenode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\dom\watcher.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nodes\meshgenerators.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -283,6 +287,10 @@
     <ClCompile Include="source\nodes\splinenode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>
+    <ClCompile Include="source\dom\watcher.cpp">
+      <Filter>source\dom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nodes\meshgenerators.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

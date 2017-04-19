@@ -4,7 +4,7 @@
 
 class MeshWatcher : public GeneralSceneWatcher {
 public:
-  MeshWatcher(MeshNode* meshNode, GLWatcherWidget* watcherWidget);
+  MeshWatcher(MeshNode* meshNode);
 
 private:
   Drawable mDrawable;

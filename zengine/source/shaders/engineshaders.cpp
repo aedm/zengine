@@ -41,8 +41,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   UINT newHeight = height;
   for (UINT i = 0; i <= downsampleCount; i++) {
     FrameBufferId target = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    glBlitNamedFramebuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight, 
-                           GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    TheDrawingAPI->BlitFrameBuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight);
     auto error = glGetError();  ASSERT(error == GL_NO_ERROR);
     width = newWidth;
     height = newHeight;
@@ -53,7 +52,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   }
 
   /// Blur the image
-  size = Vec2(width, height);
+  size = Vec2(float(width), float(height));
   globals->GBufferSourceA = renderTarget->mGBufferA;
   globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth), 
                                       float(height) / float(originalHeight));
@@ -61,7 +60,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   
   UINT gaussIterationCount = 10;
 
-  for (int i = 0; i < gaussIterationCount * 2; i++) {
+  for (UINT i = 0; i < gaussIterationCount * 2; i++) {
     FrameBufferId targetBuffer = renderTarget->mGaussFramebuffers[targetBufferIndex];
     TheDrawingAPI->SetFrameBuffer(targetBuffer);
     globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];

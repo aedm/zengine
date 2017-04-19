@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zengine.h>
-#include "../watchers/watcher.h"
+#include "../watchers/watcherui.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/qlineedit.h>
 
@@ -89,77 +89,71 @@ protected:
 
 
 /// A parameter panel item for FloatNodes
-class FloatWatcher: public Watcher {
+class FloatWatcher: public WatcherUI {
 public:
-  FloatWatcher(ValueNode<NodeType::FLOAT>* node, WatcherWidget* widget, QString name,
-               bool readOnly);
+  FloatWatcher(ValueNode<NodeType::FLOAT>* node, QString name, bool readOnly);
   virtual ~FloatWatcher() {}
 
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-protected:
-  /// This method will be called when the watched node was changed
-  virtual void HandleChangedNode(Node* node) override;
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot, 
-                                    void* payload) override;
+  virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
+  bool mIsReadOnly = false;
+  QString mName;
 
   void HandleValueChange(FloatEditor* editor, float value);
 };
 
 
 /// A parameter panel item for Vec3Nodes
-class Vec3Watcher: public Watcher {
+class Vec3Watcher: public WatcherUI {
 public:
-  Vec3Watcher(ValueNode<NodeType::VEC3>* node, WatcherWidget* widget, QString name,
-              bool readOnly);
+  Vec3Watcher(ValueNode<NodeType::VEC3>* node, QString name, bool readOnly);
   virtual ~Vec3Watcher() {}
 
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-protected:
-  /// This method will be called when the watched node was changed
-  virtual void HandleChangedNode(Node* node) override;
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
   FloatEditor* mEditorY = nullptr;
   FloatEditor* mEditorZ = nullptr;
+  bool mIsReadOnly = false;
+  QString mName;
 
   void HandleValueChange(FloatEditor* editor, float value);
 };
 
 
 /// A parameter panel item for Vec4Nodes
-class Vec4Watcher: public Watcher {
+class Vec4Watcher: public WatcherUI {
 public:
-  Vec4Watcher(ValueNode<NodeType::VEC4>* node, WatcherWidget* widget, QString name,
-              bool readOnly);
+  Vec4Watcher(ValueNode<NodeType::VEC4>* node, QString name, bool readOnly);
   virtual ~Vec4Watcher() {}
 
   /// Enable/disable editing
   void SetReadOnly(bool readOnly);
 
-protected:
-  /// This method will be called when the watched node was changed
-  virtual void HandleChangedNode(Node* node) override;
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot,
-                                    void* payload) override;
+  virtual void OnRedraw() override;
 
   FloatEditor* mEditorX = nullptr;
   FloatEditor* mEditorY = nullptr;
   FloatEditor* mEditorZ = nullptr;
   FloatEditor* mEditorW = nullptr;
+  bool mIsReadOnly = false;
+  QString mName;
 
   void HandleValueChange(FloatEditor* editor, float value);
 };

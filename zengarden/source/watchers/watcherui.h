@@ -11,15 +11,11 @@ class GLWidget;
 /// Watchers show the contents of a node or edit it. They show the content as a tab on 
 /// the ui, or as a property panel item, etc. Watchers belong to their WatcherWidgets, 
 /// and are destroyed by them.
-class Watcher {
+class WatcherUI: public Watcher {
+  friend class WatcherWidget;
+
 public:
-  virtual ~Watcher();
-
-  /// Returns the node being watched
-  Node*	GetNode();
-
-  /// Change the displayed node to another
-  void ChangeNode(Node* node);
+  virtual ~WatcherUI();
 
   /// Get the OpenGL widget, if any
   GLWidget* GetGLWidget();
@@ -31,28 +27,26 @@ public:
   virtual void HandleDragEnterEvent(QDragEnterEvent* event) {}
   virtual void HandleDropEvent(QDropEvent* event) {}
 
+  /// Set WatcherWidget that draws contents
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
+
+  /// Destorys the watcher and its UI elements
+  virtual void Unwatch() override;
+
+  /// Triggered when the Watcher isn't attached to a Node anymore. 
+  /// Can delete WatcherWidget if necessary.
+  FastDelegate<void(WatcherWidget*)> onUnwatch;
+
 protected:
-  Watcher(Node* node, WatcherWidget* watcherWidget, NodeType type = NodeType::UI);
+  WatcherUI(Node* node);
 
-  /// This method will be called when the watched node was changed. The node parameter 
-  /// is null if the underlying node is being deleted.
-  virtual void HandleChangedNode(Node* node);
-
-  /// This method will be callen when the watched node receives an internal message
-  virtual void HandleSniffedMessage(NodeMessage message, Slot* slot, void* payload);
-
-  /// The node beign watched
-  //Slot mWatchedNode;
-  Node* mNode;
-  
   /// The watcher widget that contains this watcher
-  WatcherWidget* mWatcherWidget;
+  WatcherWidget* mWatcherWidget = nullptr;
 
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;
 
-  /// Helper function for forwaring internal messages of the watched node
-  void SniffMessage(NodeMessage message, Slot* slot, void* payload);
+  virtual void OnNameChange() override;
 
 private:
   /// Generate the name displayed for the node. If the node has no name, it shows

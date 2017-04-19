@@ -1,14 +1,16 @@
 #pragma once
 
-#include "watcher.h"
+#include "watcherui.h"
 #include "watcherwidget.h"
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTextEdit>
 
-class TextWatcher: public Watcher {
+class TextWatcher: public WatcherUI {
 public:
-  TextWatcher(StringNode* node, WatcherWidget* watcherWidget);
+  TextWatcher(StringNode* node);
   virtual ~TextWatcher();
+
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   QBoxLayout*	mLayout;

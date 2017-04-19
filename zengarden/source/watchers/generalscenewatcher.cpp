@@ -3,10 +3,42 @@
 
 Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
-GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWidget) 
-  : Watcher(node, watcherWidget)
+GeneralSceneWatcher::GeneralSceneWatcher(Node* node) 
+  : WatcherUI(node)
 {
-  ASSERT(dynamic_cast<GLWatcherWidget*>(static_cast<QWidget*>(watcherWidget)) != nullptr);
+  if (node->GetType() != NodeType::SCENE) {
+    mDefaultScene.mCamera.Connect(&mCamera);
+    mScene = &mDefaultScene;
+    mRenderForwarder = mDefaultScene.Watch<RenderForwarder>(&mDefaultScene);
+    mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
+  }
+}
+
+GeneralSceneWatcher::~GeneralSceneWatcher() {
+  if (mRenderForwarder) mRenderForwarder->Unwatch();
+  SafeDelete(mDrawable);
+  SafeDelete(mRenderTarget);
+}
+
+void GeneralSceneWatcher::Paint(GLWidget* widget) {
+  if (!mWatcherWidget) return;
+  if (!mRenderTarget) {
+    GetGLWidget()->makeCurrent();
+    mRenderTarget =
+      new RenderTarget(Vec2(float(mWatcherWidget->width()), float(mWatcherWidget->height())));
+  }
+
+  Vec2 size = Vec2(widget->width(), widget->height());
+  mRenderTarget->Resize(size);
+  mScene->Draw(mRenderTarget);
+}
+
+void GeneralSceneWatcher::OnRedraw() {
+  GetGLWidget()->update();
+}
+
+void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  WatcherUI::SetWatcherWidget(watcherWidget);
 
   GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
   GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
@@ -14,35 +46,6 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node, GLWatcherWidget* watcherWid
   GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
   GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
-
-  GetGLWidget()->makeCurrent();
-  mRenderTarget =
-    new RenderTarget(Vec2(float(watcherWidget->width()), float(watcherWidget->height())));
-
-  mDefaultScene.mCamera.Connect(&mCamera);
-  mScene = &mDefaultScene;
-  mDefaultScene.onSniffMessage += Delegate(this, &GeneralSceneWatcher::SniffMessage);
-}
-
-GeneralSceneWatcher::~GeneralSceneWatcher() {
-  mDefaultScene.onSniffMessage -= Delegate(this, &GeneralSceneWatcher::SniffMessage);
-  SafeDelete(mDrawable);
-  SafeDelete(mRenderTarget);
-}
-
-void GeneralSceneWatcher::Paint(GLWidget* widget) {
-  Vec2 size = Vec2(widget->width(), widget->height());
-  mRenderTarget->Resize(size);
-  mScene->Draw(mRenderTarget);
-}
-
-void GeneralSceneWatcher::HandleSniffedMessage(NodeMessage message, Slot* slot, 
-                                               void* payload) 
-{
-  if (message == NodeMessage::NEEDS_REDRAW) {
-    /// HACK
-    if (GetGLWidget()) GetGLWidget()->update();
-  }
 }
 
 void GeneralSceneWatcher::Init()
@@ -118,5 +121,13 @@ void GeneralSceneWatcher::HandleMouseRightUp(QMouseEvent* event) {
 
 void GeneralSceneWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
 
+}
+
+RenderForwarder::RenderForwarder(SceneNode* node)
+  : Watcher(node)
+{}
+
+void RenderForwarder::OnRedraw() {
+  mOnRedraw();
 }
 
