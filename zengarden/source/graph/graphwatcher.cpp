@@ -348,6 +348,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
       for (NodeWidget* widget : mSelectedNodeWidgets) {
         widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
       }
+      GetGLWidget()->update();
     }
     break;
     case State::SELECT_RECTANGLE:
