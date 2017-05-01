@@ -23,6 +23,12 @@
  }</string>
   </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">
      <number>4</number>
@@ -40,67 +46,11 @@
      <number>4</number>
     </property>
     <item>
-     <widget class="QWidget" name="widget" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QTabWidget" name="upperLeftPanel">
-         <property name="currentIndex">
-          <number>-1</number>
-         </property>
-         <property name="tabsClosable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTabWidget" name="bottomLeftPanel">
-         <property name="currentIndex">
-          <number>-1</number>
-         </property>
-         <property name="tabsClosable">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="centerPanel" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>1</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+     <widget class="QWidget" name="verticalDummy" native="true">
       <property name="minimumSize">
        <size>
-        <width>200</width>
+        <width>100</width>
         <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>200</width>
-        <height>16777215</height>
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -117,23 +67,14 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QFrame" name="dummy2">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
+        <widget class="QWidget" name="panelsLayout" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>500</width>
+           <height>0</height>
+          </size>
          </property>
-         <property name="frameShape">
-          <enum>QFrame::Box</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>0</number>
-          </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -147,198 +88,160 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QFrame" name="dummy">
+           <widget class="QWidget" name="leftLayout" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
-              <verstretch>1</verstretch>
+              <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="autoFillBackground">
-             <bool>true</bool>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Box</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="lineWidth">
-             <number>1</number>
-            </property>
-            <property name="midLineWidth">
-             <number>1</number>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <property name="spacing">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <property name="leftMargin">
               <number>0</number>
              </property>
-             <property name="leftMargin">
-              <number>1</number>
-             </property>
              <property name="topMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="bottomMargin">
-              <number>1</number>
+              <number>0</number>
              </property>
              <item>
-              <widget class="QWidget" name="dummy3" native="true">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>1</verstretch>
-                </sizepolicy>
+              <widget class="QTabWidget" name="upperLeftPanel">
+               <property name="currentIndex">
+                <number>-1</number>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QWidget" name="propertyPanel" native="true"/>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>292</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-               <zorder>verticalSpacer</zorder>
-               <zorder>propertyPanel</zorder>
+               <property name="tabsClosable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTabWidget" name="bottomLeftPanel">
+               <property name="currentIndex">
+                <number>-1</number>
+               </property>
+               <property name="tabsClosable">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
            </widget>
           </item>
+          <item>
+           <widget class="QWidget" name="propertyDummy" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>1</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QWidget" name="propertyPanel" native="true">
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>292</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="rightLayout">
+            <item>
+             <widget class="QTabWidget" name="upperRightPanel">
+              <property name="currentIndex">
+               <number>-1</number>
+              </property>
+              <property name="usesScrollButtons">
+               <bool>false</bool>
+              </property>
+              <property name="documentMode">
+               <bool>false</bool>
+              </property>
+              <property name="tabsClosable">
+               <bool>true</bool>
+              </property>
+              <property name="movable">
+               <bool>false</bool>
+              </property>
+              <property name="tabBarAutoHide">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTabWidget" name="bottomRightPanel"/>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QTabWidget" name="tabWidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
+        <widget class="QWidget" name="timelinerWidget" native="true">
+         <property name="minimumSize">
           <size>
-           <width>200</width>
-           <height>16777215</height>
+           <width>0</width>
+           <height>200</height>
           </size>
          </property>
-         <property name="tabPosition">
-          <enum>QTabWidget::North</enum>
-         </property>
-         <property name="tabShape">
-          <enum>QTabWidget::Rounded</enum>
-         </property>
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <property name="elideMode">
-          <enum>Qt::ElideNone</enum>
-         </property>
-         <widget class="QWidget" name="graphsPanel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <attribute name="title">
-           <string>Graphs</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="spacing">
-            <number>6</number>
-           </property>
-           <property name="leftMargin">
-            <number>4</number>
-           </property>
-           <property name="topMargin">
-            <number>4</number>
-           </property>
-           <property name="rightMargin">
-            <number>4</number>
-           </property>
-           <property name="bottomMargin">
-            <number>4</number>
-           </property>
-           <item>
-            <widget class="QListView" name="graphsListView">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="addGraphButton">
-             <property name="text">
-              <string>New Graph</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="contentPanel">
-          <attribute name="title">
-           <string>Content</string>
-          </attribute>
-         </widget>
         </widget>
        </item>
       </layout>
-      <zorder>tabWidget</zorder>
-      <zorder>dummy2</zorder>
-     </widget>
-    </item>
-    <item>
-     <widget class="QTabWidget" name="rightPanel">
-      <property name="currentIndex">
-       <number>-1</number>
-      </property>
-      <property name="usesScrollButtons">
-       <bool>false</bool>
-      </property>
-      <property name="documentMode">
-       <bool>false</bool>
-      </property>
-      <property name="tabsClosable">
-       <bool>true</bool>
-      </property>
-      <property name="movable">
-       <bool>false</bool>
-      </property>
-      <property name="tabBarAutoHide">
-       <bool>false</bool>
-      </property>
      </widget>
     </item>
    </layout>

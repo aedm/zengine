@@ -63,5 +63,5 @@ void WatcherUI::Unwatch() {
   if (!mWatcherWidget) return;
 
   // Point of no return -- "this" pointer might be invalid after calling onUnwatch
-  onUnwatch(mWatcherWidget);
+  if (onUnwatch) onUnwatch(mWatcherWidget);
 }

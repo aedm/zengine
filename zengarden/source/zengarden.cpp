@@ -33,11 +33,10 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.bottomLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
     if (index > 0) delete mUI.bottomLeftPanel->widget(index);
   });
-  connect(mUI.rightPanel, &QTabWidget::tabCloseRequested, [=](int index) {
-    delete mUI.rightPanel->widget(index);
+  connect(mUI.upperRightPanel, &QTabWidget::tabCloseRequested, [=](int index) {
+    delete mUI.upperRightPanel->widget(index);
   });
 
-  connect(mUI.addGraphButton, SIGNAL(clicked()), this, SLOT(NewGraph()));
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
@@ -61,16 +60,16 @@ void ZenGarden::InitModules() {
   QTimer::singleShot(0, this, SLOT(UpdateTimeNode()));
 
   /// Set palette
-  QPalette pal = mUI.dummy->palette();
-  QPalette pal2 = mUI.dummy3->palette();
-  pal.setColor(QPalette::Background, pal.background().color().light(125));
-  pal.setColor(QPalette::WindowText, pal.background().color().light(135));
-  mUI.dummy->setPalette(pal);
-  pal.setColor(QPalette::WindowText, pal.background().color().dark());
-  mUI.dummy2->setPalette(pal);
-  pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
-  mUI.dummy3->setPalette(pal2);
-  mUI.dummy->repaint();
+  //QPalette pal = mUI.dummy->palette();
+  //QPalette pal2 = mUI.dummy3->palette();
+  //pal.setColor(QPalette::Background, pal.background().color().light(125));
+  //pal.setColor(QPalette::WindowText, pal.background().color().light(135));
+  //mUI.dummy->setPalette(pal);
+  //pal.setColor(QPalette::WindowText, pal.background().color().dark());
+  //mUI.dummy2->setPalette(pal);
+  //pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
+  //mUI.dummy3->setPalette(pal2);
+  //mUI.dummy->repaint();
 
   /// Initialize OpenGL and its dependencies
   mCommonGLWidget = new QGLWidget();
@@ -92,7 +91,6 @@ void ZenGarden::InitModules() {
 
   /// Create blank document
   mDocument = new Document();
-  mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
   Watch(graph, WatcherPosition::RIGHT_TAB);
@@ -102,7 +100,8 @@ void ZenGarden::DisposeModules() {
   /// Close all watchers
   while (mUI.upperLeftPanel->count() > 0) delete mUI.upperLeftPanel->widget(0);
   while (mUI.bottomLeftPanel->count() > 0) delete mUI.bottomLeftPanel->widget(0);
-  while (mUI.rightPanel->count() > 0) delete mUI.rightPanel->widget(0);
+  while (mUI.upperRightPanel->count() > 0) delete mUI.upperRightPanel->widget(0);
+  while (mUI.bottomRightPanel->count() > 0) delete mUI.bottomRightPanel->widget(0);
 
   Prototypes::Dispose();
   DisposePainter();
@@ -190,7 +189,7 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
       tabWidget = mUI.bottomLeftPanel;
       break;
     case WatcherPosition::RIGHT_TAB:
-      tabWidget = mUI.rightPanel;
+      tabWidget = mUI.upperRightPanel;
       break;
     default: SHOULD_NOT_HAPPEN; break;
   }
@@ -308,7 +307,6 @@ void ZenGarden::UpdateTimeNode() {
 void ZenGarden::HandleMenuNew() {
   DeleteDocument();
   mDocument = new Document();
-  mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
   Watch(graph, WatcherPosition::RIGHT_TAB);
@@ -336,7 +334,6 @@ void ZenGarden::HandleMenuOpen() {
   DeleteDocument();
   mDocument = document;
   mDocumentFileName = fileName;
-  mDocumentWatcher = new DocumentWatcher(mUI.graphsListView, mDocument);
 
   /// Open first graph
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
