@@ -12,7 +12,8 @@ enum class WatcherPosition {
   UPPER_LEFT_TAB,
   BOTTOM_LEFT_TAB,
   RIGHT_TAB,
-  PROPERTY_PANEL
+  PROPERTY_PANEL,
+  TIMELINE_PANEL,
 };
 
 class WatcherWidget: public QWidget {

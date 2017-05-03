@@ -132,16 +132,10 @@
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="propertyDummy" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QFrame" name="outerPropertyFrame">
             <property name="minimumSize">
              <size>
-              <width>50</width>
+              <width>200</width>
               <height>0</height>
              </size>
             </property>
@@ -151,10 +145,16 @@
               <height>16777215</height>
              </size>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <property name="spacing">
-              <number>0</number>
-             </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -168,33 +168,66 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="QWidget" name="propertyPanel" native="true">
-               <property name="minimumSize">
-                <size>
-                 <width>200</width>
-                 <height>0</height>
-                </size>
-               </property>
+              <widget class="QFrame" name="innerPropertyFrame">
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="autoFillBackground">
+                <bool>true</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Plain</enum>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QWidget" name="propertyPanel" native="true">
+                  <property name="minimumSize">
+                   <size>
+                    <width>200</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>501</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </widget>
-             </item>
-             <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>292</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </widget>
@@ -229,10 +262,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="timelinerWidget" native="true">
+        <widget class="QWidget" name="timelineWidget" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
+           <height>200</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
            <height>200</height>
           </size>
          </property>

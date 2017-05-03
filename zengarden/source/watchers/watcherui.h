@@ -37,6 +37,10 @@ public:
   /// Can delete WatcherWidget if necessary.
   FastDelegate<void(WatcherWidget*)> onUnwatch;
 
+  /// Generate a name displayed for a node. If the node has no name, it shows
+  /// the node type or the shader stub name.
+  static QString CreateDisplayedName(Node* node);
+
 protected:
   WatcherUI(Node* node);
 
@@ -47,9 +51,4 @@ protected:
   QString mDisplayedName;
 
   virtual void OnNameChange() override;
-
-private:
-  /// Generate the name displayed for the node. If the node has no name, it shows
-  /// the node type or the shader stub name.
-  void MakeDisplayedName();
 };

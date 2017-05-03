@@ -29,6 +29,8 @@ enum class NodeType {
   SCENE,
   GRAPH,
   DOCUMENT,
+  MOVIE,
+  CLIP,
   
   /// Empty stub value type
   NONE,

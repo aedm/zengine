@@ -17,7 +17,8 @@ public:
 protected:
   Ui::DocumentViewer mUI;
 
-  virtual void OnSlotConnectionChanged(Slot* slot);
+  virtual void OnSlotConnectionChanged(Slot* slot) override;
+  virtual void OnChildNameChange() override;
 
   void RefreshGraphList();
 

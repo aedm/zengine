@@ -21,6 +21,9 @@ public:
   /// Called when the name of the node is changed
   virtual void OnNameChange();
 
+  /// Called when the name of the node is changed
+  virtual void OnChildNameChange();
+
   /// Called when slot connections change
   virtual void OnSlotConnectionChanged(Slot* slot);
   

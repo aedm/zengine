@@ -10,6 +10,7 @@
 #include "watchers/drawablewatcher.h"
 #include "watchers/textwatcher.h"
 #include "watchers/splinewatcher.h"
+#include "watchers/moviewatcher.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
@@ -40,8 +41,8 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
-  
-  mUI.timelinerWidget->hide();
+
+  mUI.timelineWidget->hide();
 
   QTimer::singleShot(0, this, SLOT(InitModules()));
 }
@@ -58,18 +59,20 @@ void ZenGarden::InitModules() {
   mLogWatcher = new LogWatcher(this);
   mUI.bottomLeftPanel->addTab(mLogWatcher, "Log");
   mPropertyLayout = new QVBoxLayout(mUI.propertyPanel);
+  mMovieWatcherLayout = new QVBoxLayout(mUI.timelineWidget);
+  mMovieWatcherLayout->setMargin(0);
 
   mTime.start();
   QTimer::singleShot(0, this, SLOT(UpdateTimeNode()));
 
   /// Set palette
-  QPalette pal = mUI.verticalDummy->palette();
+  QPalette pal = mUI.innerPropertyFrame->palette();
   //QPalette pal2 = mUI.dummy3->palette();
   pal.setColor(QPalette::Background, pal.background().color().light(125));
   pal.setColor(QPalette::WindowText, pal.background().color().light(135));
-  mUI.verticalDummy->setPalette(pal);
-  //pal.setColor(QPalette::WindowText, pal.background().color().dark());
-  //mUI.dummy2->setPalette(pal);
+  mUI.innerPropertyFrame->setPalette(pal);
+  pal.setColor(QPalette::WindowText, pal.background().color().dark());
+  mUI.outerPropertyFrame->setPalette(pal);
   //pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
   //mUI.dummy3->setPalette(pal2);
   mUI.verticalDummy->repaint();
@@ -92,12 +95,7 @@ void ZenGarden::InitModules() {
   Prototypes::Init();
   GeneralSceneWatcher::Init();
 
-  /// Create blank document
-  mDocument = new Document();
-  Graph* graph = new Graph();
-  mDocument->mGraphs.Connect(graph);
-  Watch(graph, WatcherPosition::RIGHT_TAB);
-  Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
+  CreateNewDocument();
 }
 
 void ZenGarden::DisposeModules() {
@@ -111,13 +109,6 @@ void ZenGarden::DisposeModules() {
   DisposePainter();
   CloseZengine();
 }
-
-
-void ZenGarden::NewGraph() {
-  Graph* graph = new Graph();
-  mDocument->mGraphs.Connect(graph);
-}
-
 
 void ZenGarden::RestartSceneTimer() {
   mSceneStartTime = mTime.elapsed() - int(TheSceneTime->Get() * 1000.0f);
@@ -148,7 +139,7 @@ void ZenGarden::keyPressEvent(QKeyEvent* event) {
       RestartSceneTimer();
       return;
     case Qt::Key_5:
-      mUI.timelinerWidget->setVisible(!mUI.timelinerWidget->isVisible());
+      mUI.timelineWidget->setVisible(!mUI.timelineWidget->isVisible());
       return;
   }
   QMainWindow::keyPressEvent(event);
@@ -223,8 +214,7 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
 
   if (watcher) {
     watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
-  }
-  else {
+  } else {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
       watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<SSpline*>(node));
@@ -294,6 +284,31 @@ void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
 }
 
 
+void ZenGarden::CreateNewDocument() {
+  DeleteDocument();
+  mDocument = new Document();
+
+  MovieNode* movie = new MovieNode();
+  mDocument->mMovie.Connect(movie);
+
+  Graph* graph = new Graph();
+  mDocument->mGraphs.Connect(graph);
+
+  Watch(graph, WatcherPosition::RIGHT_TAB);
+  Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
+  SetupMovieWatcher();
+}
+
+void ZenGarden::SetupMovieWatcher() {
+  SafeDelete(mMovieWatcherWidget);
+  MovieNode* movieNode = mDocument->mMovie.GetNode();
+  shared_ptr<WatcherUI> watcher = movieNode->Watch<MovieWatcher>(movieNode);
+  mMovieWatcherWidget =
+    new WatcherWidget(mUI.timelineWidget, watcher, WatcherPosition::TIMELINE_PANEL);
+  watcher->SetWatcherWidget(mMovieWatcherWidget);
+  mMovieWatcherLayout->addWidget(mMovieWatcherWidget);
+}
+
 void ZenGarden::HandleMenuSaveAs() {
   QString fileName = QFileDialog::getSaveFileName(this,
     tr("Open project"), "app", tr("Zengine project (*.zen)"));
@@ -320,11 +335,7 @@ void ZenGarden::UpdateTimeNode() {
 }
 
 void ZenGarden::HandleMenuNew() {
-  DeleteDocument();
-  mDocument = new Document();
-  Graph* graph = new Graph();
-  mDocument->mGraphs.Connect(graph);
-  Watch(graph, WatcherPosition::RIGHT_TAB);
+  CreateNewDocument();
 }
 
 void ZenGarden::HandleMenuOpen() {
@@ -350,16 +361,25 @@ void ZenGarden::HandleMenuOpen() {
   mDocument = document;
   mDocumentFileName = fileName;
 
+  /// Make sure a MovieNode exists in the document.
+  if (!mDocument->mMovie.GetNode()) {
+    MovieNode* movieNode = new MovieNode();
+    mDocument->mMovie.Connect(movieNode);
+  }
+
   /// Open first graph
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
   Watch(graph, WatcherPosition::RIGHT_TAB);
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
+  SetupMovieWatcher();
 
   int milliseconds = myTimer.elapsed();
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
 }
 
 void ZenGarden::DeleteDocument() {
+  if (!mDocument) return;
+
   vector<Node*> nodes;
   Util::CreateTopologicalOrder(mDocument, nodes);
   for (UINT i = nodes.size(); i > 0; i--) {

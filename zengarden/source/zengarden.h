@@ -31,15 +31,22 @@ private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);
 
-  WatcherWidget* mPropertyEditor;
-  QBoxLayout* mPropertyLayout;
+  /// Creates blank document
+  void CreateNewDocument();
+
+  void SetupMovieWatcher();
+
+  WatcherWidget* mPropertyEditor = nullptr;
+  QBoxLayout* mPropertyLayout = nullptr;
+  WatcherWidget* mMovieWatcherWidget = nullptr;
+  QBoxLayout* mMovieWatcherLayout = nullptr;
 
   /// The GL widget used for initializing OpenGL and sharing context
-  QGLWidget* mCommonGLWidget;
+  QGLWidget* mCommonGLWidget = nullptr;
 
   /// The currently open document
-  Document*	mDocument;
-  DocumentWatcher* mDocumentWatcher;
+  Document*	mDocument = nullptr;
+  DocumentWatcher* mDocumentWatcher = nullptr;
   QString mDocumentFileName;
   
   /// When creating a new Graph, this number will be its index
@@ -47,7 +54,7 @@ private:
 
   /// App UI
   Ui::zengardenClass mUI;
-  LogWatcher*	mLogWatcher;
+  LogWatcher*	mLogWatcher = nullptr;
 
   /// Global time
   QTime mTime;
@@ -64,7 +71,6 @@ private:
 private slots:
   void InitModules();
   void DisposeModules();
-  void NewGraph();
   void UpdateTimeNode();
   void DeleteDocument();
 

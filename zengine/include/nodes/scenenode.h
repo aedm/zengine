@@ -31,3 +31,5 @@ protected:
   /// Handle received messages
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };
+
+typedef TypedSlot<NodeType::SCENE, SceneNode> SceneSlot;

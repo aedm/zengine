@@ -167,6 +167,9 @@
     <ClCompile Include="source\watchers\watcherui.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\moviewatcher.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -200,6 +203,9 @@
       <Filter>source\forms</Filter>
     </CustomBuild>
     <CustomBuild Include="source\forms\documentviewer.ui">
+      <Filter>source\forms</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\forms\movieeditor.ui">
       <Filter>source\forms</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -268,6 +274,12 @@
       <Filter>source\watchers</Filter>
     </ClInclude>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_documentviewer.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\moviewatcher.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_movieeditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

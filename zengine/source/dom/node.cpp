@@ -199,13 +199,15 @@ void Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
       CheckConnections();
-      //SendMessage(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
       /// Fall through:
     case NodeMessage::VALUE_CHANGED:
       if (mIsUpToDate) {
         mIsUpToDate = false;
         SendMsg(NodeMessage::VALUE_CHANGED);
       }
+      break;
+    case NodeMessage::NODE_NAME_CHANGED:
+      NotifyWatchers(&Watcher::OnChildNameChange);
       break;
     default:
       break;
@@ -222,7 +224,6 @@ void Node::SendMsg(NodeMessage message, void* payload) {
 
 void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
   HandleMessage(message, slot, payload);
-  //onSniffMessage(message, slot, payload);
 }
 
 
@@ -272,7 +273,8 @@ Node::~Node() {
 
 void Node::SetName(const string& name) {
   mName = name;
-  ReceiveMessage(NodeMessage::NODE_NAME_CHANGED);
+  NotifyWatchers(&Watcher::OnNameChange);
+  SendMsg(NodeMessage::NODE_NAME_CHANGED);
 }
 
 const string& Node::GetName() const {

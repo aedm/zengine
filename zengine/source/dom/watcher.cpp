@@ -35,3 +35,4 @@ void Watcher::OnSlotStructureChanged() {}
 void Watcher::OnGraphPositionChanged() {}
 void Watcher::OnSplineControlPointsChanged() {}
 void Watcher::OnSplineTimeChanged() {}
+void Watcher::OnChildNameChange() {}

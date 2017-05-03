@@ -6,12 +6,12 @@
 WatcherUI::WatcherUI(Node* node)
     : Watcher(node)
 {
-  MakeDisplayedName();
+  mDisplayedName = CreateDisplayedName(mNode);
 }
 
 
 void WatcherUI::OnNameChange() {
-  MakeDisplayedName();
+  mDisplayedName = CreateDisplayedName(mNode);
   if (mWatcherWidget) mWatcherWidget->SetTabLabel(mDisplayedName);
 }
 
@@ -27,26 +27,30 @@ GLWidget* WatcherUI::GetGLWidget() {
 }
 
 
-void WatcherUI::MakeDisplayedName() {
-  if (mNode == nullptr) {
-    mDisplayedName = QString();
-  } else if (!mNode->GetName().empty()) {
+QString WatcherUI::CreateDisplayedName(Node* node) {
+  if (node == nullptr) {
+    return QString();
+  } 
+  
+  if (!node->GetName().empty()) {
     /// Node has a name, use that.
-    mDisplayedName = QString::fromStdString(mNode->GetName());
-  } else {
-    /// Just use the type as a name by default
-    mDisplayedName = QString::fromStdString(
-      NodeRegistry::GetInstance()->GetNodeClass(mNode)->mClassName);
-    if (mNode->GetType() == NodeType::SHADER_STUB) {
-      StubNode* stub = static_cast<StubNode*>(mNode);
-      StubMetadata* metaData = stub->GetStubMetadata();
-      if (metaData != nullptr && !metaData->name.empty()) {
-        /// For shader stubs, use the stub name by default
-        mDisplayedName = QString::fromStdString(metaData->name);
-      }
+    return QString::fromStdString(node->GetName());
+  } 
+  
+  if (node->GetType() == NodeType::SHADER_STUB) {
+    StubNode* stub = static_cast<StubNode*>(node);
+    StubMetadata* metaData = stub->GetStubMetadata();
+    if (metaData != nullptr && !metaData->name.empty()) {
+      /// For shader stubs, use the stub name by default
+      return QString::fromStdString(metaData->name);
     }
   }
+
+  /// Just use the type as a name by default
+  return QString::fromStdString(
+    NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName);
 }
+
 
 const QString& WatcherUI::GetDisplayedName() {
   return mDisplayedName;

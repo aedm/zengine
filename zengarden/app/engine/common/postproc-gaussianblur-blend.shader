@@ -6,7 +6,9 @@
 :global float gGBufferSampleCount
 :global vec2 gPPGaussPixelSize
 :global vec2 gPPGaussRelativeSize
+:global float gTime
 :output vec4 FragColor
+
 
 float rand(vec2 co) {
   return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
