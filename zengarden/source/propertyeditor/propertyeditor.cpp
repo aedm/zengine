@@ -61,6 +61,8 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   /// Slots
   for (Slot* slot : mNode->GetPublicSlots()) {
+    if (slot->mIsMultiSlot) continue;
+
     shared_ptr<WatcherUI> watcher;
 
     /// TODO: use dynamic_cast

@@ -199,6 +199,9 @@
     <CustomBuild Include="source\forms\splineeditor.ui">
       <Filter>source\forms</Filter>
     </CustomBuild>
+    <CustomBuild Include="source\forms\documentviewer.ui">
+      <Filter>source\forms</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_zengarden.h">
@@ -263,6 +266,9 @@
     </ClInclude>
     <ClInclude Include="source\watchers\watcherui.h">
       <Filter>source\watchers</Filter>
+    </ClInclude>
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_documentviewer.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -223,9 +223,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QTabWidget" name="bottomRightPanel"/>
-            </item>
            </layout>
           </item>
          </layout>

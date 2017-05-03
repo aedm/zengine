@@ -1,21 +1,25 @@
 #pragma once
 
 #include "watcherui.h"
+#include "watcherwidget.h"
+#include "ui_documentviewer.h"
 #include <zengine.h>
-#include <QtWidgets/QListView>
 #include <QtGui/QStandardItemModel>
 
 class DocumentWatcher : public WatcherUI
 {
 public:
-	DocumentWatcher(QListView* listView, Document* documentNode);
+	DocumentWatcher(Document* documentNode);
 	virtual ~DocumentWatcher();
 
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+
 protected:
+  Ui::DocumentViewer mUI;
+
   virtual void OnSlotConnectionChanged(Slot* slot);
 
   void RefreshGraphList();
 
-	QListView* mListView;
-	QStandardItemModel* mModel;
+	QStandardItemModel* mModel = nullptr;
 };

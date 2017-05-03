@@ -31,7 +31,7 @@ ZenGarden::ZenGarden(QWidget *parent)
     delete mUI.upperLeftPanel->widget(index);
   });
   connect(mUI.bottomLeftPanel, &QTabWidget::tabCloseRequested, [=](int index) {
-    if (index > 0) delete mUI.bottomLeftPanel->widget(index);
+    if (index > 1) delete mUI.bottomLeftPanel->widget(index);
   });
   connect(mUI.upperRightPanel, &QTabWidget::tabCloseRequested, [=](int index) {
     delete mUI.upperRightPanel->widget(index);
@@ -40,6 +40,9 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
+  
+  mUI.timelinerWidget->hide();
+
   QTimer::singleShot(0, this, SLOT(InitModules()));
 }
 
@@ -60,16 +63,16 @@ void ZenGarden::InitModules() {
   QTimer::singleShot(0, this, SLOT(UpdateTimeNode()));
 
   /// Set palette
-  //QPalette pal = mUI.dummy->palette();
+  QPalette pal = mUI.verticalDummy->palette();
   //QPalette pal2 = mUI.dummy3->palette();
-  //pal.setColor(QPalette::Background, pal.background().color().light(125));
-  //pal.setColor(QPalette::WindowText, pal.background().color().light(135));
-  //mUI.dummy->setPalette(pal);
+  pal.setColor(QPalette::Background, pal.background().color().light(125));
+  pal.setColor(QPalette::WindowText, pal.background().color().light(135));
+  mUI.verticalDummy->setPalette(pal);
   //pal.setColor(QPalette::WindowText, pal.background().color().dark());
   //mUI.dummy2->setPalette(pal);
   //pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
   //mUI.dummy3->setPalette(pal2);
-  //mUI.dummy->repaint();
+  mUI.verticalDummy->repaint();
 
   /// Initialize OpenGL and its dependencies
   mCommonGLWidget = new QGLWidget();
@@ -94,6 +97,7 @@ void ZenGarden::InitModules() {
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
   Watch(graph, WatcherPosition::RIGHT_TAB);
+  Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
 }
 
 void ZenGarden::DisposeModules() {
@@ -101,7 +105,7 @@ void ZenGarden::DisposeModules() {
   while (mUI.upperLeftPanel->count() > 0) delete mUI.upperLeftPanel->widget(0);
   while (mUI.bottomLeftPanel->count() > 0) delete mUI.bottomLeftPanel->widget(0);
   while (mUI.upperRightPanel->count() > 0) delete mUI.upperRightPanel->widget(0);
-  while (mUI.bottomRightPanel->count() > 0) delete mUI.bottomRightPanel->widget(0);
+  //while (mUI.bottomRightPanel->count() > 0) delete mUI.bottomRightPanel->widget(0);
 
   Prototypes::Dispose();
   DisposePainter();
@@ -142,6 +146,9 @@ void ZenGarden::keyPressEvent(QKeyEvent* event) {
     case Qt::Key_Escape:
       TheSceneTime->Set(0);
       RestartSceneTimer();
+      return;
+    case Qt::Key_5:
+      mUI.timelinerWidget->setVisible(!mUI.timelinerWidget->isVisible());
       return;
   }
   QMainWindow::keyPressEvent(event);
@@ -203,13 +210,21 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
     {
       auto stringNode = dynamic_cast<StringNode*>(node);
       watcher = stringNode->Watch<TextWatcher>(stringNode);
-      watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
+      break;
+    }
+    case NodeType::DOCUMENT:
+    {
+      auto documentNode = dynamic_cast<Document*>(node);
+      watcher = documentNode->Watch<DocumentWatcher>(documentNode);
       break;
     }
     default: break;
   }
 
-  if (watcherWidget == nullptr) {
+  if (watcher) {
+    watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
+  }
+  else {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
       watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<SSpline*>(node));
@@ -338,6 +353,7 @@ void ZenGarden::HandleMenuOpen() {
   /// Open first graph
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
   Watch(graph, WatcherPosition::RIGHT_TAB);
+  Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
 
   int milliseconds = myTimer.elapsed();
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
