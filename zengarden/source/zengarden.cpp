@@ -10,7 +10,7 @@
 #include "watchers/drawablewatcher.h"
 #include "watchers/textwatcher.h"
 #include "watchers/splinewatcher.h"
-#include "watchers/moviewatcher.h"
+#include "watchers/timelineeditor.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
@@ -302,7 +302,7 @@ void ZenGarden::CreateNewDocument() {
 void ZenGarden::SetupMovieWatcher() {
   SafeDelete(mMovieWatcherWidget);
   MovieNode* movieNode = mDocument->mMovie.GetNode();
-  shared_ptr<WatcherUI> watcher = movieNode->Watch<MovieWatcher>(movieNode);
+  shared_ptr<WatcherUI> watcher = movieNode->Watch<TimelineEditor>(movieNode);
   mMovieWatcherWidget =
     new WatcherWidget(mUI.timelineWidget, watcher, WatcherPosition::TIMELINE_PANEL);
   watcher->SetWatcherWidget(mMovieWatcherWidget);

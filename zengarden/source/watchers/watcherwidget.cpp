@@ -96,3 +96,37 @@ void GLWidget::paintGL() {
 void GLWidget::wheelEvent(QWheelEvent * event) {
   OnMouseWheel(this, event);
 }
+
+
+EventWidget::EventWidget(QWidget* parent)
+  : QWidget(parent) {
+  setMouseTracking(true);
+}
+
+void EventWidget::paintEvent(QPaintEvent* ev) {
+  mOnPaint(ev);
+}
+
+void EventWidget::mouseMoveEvent(QMouseEvent* event) {
+  OnMouseMove(event);
+}
+
+void EventWidget::mousePressEvent(QMouseEvent* event) {
+  OnMousePress(event);
+}
+
+void EventWidget::mouseReleaseEvent(QMouseEvent* event) {
+  OnMouseRelease(event);
+
+}
+void EventWidget::keyPressEvent(QKeyEvent* event) {
+  OnKeyPress(event);
+}
+
+void EventWidget::keyReleaseEvent(QKeyEvent* event) {
+  OnKeyRelease(event);
+}
+
+void EventWidget::wheelEvent(QWheelEvent * event) {
+  OnMouseWheel(event);
+}

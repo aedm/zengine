@@ -167,6 +167,9 @@
     <ClCompile Include="source\watchers\watcherui.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
+    <ClCompile Include="source\watchers\timelineeditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
     <ClCompile Include="source\watchers\moviewatcher.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
@@ -276,10 +279,13 @@
     <ClInclude Include=".msbuild\qtGeneratedFiles\ui_documentviewer.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\watchers\moviewatcher.h">
+    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_movieeditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_movieeditor.h">
+    <ClInclude Include="source\watchers\timelineeditor.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\watchers\moviewatcher.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

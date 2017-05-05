@@ -116,6 +116,7 @@
     <ClCompile Include="source\watchers\logwatcher.cpp" />
     <ClCompile Include="source\watchers\meshwatcher.cpp" />
     <ClCompile Include="source\watchers\moviewatcher.cpp" />
+    <ClCompile Include="source\watchers\timelineeditor.cpp" />
     <ClCompile Include="source\watchers\passwatcher.cpp" />
     <ClCompile Include="source\watchers\scenewatcher.cpp" />
     <ClCompile Include="source\watchers\splinewatcher.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="source\watchers\generalscenewatcher.h" />
     <ClInclude Include="source\watchers\meshwatcher.h" />
     <ClInclude Include="source\watchers\moviewatcher.h" />
+    <ClInclude Include="source\watchers\timelineeditor.h" />
     <ClInclude Include="source\watchers\passwatcher.h" />
     <ClInclude Include="source\watchers\scenewatcher.h" />
     <ClInclude Include="source\watchers\splinewatcher.h" />

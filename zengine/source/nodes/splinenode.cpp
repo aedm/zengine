@@ -37,6 +37,18 @@ SSpline::~SSpline() {
 }
 
 
+void SSpline::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::VALUE_CHANGED:
+      SendMsg(message);
+      NotifyWatchers(&Watcher::OnRedraw);
+      break;
+    default:
+      ValueNode<NodeType::FLOAT>::HandleMessage(message, slot, payload);
+      break;
+  }
+}
+
 const float& SSpline::Get() {
   Update();
   return currentValue;
@@ -94,7 +106,7 @@ int SSpline::addPoint(float time, float value) {
   calculateTangent(i);
   calculateTangent(i + 1);
 
-  ReceiveMessage(NodeMessage::VALUE_CHANGED);
+  NotifyWatchers(&Watcher::OnRedraw);
   return i;
 }
 
@@ -112,7 +124,7 @@ void SSpline::setPointValue(int index, float time, float value) {
   calculateTangent(index - 1);
   calculateTangent(index);
   calculateTangent(index + 1);
-  ReceiveMessage(NodeMessage::VALUE_CHANGED);
+  NotifyWatchers(&Watcher::OnRedraw);
 }
 
 void SSpline::setAutotangent(int index, bool autotangent) {
@@ -120,7 +132,7 @@ void SSpline::setAutotangent(int index, bool autotangent) {
     SSplinePoint& point = points[index];
     point.isAutoangent = autotangent;
     calculateTangent(index);
-    ReceiveMessage(NodeMessage::VALUE_CHANGED);
+    NotifyWatchers(&Watcher::OnRedraw);
   }
 }
 
@@ -129,7 +141,7 @@ void SSpline::setBreakpoint(int index, bool breakpoint) {
     SSplinePoint& point = points[index];
     point.isBreakpoint = breakpoint;
     calculateTangent(index);
-    ReceiveMessage(NodeMessage::VALUE_CHANGED);
+    NotifyWatchers(&Watcher::OnRedraw);
   }
 }
 
@@ -137,7 +149,7 @@ void SSpline::setLinear(int index, bool linear) {
   if (index >= 0 && index < int(points.size())) {
     SSplinePoint& point = points[index];
     point.isLinear = linear;
-    ReceiveMessage(NodeMessage::VALUE_CHANGED);
+    NotifyWatchers(&Watcher::OnRedraw);
   }
 }
 
@@ -163,7 +175,7 @@ void SSpline::Operate() {
 
 void SSpline::removePoint(int index) {
   points.erase(points.begin() + index);
-  ReceiveMessage(NodeMessage::VALUE_CHANGED);
+  NotifyWatchers(&Watcher::OnRedraw);
 }
 
 UINT SSpline::getNumPoints() {

@@ -29,22 +29,22 @@ void SceneNode::Draw(RenderTarget* renderTarget) {
   camera->SetupGlobals(&mGlobals, renderTarget->GetSize());
 
   /// Skylight projection
-  Vec3 s = mShadowMapSize.Get();
-  Vec3 dir = mSkyLightDirection.Get();
-  mGlobals.SkylightMatrix = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z)) * Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
-  Vec4 test(1, 1, 1, 1);
-  Vec4 tr = test * mGlobals.SkylightMatrix;
+  //Vec3 s = mShadowMapSize.Get();
+  //Vec3 dir = mSkyLightDirection.Get();
+  //mGlobals.SkylightMatrix = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z)) * Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
+  //Vec4 test(1, 1, 1, 1);
+  //Vec4 tr = test * mGlobals.SkylightMatrix;
 
   /// Skylight shadow
-  TheDrawingAPI->SetFrameBuffer(renderTarget->mShadowBufferId);
-  TheDrawingAPI->SetViewport(0, 0, 512, 512);
-  TheDrawingAPI->Clear(true, true, 0xff00ff80);
-  RenderDrawables(PassType::SHADOW);
+  //TheDrawingAPI->SetFrameBuffer(renderTarget->mShadowBufferId);
+  //TheDrawingAPI->SetViewport(0, 0, 512, 512);
+  //TheDrawingAPI->Clear(true, true, 0xff00ff80);
+  //RenderDrawables(PassType::SHADOW);
 
   /// Draw to G-Buffer
   renderTarget->SetGBufferAsTarget(&mGlobals);
-  mGlobals.SkylightTexture = renderTarget->mShadowTexture;
-  mGlobals.SkylightColorTexture = renderTarget->mShadowColorBuffer;
+  //mGlobals.SkylightTexture = renderTarget->mShadowTexture;
+  //mGlobals.SkylightColorTexture = renderTarget->mShadowColorBuffer;
   TheDrawingAPI->Clear(true, true, 0x303030);
   RenderDrawables(PassType::SOLID);
 

@@ -33,6 +33,8 @@ public:
 	SSpline();
   virtual ~SSpline();
 
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+
   FloatSlot mTimeSlot;
 
   virtual const float& Get() override;

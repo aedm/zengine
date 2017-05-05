@@ -55,9 +55,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="deleteClipButton">
+       <widget class="QPushButton" name="watchMovieButton">
         <property name="text">
-         <string>Delete Clip</string>
+         <string>Watch Movie</string>
         </property>
        </widget>
       </item>
@@ -73,6 +73,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteClipButton">
+        <property name="text">
+         <string>Delete Clip</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

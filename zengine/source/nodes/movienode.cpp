@@ -14,3 +14,7 @@ MovieNode::MovieNode()
 MovieNode::~MovieNode() {
 
 }
+
+void MovieNode::Draw(RenderTarget* renderTarget) {
+
+}

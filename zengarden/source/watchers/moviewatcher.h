@@ -3,17 +3,18 @@
 #include "watcherui.h"
 #include "watcherwidget.h"
 #include <zengine.h>
-#include "ui_movieeditor.h"
 
 class MovieWatcher: public WatcherUI {
 public:
-  MovieWatcher(MovieNode* movieNode);
+  MovieWatcher(Node* node);
   virtual ~MovieWatcher();
 
+  virtual void OnRedraw() override;
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
-private:
-  Ui::MovieEditor mUI;
+protected:
+  void Paint(GLWidget* widget);
 
+  RenderTarget* mRenderTarget = nullptr;
 
 };

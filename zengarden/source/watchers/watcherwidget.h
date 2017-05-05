@@ -67,6 +67,31 @@ protected:
 };
 
 
+/// Boilerplate class, converts Qt virtual functions to events :(
+class EventWidget: public QWidget {
+public:
+  EventWidget(QWidget* parent);
+
+  Event<QPaintEvent*> mOnPaint;
+  Event<QMouseEvent*> OnMouseMove;
+  Event<QMouseEvent*> OnMousePress;
+  Event<QMouseEvent*> OnMouseRelease;
+  Event<QKeyEvent*> OnKeyPress;
+  Event<QKeyEvent*> OnKeyRelease;
+  Event<QWheelEvent*> OnMouseWheel;
+
+protected:
+  virtual void paintEvent(QPaintEvent* ev) override;
+  virtual void mouseMoveEvent(QMouseEvent* event) override;
+  virtual void mousePressEvent(QMouseEvent* event) override;
+  virtual void mouseReleaseEvent(QMouseEvent* event) override;
+  virtual void keyPressEvent(QKeyEvent* event) override;
+  virtual void keyReleaseEvent(QKeyEvent* event) override;
+  virtual void wheelEvent(QWheelEvent * event) override;
+};
+
+
+
 class GLWatcherWidget: public WatcherWidget {
 public:
   GLWatcherWidget(QWidget* Parent, shared_ptr<WatcherUI> watcher, QGLWidget* ShareWidget, 

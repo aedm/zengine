@@ -9,6 +9,8 @@ public:
   virtual ~MovieNode();
 
   ClipSlot mClips;
+
+  void Draw(RenderTarget* renderTarget);
 };
 
 typedef TypedSlot<NodeType::MOVIE, MovieNode> MovieSlot;
