@@ -22,7 +22,7 @@ void SplineWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   QVBoxLayout* layout = new QVBoxLayout(mUI.splineFrame);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mSplineWidget = new SplineWidget(mUI.splineFrame);
+  mSplineWidget = new EventForwarderWidget(mUI.splineFrame);
   layout->addWidget(mSplineWidget);
   mSplineWidget->mOnPaint += Delegate(this, &SplineWatcher<T>::DrawSpline);
   mSplineWidget->OnMousePress += Delegate(this, &SplineWatcher<T>::HandleMouseDown);
@@ -32,6 +32,12 @@ void SplineWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   UpdateRangeLabels();
   SelectPoint(-1);
+
+  mUI.addPointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.removePointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.linearCheckBox->setFocusPolicy(Qt::NoFocus);
+  mUI.autotangentCheckBox->setFocusPolicy(Qt::NoFocus);
+  mUI.breakpointCheckBox->setFocusPolicy(Qt::NoFocus);
 
   watcherWidget->connect(mUI.addPointButton, &QPushButton::pressed, [=]() { AddPoint(); });
   watcherWidget->connect(mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
@@ -341,35 +347,4 @@ void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
     float x = width * (point.time - mXRange.x) / (mXRange.y - mXRange.x);
     painter.drawRect(QRectF(x - 4, y - 4, 8, 8));
   }
-}
-
-
-
-SplineWidget::SplineWidget(QWidget* parent)
-  : QWidget(parent) {
-  setMouseTracking(true);
-}
-
-void SplineWidget::paintEvent(QPaintEvent* ev) {
-  mOnPaint(ev);
-}
-
-void SplineWidget::mouseMoveEvent(QMouseEvent* event) {
-  OnMouseMove(event);
-}
-
-void SplineWidget::mousePressEvent(QMouseEvent* event) {
-  OnMousePress(event);
-}
-
-void SplineWidget::mouseReleaseEvent(QMouseEvent* event) {
-  OnMouseRelease(event);
-
-}
-void SplineWidget::keyReleaseEvent(QKeyEvent* event) {
-  OnKeyRelease(event);
-}
-
-void SplineWidget::wheelEvent(QWheelEvent * event) {
-  OnMouseWheel(event);
 }

@@ -25,7 +25,7 @@ void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
 }
 
-void MovieWatcher::Paint(GLWidget* widget) {
+void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
 
   MovieNode* movieNode = dynamic_cast<MovieNode*>(mNode);

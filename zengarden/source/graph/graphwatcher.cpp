@@ -30,7 +30,7 @@ GraphWatcher::~GraphWatcher() {
 }
 
 
-void GraphWatcher::Paint(GLWidget* glWidget) {
+void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   TheDrawingAPI->OnContextSwitch();
 
   Vec2 canvasSize, topLeft;
@@ -107,7 +107,7 @@ void GraphWatcher::Update() {
 }
 
 
-void GraphWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
+void GraphWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   } else if (event->button() == Qt::RightButton) {
@@ -116,7 +116,7 @@ void GraphWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
 }
 
 
-void GraphWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
+void GraphWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftUp(event);
   } else if (event->button() == Qt::RightButton) {
@@ -208,7 +208,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
   switch (mCurrentState) {
     case State::DEFAULT:
       if (mHoveredWidget) {
-        if ((event->modifiers() & Qt::AltModifier) > 0) {
+        if ((event->modifiers() & Qt::ShiftModifier) > 0) {
           if (mHoveredSlotIndex >= 0) {
             /// Start connecting from slot to node
             mCurrentState = State::CONNECT_TO_NODE;
@@ -306,7 +306,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
 
 
 void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
-  if ((event->modifiers() & Qt::AltModifier) > 0) {
+  if ((event->modifiers() & Qt::ShiftModifier) > 0) {
     if (mHoveredSlotIndex >= 0) {
       /// Remove connection
       Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
@@ -337,7 +337,7 @@ void GraphWatcher::HandleMouseRightUp(QMouseEvent* event) {
 }
 
 
-void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
+void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) {
   Vec2 mousePos = MouseToWorld(event);
   mCurrentMousePos = mousePos;
   switch (mCurrentState) {
@@ -398,7 +398,7 @@ void GraphWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
 }
 
 
-void GraphWatcher::HandleMouseWheel(GLWidget*, QWheelEvent* event) {
+void GraphWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event) {
   mZoomExponent -= event->delta();
   if (mZoomExponent < 0) mZoomExponent = 0;
   mZoomFactor = powf(2.0, float(mZoomExponent) / (120.0f * 4.0f));
@@ -433,7 +433,7 @@ bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
 }
 
 
-void GraphWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
+void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
   auto scanCode = event->nativeScanCode();
 
   if (scanCode == 41) {

@@ -13,7 +13,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void Paint(GLWidget* widget);
+  void Paint(EventForwarderGLWidget* widget);
 
   RenderTarget* mRenderTarget = nullptr;
 

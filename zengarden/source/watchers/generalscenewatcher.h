@@ -28,7 +28,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void Paint(GLWidget* widget);
+  void Paint(EventForwarderGLWidget* widget);
 
   RenderTarget* mRenderTarget = nullptr;
 
@@ -45,15 +45,15 @@ protected:
   shared_ptr<RenderForwarder> mRenderForwarder;
 
   /// Qt widget event handlers
-  void HandleMousePress(GLWidget*, QMouseEvent* event);
-  void HandleMouseRelease(GLWidget*, QMouseEvent* event);
-  void HandleMouseMove(GLWidget*, QMouseEvent* event);
-  void HandleMouseWheel(GLWidget*, QWheelEvent* event);
+  void HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
   void HandleMouseLeftUp(QMouseEvent* event);
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseRightUp(QMouseEvent* event);
-  void HandleKeyPress(GLWidget*, QKeyEvent* event);
+  void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event);
 
   /// Mouse position at pressing
   QPoint mOriginalPosition;

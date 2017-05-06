@@ -23,6 +23,11 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
   mUI.setupUi(watcherWidget);
 
+  mUI.graphList->setFocusPolicy(Qt::NoFocus);
+  mUI.openButton->setFocusPolicy(Qt::NoFocus);
+  mUI.newGraphButton->setFocusPolicy(Qt::NoFocus);
+  mUI.deleteGraphButton->setFocusPolicy(Qt::NoFocus);
+
   mModel = new QStandardItemModel();
   mUI.graphList->setModel(mModel);
 

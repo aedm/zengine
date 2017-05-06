@@ -20,7 +20,7 @@ public:
   
 protected:
   Ui::SplineEditor mUI;
-  SplineWidget* mSplineWidget;
+  EventForwarderWidget* mSplineWidget;
 
   virtual void OnRedraw() override;
   virtual void OnSplineControlPointsChanged() override;
@@ -71,24 +71,3 @@ private slots:
 
 typedef SplineWatcher<NodeType::FLOAT> FloatSplineWatcher;
 
-class SplineWidget: public QWidget {
-public:
-  SplineWidget(QWidget* parent);
-
-  Event<QPaintEvent*> mOnPaint;
-  Event<QMouseEvent*> OnMouseMove;
-  Event<QMouseEvent*> OnMousePress;
-  Event<QMouseEvent*> OnMouseRelease;
-  Event<QKeyEvent*> OnKeyPress;
-  Event<QKeyEvent*> OnKeyRelease;
-  Event<QWheelEvent*> OnMouseWheel;
-
-protected:
-  virtual void paintEvent(QPaintEvent* ev) override;
-  virtual void mouseMoveEvent(QMouseEvent* event) override;
-  virtual void mousePressEvent(QMouseEvent* event) override;
-  virtual void mouseReleaseEvent(QMouseEvent* event) override;
-  //virtual void keyPressEvent(QKeyEvent* event) override;
-  virtual void keyReleaseEvent(QKeyEvent* event) override;
-  virtual void wheelEvent(QWheelEvent * event) override;
-};

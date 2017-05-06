@@ -19,7 +19,7 @@ WatcherWidget::~WatcherWidget() {
   //ASSERT(mWatcher.use_count() == 1);
 }
 
-GLWidget* WatcherWidget::GetGLWidget() {
+EventForwarderGLWidget* WatcherWidget::GetGLWidget() {
   SHOULD_NOT_HAPPEN;
   return nullptr;
 }
@@ -48,85 +48,85 @@ GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher,
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mGLWidget = new GLWidget(this, shareWidget);
+  mGLWidget = new EventForwarderGLWidget(this, shareWidget);
   layout->addWidget(mGLWidget);
 }
 
 GLWatcherWidget::~GLWatcherWidget() {}
 
-GLWidget* GLWatcherWidget::GetGLWidget() {
+EventForwarderGLWidget* GLWatcherWidget::GetGLWidget() {
   return mGLWidget;
 }
 
 
-GLWidget::GLWidget(QWidget* Parent, QGLWidget* ShareWidget)
+EventForwarderGLWidget::EventForwarderGLWidget(QWidget* Parent, QGLWidget* ShareWidget)
   : QGLWidget(Parent, ShareWidget) {
   setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
-GLWidget::~GLWidget() {}
+EventForwarderGLWidget::~EventForwarderGLWidget() {}
 
-void GLWidget::mouseMoveEvent(QMouseEvent* event) {
+void EventForwarderGLWidget::mouseMoveEvent(QMouseEvent* event) {
   OnMouseMove(this, event);
 }
 
-void GLWidget::mousePressEvent(QMouseEvent* event) {
+void EventForwarderGLWidget::mousePressEvent(QMouseEvent* event) {
   OnMousePress(this, event);
 }
 
-void GLWidget::mouseReleaseEvent(QMouseEvent* event) {
+void EventForwarderGLWidget::mouseReleaseEvent(QMouseEvent* event) {
   OnMouseRelease(this, event);
 }
 
-void GLWidget::keyPressEvent(QKeyEvent* event) {
+void EventForwarderGLWidget::keyPressEvent(QKeyEvent* event) {
   OnKeyPress(this, event);
   QGLWidget::keyPressEvent(event);
 }
 
-void GLWidget::keyReleaseEvent(QKeyEvent* event) {
+void EventForwarderGLWidget::keyReleaseEvent(QKeyEvent* event) {
   OnKeyRelease(this, event);
 }
 
-void GLWidget::paintGL() {
+void EventForwarderGLWidget::paintGL() {
   TheDrawingAPI->OnContextSwitch();
   //TheDrawingAPI->SetViewport(0, 0, width(), height());
   OnPaint(this);
 }
 
-void GLWidget::wheelEvent(QWheelEvent * event) {
+void EventForwarderGLWidget::wheelEvent(QWheelEvent * event) {
   OnMouseWheel(this, event);
 }
 
 
-EventWidget::EventWidget(QWidget* parent)
+EventForwarderWidget::EventForwarderWidget(QWidget* parent)
   : QWidget(parent) {
   setMouseTracking(true);
 }
 
-void EventWidget::paintEvent(QPaintEvent* ev) {
+void EventForwarderWidget::paintEvent(QPaintEvent* ev) {
   mOnPaint(ev);
 }
 
-void EventWidget::mouseMoveEvent(QMouseEvent* event) {
+void EventForwarderWidget::mouseMoveEvent(QMouseEvent* event) {
   OnMouseMove(event);
 }
 
-void EventWidget::mousePressEvent(QMouseEvent* event) {
+void EventForwarderWidget::mousePressEvent(QMouseEvent* event) {
   OnMousePress(event);
 }
 
-void EventWidget::mouseReleaseEvent(QMouseEvent* event) {
+void EventForwarderWidget::mouseReleaseEvent(QMouseEvent* event) {
   OnMouseRelease(event);
 
 }
-void EventWidget::keyPressEvent(QKeyEvent* event) {
+void EventForwarderWidget::keyPressEvent(QKeyEvent* event) {
   OnKeyPress(event);
 }
 
-void EventWidget::keyReleaseEvent(QKeyEvent* event) {
+void EventForwarderWidget::keyReleaseEvent(QKeyEvent* event) {
   OnKeyRelease(event);
 }
 
-void EventWidget::wheelEvent(QWheelEvent * event) {
+void EventForwarderWidget::wheelEvent(QWheelEvent * event) {
   OnMouseWheel(event);
 }

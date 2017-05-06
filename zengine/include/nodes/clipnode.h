@@ -10,8 +10,12 @@ public:
 
   SceneSlot mSceneSlot;
   FloatSlot mStartTime;
-  FloatSlot mEndTime;
+  FloatSlot mLength;
   FloatSlot mTrackNumber;
+
+protected:
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+
 };
 
 typedef TypedSlot<NodeType::CLIP, ClipNode> ClipSlot;

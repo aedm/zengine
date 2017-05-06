@@ -6,7 +6,7 @@
 #include <QDropEvent>
 
 class WatcherWidget;
-class GLWidget;
+class EventForwarderGLWidget;
 
 /// Watchers show the contents of a node or edit it. They show the content as a tab on 
 /// the ui, or as a property panel item, etc. Watchers belong to their WatcherWidgets, 
@@ -18,7 +18,7 @@ public:
   virtual ~WatcherUI();
 
   /// Get the OpenGL widget, if any
-  GLWidget* GetGLWidget();
+  EventForwarderGLWidget* GetGLWidget();
 
   /// Get displayed name
   const QString& GetDisplayedName();

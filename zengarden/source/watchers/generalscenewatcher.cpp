@@ -20,7 +20,7 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
   SafeDelete(mRenderTarget);
 }
 
-void GeneralSceneWatcher::Paint(GLWidget* widget) {
+void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
   if (!mRenderTarget) {
     GetGLWidget()->makeCurrent();
@@ -64,7 +64,7 @@ void GeneralSceneWatcher::Init()
   mDefaultMaterial->mSolidPass.Connect(defaultPass);
 }
 
-void GeneralSceneWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
+void GeneralSceneWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event) {
   mOriginalPosition = event->pos();
   mOriginalOrientation = mCamera.mOrientation.Get();
   mOriginalDistance = mCamera.mDistance.Get();
@@ -75,7 +75,7 @@ void GeneralSceneWatcher::HandleMousePress(GLWidget*, QMouseEvent* event) {
   }
 }
 
-void GeneralSceneWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
+void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftUp(event);
   } else if (event->button() == Qt::RightButton) {
@@ -83,7 +83,7 @@ void GeneralSceneWatcher::HandleMouseRelease(GLWidget*, QMouseEvent* event) {
   }
 }
 
-void GeneralSceneWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
+void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
     Vec3 orientation = mCamera.mOrientation.Get();
@@ -99,7 +99,7 @@ void GeneralSceneWatcher::HandleMouseMove(GLWidget*, QMouseEvent* event) {
   }
 }
 
-void GeneralSceneWatcher::HandleMouseWheel(GLWidget*, QWheelEvent* event) {
+void GeneralSceneWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event) {
 
 }
 
@@ -119,7 +119,7 @@ void GeneralSceneWatcher::HandleMouseRightUp(QMouseEvent* event) {
 
 }
 
-void GeneralSceneWatcher::HandleKeyPress(GLWidget*, QKeyEvent* event) {
+void GeneralSceneWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
 
 }
 

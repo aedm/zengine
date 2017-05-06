@@ -5,7 +5,7 @@
 #include <QtOpenGL/QGLWidget>
 
 class WatcherUI;
-class GLWidget;
+class EventForwarderGLWidget;
 class QTabWidget;
 
 enum class WatcherPosition {
@@ -25,7 +25,7 @@ public:
   virtual ~WatcherWidget();
 
   /// Get the OpenGL widget, if any
-  virtual GLWidget* GetGLWidget();
+  virtual EventForwarderGLWidget* GetGLWidget();
 
   const WatcherPosition	mPosition;
   QTabWidget* mTabWidget = nullptr;
@@ -42,19 +42,18 @@ protected:
 
 
 /// Boilerplate class, converts Qt virtual functions to events :(
-class GLWidget: public QGLWidget {
+class EventForwarderGLWidget: public QGLWidget {
 public:
-  GLWidget(QWidget* Parent, QGLWidget* ShareWidget);
-  virtual ~GLWidget();
+  EventForwarderGLWidget(QWidget* Parent, QGLWidget* ShareWidget);
+  virtual ~EventForwarderGLWidget();
 
-  Event<GLWidget*, QMouseEvent*> OnMouseMove;
-  /// TODO: split this to left and right press/release
-  Event<GLWidget*, QMouseEvent*> OnMousePress;
-  Event<GLWidget*, QMouseEvent*> OnMouseRelease;
-  Event<GLWidget*, QKeyEvent*> OnKeyPress;
-  Event<GLWidget*, QKeyEvent*> OnKeyRelease;
-  Event<GLWidget*, QWheelEvent*> OnMouseWheel;
-  Event<GLWidget*> OnPaint;
+  Event<EventForwarderGLWidget*, QMouseEvent*> OnMouseMove;
+  Event<EventForwarderGLWidget*, QMouseEvent*> OnMousePress;
+  Event<EventForwarderGLWidget*, QMouseEvent*> OnMouseRelease;
+  Event<EventForwarderGLWidget*, QKeyEvent*> OnKeyPress;
+  Event<EventForwarderGLWidget*, QKeyEvent*> OnKeyRelease;
+  Event<EventForwarderGLWidget*, QWheelEvent*> OnMouseWheel;
+  Event<EventForwarderGLWidget*> OnPaint;
 
 protected:
   virtual void mouseMoveEvent(QMouseEvent* event) override;
@@ -68,9 +67,9 @@ protected:
 
 
 /// Boilerplate class, converts Qt virtual functions to events :(
-class EventWidget: public QWidget {
+class EventForwarderWidget: public QWidget {
 public:
-  EventWidget(QWidget* parent);
+  EventForwarderWidget(QWidget* parent);
 
   Event<QPaintEvent*> mOnPaint;
   Event<QMouseEvent*> OnMouseMove;
@@ -98,9 +97,9 @@ public:
                   WatcherPosition Position, QTabWidget* tabWidget = nullptr);
   virtual ~GLWatcherWidget();
 
-  virtual GLWidget* GetGLWidget() override;
+  virtual EventForwarderGLWidget* GetGLWidget() override;
   QGLWidget* mShareWidget;
 
 protected:
-  GLWidget* mGLWidget;
+  EventForwarderGLWidget* mGLWidget;
 };

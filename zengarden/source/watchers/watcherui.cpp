@@ -22,7 +22,7 @@ WatcherUI::~WatcherUI() {
 }
 
 
-GLWidget* WatcherUI::GetGLWidget() {
+EventForwarderGLWidget* WatcherUI::GetGLWidget() {
   return mWatcherWidget->GetGLWidget();
 }
 

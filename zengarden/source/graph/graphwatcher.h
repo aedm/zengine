@@ -24,15 +24,15 @@ public:
 
 private:
   /// Qt widget event handlers
-  void HandleMousePress(GLWidget*, QMouseEvent* event);
-  void HandleMouseRelease(GLWidget*, QMouseEvent* event);
-  void HandleMouseMove(GLWidget*, QMouseEvent* event);
-  void HandleMouseWheel(GLWidget*, QWheelEvent* event);
+  void HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
   void HandleMouseLeftUp(QMouseEvent* event);
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseRightUp(QMouseEvent* event);
-  void HandleKeyPress(GLWidget*, QKeyEvent* event);
+  void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event);
 
   /// Watcher callbacks
   virtual void OnSlotConnectionChanged(Slot* slot);
@@ -41,7 +41,7 @@ private:
   void Update();
 
   /// Draws the graph
-  void Paint(GLWidget*);
+  void Paint(EventForwarderGLWidget*);
 
   /// All wigdets on the graph
   Graph* GetGraph();
