@@ -128,7 +128,6 @@ void TimelineEditor::HandleMouseLeftDown(QMouseEvent* event) {
     case State::DEFAULT:
       mSelectedClip = mHoveredClip;
       ZenGarden::GetInstance()->SetNodeForPropertyEditor(mSelectedClip);
-      mTimelineCanvas->update();
       if (mSelectedClip) {
         mState = ((event->modifiers() & Qt::ShiftModifier) > 0)
           ? State::CLIP_LENGTH_ADJUST : State::CLIP_MOVE;
@@ -136,6 +135,11 @@ void TimelineEditor::HandleMouseLeftDown(QMouseEvent* event) {
         mOriginalClipStart = mSelectedClip->mStartTime.Get();
         mOriginalClipLength = mSelectedClip->mLength.Get();
       }
+      else {
+        mState = State::TIME_SEEK;
+        ZenGarden::GetInstance()->SetMovieCursor(ScreenToTime(event->pos().x()));
+      }
+      mTimelineCanvas->update();
       break;
   }
 }

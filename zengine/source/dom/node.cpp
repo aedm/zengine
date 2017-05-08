@@ -47,8 +47,7 @@ bool Slot::Connect(Node* target) {
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
     /// TODO: merge these
-    mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_ADDED, this, target);
-    mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
+    mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
   } else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
@@ -56,7 +55,6 @@ bool Slot::Connect(Node* target) {
       if (mNode) mNode->ConnectToSlot(this);
       /// TODO: merge these
       mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
-      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
   }
   return true;
@@ -69,8 +67,7 @@ void Slot::Disconnect(Node* target) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CONNECTION_REMOVED, this, target);
-        mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
+        mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
         return;
       }
     }
@@ -87,18 +84,16 @@ void Slot::DisconnectAll(bool notifyOwner) {
   if (mIsMultiSlot) {
     for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
       (*it)->DisconnectFromSlot(this);
-      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
     mMultiNodes.clear();
     if (notifyOwner) {
-      mOwner->ReceiveMessage(NodeMessage::MULTISLOT_CLEARED, this);
+      mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED);
     }
   } else {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
     if (notifyOwner) {
       mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
-      mOwner->NotifyWatchers(&Watcher::OnSlotConnectionChanged, this);
     }
   }
 }
@@ -181,7 +176,6 @@ void Node::ConnectToSlot(Slot* slot) {
 void Node::DisconnectFromSlot(Slot* slot) {
   mDependants.erase(std::remove(mDependants.begin(), mDependants.end(), slot), 
                     mDependants.end());
-  NotifyWatchers(&Watcher::OnSlotConnectionChanged, slot);
 }
 
 
@@ -196,22 +190,7 @@ NodeType Node::GetType() const {
 
 
 void Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-      CheckConnections();
-      /// Fall through:
-    case NodeMessage::VALUE_CHANGED:
-      if (mIsUpToDate) {
-        mIsUpToDate = false;
-        SendMsg(NodeMessage::VALUE_CHANGED);
-      }
-      break;
-    case NodeMessage::NODE_NAME_CHANGED:
-      NotifyWatchers(&Watcher::OnChildNameChange);
-      break;
-    default:
-      break;
-  }
+  // Overload this
 }
 
 
@@ -223,6 +202,36 @@ void Node::SendMsg(NodeMessage message, void* payload) {
 
 
 void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+      CheckConnections();
+      /// Notifies dependants about transitive closure change
+      ReceiveMessage(NodeMessage::TRANSITIVE_CLOSURE_CHANGED);
+      NotifyWatchers(&Watcher::OnSlotConnectionChanged, slot);
+      break;
+    case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
+      /// Bubbles up transitive closure notifications
+      SendMsg(NodeMessage::TRANSITIVE_CLOSURE_CHANGED);
+      break;
+    case NodeMessage::NEEDS_REDRAW:
+      /// Bubbles up redraw command
+      SendMsg(NodeMessage::NEEDS_REDRAW);
+      NotifyWatchers(&Watcher::OnRedraw);
+      break;
+    //case NodeMessage::VALUE_CHANGED:
+    //  /// TODO: figure out a proper way to propagate value changes
+    //  if (mIsUpToDate) {
+    //    mIsUpToDate = false;
+    //    SendMsg(NodeMessage::VALUE_CHANGED);
+    //  }
+    //  break;
+    case NodeMessage::NODE_NAME_CHANGED:
+      NotifyWatchers(&Watcher::OnChildNameChange);
+      break;
+    default:
+      break;
+  }
+
   HandleMessage(message, slot, payload);
 }
 
@@ -340,3 +349,36 @@ void Node::AssignWatcher(shared_ptr<Watcher> watcher) {
   watcher->ChangeNode(this);
 }
 
+class TransitiveClosure {
+public:
+  TransitiveClosure(Node* root, vector<Node*>& oResult) {
+    mResult = &oResult;
+    Traverse(root);
+  }
+
+private:
+  void Traverse(Node* node) {
+    if (mVisited.find(node) != mVisited.end()) return;
+    mVisited.insert(node);
+
+    for (Slot* slot : node->GetPublicSlots()) {
+      if (slot->mIsMultiSlot) {
+        for (Node* dependency : slot->GetMultiNodes()) {
+          Traverse(dependency);
+        }
+      } else if (!slot->IsDefaulted()) {
+        Node* dependency = slot->GetAbstractNode();
+        if (dependency != nullptr) Traverse(dependency);
+      }
+    }
+
+    mResult->push_back(node);
+  }
+
+  vector<Node*>* mResult;
+  set<Node*> mVisited;
+};
+
+void Node::GenerateTransitiveClosure(vector<Node*>& oResult) {
+  TransitiveClosure tmp(this, oResult);
+}

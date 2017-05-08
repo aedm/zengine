@@ -18,20 +18,11 @@ enum class NodeMessage {
   /// Some slots were added or removed.
   SLOT_STRUCTURE_CHANGED,
 
-  /// Direct slot connection changed. Only emitted by single slots.
+  /// Direct slot connection changed.
   SLOT_CONNECTION_CHANGED,
 
-  /// A node was added to the multislot. Payload is the added Node* pointer.
-  MULTISLOT_CONNECTION_ADDED,
-
-  /// A node was removed from the multislot. Payload is the removed Node* pointer.
-  MULTISLOT_CONNECTION_REMOVED,
-
-  /// All connections were removed from the multislot.
-  MULTISLOT_CLEARED,
-
-  /// Some transitive connection changed
-  TRANSITIVE_CONNECTION_CHANGED,
+  /// THe transitive closure changed
+  TRANSITIVE_CLOSURE_CHANGED,
 
   /// The value of a connected node changed, reevaluation might be needed
   VALUE_CHANGED,
@@ -137,6 +128,10 @@ public:
 
   /// Reruns Operate() if not up to date (also updates on ancestors)
   void Update();
+
+  /// Calculates the transitive closure of the node to "oResult" in topological ordering.
+  /// Deepest nodes come first. 
+  void GenerateTransitiveClosure(vector<Node*>& oResult);
 
 protected:
   Node(NodeType type);

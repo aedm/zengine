@@ -1,16 +1,11 @@
 #include <include/nodes/scenenode.h>
 #include <include/shaders/engineshaders.h>
-
 REGISTER_NODECLASS(SceneNode, "Scene");
 
 static SharedString DrawablesSlotName = make_shared<string>("Drawables");
 static SharedString CameraSlotName = make_shared<string>("Camera");
 static SharedString ShadowMapSizeSlotName = make_shared<string>("Shadow map size");
 static SharedString SkylightDirectionSlotName = make_shared<string>("Skylight direction");
-
-/// Local time of the current scene
-/// TODO: delete it at exit
-FloatNode* TheSceneTime = new FloatNode();
 
 SceneNode::SceneNode()
   : Node(NodeType::SCENE)
@@ -62,11 +57,36 @@ void SceneNode::RenderDrawables(PassType passType) {
 void SceneNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   Node::HandleMessage(message, slot, payload);
   switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
+    case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
+      mIsUpToDate = false;
+      break;
     case NodeMessage::VALUE_CHANGED:
-    case NodeMessage::NEEDS_REDRAW:
-      NotifyWatchers(&Watcher::OnRedraw);
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
+  }
+}
+
+void SceneNode::CalculateRenderDependencies() {
+  mTransitiveClosure.clear();
+  mDependentSceneTimeNodes.clear();
+  GenerateTransitiveClosure(mTransitiveClosure);
+  for (Node* node : mTransitiveClosure) {
+    if (IsInstanceOf<SceneTimeNode>(node)) {
+      SceneTimeNode* sceneTimeNode = dynamic_cast<SceneTimeNode*>(node);
+      ASSERT(sceneTimeNode);
+      mDependentSceneTimeNodes.push_back(sceneTimeNode);
+    }
+  }
+}
+
+void SceneNode::SetSceneTime(float seconds) {
+  if (!mIsUpToDate) {
+    CalculateRenderDependencies();
+    mIsUpToDate = true;
+  }
+  for (SceneTimeNode* sceneTimeNode : mDependentSceneTimeNodes) {
+    sceneTimeNode->Set(seconds);
   }
 }

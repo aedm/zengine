@@ -1,5 +1,6 @@
 #include "generalscenewatcher.h"
 #include "../util/util.h"
+#include "../zengarden.h"
 
 Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
@@ -12,6 +13,7 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
     mRenderForwarder = mDefaultScene.Watch<RenderForwarder>(&mDefaultScene);
     mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
   }
+  GlobalTimeNode::OnTimeChanged += Delegate(this, &GeneralSceneWatcher::Tick);
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
@@ -34,7 +36,7 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
 }
 
 void GeneralSceneWatcher::OnRedraw() {
-  GetGLWidget()->update();
+  if (mWatcherWidget) GetGLWidget()->update();
 }
 
 void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
@@ -97,6 +99,12 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
     distance = mOriginalDistance - float(diff.y()) / 2.0f;
     mCamera.mDistance.SetDefaultValue(distance);
   }
+}
+
+void GeneralSceneWatcher::Tick(float globalTime) {
+  /// Use movie cursor as scene time
+  float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
+  mScene->SetSceneTime(movieCursor);
 }
 
 void GeneralSceneWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event) {

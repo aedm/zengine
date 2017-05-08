@@ -28,12 +28,12 @@ SSpline::SSpline()
   : ValueNode<NodeType::FLOAT>()
   , mTimeSlot(this, TimeSlotName, false, false, false)
 {
-  mTimeSlot.Connect(TheSceneTime);
+  mTimeSlot.Connect(&mSceneTimeNode);
 }
 
 
 SSpline::~SSpline() {
-  mTimeSlot.Disconnect(TheSceneTime);
+  mTimeSlot.Disconnect(&mSceneTimeNode);
 }
 
 

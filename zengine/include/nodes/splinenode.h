@@ -2,6 +2,7 @@
 
 //#include "../base/vectormath.h"
 #include "valuenodes.h"
+#include "timenode.h"
 #include <vector>
 
 using namespace std;
@@ -67,6 +68,9 @@ protected:
 
   /// Last queried point (cache)
 	int	lastIndex = 0;
+
+  /// Scene time node
+  SceneTimeNode mSceneTimeNode;
 
   virtual void Operate();
 };

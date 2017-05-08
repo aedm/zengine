@@ -137,9 +137,6 @@
     <ClInclude Include="include\dom\nodetype.h">
       <Filter>include\dom</Filter>
     </ClInclude>
-    <ClInclude Include="include\nodes\timenode.h">
-      <Filter>include\nodes</Filter>
-    </ClInclude>
     <ClInclude Include="include\shaders\shadernode.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
@@ -185,6 +182,9 @@
     <ClInclude Include="include\nodes\meshgenerators.h" />
     <ClInclude Include="include\nodes\movienode.h" />
     <ClInclude Include="include\nodes\clipnode.h" />
+    <ClInclude Include="include\nodes\timenode.h">
+      <Filter>include\nodes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -247,9 +247,6 @@
     <ClCompile Include="source\dom\nodetype.cpp">
       <Filter>source\dom</Filter>
     </ClCompile>
-    <ClCompile Include="source\nodes\timenode.cpp">
-      <Filter>source\nodes</Filter>
-    </ClCompile>
     <ClCompile Include="source\shaders\shadernode.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
@@ -295,6 +292,7 @@
     <ClCompile Include="source\nodes\meshgenerators.cpp" />
     <ClCompile Include="source\nodes\movienode.cpp" />
     <ClCompile Include="source\nodes\clipnode.cpp" />
+    <ClCompile Include="source\nodes\timenode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

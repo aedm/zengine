@@ -28,6 +28,7 @@ private:
     WINDOW_MOVE,
     CLIP_MOVE,
     CLIP_LENGTH_ADJUST,
+    TIME_SEEK,
   };
   State mState = State::DEFAULT;
   float mOriginalTimelineStartTime;

@@ -43,6 +43,8 @@ public:
 	Vec3& operator *= (float f);
 	Vec3& operator += (const Vec3& op);
 
+  bool operator == (const Vec3& op) const;
+
 	Vec3 Cross(const Vec3& op) const;
 	float Dot(const Vec3& op) const;
 	float Length() const;

@@ -32,17 +32,14 @@ const std::vector<ClipNode*>& MovieNode::GetTrack(int trackIndex) {
 
 void MovieNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
-    case NodeMessage::MULTISLOT_CONNECTION_ADDED:
-    case NodeMessage::MULTISLOT_CONNECTION_REMOVED:
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:
       if (slot == &mClips) {
         SortClips();
         NotifyWatchers(&Watcher::OnRedraw);
       }
       break;
-    default:
-      Node::HandleMessage(message, slot, payload);
-      break;
+    default: break;
   }
 }
 

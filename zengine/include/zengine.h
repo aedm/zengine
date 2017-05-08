@@ -28,6 +28,8 @@
 #include "nodes/meshnode.h"
 #include "nodes/timenode.h"
 #include "nodes/scenenode.h"
+#include "nodes/clipnode.h"
+#include "nodes/movienode.h"
 #include "nodes/vectornodes.h"
 #include "nodes/splinenode.h"
 #include "nodes/cameranode.h"

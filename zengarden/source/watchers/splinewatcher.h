@@ -15,8 +15,6 @@ public:
   virtual ~SplineWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
-
-  Event<> OnAdjustTime;
   
 protected:
   Ui::SplineEditor mUI;

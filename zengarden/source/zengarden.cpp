@@ -63,7 +63,7 @@ void ZenGarden::InitModules() {
   mMovieWatcherLayout->setMargin(0);
 
   mTime.start();
-  QTimer::singleShot(0, this, SLOT(UpdateTimeNode()));
+  QTimer::singleShot(0, this, SLOT(Tick()));
 
   /// Set palette
   QPalette pal = mUI.innerPropertyFrame->palette();
@@ -110,8 +110,8 @@ void ZenGarden::DisposeModules() {
   CloseZengine();
 }
 
-void ZenGarden::RestartSceneTimer() {
-  mSceneStartTime = mTime.elapsed() - int(TheSceneTime->Get() * 1000.0f);
+void ZenGarden::RestartMovieTimer() {
+  mMovieStartTime = mTime.elapsed() - int(mMovieCursor * 1000.0f);
 }
 
 void ZenGarden::LoadEngineShaders(QString& path) {
@@ -131,12 +131,12 @@ void ZenGarden::LoadEngineShaders(QString& path) {
 void ZenGarden::keyPressEvent(QKeyEvent* event) {
   switch (event->key()) {
     case Qt::Key_Space:
-      RestartSceneTimer();
-      mPlayScene = !mPlayScene;
+      RestartMovieTimer();
+      mPlayMovie = !mPlayMovie;
       return;
     case Qt::Key_Escape:
-      TheSceneTime->Set(0);
-      RestartSceneTimer();
+      mMovieCursor = 0.0f;
+      RestartMovieTimer();
       return;
     case Qt::Key_5:
       mUI.timelineWidget->setVisible(!mUI.timelineWidget->isVisible());
@@ -176,6 +176,26 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   }
 }
 
+
+void ZenGarden::SetMovieCursor(float seconds) {
+  mMovieCursor = seconds;
+  RestartMovieTimer();
+}
+
+
+void ZenGarden::SetClipCursor(float seconds) {
+  // TODO: make this work.
+
+}
+
+
+float ZenGarden::GetGlobalTime() {
+  return float(mTime.elapsed()) / 1000.0f;
+}
+
+float ZenGarden::GetMovieCursor() {
+  return mMovieCursor;
+}
 
 void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   QTabWidget* tabWidget = nullptr;
@@ -219,8 +239,6 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
     if (nodeClass->mClassName == "Float Spline") {
       watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<SSpline*>(node));
       watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
-      dynamic_pointer_cast<FloatSplineWatcher>(watcher)->OnAdjustTime +=
-        Delegate(this, &ZenGarden::RestartSceneTimer);
     }
   }
 
@@ -326,12 +344,13 @@ void ZenGarden::HandleMenuSaveAs() {
   mDocumentFileName = fileName;
 }
 
-void ZenGarden::UpdateTimeNode() {
-  TimeNode::OnTimeChanged(float(mTime.elapsed()) / 1000.0f);
-  if (mPlayScene) {
-    TheSceneTime->Set(float(mTime.elapsed() - mSceneStartTime) / 1000.0f);
+void ZenGarden::Tick() {
+  int elapsed = mTime.elapsed();
+  if (mPlayMovie) {
+    mMovieCursor = float(elapsed - mMovieStartTime) / 1000.0f;
   }
-  QTimer::singleShot(10, this, SLOT(UpdateTimeNode()));
+  GlobalTimeNode::OnTimeChanged(float(elapsed) / 1000.0f);
+  QTimer::singleShot(10, this, SLOT(Tick()));
 }
 
 void ZenGarden::HandleMenuNew() {
@@ -381,7 +400,7 @@ void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
 
   vector<Node*> nodes;
-  Util::CreateTopologicalOrder(mDocument, nodes);
+  mDocument->GenerateTransitiveClosure(nodes);
   for (UINT i = nodes.size(); i > 0; i--) {
     delete nodes[i - 1];
   }

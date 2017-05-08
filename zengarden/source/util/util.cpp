@@ -47,43 +47,6 @@ namespace Util {
     return pass;
   }
 
-
-
-  class TopologicalOrder {
-  public:
-    TopologicalOrder(Node* root, vector<Node*>& oResult) {
-      mResult = &oResult;
-      Traverse(root);
-    }
-
-  private:
-    void Traverse(Node* node) {
-      if (mVisited.find(node) != mVisited.end()) return;
-      mVisited.insert(node);
-
-      for (Slot* slot : node->GetPublicSlots()) {
-        if (slot->mIsMultiSlot) {
-          for (Node* dependency : slot->GetMultiNodes()) {
-            Traverse(dependency);
-          }
-        }
-        else if (!slot->IsDefaulted()) {
-          Node* dependency = slot->GetAbstractNode();
-          if (dependency != nullptr) Traverse(dependency);
-        }
-      }
-
-      mResult->push_back(node);
-    }
-    
-    vector<Node*>* mResult;
-    set<Node*> mVisited;
-  };
-
-  void CreateTopologicalOrder(Node* root, vector<Node*>& oResult) {
-    TopologicalOrder tmp(root, oResult);
-  }
-
   static Vec3 ObjLineToVec3(const QString& line) {
     QStringList v = line.split(' ', QString::SkipEmptyParts);
     if (v.size() != 4) {

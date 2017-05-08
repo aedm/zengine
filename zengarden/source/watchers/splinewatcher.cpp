@@ -1,5 +1,6 @@
 #include "splinewatcher.h"
 #include <math.h>
+#include "../zengarden.h"
 
 template class SplineWatcher<NodeType::FLOAT>;
 
@@ -127,8 +128,7 @@ void SplineWatcher<T>::HandleMouseMove(QMouseEvent* event) {
     }
     break;
     case SplineWatcher::State::TIME_MOVE:
-      TheSceneTime->Set(ScreenToTime(event->pos().x()));
-      OnAdjustTime();
+      ZenGarden::GetInstance()->SetClipCursor(ScreenToTime(event->pos().x()));
       break;
     default:
     {
@@ -192,9 +192,9 @@ void SplineWatcher<T>::HandleMouseLeftDown(QMouseEvent* event) {
   } else {
     /// Move time
     mState = SplineWatcher::State::TIME_MOVE;
-    TheSceneTime->Set(ScreenToTime(event->pos().x()));
+    /// TODO: fix this, it's broken
+    ZenGarden::GetInstance()->SetClipCursor(ScreenToTime(event->pos().x()));
     SelectPoint(-1);
-    OnAdjustTime();
   }
 }
 
@@ -314,16 +314,17 @@ void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
     beat++;
   }
 
+  SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+
   /// Draw scene time
   painter.setPen(QColor(80, 200, 80));
-  QPointF timePoint = ToScreenCoord(TheSceneTime->Get(), 0);
+  QPointF timePoint = ToScreenCoord(spline->mTimeSlot.Get(), 0);
   painter.drawLine(QPointF(timePoint.x(), 0), QPointF(timePoint.x(), height));
 
 
   /// Draw spline
   painter.setPen(QColor(192, 192, 192));
   UINT sampleCount = mSplineWidget->width();
-  SSpline* spline = dynamic_cast<SSpline*>(GetNode());
   float t = mXRange.x;
   float delta = (mXRange.y - mXRange.x) / float(sampleCount - 1);
 

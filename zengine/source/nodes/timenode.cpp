@@ -1,22 +1,24 @@
 #include <include/nodes/timenode.h>
 
-REGISTER_NODECLASS(TimeNode, "Time");
+REGISTER_NODECLASS(SceneTimeNode, "Scene Time");
+REGISTER_NODECLASS(GlobalTimeNode, "Global Time");
 
-Event<float> TimeNode::OnTimeChanged;
+Event<float> GlobalTimeNode::OnTimeChanged;
 
-
-TimeNode::TimeNode() 
-  : FloatNode()
+GlobalTimeNode::GlobalTimeNode()
+  : FloatNode() 
 {
-  OnTimeChanged += Delegate(this, &TimeNode::HandleTimeChange);
+  OnTimeChanged += Delegate(this, &GlobalTimeNode::HandleTimeChange);
 }
 
-
-TimeNode::~TimeNode() {
-  OnTimeChanged -= Delegate(this, &TimeNode::HandleTimeChange);
+GlobalTimeNode::~GlobalTimeNode() {
+  OnTimeChanged -= Delegate(this, &GlobalTimeNode::HandleTimeChange);
 }
 
-
-void TimeNode::HandleTimeChange(float milliseconds) {
+void GlobalTimeNode::HandleTimeChange(float milliseconds) {
   Set(milliseconds);
 }
+
+SceneTimeNode::SceneTimeNode()
+  : FloatNode() 
+{}

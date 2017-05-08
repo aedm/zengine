@@ -5,10 +5,7 @@
 #include "cameranode.h"
 #include "../render/rendertarget.h"
 #include "../shaders/pass.h"
-
-/// Local time of the current scene
-/// TODO: make it not global somehow
-extern FloatNode* TheSceneTime;
+#include "timenode.h"
 
 class SceneNode: public Node {
 public:
@@ -23,6 +20,9 @@ public:
 
   void Draw(RenderTarget* renderTarget);
 
+  /// Sets the clip-relative time to all SceneTimeNode dependencies
+  void SetSceneTime(float seconds);
+
 protected:
   Globals mGlobals;
 
@@ -30,6 +30,12 @@ protected:
 
   /// Handle received messages
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+
+private:
+  vector<Node*> mTransitiveClosure;
+  vector<SceneTimeNode*> mDependentSceneTimeNodes;
+
+  void CalculateRenderDependencies();
 };
 
 typedef TypedSlot<NodeType::SCENE, SceneNode> SceneSlot;

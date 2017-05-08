@@ -125,21 +125,24 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
 }
 
 void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  /// Stubs send a VALUE_CHANGED message is the shader needs to be rebuilt
   switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-      CheckConnections();
-      /// Fall through:
-    case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-      SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
-      break;
     case NodeMessage::VALUE_CHANGED:
       if (slot == &mSource) {
         HandleSourceChange();
-        SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+        SendMsg(NodeMessage::VALUE_CHANGED);
       }
       else if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
-        SendMsg(NodeMessage::TRANSITIVE_CONNECTION_CHANGED);
+        SendMsg(NodeMessage::VALUE_CHANGED);
       }
+      else {
+        SendMsg(NodeMessage::NEEDS_REDRAW);
+      }
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+      if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
+        SendMsg(NodeMessage::VALUE_CHANGED);
+      }
+      break;
     default:
       break;
   }

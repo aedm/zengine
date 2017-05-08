@@ -79,9 +79,9 @@ const typename StaticValueNode<T>::ValueType& StaticValueNode<T>::Get() {
 
 template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
+  if (mValue == newValue) return;
   mValue = newValue;
   SendMsg(NodeMessage::VALUE_CHANGED);
-  NotifyWatchers(&Watcher::OnRedraw);
 }
 
 

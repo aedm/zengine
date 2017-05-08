@@ -27,6 +27,18 @@ public:
   /// Property editor related
   void SetNodeForPropertyEditor(Node* node);
 
+  /// Sets the cursor relative to the beginning of the timeline
+  void SetMovieCursor(float seconds);
+
+  /// Sets the cursor relative to the beginning of the current clip
+  void SetClipCursor(float seconds);
+
+  /// Returns the global time in seconds
+  float GetGlobalTime();
+
+  /// Returns the movie cursor position in seconds
+  float GetMovieCursor();
+
 private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);
@@ -56,11 +68,17 @@ private:
   Ui::zengardenClass mUI;
   LogWatcher*	mLogWatcher = nullptr;
 
-  /// Global time
+  /// Global time elapsed since app launch
   QTime mTime;
-  int mSceneStartTime;
-  bool mPlayScene = false;
-  void RestartSceneTimer();
+
+  /// Global time when movie started playing in milliseconds
+  int mMovieStartTime;
+
+  /// Current movie cursor position in seconds, updates when movie is playing
+  float mMovieCursor;
+
+  bool mPlayMovie = false;
+  void RestartMovieTimer();
 
   /// Engine shaders
   void LoadEngineShaders(QString& path);
@@ -71,8 +89,10 @@ private:
 private slots:
   void InitModules();
   void DisposeModules();
-  void UpdateTimeNode();
   void DeleteDocument();
+
+  /// Handles the change of time
+  void Tick();
 
   /// Loads an engine-level shader file
   void LoadEngineShader(const QString& path);

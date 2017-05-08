@@ -78,6 +78,10 @@ Vec3 Vec3::operator/(float f) const {
   return Vec3(x / f, y / f, z / f);
 }
 
+bool Vec3::operator==(const Vec3& op) const {
+  return x == op.x && y == op.y && z == op.z;
+}
+
 Vec3 Vec3::Cross(const Vec3& op) const {
   return Vec3(y * op.z - z * op.y, z * op.x - x * op.z, x * op.y - y * op.x);
 }

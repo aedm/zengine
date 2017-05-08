@@ -29,28 +29,13 @@ Pass::~Pass()
 void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
-    case NodeMessage::TRANSITIVE_CONNECTION_CHANGED:
-      if (slot == &mVertexStub) {
+    case NodeMessage::VALUE_CHANGED:
+      if (slot == &mVertexStub || slot == &mFragmentStub) {
         SafeDelete(mVertexShaderMetadata);
-        mIsUpToDate = false;
-        ReceiveMessage(NodeMessage::NEEDS_REDRAW);
-        NotifyWatchers(&Watcher::OnRedraw);
-      }
-      else if (slot == &mFragmentStub) {
         SafeDelete(mFragmentShaderMetadata);
         mIsUpToDate = false;
         ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       }
-      break;
-    case NodeMessage::VALUE_CHANGED:
-      if (slot == &mVertexStub || slot == &mFragmentStub) {
-        /// Shader sources changed, rebuild pipeline
-        mIsUpToDate = false;
-      }
-      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
-      break;
-    case NodeMessage::NEEDS_REDRAW:
-      SendMsg(NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }
