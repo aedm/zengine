@@ -4,8 +4,7 @@
 
 
 RenderTarget::RenderTarget(Vec2 size)
-  : mSize(0,0)
-{
+  : mSize(0, 0) {
   Resize(size);
 }
 
@@ -15,6 +14,8 @@ RenderTarget::~RenderTarget() {
 }
 
 void RenderTarget::SetGBufferAsTarget(Globals* globals) {
+  globals->RenderTargetSize = mSize;
+  globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = 0;
   globals->GBufferSourceA = 0;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;

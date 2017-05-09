@@ -40,11 +40,9 @@ SSpline::~SSpline() {
 void SSpline::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED:
-      SendMsg(message);
-      NotifyWatchers(&Watcher::OnRedraw);
+      InvalidateCurrentValue();
       break;
     default:
-      ValueNode<NodeType::FLOAT>::HandleMessage(message, slot, payload);
       break;
   }
 }
@@ -106,7 +104,7 @@ int SSpline::addPoint(float time, float value) {
   calculateTangent(i);
   calculateTangent(i + 1);
 
-  NotifyWatchers(&Watcher::OnRedraw);
+  InvalidateCurrentValue();
   return i;
 }
 
@@ -124,7 +122,7 @@ void SSpline::setPointValue(int index, float time, float value) {
   calculateTangent(index - 1);
   calculateTangent(index);
   calculateTangent(index + 1);
-  NotifyWatchers(&Watcher::OnRedraw);
+  InvalidateCurrentValue();
 }
 
 void SSpline::setAutotangent(int index, bool autotangent) {
@@ -132,7 +130,7 @@ void SSpline::setAutotangent(int index, bool autotangent) {
     SSplinePoint& point = points[index];
     point.isAutoangent = autotangent;
     calculateTangent(index);
-    NotifyWatchers(&Watcher::OnRedraw);
+    InvalidateCurrentValue();
   }
 }
 
@@ -141,7 +139,7 @@ void SSpline::setBreakpoint(int index, bool breakpoint) {
     SSplinePoint& point = points[index];
     point.isBreakpoint = breakpoint;
     calculateTangent(index);
-    NotifyWatchers(&Watcher::OnRedraw);
+    InvalidateCurrentValue();
   }
 }
 
@@ -149,7 +147,7 @@ void SSpline::setLinear(int index, bool linear) {
   if (index >= 0 && index < int(points.size())) {
     SSplinePoint& point = points[index];
     point.isLinear = linear;
-    NotifyWatchers(&Watcher::OnRedraw);
+    InvalidateCurrentValue();
   }
 }
 
@@ -169,13 +167,20 @@ void SSpline::calculateTangent(int index) {
   }
 }
 
+void SSpline::InvalidateCurrentValue() {
+  if (!mIsUpToDate) return;
+  mIsUpToDate = false;
+  SendMsg(NodeMessage::VALUE_CHANGED);
+  NotifyWatchers(&Watcher::OnRedraw);
+}
+
 void SSpline::Operate() {
   currentValue = getValue(mTimeSlot.Get());
 }
 
 void SSpline::removePoint(int index) {
   points.erase(points.begin() + index);
-  NotifyWatchers(&Watcher::OnRedraw);
+  InvalidateCurrentValue();
 }
 
 UINT SSpline::getNumPoints() {

@@ -13,6 +13,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   virtual void OnRedraw() override;
   virtual void OnChildNameChange();
+  void SetSceneNodeForSelectedClip(SceneNode* sceneNode);
 
 private:
   Ui::MovieEditor mUI;
@@ -38,6 +39,7 @@ private:
   ClipNode* mHoveredClip = nullptr;
   ClipNode* mSelectedClip = nullptr;
 
+  void HandleMovieCursorChange(float seconds);
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);

@@ -72,6 +72,7 @@ protected:
   /// Scene time node
   SceneTimeNode mSceneTimeNode;
 
+  void InvalidateCurrentValue();
   virtual void Operate();
 };
 

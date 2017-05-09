@@ -12,14 +12,14 @@ const int gVariableByteSizes[] = {
 
 
 Slot::Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot,
-           bool isPublic, bool isSerializable)
+           bool isPublic, bool isSerializable, bool isTraversable)
            : mOwner(owner)
            , mType(type)
            , mIsMultiSlot(isMultiSlot) {
   ASSERT(mOwner != nullptr);
   mNode = nullptr;
   mName = name;
-  mOwner->AddSlot(this, isPublic, isSerializable);
+  mOwner->AddSlot(this, isPublic, isSerializable, isTraversable);
   if (isPublic) {
     mOwner->ReceiveMessage(NodeMessage::SLOT_STRUCTURE_CHANGED, this, nullptr);
   }
@@ -309,13 +309,17 @@ const Vec2 Node::GetSize() const {
   return mSize;
 }
 
-void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable) {
+void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable, bool isTraversable) {
   /// All public slots need to be serializable
   ASSERT(!isPublic || isSerializable);
 
   if (isPublic) {
     ASSERT(find(mPublicSlots.begin(), mPublicSlots.end(), slot) == mPublicSlots.end());
     mPublicSlots.push_back(slot);
+  }
+  if (isTraversable) {
+    ASSERT(find(mTraversableSlots.begin(), mTraversableSlots.end(), slot) == mTraversableSlots.end());
+    mTraversableSlots.push_back(slot);
   }
   if (isSerializable) {
     mSerializableSlotsByName[slot->GetName()] = slot;
@@ -329,6 +333,10 @@ void Node::ClearSlots() {
 
 const vector<Slot*>& Node::GetPublicSlots() {
   return mPublicSlots;
+}
+
+const std::vector<Slot*>& Node::GetTraversableSlots() {
+  return mTraversableSlots;
 }
 
 const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
@@ -351,8 +359,9 @@ void Node::AssignWatcher(shared_ptr<Watcher> watcher) {
 
 class TransitiveClosure {
 public:
-  TransitiveClosure(Node* root, vector<Node*>& oResult) {
+  TransitiveClosure(Node* root, bool includeHiddenSlots, vector<Node*>& oResult) {
     mResult = &oResult;
+    mIncludeHiddenSlots = includeHiddenSlots;
     Traverse(root);
   }
 
@@ -361,7 +370,10 @@ private:
     if (mVisited.find(node) != mVisited.end()) return;
     mVisited.insert(node);
 
-    for (Slot* slot : node->GetPublicSlots()) {
+    const vector<Slot*>& slots = 
+      mIncludeHiddenSlots ? node->GetTraversableSlots() : node->GetPublicSlots();
+
+    for (Slot* slot : slots) {
       if (slot->mIsMultiSlot) {
         for (Node* dependency : slot->GetMultiNodes()) {
           Traverse(dependency);
@@ -375,10 +387,11 @@ private:
     mResult->push_back(node);
   }
 
+  bool mIncludeHiddenSlots;
   vector<Node*>* mResult;
   set<Node*> mVisited;
 };
 
-void Node::GenerateTransitiveClosure(vector<Node*>& oResult) {
-  TransitiveClosure tmp(this, oResult);
+void Node::GenerateTransitiveClosure(vector<Node*>& oResult, bool includeHiddenSlots) {
+  TransitiveClosure tmp(this, includeHiddenSlots, oResult);
 }

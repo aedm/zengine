@@ -10,6 +10,7 @@
 #include "watchers/drawablewatcher.h"
 #include "watchers/textwatcher.h"
 #include "watchers/splinewatcher.h"
+#include "watchers/moviewatcher.h"
 #include "watchers/timelineeditor.h"
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
@@ -103,6 +104,7 @@ void ZenGarden::DisposeModules() {
   while (mUI.upperLeftPanel->count() > 0) delete mUI.upperLeftPanel->widget(0);
   while (mUI.bottomLeftPanel->count() > 0) delete mUI.bottomLeftPanel->widget(0);
   while (mUI.upperRightPanel->count() > 0) delete mUI.upperRightPanel->widget(0);
+  SafeDelete(mMovieWatcherWidget);
   //while (mUI.bottomRightPanel->count() > 0) delete mUI.bottomRightPanel->widget(0);
 
   Prototypes::Dispose();
@@ -112,6 +114,7 @@ void ZenGarden::DisposeModules() {
 
 void ZenGarden::RestartMovieTimer() {
   mMovieStartTime = mTime.elapsed() - int(mMovieCursor * 1000.0f);
+  mOnMovieCursorChange(mMovieCursor);
 }
 
 void ZenGarden::LoadEngineShaders(QString& path) {
@@ -127,6 +130,7 @@ void ZenGarden::LoadEngineShaders(QString& path) {
   }
   TheEngineStubs->OnLoadFinished();
 }
+
 
 void ZenGarden::keyPressEvent(QKeyEvent* event) {
   switch (event->key()) {
@@ -195,6 +199,14 @@ float ZenGarden::GetGlobalTime() {
 
 float ZenGarden::GetMovieCursor() {
   return mMovieCursor;
+}
+
+void ZenGarden::SetSceneNodeForClip(SceneNode* sceneNode) {
+  if (!mMovieWatcherWidget || !mMovieWatcherWidget->mWatcher) return;
+  shared_ptr<TimelineEditor> editor = 
+    dynamic_pointer_cast<TimelineEditor>(mMovieWatcherWidget->mWatcher);
+  if (!editor) return;
+  editor->SetSceneNodeForSelectedClip(sceneNode);
 }
 
 void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
@@ -276,6 +288,12 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
         watcher = static_pointer_cast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
       }
       break;
+      case NodeType::MOVIE:
+      {
+        auto movieNode = dynamic_cast<MovieNode*>(node);
+        watcher = static_pointer_cast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
+      }
+      break;
       default: return;
     }
     watcherWidget =
@@ -348,6 +366,7 @@ void ZenGarden::Tick() {
   int elapsed = mTime.elapsed();
   if (mPlayMovie) {
     mMovieCursor = float(elapsed - mMovieStartTime) / 1000.0f;
+    mOnMovieCursorChange(mMovieCursor);
   }
   GlobalTimeNode::OnTimeChanged(float(elapsed) / 1000.0f);
   QTimer::singleShot(10, this, SLOT(Tick()));
@@ -400,7 +419,7 @@ void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
 
   vector<Node*> nodes;
-  mDocument->GenerateTransitiveClosure(nodes);
+  mDocument->GenerateTransitiveClosure(nodes, false);
   for (UINT i = nodes.size(); i > 0; i--) {
     delete nodes[i - 1];
   }

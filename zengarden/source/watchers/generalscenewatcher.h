@@ -67,6 +67,8 @@ private:
   /// The Drawable supplied by an implementation
   Drawable* mDrawable = nullptr;
 
+  Globals mGlobals;
+
   /// Updates scene times
   void Tick(float globalTime);
 };

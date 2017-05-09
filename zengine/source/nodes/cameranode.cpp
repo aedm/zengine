@@ -32,9 +32,8 @@ CameraNode::CameraNode()
   mOrientation.SetDefaultValue(Vec3(0, 0, 0));
 }
 
-void CameraNode::SetupGlobals(Globals* globals, const Vec2& canvasSize) {
-  globals->RenderTargetSize = canvasSize;
-  globals->RenderTargetSizeRecip = Vec2(1.0f / canvasSize.x, 1.0f / canvasSize.y);
+void CameraNode::SetupGlobals(Globals* globals) {
+  Vec2 canvasSize = globals->RenderTargetSize;
 
   if (mOrthonormal) {
     globals->View.LoadIdentity();

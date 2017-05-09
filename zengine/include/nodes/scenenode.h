@@ -18,15 +18,13 @@ public:
   Vec3Slot mShadowMapSize;
   Vec3Slot mSkyLightDirection;
 
-  void Draw(RenderTarget* renderTarget);
+  void Draw(Globals* globals);
 
   /// Sets the clip-relative time to all SceneTimeNode dependencies
   void SetSceneTime(float seconds);
 
 protected:
-  Globals mGlobals;
-
-  void RenderDrawables(PassType passType);
+  void RenderDrawables(Globals* globals, PassType passType);
 
   /// Handle received messages
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;

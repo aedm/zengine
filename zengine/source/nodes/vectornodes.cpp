@@ -20,6 +20,18 @@ const Vec3& FloatsToVec3Node::Get() {
   return mValue;
 }
 
+void FloatsToVec3Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  switch (message) {
+    case NodeMessage::SLOT_CONNECTION_CHANGED:
+    case NodeMessage::VALUE_CHANGED:
+      mIsUpToDate = false;
+      SendMsg(NodeMessage::VALUE_CHANGED);
+      break;
+    default:
+      break;
+  }
+}
+
 FloatsToVec3Node::~FloatsToVec3Node() {}
 
 void FloatsToVec3Node::Operate() {

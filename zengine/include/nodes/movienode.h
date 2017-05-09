@@ -10,7 +10,7 @@ public:
 
   ClipSlot mClips;
 
-  void Draw(RenderTarget* renderTarget);
+  void Draw(RenderTarget* renderTarget, float time);
 
   int GetTrackCount();
   const vector<ClipNode*>& GetTrack(int trackIndex);
@@ -24,6 +24,7 @@ private:
 
   void SortClips();
 
+  Globals mGlobals;
 };
 
 typedef TypedSlot<NodeType::MOVIE, MovieNode> MovieSlot;

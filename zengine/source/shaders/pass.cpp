@@ -66,28 +66,28 @@ void Pass::Operate() {
 
   for (auto sampler : mVertexShaderMetadata->mSamplers) {
     if (sampler->node) {
-      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false);
+      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false, false);
       slot->Connect(sampler->node);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto uniform : mVertexShaderMetadata->mUniforms) {
     if (uniform->node) {
-      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false);
+      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false, false);
       slot->Connect(uniform->node);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto sampler : mFragmentShaderMetadata->mSamplers) {
     if (sampler->node) {
-      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false);
+      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false, false);
       slot->Connect(sampler->node);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto uniform : mFragmentShaderMetadata->mUniforms) {
     if (uniform->node) {
-      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false);
+      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false, false);
       slot->Connect(uniform->node);
       mUniformAndSamplerSlots.push_back(slot);
     }

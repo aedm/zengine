@@ -1,13 +1,14 @@
 #include "moviewatcher.h"
+#include "../zengarden.h"
 
 MovieWatcher::MovieWatcher(Node* node)
   : WatcherUI(node)
 {
-
+  ZenGarden::GetInstance()->mOnMovieCursorChange += Delegate(this, &MovieWatcher::HandleMovieCursorChange);
 }
 
 MovieWatcher::~MovieWatcher() {
-
+  ZenGarden::GetInstance()->mOnMovieCursorChange -= Delegate(this, &MovieWatcher::HandleMovieCursorChange);
 }
 
 void MovieWatcher::OnRedraw() {
@@ -39,5 +40,10 @@ void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
 
   Vec2 size = Vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
-  movieNode->Draw(mRenderTarget);
+
+  movieNode->Draw(mRenderTarget, ZenGarden::GetInstance()->GetMovieCursor());
+}
+
+void MovieWatcher::HandleMovieCursorChange(float movieCursor) {
+  GetGLWidget()->update();
 }

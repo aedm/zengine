@@ -17,6 +17,7 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
+  GlobalTimeNode::OnTimeChanged -= Delegate(this, &GeneralSceneWatcher::Tick);
   if (mRenderForwarder) mRenderForwarder->Unwatch();
   SafeDelete(mDrawable);
   SafeDelete(mRenderTarget);
@@ -32,7 +33,14 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
 
   Vec2 size = Vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
-  mScene->Draw(mRenderTarget);
+
+  mRenderTarget->SetGBufferAsTarget(&mGlobals);
+  TheDrawingAPI->Clear(true, true, 0x303030);
+
+  mScene->Draw(&mGlobals);
+
+  /// Apply post-process to scene to framebuffer
+  TheEngineShaders->ApplyPostProcess(mRenderTarget, &mGlobals);
 }
 
 void GeneralSceneWatcher::OnRedraw() {

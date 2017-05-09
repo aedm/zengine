@@ -39,6 +39,11 @@ public:
   /// Returns the movie cursor position in seconds
   float GetMovieCursor();
 
+  void SetSceneNodeForClip(SceneNode* sceneNode);
+
+  /// Event that fires when the movie cursor changes
+  Event<float> mOnMovieCursorChange;
+
 private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);
@@ -50,6 +55,7 @@ private:
 
   WatcherWidget* mPropertyEditor = nullptr;
   QBoxLayout* mPropertyLayout = nullptr;
+
   WatcherWidget* mMovieWatcherWidget = nullptr;
   QBoxLayout* mMovieWatcherLayout = nullptr;
 

@@ -18,10 +18,10 @@ SceneNode::SceneNode()
 SceneNode::~SceneNode() {
 }
 
-void SceneNode::Draw(RenderTarget* renderTarget) {
+void SceneNode::Draw(Globals* globals) {
   CameraNode* camera = mCamera.GetNode();
   if (camera == nullptr) return;
-  camera->SetupGlobals(&mGlobals, renderTarget->GetSize());
+  camera->SetupGlobals(globals);
 
   /// Skylight projection
   //Vec3 s = mShadowMapSize.Get();
@@ -37,20 +37,17 @@ void SceneNode::Draw(RenderTarget* renderTarget) {
   //RenderDrawables(PassType::SHADOW);
 
   /// Draw to G-Buffer
-  renderTarget->SetGBufferAsTarget(&mGlobals);
-  //mGlobals.SkylightTexture = renderTarget->mShadowTexture;
-  //mGlobals.SkylightColorTexture = renderTarget->mShadowColorBuffer;
-  TheDrawingAPI->Clear(true, true, 0x303030);
-  RenderDrawables(PassType::SOLID);
-
-  /// Apply post-process to scene to framebuffer
-  TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+  //renderTarget->SetGBufferAsTarget(&mGlobals);
+  ////mGlobals.SkylightTexture = renderTarget->mShadowTexture;
+  ////mGlobals.SkylightColorTexture = renderTarget->mShadowColorBuffer;
+  //TheDrawingAPI->Clear(true, true, 0x303030);
+  RenderDrawables(globals, PassType::SOLID);
 }
 
-void SceneNode::RenderDrawables(PassType passType) {
+void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
   for (Node* node : mDrawables.GetMultiNodes()) {
     Drawable* drawable = static_cast<Drawable*>(node);
-    drawable->Draw(&mGlobals, passType);
+    drawable->Draw(globals, passType);
   }
 }
 
@@ -71,7 +68,7 @@ void SceneNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
 void SceneNode::CalculateRenderDependencies() {
   mTransitiveClosure.clear();
   mDependentSceneTimeNodes.clear();
-  GenerateTransitiveClosure(mTransitiveClosure);
+  GenerateTransitiveClosure(mTransitiveClosure, true);
   for (Node* node : mTransitiveClosure) {
     if (IsInstanceOf<SceneTimeNode>(node)) {
       SceneTimeNode* sceneTimeNode = dynamic_cast<SceneTimeNode*>(node);

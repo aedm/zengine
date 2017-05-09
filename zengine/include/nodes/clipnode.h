@@ -13,6 +13,11 @@ public:
   FloatSlot mLength;
   FloatSlot mTrackNumber;
 
+  FloatSlot mClearColorBuffer;
+  FloatSlot mClearDepthBuffer;
+  
+  void Draw(Globals* globals, float clipTime);
+
 protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 

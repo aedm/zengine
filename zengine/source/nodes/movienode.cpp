@@ -1,4 +1,5 @@
 #include <include/nodes/movienode.h>
+#include <include/shaders/engineshaders.h>
 #include <algorithm>
 
 REGISTER_NODECLASS(MovieNode, "Movie");
@@ -9,8 +10,7 @@ static const int MaxTrackCount = 8;
 
 MovieNode::MovieNode()
   : Node(NodeType::MOVIE)
-  , mClips(this, ClipSlotName, true) 
-{
+  , mClips(this, ClipSlotName, true) {
   mTracks.resize(MaxTrackCount);
 }
 
@@ -18,8 +18,27 @@ MovieNode::~MovieNode() {
 
 }
 
-void MovieNode::Draw(RenderTarget* renderTarget) {
+void MovieNode::Draw(RenderTarget* renderTarget, float time) {
+  renderTarget->SetGBufferAsTarget(&mGlobals);
 
+  for (vector<ClipNode*>& track : mTracks) {
+    int clipIndex = 0;
+    int clipCount = int(track.size());
+    for (; clipIndex < clipCount; clipIndex++) {
+      ClipNode* clip = track[clipIndex];
+      float startTime = clip->mStartTime.Get();
+      float endTime = startTime + clip->mLength.Get();
+      if (startTime <= time && endTime > time) {
+        /// Render clip
+        clip->Draw(&mGlobals, time - startTime);
+        break;
+      }
+      if (startTime > time) break;
+    }
+  }
+
+  /// Apply post-process to scene to framebuffer
+  TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
 }
 
 int MovieNode::GetTrackCount() {

@@ -5,11 +5,16 @@ const float DefaultPixelsPerSecond = 100.0f;
 const int TrackHeightPixels = 20;
 
 TimelineEditor::TimelineEditor(MovieNode* movieNode)
-  : WatcherUI(movieNode) {
-
+  : WatcherUI(movieNode) 
+{
+  ZenGarden::GetInstance()->mOnMovieCursorChange += 
+    Delegate(this, &TimelineEditor::HandleMovieCursorChange);
 }
 
-TimelineEditor::~TimelineEditor() {}
+TimelineEditor::~TimelineEditor() {
+  ZenGarden::GetInstance()->mOnMovieCursorChange -=
+    Delegate(this, &TimelineEditor::HandleMovieCursorChange);
+}
 
 void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
@@ -38,6 +43,12 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     movieNode->mClips.Connect(clipNode);
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(clipNode);
   });
+
+  watcherWidget->connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
+    MovieNode* movieNode = dynamic_cast<MovieNode*>(this->mNode);
+    ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
+  });
+
 }
 
 void TimelineEditor::OnRedraw() {
@@ -46,6 +57,11 @@ void TimelineEditor::OnRedraw() {
 
 void TimelineEditor::OnChildNameChange() {
   mTimelineCanvas->update();
+}
+
+void TimelineEditor::SetSceneNodeForSelectedClip(SceneNode* sceneNode) {
+  if (!mSelectedClip) return;
+  mSelectedClip->mSceneSlot.Connect(sceneNode);
 }
 
 void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
@@ -109,6 +125,16 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
         QString::fromStdString(clipNode->GetName()));
     }
   }
+
+  /// Draw movie cursor
+  float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
+  int cursorPos = TimeToScreen(movieCursor);
+  painter.setPen(QColor(200, 200, 100));
+  painter.drawLine(QPoint(cursorPos, 0), QPoint(cursorPos, height));
+}
+
+void TimelineEditor::HandleMovieCursorChange(float seconds) {
+  mTimelineCanvas->update();
 }
 
 void TimelineEditor::HandleMouseDown(QMouseEvent* event) {
@@ -179,6 +205,9 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
         mTimelineCanvas->update();
       }
     }
+    break;
+    case State::TIME_SEEK:
+      ZenGarden::GetInstance()->SetMovieCursor(ScreenToTime(event->pos().x()));
     break;
     case State::WINDOW_MOVE:
     {

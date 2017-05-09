@@ -8,7 +8,7 @@ public:
   CameraNode();
   virtual ~CameraNode();
 
-  void SetupGlobals(Globals* globals, const Vec2& canvasSize);
+  void SetupGlobals(Globals* globals);
 
   /// Camera setup
   FloatSlot mFovY;

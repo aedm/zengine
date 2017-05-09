@@ -14,7 +14,7 @@ public:
 
 protected:
   void Paint(EventForwarderGLWidget* widget);
+  void HandleMovieCursorChange(float movieCursor);
 
   RenderTarget* mRenderTarget = nullptr;
-
 };

@@ -51,7 +51,7 @@ class Watcher;
 class Slot {
 public:
   Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot = false,
-       bool isPublic = true, bool isSerializable = true);
+       bool isPublic = true, bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
   /// The operator which this slot is a member of
@@ -131,7 +131,7 @@ public:
 
   /// Calculates the transitive closure of the node to "oResult" in topological ordering.
   /// Deepest nodes come first. 
-  void GenerateTransitiveClosure(vector<Node*>& oResult);
+  void GenerateTransitiveClosure(vector<Node*>& oResultm, bool includeHiddenSlots);
 
 protected:
   Node(NodeType type);
@@ -186,12 +186,15 @@ public:
   /// Returns the list of publicly editable slots
   const vector<Slot*>& GetPublicSlots();
 
+  /// Returns the list of all slots
+  const vector<Slot*>& GetTraversableSlots();
+
   /// Returns the slots that need to be serialized when saving / loading
   const unordered_map<SharedString, Slot*>& GetSerializableSlots();
 
 protected:
   /// Registers a new slot
-  void AddSlot(Slot* slot, bool isPublic, bool isSerializable);
+  void AddSlot(Slot* slot, bool isPublic, bool isSerializable, bool isTraversable);
 
   /// Removes public and serializable slots
   void ClearSlots();
@@ -204,8 +207,13 @@ private:
   Vec2 mPosition;
   Vec2 mSize;
 
-  /// Public slots of this node. The user may
+  /// Public slots of this node.
   vector<Slot*>	mPublicSlots;
+
+  /// All traversable slots of this node. These include hidden slots that aren't 
+  /// displayed on the UI (like SceneTime slots of SplineNodes), but they don't
+  /// include generated slots (like for StubNodes).
+  vector<Slot*>	mTraversableSlots;
 
   /// Slots that need to be serialized when saving / loading.
   unordered_map<SharedString, Slot*> mSerializableSlotsByName;

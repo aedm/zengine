@@ -128,7 +128,7 @@ void SplineWatcher<T>::HandleMouseMove(QMouseEvent* event) {
     }
     break;
     case SplineWatcher::State::TIME_MOVE:
-      ZenGarden::GetInstance()->SetClipCursor(ScreenToTime(event->pos().x()));
+      ZenGarden::GetInstance()->SetMovieCursor(ScreenToTime(event->pos().x()));
       break;
     default:
     {
@@ -193,7 +193,7 @@ void SplineWatcher<T>::HandleMouseLeftDown(QMouseEvent* event) {
     /// Move time
     mState = SplineWatcher::State::TIME_MOVE;
     /// TODO: fix this, it's broken
-    ZenGarden::GetInstance()->SetClipCursor(ScreenToTime(event->pos().x()));
+    ZenGarden::GetInstance()->SetMovieCursor(ScreenToTime(event->pos().x()));
     SelectPoint(-1);
   }
 }

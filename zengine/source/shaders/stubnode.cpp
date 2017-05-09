@@ -69,7 +69,8 @@ void StubNode::HandleSourceChange() {
     auto it = mParameterNameSlotMap.find(*param->mName);
     if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptType(param->mType)) {
       /// This slot was used before, reuse it.
-      AddSlot(it->second, true, true);
+      /// "isTraversable" is false since it's already in the mTraversableSlots vector.
+      AddSlot(it->second, true, true, false);
       mParameterSlotMap[param] = it->second;
       it->second = nullptr;
     }
@@ -138,10 +139,9 @@ void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
       else {
         SendMsg(NodeMessage::NEEDS_REDRAW);
       }
+      break;
     case NodeMessage::SLOT_CONNECTION_CHANGED:
-      if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
-        SendMsg(NodeMessage::VALUE_CHANGED);
-      }
+      SendMsg(NodeMessage::VALUE_CHANGED);
       break;
     default:
       break;
