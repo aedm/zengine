@@ -97,9 +97,12 @@ void ZenGarden::InitModules() {
   GeneralSceneWatcher::Init();
 
   CreateNewDocument();
+  LoadMusic();
 }
 
 void ZenGarden::DisposeModules() {
+  BASS_Free();
+
   /// Close all watchers
   while (mUI.upperLeftPanel->count() > 0) delete mUI.upperLeftPanel->widget(0);
   while (mUI.bottomLeftPanel->count() > 0) delete mUI.bottomLeftPanel->widget(0);
@@ -115,6 +118,7 @@ void ZenGarden::DisposeModules() {
 void ZenGarden::RestartMovieTimer() {
   mMovieStartTime = mTime.elapsed() - int(mMovieCursor * 1000.0f);
   mOnMovieCursorChange(mMovieCursor);
+  if (mPlayMovie) PlayMusic(mMovieCursor);
 }
 
 void ZenGarden::LoadEngineShaders(QString& path) {
@@ -135,8 +139,9 @@ void ZenGarden::LoadEngineShaders(QString& path) {
 void ZenGarden::keyPressEvent(QKeyEvent* event) {
   switch (event->key()) {
     case Qt::Key_Space:
-      RestartMovieTimer();
       mPlayMovie = !mPlayMovie;
+      RestartMovieTimer();
+      if (!mPlayMovie) StopMusic();
       return;
     case Qt::Key_Escape:
       mMovieCursor = 0.0f;
@@ -425,4 +430,29 @@ void ZenGarden::DeleteDocument() {
   }
   mDocument = nullptr;
   mDocumentWatcher = nullptr;
+}
+
+void ZenGarden::LoadMusic() {
+  BASS_DEVICEINFO di;
+  for (int a = 1; BASS_GetDeviceInfo(a, &di); a++) {
+    if (di.flags&BASS_DEVICE_ENABLED) // enabled output device
+      INFO("dev %d: %s\n", a, di.name);
+  }
+
+  if (!BASS_Init(1, 44100, 0, 0, NULL)) {
+    ERR("Can't initialize BASS");
+    return;
+  }
+  mBassMusicChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_PRESCAN);
+}
+
+void ZenGarden::PlayMusic(float seconds) {
+  if (mBassMusicChannel < 0) return;
+  BASS_ChannelSetPosition(mBassMusicChannel, BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds), BASS_POS_BYTE);
+  BASS_ChannelPlay(mBassMusicChannel, FALSE);
+}
+
+void ZenGarden::StopMusic() {
+  if (mBassMusicChannel < 0) return;
+  BASS_ChannelStop(mBassMusicChannel);
 }

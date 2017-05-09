@@ -1,0 +1,60 @@
+{
+ "nodes": [
+  {
+   "node": "Document",
+   "id": 1,
+   "slots": {
+    "graphs": [
+     2
+    ],
+    "movie": 3
+   }
+  },
+  {
+   "node": "Graph",
+   "id": 2,
+   "slots": {
+    "nodes": []
+   }
+  },
+  {
+   "node": "Movie",
+   "id": 3,
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "clips": [
+     4
+    ]
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 4,
+   "name": "törlőkendő",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Start time": {
+     "default": 0.0
+    },
+    "Clip Length": {
+     "default": 160.0
+    },
+    "Clear depth buffer": {
+     "default": 1.1376811265945435
+    },
+    "Track": {
+     "default": 0.0
+    },
+    "Clear color buffer": {
+     "default": 1.3695652484893799
+    }
+   }
+  }
+ ]
+}

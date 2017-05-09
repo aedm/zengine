@@ -468,8 +468,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IntDir>$(ProjectDir)\.msbuild\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>zengarden-debug64</TargetName>
-    <IncludePath>..\zengine\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\zengine\include;..\components\bass;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)\app\</OutDir>
+    <LibraryPath>..\components\bass;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-static|x64'">
     <IntDir>$(ProjectDir)\.msbuild\$(Platform)\$(Configuration)\</IntDir>
@@ -499,7 +500,7 @@
       <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../components/glew/glew32s.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>bass.lib;../components/glew/glew32s.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>

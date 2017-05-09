@@ -10,7 +10,7 @@
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTime>
-
+#include <bass.h>
 
 class ZenGarden: public QMainWindow {
   Q_OBJECT
@@ -91,6 +91,12 @@ private:
   QFileSystemWatcher mEngineShadersFolderWatcher;
 
   virtual void keyPressEvent(QKeyEvent* event) override;
+
+  /// Music related
+  DWORD mBassMusicChannel = -1;
+  void LoadMusic();
+  void PlayMusic(float seconds);
+  void StopMusic();
 
 private slots:
   void InitModules();
