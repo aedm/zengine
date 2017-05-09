@@ -49,6 +49,17 @@ const std::vector<ClipNode*>& MovieNode::GetTrack(int trackIndex) {
   return mTracks[trackIndex];
 }
 
+float MovieNode::CalculateMovieLength() {
+  float length = 0.0f;
+  for (auto& track : mTracks) {
+    for (ClipNode* clipNode : track) {
+      float clipEnd = clipNode->mStartTime.Get() + clipNode->mLength.Get();
+      if (clipEnd > length) length = clipEnd;
+    }
+  }
+  return length;
+}
+
 void MovieNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:

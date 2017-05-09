@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>zengine-debug64</TargetName>
-    <IncludePath>D:\Develop\Haiku\Zengine\include;D:\3rdparty\glut-3.7.6-bin;d:\3rdparty\Box2D_v2.2.1;D:\3rdparty\boost_1_52_0;D:\3rdparty\Qt\4.8.3\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\3rdparty\glew-1.9.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\3rdparty\boost_1_52_0;D:\3rdparty\glew-1.9.0\include;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)\lib\</OutDir>
     <IntDir>$(ProjectDir)\.msbuild\$(Configuration)\</IntDir>
   </PropertyGroup>

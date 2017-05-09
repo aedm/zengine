@@ -15,6 +15,9 @@ public:
   int GetTrackCount();
   const vector<ClipNode*>& GetTrack(int trackIndex);
 
+  /// Returns the end of the last clip
+  float CalculateMovieLength();
+
 protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 
