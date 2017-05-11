@@ -6,21 +6,11 @@ Watcher::Watcher(Node* node)
 {}
 
 Watcher::~Watcher() {
-  ResetNode();
+  ASSERT(mNode == nullptr);
 }
 
 Node* Watcher::GetNode() {
   return mNode;
-}
-
-void Watcher::ResetNode() {
-  if (!mNode) return;
-  mNode->RemoveWatcher(this);
-  mNode = nullptr;
-}
-
-void Watcher::Unwatch() {
-  ResetNode();
 }
 
 void Watcher::ChangeNode(Node* node) {
@@ -28,6 +18,7 @@ void Watcher::ChangeNode(Node* node) {
   OnRedraw();
 }
 
+void Watcher::OnDeleteNode() {}
 void Watcher::OnRedraw() {}
 void Watcher::OnNameChange() {}
 void Watcher::OnSlotConnectionChanged(Slot* slot) {}

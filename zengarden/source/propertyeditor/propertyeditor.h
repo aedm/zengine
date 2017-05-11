@@ -28,7 +28,7 @@ protected:
 class DefaultPropertyEditor: public PropertyEditor {
 public:
   DefaultPropertyEditor(Node* node);
-  virtual ~DefaultPropertyEditor() {}
+  virtual ~DefaultPropertyEditor();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 

@@ -62,10 +62,13 @@ void WatcherUI::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mWatcherWidget = watcherWidget;
 }
 
-void WatcherUI::Unwatch() {
-  Watcher::Unwatch();
-  if (!mWatcherWidget) return;
+void WatcherUI::OnDeleteNode() {
+  if (mWatcherWidget) {
+    WatcherWidget* widget = mWatcherWidget;
+    mWatcherWidget = nullptr;
+    widget->mWatcher = nullptr;
 
-  // Point of no return -- "this" pointer might be invalid after calling onUnwatch
-  if (onUnwatch) onUnwatch(mWatcherWidget);
+    /// Call the function that deletes the watcher widget
+    if (deleteWatcherWidgetCallback) deleteWatcherWidgetCallback(widget);
+  }
 }

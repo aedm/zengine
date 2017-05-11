@@ -13,7 +13,7 @@ public:
   Node*	GetNode();
 
   /// Destroys the watcher and its UI elements
-  virtual void Unwatch();
+  virtual void OnDeleteNode();
 
   /// Called when the watcher needs to be rerendered
   virtual void OnRedraw();
@@ -40,9 +40,6 @@ public:
   virtual void OnSplineTimeChanged();
 
 protected:
-  /// Sets the node being watched to nullptr and redraws the UI.
-  void ResetNode();
-
   Watcher(Node* node);
 
   Node* mNode = nullptr;

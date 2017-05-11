@@ -13,10 +13,16 @@ WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, Wat
 
 WatcherWidget::~WatcherWidget() {
   if (mWatcher) {
+    // Make the node release the watcher
+    Node* node = mWatcher->mNode;
+    if (node) node->RemoveWatcher(mWatcher.get());
+    
+    // Release the watcher, thereby killing its last reference
     mWatcher->mWatcherWidget = nullptr;
-    mWatcher->Unwatch();
+    mWatcher = nullptr;
+
+    ASSERT(mWatcher.use_count() == 0);
   }
-  //ASSERT(mWatcher.use_count() == 1);
 }
 
 EventForwarderGLWidget* WatcherWidget::GetGLWidget() {

@@ -1,6 +1,7 @@
 #include "nodewidget.h"
 #include "prototypes.h"
 #include "../util/uipainter.h"
+#include "../zengarden.h"
 #include <zengine.h>
 #include <QImage>
 #include <QGLWidget>
@@ -177,6 +178,10 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 void NodeWidget::OnSlotStructureChanged() {
   CreateWidgetSlots();
   UpdateGraph();
+  Node* node = ZenGarden::GetInstance()->GetNodeInPropertyEditor();
+  if (node == mNode) {
+    ZenGarden::GetInstance()->SetNodeForPropertyEditor(node);;
+  }
 }
 
 

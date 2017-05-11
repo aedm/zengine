@@ -56,6 +56,13 @@ DefaultPropertyEditor::DefaultPropertyEditor(Node* node)
   : PropertyEditor(node) {}
 
 
+DefaultPropertyEditor::~DefaultPropertyEditor() {
+  for (auto it : mSlotWatchers) {
+    if (it.second->GetNode()) it.second->GetNode()->RemoveWatcher(it.second.get());
+    SafeDelete(it.second->mWatcherWidget);
+  }
+}
+
 void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
@@ -88,7 +95,7 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
     if (watcher) {
       WatcherWidget* widget = new WatcherWidget(watcherWidget, watcher, WatcherPosition::PROPERTY_PANEL);
-      watcher->onUnwatch = Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
+      watcher->deleteWatcherWidgetCallback = Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
       mLayout->addWidget(widget);
       watcher->SetWatcherWidget(widget);
       mSlotWatchers[slot] = watcher;
@@ -116,8 +123,9 @@ void DefaultPropertyEditor::OnSlotConnectionChanged(Slot* slot) {
   auto it = mSlotWatchers.find(slot);
   if (it != mSlotWatchers.end()) {
     shared_ptr<WatcherUI> watcher = it->second;
-    if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
-      watcher->Unwatch();
+    Node* node = slot->GetAbstractNode();
+    if (node->GetType() == NodeType::SHADER_STUB) {
+      node->RemoveWatcher(watcher.get());
     } else {
       slot->GetAbstractNode()->AssignWatcher(watcher);
       WatcherUI* watcherPtr = watcher.get();

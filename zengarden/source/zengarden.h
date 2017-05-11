@@ -26,6 +26,7 @@ public:
 
   /// Property editor related
   void SetNodeForPropertyEditor(Node* node);
+  Node* GetNodeInPropertyEditor();
 
   /// Sets the cursor relative to the beginning of the timeline
   void SetMovieCursor(float seconds);

@@ -176,13 +176,19 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
       watcher = node->Watch<DefaultPropertyEditor>(node);
     }
     if (watcher) {
-      watcher->onUnwatch = Delegate(this, &ZenGarden::DeleteWatcherWidget);
+      watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
       mPropertyEditor =
         new WatcherWidget(mUI.propertyPanel, watcher, WatcherPosition::PROPERTY_PANEL);
       watcher->SetWatcherWidget(mPropertyEditor);
       mPropertyLayout->addWidget(mPropertyEditor);
     }
   }
+}
+
+
+Node* ZenGarden::GetNodeInPropertyEditor() {
+  if (!mPropertyEditor) return nullptr;
+  return mPropertyEditor->mWatcher->GetNode();
 }
 
 
@@ -308,7 +314,7 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
   tabWidget->setCurrentIndex(index);
   watcher->SetWatcherWidget(watcherWidget);
-  watcher->onUnwatch = Delegate(this, &ZenGarden::DeleteWatcherWidget);
+  watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
 }
 
 

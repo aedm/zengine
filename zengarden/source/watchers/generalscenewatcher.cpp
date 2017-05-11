@@ -18,7 +18,7 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
   GlobalTimeNode::OnTimeChanged -= Delegate(this, &GeneralSceneWatcher::Tick);
-  if (mRenderForwarder) mRenderForwarder->Unwatch();
+  mRenderForwarder = nullptr;
   SafeDelete(mDrawable);
   SafeDelete(mRenderTarget);
 }

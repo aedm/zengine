@@ -31,21 +31,21 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Destorys the watcher and its UI elements
-  virtual void Unwatch() override;
+  virtual void OnDeleteNode() override;
 
   /// Triggered when the Watcher isn't attached to a Node anymore. 
-  /// Can delete WatcherWidget if necessary.
-  FastDelegate<void(WatcherWidget*)> onUnwatch;
+  /// Should deletes the WatcherWidget.
+  FastDelegate<void(WatcherWidget*)> deleteWatcherWidgetCallback;
 
   /// Generate a name displayed for a node. If the node has no name, it shows
   /// the node type or the shader stub name.
   static QString CreateDisplayedName(Node* node);
 
-protected:
-  WatcherUI(Node* node);
-
   /// The watcher widget that contains this watcher
   WatcherWidget* mWatcherWidget = nullptr;
+
+protected:
+  WatcherUI(Node* node);
 
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;
