@@ -329,6 +329,7 @@ void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable, bool isTraver
 void Node::ClearSlots() {
   mPublicSlots.clear();
   mSerializableSlotsByName.clear();
+  mTraversableSlots.clear();
 }
 
 const vector<Slot*>& Node::GetPublicSlots() {

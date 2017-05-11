@@ -173,6 +173,9 @@
     <ClCompile Include="source\watchers\moviewatcher.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\util\c4dloader.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -286,6 +289,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\moviewatcher.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\util\c4dloader.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

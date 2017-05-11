@@ -2,6 +2,7 @@
 #include "nodewidget.h"
 #include "../util/uipainter.h"
 #include "../util/util.h"
+#include "../util/c4dloader.h"
 #include "../commands/graphcommands.h"
 #include "prototypes.h"
 #include "../zengarden.h"
@@ -44,12 +45,12 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   /// Draw connections
   ThePainter->mColor.Set(Vec4(1, 1, 1, 1));
   for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
-    NodeWidget* nodeWidget = mWidgetMap.at(node);
+    shared_ptr<NodeWidget> nodeWidget = mWidgetMap.at(node);
     for (int i = 0; i < nodeWidget->mWidgetSlots.size(); i++) {
       Slot* slot = nodeWidget->mWidgetSlots[i]->mSlot;
       if (slot->mIsMultiSlot) {
         for (Node* connectedNode : slot->GetMultiNodes()) {
-          NodeWidget* connectedNodeWidget = GetNodeWidget(connectedNode);
+          shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget != NULL) {
             /// Draw connection
             Vec2 p1 = connectedNodeWidget->GetOutputPosition();
@@ -61,7 +62,7 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
         /// TODO: remove code duplication
         Node* connectedNode = slot->GetAbstractNode();
         if (connectedNode) {
-          NodeWidget* connectedNodeWidget = GetNodeWidget(connectedNode);
+          shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget != NULL) {
             /// Draw connection
             Vec2 p1 = connectedNodeWidget->GetOutputPosition();
@@ -125,7 +126,7 @@ void GraphWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* even
 }
 
 
-NodeWidget* GraphWatcher::GetNodeWidget(Node* node) {
+shared_ptr<NodeWidget> GraphWatcher::GetNodeWidget(Node* node) {
   auto it = mWidgetMap.find(node);
   return (it != mWidgetMap.end()) ? it->second : NULL;
 }
@@ -141,7 +142,7 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   GetGLWidget()->makeCurrent();
   Graph* graph = dynamic_cast<Graph*>(mNode);
   for (Node* node : graph->mNodes.GetMultiNodes()) {
-    NodeWidget* widget = new NodeWidget(node, this);
+    shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
     mWidgetMap[node] = widget;
   }
 
@@ -185,7 +186,7 @@ bool HasIntersection(Vec2 pos1, Vec2 size1, Vec2 pos2, Vec2 size2) {
 
 
 void GraphWatcher::DeselectAll() {
-  for (NodeWidget* widget : mSelectedNodeWidgets) {
+  for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
     widget->mIsSelected = false;
   }
   mSelectedNodeWidgets.clear();
@@ -193,7 +194,7 @@ void GraphWatcher::DeselectAll() {
 
 
 void GraphWatcher::StorePositionOfSelectedNodes() {
-  for (NodeWidget* nodeWidget : mSelectedNodeWidgets) {
+  for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
     nodeWidget->mOriginalPosition = nodeWidget->GetNode()->GetPosition();
     nodeWidget->mOriginalSize = nodeWidget->GetNode()->GetSize();
   }
@@ -260,7 +261,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   switch (mCurrentState) {
     case State::MOVE_NODES:
       if (mAreNodesMoved) {
-        for (NodeWidget* widget : mSelectedNodeWidgets) {
+        for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
           Vec2 pos = widget->GetNode()->GetPosition();
           TheCommandStack->Execute(
             new MoveNodeCommand(widget->GetNode(), pos, widget->mOriginalPosition));
@@ -275,7 +276,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
       break;
     case State::SELECT_RECTANGLE:
       for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
-        NodeWidget* widget = mWidgetMap.at(node);
+        shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
         if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
       }
       mCurrentState = State::DEFAULT;
@@ -345,7 +346,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
     {
       mAreNodesMoved = true;
       Vec2 mouseDiff = mousePos - mOriginalMousePos;
-      for (NodeWidget* widget : mSelectedNodeWidgets) {
+      for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
         widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
       }
       GetGLWidget()->update();
@@ -353,7 +354,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
     break;
     case State::SELECT_RECTANGLE:
       for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
-        NodeWidget* widget = mWidgetMap.at(node);
+        shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
         widget->mIsSelected = HasIntersection(mOriginalMousePos,
           mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
       }
@@ -407,11 +408,11 @@ void GraphWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event)
 
 
 bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
-  NodeWidget* hovered = nullptr;
+  shared_ptr<NodeWidget> hovered = nullptr;
   int slot = -1;
   for (auto& it : mWidgetMap) {
     Node* node = it.first;
-    NodeWidget* widget = it.second;
+    shared_ptr<NodeWidget> widget = it.second;
     if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
       hovered = widget;
       for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
@@ -451,7 +452,7 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
     case Qt::Key_Delete:
       if (mSelectedNodeWidgets.size() > 0) {
         set<Node*>* selectedNodes = new set<Node*>();
-        for (NodeWidget* nodeWidget : mSelectedNodeWidgets) {
+        for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
           selectedNodes->insert(nodeWidget->GetNode());
         }
         TheCommandStack->Execute(new DeleteNodeCommand(selectedNodes));
@@ -507,7 +508,7 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
   for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
     auto it = mWidgetMap.find(node);
     if (it == mWidgetMap.end()) {
-      NodeWidget* widget = new NodeWidget(node, this);
+      shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
       mWidgetMap[node] = widget;
       GetGLWidget()->update();
     }
@@ -520,7 +521,7 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
     for (auto it : mWidgetMap) {
       Node* node = it.first;
       if (find(nodes.begin(), nodes.end(), node) == nodes.end()) {
-        NodeWidget* widget = it.second;
+        shared_ptr<NodeWidget> widget = it.second;
         mWidgetMap.erase(node);
         found = true;
         break;
@@ -575,8 +576,9 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
 
   QString fileName = urlList.at(0).toLocalFile();
   QFileInfo fileInfo(fileName);
-  if (fileInfo.suffix() == "obj") {
-    Mesh* mesh = Util::LoadMesh(fileName);
+  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "c4d") {
+    Mesh* mesh = fileInfo.suffix() == "c4d" ? 
+      Util::LoadC4DMesh(fileName) : Util::LoadMesh(fileName);
     MeshNode* node = StaticMeshNode::Create(mesh);
     node->SetName(fileInfo.fileName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));

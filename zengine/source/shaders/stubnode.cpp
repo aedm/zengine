@@ -111,6 +111,8 @@ void StubNode::HandleSourceChange() {
   for (auto it = mParameterSlotMap.begin(); it != mParameterSlotMap.end(); ++it) {
     mParameterNameSlotMap[*it->first->mName] = it->second;
   }
+
+  NotifyWatchers(&Watcher::OnSlotStructureChanged);
 }
 
 StubMetadata* StubNode::GetStubMetadata() const {

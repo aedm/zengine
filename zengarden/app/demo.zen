@@ -26,33 +26,438 @@
    },
    "slots": {
     "clips": [
-     4
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19
     ]
    }
   },
   {
    "node": "Clip",
    "id": 4,
-   "name": "törlőkendő",
+   "name": "törlés",
    "position": {
     "x": -431602080.0,
     "y": -431602080.0
    },
    "slots": {
+    "Clip Length": {
+     "default": 155.0
+    },
     "Start time": {
      "default": 0.0
     },
-    "Clip Length": {
-     "default": 160.0
-    },
     "Clear depth buffer": {
-     "default": 1.1376811265945435
+     "default": 0.8115941882133484
     },
     "Track": {
      "default": 0.0
     },
     "Clear color buffer": {
-     "default": 1.3695652484893799
+     "default": 0.739130437374115
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 5,
+   "name": "the cube is nice",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 8.0
+    },
+    "Start time": {
+     "default": 2.005000114440918
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.0
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 6,
+   "name": "ducks are good",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 8.0
+    },
+    "Start time": {
+     "default": 10.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.0
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 7,
+   "name": "cube is nice 2",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 8.0
+    },
+    "Start time": {
+     "default": 18.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.0
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 8,
+   "name": "ducks are good 2",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 8.0
+    },
+    "Start time": {
+     "default": 26.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.1594202518463135
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 9,
+   "name": "cubes",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 2.0
+    },
+    "Start time": {
+     "default": 34.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.4057971239089966
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 10,
+   "name": "ducks",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 2.0
+    },
+    "Start time": {
+     "default": 35.99416732788086
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.5299999713897706
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 11,
+   "name": "cubes",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 2.0
+    },
+    "Start time": {
+     "default": 38.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.2898551225662232
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 12,
+   "name": "ducks",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 2.0
+    },
+    "Start time": {
+     "default": 40.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.43478262424469
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 13,
+   "name": "cubes-ducks",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 6.0
+    },
+    "Start time": {
+     "default": 42.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.5700000524520875
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 14,
+   "name": "ducks are cube",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 2.0
+    },
+    "Start time": {
+     "default": 47.984580993652347
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.3799999952316285
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 15,
+   "name": "effekt1",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 32.0
+    },
+    "Start time": {
+     "default": 50.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.5579710006713868
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 16,
+   "name": "plömpf",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 4.0
+    },
+    "Start time": {
+     "default": 82.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.56521737575531
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 17,
+   "name": "greetings",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 48.0
+    },
+    "Start time": {
+     "default": 86.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.0
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 18,
+   "name": "vége",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 16.0
+    },
+    "Start time": {
+     "default": 134.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.0
+    },
+    "Clear color buffer": {
+     "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Clip",
+   "id": 19,
+   "name": "ducks are cube",
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "Clip Length": {
+     "default": 4.0
+    },
+    "Start time": {
+     "default": 150.0
+    },
+    "Clear depth buffer": {
+     "default": 0.0
+    },
+    "Track": {
+     "default": 1.0
+    },
+    "Clear color buffer": {
+     "default": 0.0
     }
    }
   }

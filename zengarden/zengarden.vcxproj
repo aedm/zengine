@@ -107,6 +107,7 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\propertyeditor\parameterwidgets.cpp" />
     <ClCompile Include="source\propertyeditor\propertyeditor.cpp" />
+    <ClCompile Include="source\util\c4dloader.cpp" />
     <ClCompile Include="source\util\util.cpp" />
     <ClCompile Include="source\util\uipainter.cpp" />
     <ClCompile Include="source\util\textTexture.cpp" />
@@ -193,6 +194,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release-static|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="source\util\c4dloader.h" />
     <ClInclude Include="source\watchers\drawablewatcher.h" />
     <ClInclude Include="source\watchers\generalscenewatcher.h" />
     <ClInclude Include="source\watchers\meshwatcher.h" />
@@ -500,7 +502,7 @@
       <OutputFile>$(OutDir)\$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>bass.lib;../components/glew/glew32s.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>WinMM.lib;melangelib_debug.lib;jpeglib_debug.lib;bass.lib;../components/glew/glew32s.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>

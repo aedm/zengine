@@ -58,6 +58,7 @@ void NodeWidget::CreateWidgetSlots()
 	for (auto x : mWidgetSlots) delete x;
 	mWidgetSlots.clear();
 
+  mGraphWatcher->GetGLWidget()->makeCurrent();
   for (Slot* slot : mNode->GetPublicSlots())
 	{
     if (slot->DoesAcceptType(NodeType::STRING)) continue;
@@ -116,11 +117,11 @@ void NodeWidget::Paint()
 	{
 		Vec4 slotFrameColor(1, 1, 1, 0.1);
 		if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
-      if (mGraphWatcher->mClickedWidget == this 
+      if (mGraphWatcher->mClickedWidget.get() == this 
           && mGraphWatcher->mClickedSlotIndex == i) {
 				slotFrameColor = ConnectionColor;
 			}
-    } else if (mGraphWatcher->mHoveredWidget == this 
+    } else if (mGraphWatcher->mHoveredWidget.get() == this 
                && mGraphWatcher->mHoveredSlotIndex == i) {
       if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT) {
         slotFrameColor = mGraphWatcher->mIsConnectionValid
@@ -145,11 +146,11 @@ void NodeWidget::Paint()
 	if (mIsSelected) {
 		frameColor = Vec4(1, 1, 1, 1);
   } else if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT
-             && mGraphWatcher->mClickedWidget == this) {
+             && mGraphWatcher->mClickedWidget.get() == this) {
 			frameColor = ConnectionColor;
-  } else if (mGraphWatcher->mHoveredWidget == this) {
+  } else if (mGraphWatcher->mHoveredWidget.get() == this) {
     if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
-      if (mGraphWatcher->mClickedWidget != this) {
+      if (mGraphWatcher->mClickedWidget.get() != this) {
         frameColor = mGraphWatcher->mIsConnectionValid
           ? ConnectionColorValid : ConnectionColorInvalid;
 			}

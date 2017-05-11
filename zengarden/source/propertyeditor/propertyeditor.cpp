@@ -88,8 +88,7 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
     if (watcher) {
       WatcherWidget* widget = new WatcherWidget(watcherWidget, watcher, WatcherPosition::PROPERTY_PANEL);
-      //widget->onWatcherDeath =
-      //  Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
+      watcher->onUnwatch = Delegate(this, &DefaultPropertyEditor::RemoveWatcherWidget);
       mLayout->addWidget(widget);
       watcher->SetWatcherWidget(widget);
       mSlotWatchers[slot] = watcher;

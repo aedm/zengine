@@ -38,6 +38,7 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   watcherWidget->connect(mUI.newClipButton, &QPushButton::pressed, [=]() {
     ClipNode* clipNode = new ClipNode();
+    clipNode->mStartTime.SetDefaultValue(ZenGarden::GetInstance()->GetMovieCursor());
     clipNode->mLength.SetDefaultValue(5.0f);
     MovieNode* movieNode = dynamic_cast<MovieNode*>(this->mNode);
     movieNode->mClips.Connect(clipNode);

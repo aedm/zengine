@@ -18,7 +18,7 @@ public:
   GraphWatcher(Graph* graph);
   virtual ~GraphWatcher();
 
-  NodeWidget* GetNodeWidget(Node* node);
+  shared_ptr<NodeWidget> GetNodeWidget(Node* node);
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
@@ -51,10 +51,10 @@ private:
   virtual void HandleDropEvent(QDropEvent* event) override;
 
   /// Mapping from node to widget
-  map<Node*, NodeWidget*> mWidgetMap;
+  map<Node*, shared_ptr<NodeWidget>> mWidgetMap;
 
   /// Operators currectly selected
-  set<NodeWidget*> mSelectedNodeWidgets;
+  set<shared_ptr<NodeWidget>> mSelectedNodeWidgets;
 
   /// State machine
   enum class State {
@@ -93,11 +93,11 @@ private:
   Vec2 mCurrentMousePos;
 
   /// Clicked widget for some operations
-  NodeWidget* mClickedWidget;
+  shared_ptr<NodeWidget> mClickedWidget;
   int mClickedSlotIndex;
 
   /// Hovered widget and slot
-  NodeWidget* mHoveredWidget;
+  shared_ptr<NodeWidget> mHoveredWidget;
   int mHoveredSlotIndex;
 
   void DeselectAll();
