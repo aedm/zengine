@@ -41,6 +41,7 @@ void SSpline::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED:
       InvalidateCurrentValue();
+      NotifyWatchers(&Watcher::OnSplineTimeChanged);
       break;
     default:
       break;

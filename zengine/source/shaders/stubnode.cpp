@@ -70,7 +70,7 @@ void StubNode::HandleSourceChange() {
     if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptType(param->mType)) {
       /// This slot was used before, reuse it.
       /// "isTraversable" is false since it's already in the mTraversableSlots vector.
-      AddSlot(it->second, true, true, false);
+      AddSlot(it->second, true, true, true);
       mParameterSlotMap[param] = it->second;
       it->second = nullptr;
     }
