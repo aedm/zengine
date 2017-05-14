@@ -28,6 +28,11 @@ public:
   Texture* mDepthBuffer = nullptr;
   Texture* mGBufferA = nullptr;
 
+  /// Secondary texture. For some fx.
+  FrameBufferId mSecondaryFramebuffer = 0;
+  Texture* mSecondaryTexture = nullptr;
+  //Texture* mSecondaryDepth = nullptr;
+
   /// Final color buffer (framebuffer or texture)
   /// Default frambuffer id is 0
   FrameBufferId mColorBufferId = 0;

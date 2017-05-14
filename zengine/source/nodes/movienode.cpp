@@ -30,7 +30,7 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
       float endTime = startTime + clip->mLength.Get();
       if (startTime <= time && endTime > time) {
         /// Render clip
-        clip->Draw(&mGlobals, time - startTime);
+        clip->Draw(renderTarget, &mGlobals, time - startTime);
         break;
       }
       if (startTime > time) break;

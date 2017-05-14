@@ -25,6 +25,7 @@ using namespace std;
   ITEM(USAGE_DEPTH_BUFFER,				    TEXTURE,		DepthBufferSource)		  \
   ITEM(USAGE_GBUFFER_SOURCE_A,        TEXTURE,		GBufferSourceA)	        \
   ITEM(USAGE_GBUFFER_SAMPLE_COUNT,		FLOAT,      GBufferSampleCount)     \
+  ITEM(USAGE_SECONDARY_TEXTURE,       TEXTURE,		SecondaryTexture)       \
   ITEM(USAGE_SKYLIGHT_TEXTURE,        TEXTURE,		SkylightTexture)        \
   ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,        TEXTURE,		SkylightColorTexture)       \
   ITEM(USAGE_SKYLIGHT_PROJECTION,     MATRIX44,		SkylightMatrix)         \

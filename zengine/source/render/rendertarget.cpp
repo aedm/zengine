@@ -19,6 +19,7 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   globals->DepthBufferSource = 0;
   globals->GBufferSourceA = 0;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
+  globals->SecondaryTexture = mSecondaryTexture;
   TheDrawingAPI->SetFrameBuffer(mGBufferId);
   TheDrawingAPI->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
@@ -43,6 +44,11 @@ void RenderTarget::Resize(Vec2 size) {
   mGBufferA = TheResourceManager->CreateGPUTexture(
     width, height, TexelType::ARGB16F, nullptr, true, false);
   mGBufferId = TheDrawingAPI->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
+
+  /// Create secondary framebuffer
+  mSecondaryTexture = TheResourceManager->CreateGPUTexture(
+    width, height, TexelType::ARGB16F, nullptr, false, false);
+  mSecondaryFramebuffer = TheDrawingAPI->CreateFrameBuffer(0, mSecondaryTexture->mHandle, 0, false);
 
   /// Create shadow map
   mShadowTexture = TheResourceManager->CreateGPUTexture(

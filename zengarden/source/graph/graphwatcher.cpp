@@ -27,7 +27,11 @@ GraphWatcher::GraphWatcher(Graph* graph)
 
 
 GraphWatcher::~GraphWatcher() {
-  for (auto& it : mWidgetMap) it.second->mGraphWatcher = nullptr;
+  for (auto& it : mWidgetMap) {
+    shared_ptr<NodeWidget> watcher = it.second;
+    if (watcher->GetNode()) watcher->GetNode()->RemoveWatcher(watcher.get());
+    watcher->mGraphWatcher = nullptr;
+  }
 }
 
 

@@ -103,8 +103,8 @@ int CALLBACK WinMain(
   //dmScreenSettings.dmPelsWidth = windowWidth;
   //dmScreenSettings.dmPelsHeight = windowHeight;
   static DEVMODEW dmScreenSettings = {
-    L"", 0, 0, sizeof(dmScreenSettings), 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, L"", 0, 0, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    L"", 0, 0, sizeof(dmScreenSettings), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    L"", 0, 0, DWORD(-1), DWORD(-1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   };
   ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
   HWND hwnd = CreateWindowW(L"edit", 0, WS_POPUP | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 0, 0, 0, 0, 0, 0);

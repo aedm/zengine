@@ -15,8 +15,9 @@ public:
 
   FloatSlot mClearColorBuffer;
   FloatSlot mClearDepthBuffer;
+  FloatSlot mCopyToSecondaryBuffer;
   
-  void Draw(Globals* globals, float clipTime);
+  void Draw(RenderTarget* renderTarget, Globals* globals, float clipTime);
 
 protected:
   virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;

@@ -8,23 +8,33 @@ static SharedString LengthSlotName = make_shared<string>("Clip Length");
 static SharedString TrackNumberSlotName = make_shared<string>("Track");
 static SharedString ClearColorBufferSlotName = make_shared<string>("Clear color buffer");
 static SharedString ClearDepthBufferSlotName = make_shared<string>("Clear depth buffer");
+static SharedString CopyToSecondaryBufferSlotName = make_shared<string>("Copy to secondary buffer");
 
 ClipNode::ClipNode()
-  : Node(NodeType::CLIP) 
+  : Node(NodeType::CLIP)
   , mSceneSlot(this, SceneSlotName)
   , mStartTime(this, StartSlotName)
   , mLength(this, LengthSlotName)
   , mTrackNumber(this, TrackNumberSlotName)
   , mClearColorBuffer(this, ClearColorBufferSlotName)
   , mClearDepthBuffer(this, ClearDepthBufferSlotName)
-{
-}
+  , mCopyToSecondaryBuffer(this, CopyToSecondaryBufferSlotName)
+{}
 
 ClipNode::~ClipNode() {
 
 }
 
-void ClipNode::Draw(Globals* globals, float clipTime) {
+void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime) {
+  if (mCopyToSecondaryBuffer.Get() >= 0.5f) {
+    int width = int(globals->RenderTargetSize.x);
+    int height = int(globals->RenderTargetSize.y);
+    TheDrawingAPI->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer, 
+      0, 0, width, height, 0, 0, width, height);
+    TheDrawingAPI->SetFrameBuffer(renderTarget->mSecondaryFramebuffer);
+    TheDrawingAPI->SetFrameBuffer(renderTarget->mGBufferId);
+  }
+  
   bool clearColor = mClearColorBuffer.Get() >= 0.5f;
   bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
   TheDrawingAPI->Clear(clearColor, clearDepth);
