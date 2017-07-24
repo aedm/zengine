@@ -160,7 +160,7 @@
     <ClCompile Include="source\nodes\splinenode.cpp" />
     <ClCompile Include="source\nodes\valuenodes.cpp" />
     <ClCompile Include="source\nodes\vectornodes.cpp" />
-    <ClCompile Include="source\render\opengl\drawingopengl.cpp" />
+    <ClCompile Include="source\render\drawingapi.cpp" />
     <ClCompile Include="source\render\rendertarget.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />

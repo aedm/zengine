@@ -199,9 +199,6 @@
     <ClCompile Include="source\dom\node.cpp">
       <Filter>source\dom</Filter>
     </ClCompile>
-    <ClCompile Include="source\render\opengl\drawingopengl.cpp">
-      <Filter>source\render\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="source\resources\mesh.cpp">
       <Filter>source\resources</Filter>
     </ClCompile>
@@ -293,6 +290,9 @@
     <ClCompile Include="source\nodes\movienode.cpp" />
     <ClCompile Include="source\nodes\clipnode.cpp" />
     <ClCompile Include="source\nodes\timenode.cpp" />
+    <ClCompile Include="source\render\drawingapi.cpp">
+      <Filter>source\render\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

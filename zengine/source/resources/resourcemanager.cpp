@@ -93,9 +93,9 @@ void ResourceManager::DiscardMesh(Mesh* meshInstance) {
 
 Texture* ResourceManager::CreateTexture(int width, int height, TexelType type, 
                                         OWNERSHIP void* texelData) {
-  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type, false, false, true);
+  TextureHandle handle = OpenGL->CreateTexture(width, height, type, false, false, true);
   if (texelData) {
-    TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
+    OpenGL->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling
   }
   Texture* texture = new Texture(width, height, type, handle, texelData, false);
@@ -104,9 +104,9 @@ Texture* ResourceManager::CreateTexture(int width, int height, TexelType type,
 
 Texture* ResourceManager::CreateGPUTexture(int width, int height, TexelType type, 
                                            void* texelData, bool multiSample, bool doesRepeat) {
-  TextureHandle handle = TheDrawingAPI->CreateTexture(width, height, type, multiSample, doesRepeat, false);
+  TextureHandle handle = OpenGL->CreateTexture(width, height, type, multiSample, doesRepeat, false);
   if (texelData) {
-    TheDrawingAPI->UploadTextureData(handle, width, height, type, texelData);
+    OpenGL->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling
   }
   Texture* texture = new Texture(width, height, type, handle, nullptr, multiSample);
@@ -115,6 +115,6 @@ Texture* ResourceManager::CreateGPUTexture(int width, int height, TexelType type
 
 void ResourceManager::DiscardTexture(Texture* textureInstance) {
   if (!textureInstance) return;
-  TheDrawingAPI->DeleteTexture(textureInstance->mHandle);
+  OpenGL->DeleteTexture(textureInstance->mHandle);
   delete textureInstance;
 }

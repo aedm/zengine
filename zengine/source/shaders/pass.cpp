@@ -96,7 +96,7 @@ void Pass::Operate() {
   const string& vertexSource = mVertexShaderMetadata->mSource;
   const string& fragmentSource = mFragmentShaderMetadata->mSource;
 
-  ShaderCompileDesc* shaderCompileDesc = TheDrawingAPI->CreateShaderFromSource(
+  ShaderCompileDesc* shaderCompileDesc = OpenGL->CreateShaderFromSource(
     vertexSource.c_str(), fragmentSource.c_str());
   if (shaderCompileDesc == nullptr) {
     ERR("Missing shader compilation result.");
@@ -154,8 +154,8 @@ void Pass::Operate() {
 void Pass::Set(Globals* globals) {
   ASSERT(mHandle != -1);
 
-  TheDrawingAPI->SetRenderState(&mRenderstate);
-  TheDrawingAPI->SetShaderProgram(mHandle);
+  OpenGL->SetRenderState(&mRenderstate);
+  OpenGL->SetShaderProgram(mHandle);
 
   /// Set uniforms
   for (PassUniform& uniform : mUniforms) {
@@ -168,7 +168,7 @@ void Pass::Set(Globals* globals) {
 				case NodeType::name: { \
           auto vNode = static_cast<ValueNode<NodeType::name>*>(uniform.node); \
           vNode->Update(); \
-					TheDrawingAPI->SetUniform(uniform.handle, NodeType::name, &vNode->Get()); } \
+					OpenGL->SetUniform(uniform.handle, NodeType::name, &vNode->Get()); } \
 					break;
         VALUETYPE_LIST
 
@@ -178,7 +178,7 @@ void Pass::Set(Globals* globals) {
       /// Global uniform, takes value from the Globals object
       int offset = GlobalUniformOffsets[(UINT)uniform.globalType];
       void* source = reinterpret_cast<char*>(globals)+offset;
-      TheDrawingAPI->SetUniform(uniform.handle, uniform.type, source);
+      OpenGL->SetUniform(uniform.handle, uniform.type, source);
     }
   }
 
@@ -195,7 +195,7 @@ void Pass::Set(Globals* globals) {
       void* source = reinterpret_cast<char*>(globals) + offset;
       tex = *reinterpret_cast<Texture**>(source);
     }
-    TheDrawingAPI->SetTexture(sampler.handle, tex ? tex->mHandle : 0, i++, 
+    OpenGL->SetTexture(sampler.handle, tex ? tex->mHandle : 0, i++,
                               tex ? tex->mIsMultisampe : false);
   }
 }

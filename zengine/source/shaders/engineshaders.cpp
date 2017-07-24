@@ -41,7 +41,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   UINT newHeight = height;
   for (UINT i = 0; i <= downsampleCount; i++) {
     FrameBufferId target = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    TheDrawingAPI->BlitFrameBuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight);
+    OpenGL->BlitFrameBuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight);
     auto error = glGetError();  ASSERT(error == GL_NO_ERROR);
     width = newWidth;
     height = newHeight;
@@ -62,7 +62,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
 
   for (UINT i = 0; i < gaussIterationCount * 2; i++) {
     FrameBufferId targetBuffer = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    TheDrawingAPI->SetFrameBuffer(targetBuffer);
+    OpenGL->SetFrameBuffer(targetBuffer);
     globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];
     Pass* pass = (i % 2 == 0)
       ? &mPostProcess_GaussianBlurHorizontal : &mPostProcess_GaussianBlurVertical;
@@ -71,7 +71,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
     }
     if (i <= 1) {
       glViewport(0, 0, originalWidth, originalHeight);
-      TheDrawingAPI->Clear(true, false, 0);
+      OpenGL->Clear(true, false, 0);
       glViewport(0, 0, width, height);
     }
     pass->Set(globals);
@@ -81,7 +81,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
 
   /// Blend to original image and perform HDR multisampling correction
   
-  TheDrawingAPI->SetFrameBuffer(renderTarget->mColorBufferId);
+  OpenGL->SetFrameBuffer(renderTarget->mColorBufferId);
   size = renderTarget->GetSize();
   glViewport(0, 0, originalWidth, originalHeight);
   globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];

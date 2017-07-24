@@ -1,6 +1,9 @@
-﻿#include "drawingopengl.h"
+﻿#include <include/render/drawingapi.h>
 #include <include/base/helpers.h>
 #include <Windows.h>
+
+#define GLEW_STATIC
+#include <glew/glew.h>
 
 #ifdef _DEBUG
 void CheckGLError() {
@@ -10,8 +13,28 @@ void CheckGLError() {
 #	define CheckGLError()
 #endif
 
-struct GLVersion { GLboolean* version; const wchar_t* name; };
+struct MappedAttributeOpenGL {
+  GLuint Index;
+  GLint Size;
+  GLenum Type;
+  UINT Offset;
+};
 
+
+class AttributeMapperOpenGL: public AttributeMapper {
+public:
+  AttributeMapperOpenGL();
+  virtual ~AttributeMapperOpenGL() {}
+
+  void Set() const;
+
+  GLsizei Stride;
+
+  vector<MappedAttributeOpenGL>	MappedAttributes;
+};
+
+
+struct GLVersion { GLboolean* version; const wchar_t* name; };
 static GLVersion gOpenGLVersions[] = {
   {&__GLEW_VERSION_1_1, L"1.1"},
   {&__GLEW_VERSION_1_1, L"1.1"},
@@ -35,7 +58,7 @@ static GLVersion gOpenGLVersions[] = {
   {NULL, NULL}
 };
 
-DrawingOpenGL::DrawingOpenGL() {
+OpenGLAPI::OpenGLAPI() {
   GLenum err = glewInit();
   ASSERT(err == GLEW_OK);
   if (err != GLEW_OK) {
@@ -60,9 +83,9 @@ DrawingOpenGL::DrawingOpenGL() {
   OnContextSwitch();
 }
 
-DrawingOpenGL::~DrawingOpenGL() {}
+OpenGLAPI::~OpenGLAPI() {}
 
-void DrawingOpenGL::OnContextSwitch() {
+void OpenGLAPI::OnContextSwitch() {
   /// Set defaults (shadow values must be something different at the beginning to avoid false cache hit)
   FaceShadow = RenderState::FACE_BACK;
   SetFace(RenderState::FACE_FRONT_AND_BACK);
@@ -120,7 +143,7 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
   return true;
 }
 
-OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
+OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
   GLuint program = glCreateProgram();
 
@@ -257,19 +280,19 @@ OWNERSHIP ShaderCompileDesc* DrawingOpenGL::CreateShaderFromSource(
   return builder;
 }
 
-void DrawingOpenGL::SetShaderProgram(ShaderHandle handle) {
+void OpenGLAPI::SetShaderProgram(ShaderHandle handle) {
   glUseProgram(handle);
   CheckGLError();
 }
 
-void DrawingOpenGL::SetUniform(UniformId id, NodeType type, const void* values) {
+void OpenGLAPI::SetUniform(UniformId id, NodeType type, const void* values) {
   CheckGLError();
 
   switch (type) {
-    case NodeType::FLOAT:		glUniform1f(id, *(const GLfloat*)values);					break;
-    case NodeType::VEC2:		glUniform2fv(id, 1, (const GLfloat*)values);				break;
-    case NodeType::VEC3:		glUniform3fv(id, 1, (const GLfloat*)values);				break;
-    case NodeType::VEC4:		glUniform4fv(id, 1, (const GLfloat*)values);				break;
+    case NodeType::FLOAT:		  glUniform1f(id, *(const GLfloat*)values);					        break;
+    case NodeType::VEC2:		  glUniform2fv(id, 1, (const GLfloat*)values);				      break;
+    case NodeType::VEC3:		  glUniform3fv(id, 1, (const GLfloat*)values);				      break;
+    case NodeType::VEC4:		  glUniform4fv(id, 1, (const GLfloat*)values);				      break;
     case NodeType::MATRIX44:	glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);	break;
 
     default: NOT_IMPLEMENTED; break;
@@ -278,12 +301,12 @@ void DrawingOpenGL::SetUniform(UniformId id, NodeType type, const void* values) 
   CheckGLError();
 }
 
-void DrawingOpenGL::DestroyShaderProgram(ShaderHandle handle) {
+void OpenGLAPI::DestroyShaderProgram(ShaderHandle handle) {
   glDeleteProgram(handle);
   CheckGLError();
 }
 
-VertexBufferHandle DrawingOpenGL::CreateVertexBuffer(UINT size) {
+VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
   VertexBufferHandle handle;
   glGenBuffers(1, &handle);
   CheckGLError();
@@ -293,25 +316,25 @@ VertexBufferHandle DrawingOpenGL::CreateVertexBuffer(UINT size) {
   return handle;
 }
 
-void DrawingOpenGL::DestroyVertexBuffer(VertexBufferHandle handle) {
+void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
   glDeleteBuffers(1, &handle);
 }
 
-void* DrawingOpenGL::MapVertexBuffer(VertexBufferHandle handle) {
+void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
   BindVertexBuffer(handle);
   void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
   CheckGLError();
   return address;
 }
 
-void DrawingOpenGL::UnMapVertexBuffer(VertexBufferHandle handle) {
+void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
   /// Please don't do anything else while a buffer is mapped
   ASSERT(BoundVertexBufferShadow == handle);
 
   glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-IndexBufferHandle DrawingOpenGL::CreateIndexBuffer(UINT size) {
+IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
   IndexBufferHandle handle;
   glGenBuffers(1, &handle);
   CheckGLError();
@@ -321,25 +344,25 @@ IndexBufferHandle DrawingOpenGL::CreateIndexBuffer(UINT size) {
   return handle;
 }
 
-void DrawingOpenGL::DestroyIndexBuffer(IndexBufferHandle handle) {
+void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
   glDeleteBuffers(1, &handle);
 }
 
-void* DrawingOpenGL::MapIndexBuffer(IndexBufferHandle handle) {
+void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
   BindIndexBuffer(handle);
   void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
   CheckGLError();
   return buffer;
 }
 
-void DrawingOpenGL::UnMapIndexBuffer(IndexBufferHandle handle) {
+void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
   /// Please don't do anything else while a buffer is mapped
   ASSERT(BoundIndexBufferShadow == handle);
 
   glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 }
 
-void DrawingOpenGL::BindVertexBuffer(GLuint bufferID) {
+void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
   if (bufferID != BoundVertexBufferShadow) {
     glBindBuffer(GL_ARRAY_BUFFER, bufferID);
     CheckGLError();
@@ -347,7 +370,7 @@ void DrawingOpenGL::BindVertexBuffer(GLuint bufferID) {
   }
 }
 
-void DrawingOpenGL::BindIndexBuffer(GLuint bufferID) {
+void OpenGLAPI::BindIndexBuffer(GLuint bufferID) {
   if (bufferID != BoundIndexBufferShadow) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
     CheckGLError();
@@ -355,7 +378,7 @@ void DrawingOpenGL::BindIndexBuffer(GLuint bufferID) {
   }
 }
 
-void DrawingOpenGL::BindFrameBuffer(GLuint frameBufferID) {
+void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
   if (frameBufferID != BoundFrameBufferShadow) {
     CheckGLError();
     glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
@@ -364,7 +387,7 @@ void DrawingOpenGL::BindFrameBuffer(GLuint frameBufferID) {
   }
 }
 
-AttributeMapper* DrawingOpenGL::CreateAttributeMapper(
+AttributeMapper* OpenGLAPI::CreateAttributeMapper(
   const vector<VertexAttribute>& bufferAttribs,
   const vector<ShaderAttributeDesc>& shaderAttribs, UINT stride) {
   AttributeMapperOpenGL* mapper = new AttributeMapperOpenGL();
@@ -410,10 +433,10 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
   return 0;
 }
 
-void DrawingOpenGL::RenderIndexedMesh(IndexBufferHandle indexHandle,
-                                      UINT indexCount, VertexBufferHandle vertexHandle,
-                                      const AttributeMapper* mapper,
-                                      PrimitiveTypeEnum primitiveType) {
+void OpenGLAPI::RenderIndexedMesh(IndexBufferHandle indexHandle,
+                                  UINT indexCount, VertexBufferHandle vertexHandle,
+                                  const AttributeMapper* mapper,
+                                  PrimitiveTypeEnum primitiveType) {
   BindVertexBuffer(vertexHandle);
   static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
 
@@ -422,17 +445,17 @@ void DrawingOpenGL::RenderIndexedMesh(IndexBufferHandle indexHandle,
   CheckGLError();
 }
 
-void DrawingOpenGL::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
-                               const AttributeMapper* mapper,
-                               PrimitiveTypeEnum primitiveType) {
+void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
+                           const AttributeMapper* mapper,
+                           PrimitiveTypeEnum primitiveType) {
   BindVertexBuffer(vertexHandle);
   static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
   glDrawArrays(GetGLPrimitive(primitiveType), 0, vertexCount);
   CheckGLError();
 }
 
-void DrawingOpenGL::Render(IndexBufferHandle indexBuffer, UINT count,
-                           PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
+void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
+                       PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
   if (indexBuffer != 0) {
     BindIndexBuffer(indexBuffer);
     CheckGLError();
@@ -444,13 +467,13 @@ void DrawingOpenGL::Render(IndexBufferHandle indexBuffer, UINT count,
   }
 }
 
-void DrawingOpenGL::SetViewport(int x, int y, int width, int height,
-                                float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
+void OpenGLAPI::SetViewport(int x, int y, int width, int height,
+                            float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
   glViewport(x, y, width, height);
   glDepthRange(depthMin, depthMax);
 }
 
-void DrawingOpenGL::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 0*/) {
+void OpenGLAPI::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 0*/) {
   SetClearColor(rgbColor);
   CheckGLError();
   glClear((colorBuffer ? GL_COLOR_BUFFER_BIT : 0) |
@@ -458,20 +481,20 @@ void DrawingOpenGL::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 
   CheckGLError();
 }
 
-void DrawingOpenGL::SetRenderState(const RenderState* state) {
+void OpenGLAPI::SetRenderState(const RenderState* state) {
   SetDepthTest(state->DepthTest);
   SetFace(state->Face);
   SetBlendMode(state->BlendMode);
 }
 
-void DrawingOpenGL::SetDepthTest(bool enable) {
+void OpenGLAPI::SetDepthTest(bool enable) {
   if (enable == DepthTestEnabledShadow) return;
   if (enable) glEnable(GL_DEPTH_TEST);
   else glDisable(GL_DEPTH_TEST);
   DepthTestEnabledShadow = enable;
 }
 
-void DrawingOpenGL::SetBlendMode(RenderState::BlendModeEnum blendMode) {
+void OpenGLAPI::SetBlendMode(RenderState::BlendModeEnum blendMode) {
   if (blendMode == BlendModeShadow) return;
   switch (blendMode) {
     case RenderState::BLEND_NORMAL:
@@ -489,36 +512,36 @@ void DrawingOpenGL::SetBlendMode(RenderState::BlendModeEnum blendMode) {
   BlendModeShadow = blendMode;
 }
 
-void DrawingOpenGL::BindReadFramebuffer(GLuint framebuffer) {
+void OpenGLAPI::BindReadFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferReadBuffer == framebuffer) return;
   BoundFrameBufferReadBuffer = framebuffer;
   glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
 }
 
-void DrawingOpenGL::BindDrawFramebuffer(GLuint framebuffer) {
+void OpenGLAPI::BindDrawFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferDrawBuffer == framebuffer) return;
   BoundFrameBufferDrawBuffer = framebuffer;
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
 }
 
-void DrawingOpenGL::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
+void OpenGLAPI::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
   BindReadFramebuffer(framebuffer);
   glReadBuffer(mode);
 }
 
-void DrawingOpenGL::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
+void OpenGLAPI::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
   BindDrawFramebuffer(framebuffer);
   glDrawBuffer(mode);
 }
 
-void DrawingOpenGL::SetBlending(bool enable) {
+void OpenGLAPI::SetBlending(bool enable) {
   if (enable == BlendEnableShadow) return;
   if (enable) glEnable(GL_BLEND);
   else glDisable(GL_BLEND);
   BlendEnableShadow = enable;
 }
 
-void DrawingOpenGL::SetFace(RenderState::FaceEnum face) {
+void OpenGLAPI::SetFace(RenderState::FaceEnum face) {
   if (FaceShadow == face) return;
   switch (face) {
     case RenderState::FACE_FRONT:
@@ -540,7 +563,7 @@ inline float IntColorToFloat(UINT color) {
   return float(color) / 255.0f;
 }
 
-void DrawingOpenGL::SetClearColor(UINT clearColor) {
+void OpenGLAPI::SetClearColor(UINT clearColor) {
   if (clearColor == ClearColorShadow) return;
   glClearColor(
     IntColorToFloat((clearColor >> 16) & 0xff),
@@ -587,8 +610,8 @@ static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format
 }
 
 
-TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type,
-                                           bool isMultiSample, bool doesRepeat, bool mipmap) {
+TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
+                                       bool isMultiSample, bool doesRepeat, bool mipmap) {
   CheckGLError();
   GLuint texture;
   glGenTextures(1, &texture);
@@ -618,8 +641,8 @@ TextureHandle DrawingOpenGL::CreateTexture(int width, int height, TexelType type
 }
 
 
-void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type,
-                                   void* texelData, bool generateMipmap) {
+void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
+                               void* texelData, bool generateMipmap) {
   GLint internalFormat;
   GLenum format;
   GLenum glType;
@@ -629,8 +652,8 @@ void DrawingOpenGL::SetTextureData(UINT width, UINT height, TexelType type,
   CheckGLError();
 }
 
-void DrawingOpenGL::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
-                                      TexelType type, void* texelData) {
+void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
+                                  TexelType type, void* texelData) {
   GLint internalFormat;
   GLenum format;
   GLenum glType;
@@ -641,24 +664,24 @@ void DrawingOpenGL::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
 }
 
 
-void DrawingOpenGL::DeleteTexture(TextureHandle handle) {
+void OpenGLAPI::DeleteTexture(TextureHandle handle) {
   glDeleteTextures(1, &handle);
 }
 
-void DrawingOpenGL::UploadTextureData(TextureHandle handle, int width, int height,
-                                      TexelType type, void* texelData) {
+void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
+                                  TexelType type, void* texelData) {
   BindTexture(handle);
   SetTextureData(width, height, type, texelData, true);
 }
 
-void DrawingOpenGL::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
-                                         int width, int height, TexelType type,
-                                         void* texelData) {
+void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
+                                     int width, int height, TexelType type,
+                                     void* texelData) {
   BindTexture(handle);
   SetTextureSubData(width, x, y, height, type, texelData);
 }
 
-void DrawingOpenGL::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex, bool isRenderTarget) {
+void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex, bool isRenderTarget) {
   CheckGLError();
   SetActiveTexture(slotIndex);
   if (isRenderTarget) BindMultisampleTexture(texture);
@@ -667,10 +690,10 @@ void DrawingOpenGL::SetTexture(SamplerId sampler, TextureHandle texture, UINT sl
   CheckGLError();
 }
 
-FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
-                                               TextureHandle targetBufferA,
-                                               TextureHandle targetBufferB,
-                                               bool isMultiSample) {
+FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
+                                           TextureHandle targetBufferA,
+                                           TextureHandle targetBufferB,
+                                           bool isMultiSample) {
   CheckGLError();
   GLuint bufferId;
   glGenFramebuffers(1, &bufferId);
@@ -713,18 +736,18 @@ FrameBufferId DrawingOpenGL::CreateFrameBuffer(TextureHandle depthBuffer,
   return bufferId;
 }
 
-void DrawingOpenGL::DeleteFrameBuffer(FrameBufferId frameBufferId) {
+void OpenGLAPI::DeleteFrameBuffer(FrameBufferId frameBufferId) {
   glDeleteFramebuffers(1, &frameBufferId);
 }
 
-void DrawingOpenGL::SetFrameBuffer(FrameBufferId frameBufferid) {
+void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
   BindFrameBuffer(frameBufferid);
   CheckGLError();
 }
 
-void DrawingOpenGL::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
-                                    int srcX0, int srcY0, int srcX1, int srcY1,
-                                    int dstX0, int dstY0, int dstX1, int dstY1) {
+void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
+                                int srcX0, int srcY0, int srcX1, int srcY1,
+                                int dstX0, int dstY0, int dstX1, int dstY1) {
   BindReadFramebuffer(source);
   BindDrawFramebuffer(target);
   glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
@@ -732,36 +755,36 @@ void DrawingOpenGL::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
 
-void DrawingOpenGL::SetActiveTexture(GLuint activeTextureIndex) {
+void OpenGLAPI::SetActiveTexture(GLuint activeTextureIndex) {
   if (ActiveTextureShadow == activeTextureIndex) return;
   glActiveTexture(GL_TEXTURE0 + activeTextureIndex);
   ActiveTextureShadow = activeTextureIndex;
 }
 
 
-void DrawingOpenGL::BindTexture(GLuint textureID) {
+void OpenGLAPI::BindTexture(GLuint textureID) {
   if (BoundTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D, textureID);
   BoundTextureShadow[ActiveTextureShadow] = textureID;
 }
 
-void DrawingOpenGL::BindMultisampleTexture(GLuint textureID) {
+void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
   if (BoundMultisampleTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
   BoundMultisampleTextureShadow[ActiveTextureShadow] = textureID;
 }
 
 
-void DrawingOpenGL::SetVertexBuffer(VertexBufferHandle handle) {
+void OpenGLAPI::SetVertexBuffer(VertexBufferHandle handle) {
   BindVertexBuffer(handle);
 }
 
-void DrawingOpenGL::SetIndexBuffer(IndexBufferHandle handle) {
+void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
   BindIndexBuffer(handle);
 }
 
-void DrawingOpenGL::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset,
-                                          UINT stride) {
+void OpenGLAPI::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset,
+                                      UINT stride) {
   GLint size = 0;
   GLenum type = 0;
   switch (nodeType) {

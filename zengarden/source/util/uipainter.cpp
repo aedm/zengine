@@ -178,7 +178,7 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
 
 void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, 
                               Vec2 size) {
-  TheDrawingAPI->SetViewport(0, 0, canvasWidth, canvasHeight);
+  OpenGL->SetViewport(0, 0, canvasWidth, canvasHeight);
   mColor.Set(Vec4(1, 1, 1, 1));
 
   mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);

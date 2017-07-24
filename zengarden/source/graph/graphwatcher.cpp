@@ -36,7 +36,7 @@ GraphWatcher::~GraphWatcher() {
 
 
 void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
-  TheDrawingAPI->OnContextSwitch();
+  OpenGL->OnContextSwitch();
 
   Vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
@@ -44,7 +44,7 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   ThePainter->SetupViewport(glWidget->width(), glWidget->height(), topLeft, canvasSize);
 
   glClearColor(0.26f, 0.26f, 0.26f, 1.0f);
-  TheDrawingAPI->Clear();
+  OpenGL->Clear();
 
   /// Draw connections
   ThePainter->mColor.Set(Vec4(1, 1, 1, 1));

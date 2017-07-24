@@ -130,7 +130,7 @@ int CALLBACK WinMain(
 
   /// Initialize Zengine
   InitZengine();
-  TheDrawingAPI->OnContextSwitch();
+  OpenGL->OnContextSwitch();
   LoadEngineShaders();
   Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
   RenderTarget* renderTarget = new RenderTarget(windowSize);

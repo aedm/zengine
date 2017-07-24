@@ -35,7 +35,7 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   mRenderTarget->Resize(size);
 
   mRenderTarget->SetGBufferAsTarget(&mGlobals);
-  TheDrawingAPI->Clear(true, true, 0x303030);
+  OpenGL->Clear(true, true, 0x303030);
 
   mScene->Draw(&mGlobals);
 

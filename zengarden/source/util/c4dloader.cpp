@@ -40,7 +40,8 @@ Mesh* LoadPolyObject(PolygonObject* polyObject) {
 OWNERSHIP Mesh* Util::LoadC4DMesh(const QString& fileName) {
   NOT_IMPLEMENTED;
 
-  BaseDocument* c4dDoc = LoadDocument(Filename(fileName.toStdString().c_str()), SCENEFILTER_OBJECTS);
+  BaseDocument* c4dDoc = 
+    LoadDocument(Filename(fileName.toStdString().c_str()), SCENEFILTER_OBJECTS);
   BaseObject* object = c4dDoc->GetFirstObject();
   
   while (object) {
@@ -50,7 +51,8 @@ OWNERSHIP Mesh* Util::LoadC4DMesh(const QString& fileName) {
     melange::Matrix ml = object->GetMl(); // local matrix
     melange::Matrix mg = object->GetMg(); // global matrix
                                  // depending on the type, get specific data for the current object
-    GeData data; // universal data type, can handle all data formats (Float, Int32, Bool, Vector, ...)
+    GeData data; // universal data type, can handle all data formats 
+                 // (Float, Int32, Bool, Vector, ...)
     if (type == Ocamera) {
       object->GetParameter(CAMERAOBJECT_FOV, data);
       Float fov = data.GetFloat();

@@ -29,15 +29,15 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   if (mCopyToSecondaryBuffer.Get() >= 0.5f) {
     int width = int(globals->RenderTargetSize.x);
     int height = int(globals->RenderTargetSize.y);
-    TheDrawingAPI->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer, 
+    OpenGL->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer, 
       0, 0, width, height, 0, 0, width, height);
-    TheDrawingAPI->SetFrameBuffer(renderTarget->mSecondaryFramebuffer);
-    TheDrawingAPI->SetFrameBuffer(renderTarget->mGBufferId);
+    OpenGL->SetFrameBuffer(renderTarget->mSecondaryFramebuffer);
+    OpenGL->SetFrameBuffer(renderTarget->mGBufferId);
   }
   
   bool clearColor = mClearColorBuffer.Get() >= 0.5f;
   bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
-  TheDrawingAPI->Clear(clearColor, clearDepth);
+  OpenGL->Clear(clearColor, clearDepth);
 
   SceneNode* scene = mSceneSlot.GetNode();
   if (!scene) return;
