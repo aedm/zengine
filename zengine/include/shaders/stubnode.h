@@ -10,9 +10,14 @@ using namespace std;
 /// Macro list for global uniforms (name, type, variable/token)
 #define GLOBALUSAGE_LIST \
   ITEM(USAGE_TIME,					                      FLOAT,			  Time)					            \
+  ITEM(USAGE_MATRIX_CAMERA,			                  MATRIX44,		  Camera)					          \
+  ITEM(USAGE_MATRIX_WORLD,			                  MATRIX44,		  World)					          \
   ITEM(USAGE_MATRIX_VIEW,				                  MATRIX44,		  View)					            \
   ITEM(USAGE_MATRIX_PROJECTION,		                MATRIX44,		  Projection)				        \
   ITEM(USAGE_MATRIX_TRANSFORMATION,	              MATRIX44,		  Transformation)			      \
+  ITEM(USAGE_MATRIX_SKYLIGHT_CAMERA,              MATRIX44,		  SkylightCamera)           \
+  ITEM(USAGE_MATRIX_SKYLIGHT_PROJECTION,          MATRIX44,		  SkylightProjection)       \
+  ITEM(USAGE_MATRIX_SKYLIGHT_TRANSFORMATION,      MATRIX44,		  SkylightTransformation)   \
   ITEM(USAGE_NOISEMAP_SIZE,			                  VEC2,			    NoiseMapSize)			        \
   ITEM(USAGE_NOISEMAP_SIZE_RECIP,		              VEC2,			    NoiseMapSizeRecip)		    \
   ITEM(USAGE_RENDERTARGET_SIZE,		                VEC2,			    RenderTargetSize)		      \
@@ -28,7 +33,6 @@ using namespace std;
   ITEM(USAGE_SECONDARY_TEXTURE,                   TEXTURE,		  SecondaryTexture)         \
   ITEM(USAGE_SKYLIGHT_TEXTURE,                    TEXTURE,		  SkylightTexture)          \
   ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,              TEXTURE,		  SkylightColorTexture)     \
-  ITEM(USAGE_SKYLIGHT_PROJECTION,                 MATRIX44,		  SkylightMatrix)           \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,                TEXTURE,      PPGauss)		              \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE,     VEC2,         PPGaussPixelSize)		      \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE,  VEC2,         PPGaussRelativeSize)		  \

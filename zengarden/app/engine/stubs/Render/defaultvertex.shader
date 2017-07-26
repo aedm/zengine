@@ -10,10 +10,12 @@
 
 :output vec2 vTexCoord
 :output vec3 vNormal
+:output vec3 vPosition
 
 SHADER
 {
 	gl_Position = vec4(aPosition, 1.0) * gTransformation; 
-	vTexCoord = aTexCoord;
+  vPosition = vec4(aPosition, 1.0) * gView;
 	vNormal = (vec4(aNormal, 0.0) * gView).xyz;
+  vTexCoord = aTexCoord;
 }

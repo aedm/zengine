@@ -23,29 +23,29 @@ void CubeMeshNode::Operate() {
 
   VertexPosUVNorm vertices[] = {
     {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0)},
-    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0)},
     {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0)},
+    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0)},
     {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0)},
 
-    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0)},
     {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0)},
+    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0)},
     {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0)},
 
     {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0)},
     {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0)},
     {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0)},
     {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0)},
 
-    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0)},
     {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0)},
     {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0)},
+    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0)},
 
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1)},
     {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1)},
     {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1)},
+    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1)},
 
     {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1)},
     {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1)},
@@ -67,4 +67,17 @@ void CubeMeshNode::Operate() {
 
   mMesh->SetVertices(vertices);
   mMesh->SetIndices(indexes);
+}
+
+void CubeMeshNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+  Node::HandleMessage(message, slot, payload);
+  switch (message) {
+    case NodeMessage::VALUE_CHANGED:
+      if (mIsUpToDate) {
+        mIsUpToDate = false;
+        SendMsg(NodeMessage::VALUE_CHANGED);
+      }
+      break;
+    default: break;
+  }
 }

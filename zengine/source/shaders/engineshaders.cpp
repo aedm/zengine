@@ -24,7 +24,7 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
       || !mPostProcess_GaussianBlurVertical.isComplete()
       || !mPostProcess_GaussianBlurHorizontal_First.isComplete()
       || !mPostProcess_GaussianBlur_Blend.isComplete()) return;
-  
+
   UINT targetBufferIndex = 0;
 
   Vec2 size = renderTarget->GetSize();
@@ -54,10 +54,10 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   /// Blur the image
   size = Vec2(float(width), float(height));
   globals->GBufferSourceA = renderTarget->mGBufferA;
-  globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth), 
+  globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth),
                                       float(height) / float(originalHeight));
   globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
-  
+
   UINT gaussIterationCount = 10;
 
   for (UINT i = 0; i < gaussIterationCount * 2; i++) {
@@ -80,48 +80,73 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   }
 
   /// Blend to original image and perform HDR multisampling correction
-  
+
   OpenGL->SetFrameBuffer(renderTarget->mColorBufferId);
   size = renderTarget->GetSize();
   glViewport(0, 0, originalWidth, originalHeight);
   globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];
   mPostProcess_GaussianBlur_Blend.Set(globals);
-  mFullScreenQuad->Render(mPostProcess_GaussianBlur_Blend.GetUsedAttributes(), 1, 
+  mFullScreenQuad->Render(mPostProcess_GaussianBlur_Blend.GetUsedAttributes(), 1,
                           PRIMITIVE_TRIANGLES);
 
 
 }
 
 void EngineShaders::BuildPostProcessPasses() {
-  StubNode* fullscreenVertex = TheEngineStubs->GetStub("postproc-fullscreen-vertex");
-  StubNode* gaussianHorizontalFirst = TheEngineStubs->GetStub("postproc-gaussianblur-horizontal-first");
-  StubNode* gaussianHorizontal = TheEngineStubs->GetStub("postproc-gaussianblur-horizontal");
-  StubNode* gaussianVertical = TheEngineStubs->GetStub("postproc-gaussianblur-vertical");
-  StubNode* gaussianBlend = TheEngineStubs->GetStub("postproc-gaussianblur-blend");
+  StubNode* fullscreenVertex =
+    TheEngineStubs->GetStub("postproc-fullscreen-vertex");
+  StubNode* gaussianHorizontalFirst =
+    TheEngineStubs->GetStub("postproc-gaussianblur-horizontal-first");
+  StubNode* gaussianHorizontal =
+    TheEngineStubs->GetStub("postproc-gaussianblur-horizontal");
+  StubNode* gaussianVertical =
+    TheEngineStubs->GetStub("postproc-gaussianblur-vertical");
+  StubNode* gaussianBlend =
+    TheEngineStubs->GetStub("postproc-gaussianblur-blend");
 
   mPostProcess_GaussianBlurHorizontal.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurHorizontal.mFragmentStub.Connect(gaussianHorizontal);
-  mPostProcess_GaussianBlurHorizontal.mRenderstate.BlendMode = RenderState::BLEND_NORMAL;
-  mPostProcess_GaussianBlurHorizontal.mRenderstate.DepthTest = false;
-  mPostProcess_GaussianBlurHorizontal.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  mPostProcess_GaussianBlurHorizontal.mRenderstate.mDepthTest = false;
+  mPostProcess_GaussianBlurHorizontal.mBlendModeSlot.SetDefaultValue(1.0f); // normal
+  mPostProcess_GaussianBlurHorizontal.mFaceModeSlot.SetDefaultValue(0.5f); // f&b
+  //mPostProcess_GaussianBlurHorizontal.mRenderstate.mBlendMode =
+  //  RenderState::BlendMode::NORMAL;
+  //mPostProcess_GaussianBlurHorizontal.mRenderstate.mFaceMode =
+  //  RenderState::FaceMode::FRONT_AND_BACK;
 
   mPostProcess_GaussianBlurHorizontal_First.mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlurHorizontal_First.mFragmentStub.Connect(gaussianHorizontalFirst);
-  mPostProcess_GaussianBlurHorizontal_First.mRenderstate.BlendMode = RenderState::BLEND_NORMAL;
-  mPostProcess_GaussianBlurHorizontal_First.mRenderstate.DepthTest = false;
-  mPostProcess_GaussianBlurHorizontal_First.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  mPostProcess_GaussianBlurHorizontal_First.mFragmentStub.Connect(
+    gaussianHorizontalFirst);
+  mPostProcess_GaussianBlurHorizontal_First.mRenderstate.mDepthTest = false;
+  mPostProcess_GaussianBlurHorizontal_First.mBlendModeSlot.SetDefaultValue(1.0f);
+  mPostProcess_GaussianBlurHorizontal_First.mFaceModeSlot.SetDefaultValue(0.5f);
+
+  //mPostProcess_GaussianBlurHorizontal_First.mRenderstate.mBlendMode =
+  //  RenderState::BlendMode::NORMAL;
+  //mPostProcess_GaussianBlurHorizontal_First.mRenderstate.mFaceMode =
+  //  RenderState::FaceMode::FRONT_AND_BACK;
 
   mPostProcess_GaussianBlurVertical.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurVertical.mFragmentStub.Connect(gaussianVertical);
-  mPostProcess_GaussianBlurVertical.mRenderstate.BlendMode = RenderState::BLEND_NORMAL;
-  mPostProcess_GaussianBlurVertical.mRenderstate.DepthTest = false;
-  mPostProcess_GaussianBlurVertical.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  mPostProcess_GaussianBlurVertical.mRenderstate.mDepthTest = false;
+  mPostProcess_GaussianBlurVertical.mBlendModeSlot.SetDefaultValue(1.0f);
+  mPostProcess_GaussianBlurVertical.mFaceModeSlot.SetDefaultValue(0.5f);
+
+  //mPostProcess_GaussianBlurVertical.mRenderstate.mBlendMode =
+  //  RenderState::BlendMode::NORMAL;
+  //mPostProcess_GaussianBlurVertical.mRenderstate.mFaceMode =
+  //  RenderState::FaceMode::FRONT_AND_BACK;
 
   mPostProcess_GaussianBlur_Blend.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlur_Blend.mFragmentStub.Connect(gaussianBlend);
-  mPostProcess_GaussianBlur_Blend.mRenderstate.BlendMode = RenderState::BLEND_NORMAL;
-  mPostProcess_GaussianBlur_Blend.mRenderstate.DepthTest = false;
-  mPostProcess_GaussianBlur_Blend.mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
+  mPostProcess_GaussianBlur_Blend.mRenderstate.mDepthTest = false;
+  mPostProcess_GaussianBlur_Blend.mBlendModeSlot.SetDefaultValue(1.0f);
+  mPostProcess_GaussianBlur_Blend.mFaceModeSlot.SetDefaultValue(0.5f);
+
+  //mPostProcess_GaussianBlur_Blend.mRenderstate.mBlendMode =
+  //  RenderState::BlendMode::NORMAL;
+  //mPostProcess_GaussianBlur_Blend.mRenderstate.mFaceMode =
+  //  RenderState::FaceMode::FRONT_AND_BACK;
 
   /// Fullscreen quad
   IndexEntry quadIndices[] = {0, 1, 2, 2, 1, 3};

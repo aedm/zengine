@@ -17,21 +17,21 @@ static const int MAX_COMBINED_TEXTURE_SLOTS = 48;
 
 /// All states of the rendering pipeline
 struct RenderState {
-  enum FaceEnum {
-    FACE_FRONT,
-    FACE_BACK,
-    FACE_FRONT_AND_BACK
+  enum class FaceMode {
+    FRONT,
+    BACK,
+    FRONT_AND_BACK
   };
 
-  enum BlendModeEnum {
-    BLEND_NORMAL,
-    BLEND_ADDITIVE,
-    BLEND_ALPHA,
+  enum class BlendMode {
+    NORMAL,
+    ADDITIVE,
+    ALPHA,
   };
 
-  bool DepthTest;
-  FaceEnum Face;
-  BlendModeEnum BlendMode;
+  bool mDepthTest;
+  FaceMode mFaceMode;
+  BlendMode mBlendMode;
 };
 
 
@@ -193,11 +193,11 @@ private:
   void SetActiveTexture(UINT ActiveTextureIndex); // silly OpenGL.
 
   void SetDepthTest(bool Enable);
-  void SetFace(RenderState::FaceEnum Face);
+  void SetFaceMode(RenderState::FaceMode faceMode);
   void SetClearColor(UINT ClearColor);
 
   void SetBlending(bool Enable);
-  void SetBlendMode(RenderState::BlendModeEnum BlendMode);
+  void SetBlendMode(RenderState::BlendMode blendMode);
 
   /// Same as glNamedFramebufferXXXBuffer in OpenGL 4.5, but Intel doesn't fckn support that
   void BindReadFramebuffer(FrameBufferId framebuffer);
@@ -218,9 +218,9 @@ private:
   TextureHandle ActiveTextureShadow;
 
   bool DepthTestEnabledShadow;
-  RenderState::FaceEnum FaceShadow;
-  RenderState::BlendModeEnum BlendModeShadow;
-  bool BlendEnableShadow;
+  RenderState::FaceMode mFaceMode;
+  RenderState::BlendMode mBlendMode;
+  bool mBlendEnabled;
   UINT ClearColorShadow;
 
   RenderState* DefaultRenderState;

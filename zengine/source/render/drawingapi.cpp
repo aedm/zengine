@@ -83,16 +83,19 @@ OpenGLAPI::OpenGLAPI() {
   OnContextSwitch();
 }
 
+
 OpenGLAPI::~OpenGLAPI() {}
 
-void OpenGLAPI::OnContextSwitch() {
-  /// Set defaults (shadow values must be something different at the beginning to avoid false cache hit)
-  FaceShadow = RenderState::FACE_BACK;
-  SetFace(RenderState::FACE_FRONT_AND_BACK);
 
-  BlendModeShadow = RenderState::BLEND_ADDITIVE;
-  BlendEnableShadow = true;
-  SetBlendMode(RenderState::BLEND_NORMAL);
+void OpenGLAPI::OnContextSwitch() {
+  /// Set defaults (shadow values must be something different at the beginning 
+  /// to avoid false cache hit)
+  mFaceMode = RenderState::FaceMode::BACK;
+  SetFaceMode(RenderState::FaceMode::FRONT_AND_BACK);
+
+  mBlendMode = RenderState::BlendMode::ADDITIVE;
+  mBlendEnabled = true;
+  SetBlendMode(RenderState::BlendMode::NORMAL);
 
   DepthTestEnabledShadow = true;
   SetDepthTest(false);
@@ -114,6 +117,7 @@ void OpenGLAPI::OnContextSwitch() {
   }
 }
 
+
 static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
                                    const char* source) {
   /// Create shader object, set the source, and compile
@@ -130,9 +134,7 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
     char *log = new char[length];
     glGetShaderInfoLog(shader, length, &result, log);
-
     ERR(log);
-
     glDeleteShader(shader);
     return false;
   }
@@ -142,6 +144,7 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
   CheckGLError();
   return true;
 }
+
 
 OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
@@ -280,31 +283,45 @@ OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
   return builder;
 }
 
+
 void OpenGLAPI::SetShaderProgram(ShaderHandle handle) {
   glUseProgram(handle);
   CheckGLError();
 }
 
+
 void OpenGLAPI::SetUniform(UniformId id, NodeType type, const void* values) {
   CheckGLError();
 
   switch (type) {
-    case NodeType::FLOAT:		  glUniform1f(id, *(const GLfloat*)values);					        break;
-    case NodeType::VEC2:		  glUniform2fv(id, 1, (const GLfloat*)values);				      break;
-    case NodeType::VEC3:		  glUniform3fv(id, 1, (const GLfloat*)values);				      break;
-    case NodeType::VEC4:		  glUniform4fv(id, 1, (const GLfloat*)values);				      break;
-    case NodeType::MATRIX44:	glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);	break;
-
-    default: NOT_IMPLEMENTED; break;
+    case NodeType::FLOAT:		  
+      glUniform1f(id, *(const GLfloat*)values);					        
+      break;
+    case NodeType::VEC2:		  
+      glUniform2fv(id, 1, (const GLfloat*)values);				      
+      break;
+    case NodeType::VEC3:		  
+      glUniform3fv(id, 1, (const GLfloat*)values);				      
+      break;
+    case NodeType::VEC4:		  
+      glUniform4fv(id, 1, (const GLfloat*)values);				      
+      break;
+    case NodeType::MATRIX44:	
+      glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);	
+      break;
+    default: 
+      NOT_IMPLEMENTED; 
+      break;
   }
-
   CheckGLError();
 }
+
 
 void OpenGLAPI::DestroyShaderProgram(ShaderHandle handle) {
   glDeleteProgram(handle);
   CheckGLError();
 }
+
 
 VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
   VertexBufferHandle handle;
@@ -316,9 +333,11 @@ VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
   return handle;
 }
 
+
 void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
   glDeleteBuffers(1, &handle);
 }
+
 
 void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
   BindVertexBuffer(handle);
@@ -327,12 +346,13 @@ void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
   return address;
 }
 
+
 void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
   /// Please don't do anything else while a buffer is mapped
   ASSERT(BoundVertexBufferShadow == handle);
-
   glUnmapBuffer(GL_ARRAY_BUFFER);
 }
+
 
 IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
   IndexBufferHandle handle;
@@ -344,9 +364,11 @@ IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
   return handle;
 }
 
+
 void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
   glDeleteBuffers(1, &handle);
 }
+
 
 void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
   BindIndexBuffer(handle);
@@ -355,12 +377,13 @@ void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
   return buffer;
 }
 
+
 void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
   /// Please don't do anything else while a buffer is mapped
   ASSERT(BoundIndexBufferShadow == handle);
-
   glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 }
+
 
 void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
   if (bufferID != BoundVertexBufferShadow) {
@@ -370,6 +393,7 @@ void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
   }
 }
 
+
 void OpenGLAPI::BindIndexBuffer(GLuint bufferID) {
   if (bufferID != BoundIndexBufferShadow) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
@@ -377,6 +401,7 @@ void OpenGLAPI::BindIndexBuffer(GLuint bufferID) {
     BoundIndexBufferShadow = bufferID;
   }
 }
+
 
 void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
   if (frameBufferID != BoundFrameBufferShadow) {
@@ -386,6 +411,7 @@ void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
     BoundFrameBufferShadow = frameBufferID;
   }
 }
+
 
 AttributeMapper* OpenGLAPI::CreateAttributeMapper(
   const vector<VertexAttribute>& bufferAttribs,
@@ -409,9 +435,7 @@ AttributeMapper* OpenGLAPI::CreateAttributeMapper(
             break;
         }
         attr.Offset = bufferAttr.Offset;
-
         mapper->MappedAttributes.push_back(attr);
-
         found = true;
         break;
       }
@@ -423,6 +447,7 @@ AttributeMapper* OpenGLAPI::CreateAttributeMapper(
   return mapper;
 }
 
+
 GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
   switch (primitiveType) {
     case PRIMITIVE_LINES:		return GL_LINES;
@@ -432,6 +457,7 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
   SHOULD_NOT_HAPPEN;
   return 0;
 }
+
 
 void OpenGLAPI::RenderIndexedMesh(IndexBufferHandle indexHandle,
                                   UINT indexCount, VertexBufferHandle vertexHandle,
@@ -445,6 +471,7 @@ void OpenGLAPI::RenderIndexedMesh(IndexBufferHandle indexHandle,
   CheckGLError();
 }
 
+
 void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
                            const AttributeMapper* mapper,
                            PrimitiveTypeEnum primitiveType) {
@@ -453,6 +480,7 @@ void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
   glDrawArrays(GetGLPrimitive(primitiveType), 0, vertexCount);
   CheckGLError();
 }
+
 
 void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
                        PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
@@ -467,11 +495,13 @@ void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
   }
 }
 
+
 void OpenGLAPI::SetViewport(int x, int y, int width, int height,
                             float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
   glViewport(x, y, width, height);
   glDepthRange(depthMin, depthMax);
 }
+
 
 void OpenGLAPI::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 0*/) {
   SetClearColor(rgbColor);
@@ -481,11 +511,13 @@ void OpenGLAPI::Clear(bool colorBuffer, bool depthBuffer, UINT rgbColor /*= 0*/)
   CheckGLError();
 }
 
+
 void OpenGLAPI::SetRenderState(const RenderState* state) {
-  SetDepthTest(state->DepthTest);
-  SetFace(state->Face);
-  SetBlendMode(state->BlendMode);
+  SetDepthTest(state->mDepthTest);
+  SetFaceMode(state->mFaceMode);
+  SetBlendMode(state->mBlendMode);
 }
+
 
 void OpenGLAPI::SetDepthTest(bool enable) {
   if (enable == DepthTestEnabledShadow) return;
@@ -494,23 +526,25 @@ void OpenGLAPI::SetDepthTest(bool enable) {
   DepthTestEnabledShadow = enable;
 }
 
-void OpenGLAPI::SetBlendMode(RenderState::BlendModeEnum blendMode) {
-  if (blendMode == BlendModeShadow) return;
+
+void OpenGLAPI::SetBlendMode(RenderState::BlendMode blendMode) {
+  if (blendMode == mBlendMode) return;
   switch (blendMode) {
-    case RenderState::BLEND_NORMAL:
+    case RenderState::BlendMode::NORMAL:
       SetBlending(false);
       break;
-    case RenderState::BLEND_ADDITIVE:
+    case RenderState::BlendMode::ADDITIVE:
       SetBlending(true);
       glBlendFunc(GL_ONE, GL_ONE);
       break;
-    case RenderState::BLEND_ALPHA:
+    case RenderState::BlendMode::ALPHA:
       SetBlending(true);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       break;
   }
-  BlendModeShadow = blendMode;
+  mBlendMode = blendMode;
 }
+
 
 void OpenGLAPI::BindReadFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferReadBuffer == framebuffer) return;
@@ -518,50 +552,57 @@ void OpenGLAPI::BindReadFramebuffer(GLuint framebuffer) {
   glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
 }
 
+
 void OpenGLAPI::BindDrawFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferDrawBuffer == framebuffer) return;
   BoundFrameBufferDrawBuffer = framebuffer;
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
 }
 
+
 void OpenGLAPI::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
   BindReadFramebuffer(framebuffer);
   glReadBuffer(mode);
 }
+
 
 void OpenGLAPI::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
   BindDrawFramebuffer(framebuffer);
   glDrawBuffer(mode);
 }
 
+
 void OpenGLAPI::SetBlending(bool enable) {
-  if (enable == BlendEnableShadow) return;
+  if (enable == mBlendEnabled) return;
   if (enable) glEnable(GL_BLEND);
   else glDisable(GL_BLEND);
-  BlendEnableShadow = enable;
+  mBlendEnabled = enable;
 }
 
-void OpenGLAPI::SetFace(RenderState::FaceEnum face) {
-  if (FaceShadow == face) return;
-  switch (face) {
-    case RenderState::FACE_FRONT:
+
+void OpenGLAPI::SetFaceMode(RenderState::FaceMode faceMode) {
+  if (mFaceMode == faceMode) return;
+  switch (faceMode) {
+    case RenderState::FaceMode::FRONT:
       glEnable(GL_CULL_FACE);
       glCullFace(GL_FRONT);
       break;
-    case RenderState::FACE_FRONT_AND_BACK:
+    case RenderState::FaceMode::FRONT_AND_BACK:
       glDisable(GL_CULL_FACE);
       break;
-    case RenderState::FACE_BACK:
+    case RenderState::FaceMode::BACK:
       glEnable(GL_CULL_FACE);
-      glCullFace(GL_FRONT);
+      glCullFace(GL_BACK);
       break;
   }
-  FaceShadow = face;
+  mFaceMode = faceMode;
 }
+
 
 inline float IntColorToFloat(UINT color) {
   return float(color) / 255.0f;
 }
+
 
 void OpenGLAPI::SetClearColor(UINT clearColor) {
   if (clearColor == ClearColorShadow) return;
@@ -624,16 +665,21 @@ TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
     GLint internalFormat;
     GLenum format, glType;
     GetTextureType(type, internalFormat, format, glType);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 
+                            ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
                             internalFormat, width, height, false);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
   } else {
     BindTexture(texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+                    mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+    if (type == TexelType::DEPTH32F) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    }
     SetTextureData(width, height, type, NULL, mipmap);
   }
   CheckGLError();
@@ -647,10 +693,12 @@ void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
   GLenum format;
   GLenum glType;
   GetTextureType(type, internalFormat, format, glType);
-  glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType, texelData);
+  glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType, 
+               texelData);
   if (generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
   CheckGLError();
 }
+
 
 void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
                                   TexelType type, void* texelData) {
@@ -668,11 +716,13 @@ void OpenGLAPI::DeleteTexture(TextureHandle handle) {
   glDeleteTextures(1, &handle);
 }
 
+
 void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
                                   TexelType type, void* texelData) {
   BindTexture(handle);
   SetTextureData(width, height, type, texelData, true);
 }
+
 
 void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
                                      int width, int height, TexelType type,
@@ -681,7 +731,9 @@ void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
   SetTextureSubData(width, x, y, height, type, texelData);
 }
 
-void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex, bool isRenderTarget) {
+
+void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex, 
+                           bool isRenderTarget) {
   CheckGLError();
   SetActiveTexture(slotIndex);
   if (isRenderTarget) BindMultisampleTexture(texture);
@@ -689,6 +741,7 @@ void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIn
   glUniform1i(sampler, slotIndex);
   CheckGLError();
 }
+
 
 FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
                                            TextureHandle targetBufferA,
@@ -710,7 +763,8 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
     /// No target buffer
   } else if (!targetBufferB) {
     CheckGLError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, targetBufferA, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, 
+                           targetBufferA, 0);
     GLuint attachments[] = {GL_COLOR_ATTACHMENT0};
     CheckGLError();
     glDrawBuffers(1, attachments);
@@ -736,14 +790,17 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
   return bufferId;
 }
 
+
 void OpenGLAPI::DeleteFrameBuffer(FrameBufferId frameBufferId) {
   glDeleteFramebuffers(1, &frameBufferId);
 }
+
 
 void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
   BindFrameBuffer(frameBufferid);
   CheckGLError();
 }
+
 
 void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
                                 int srcX0, int srcY0, int srcX1, int srcY1,
@@ -754,6 +811,7 @@ void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
                     dstX0, dstY0, dstX1, dstY1,
                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
+
 
 void OpenGLAPI::SetActiveTexture(GLuint activeTextureIndex) {
   if (ActiveTextureShadow == activeTextureIndex) return;
@@ -768,6 +826,7 @@ void OpenGLAPI::BindTexture(GLuint textureID) {
   BoundTextureShadow[ActiveTextureShadow] = textureID;
 }
 
+
 void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
   if (BoundMultisampleTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
@@ -779,9 +838,11 @@ void OpenGLAPI::SetVertexBuffer(VertexBufferHandle handle) {
   BindVertexBuffer(handle);
 }
 
+
 void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
   BindIndexBuffer(handle);
 }
+
 
 void OpenGLAPI::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset,
                                       UINT stride) {
@@ -800,9 +861,11 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset
   glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)size_t(offset));
 }
 
+
 AttributeMapperOpenGL::AttributeMapperOpenGL() {
   Stride = 0;
 }
+
 
 void AttributeMapperOpenGL::Set() const {
   for (const MappedAttributeOpenGL& attr : MappedAttributes) {

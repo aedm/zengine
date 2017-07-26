@@ -9,16 +9,20 @@ REGISTER_NODECLASS(Pass, "Pass");
 
 static SharedString VertesStubSlotName = make_shared<string>("Vertex shader");
 static SharedString FragmentStubSlotName = make_shared<string>("Fragment shader");
+static SharedString FaceModeSlotName = make_shared<string>("Face mode");
+static SharedString BlendModeSlotName = make_shared<string>("Blending");
 
 Pass::Pass()
   : Node(NodeType::PASS)
   , mVertexStub(this, VertesStubSlotName)
   , mFragmentStub(this, FragmentStubSlotName)
+  , mFaceModeSlot(this, FaceModeSlotName)
+  , mBlendModeSlot(this, BlendModeSlotName)
   , mHandle(-1) 
 {
-  mRenderstate.DepthTest = true;
-  mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
-  mRenderstate.BlendMode = RenderState::BLEND_ALPHA;
+  mRenderstate.mDepthTest = true;
+  mRenderstate.mFaceMode = RenderState::FaceMode::FRONT;
+  mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
 }
 
 Pass::~Pass() 
@@ -34,8 +38,8 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
         SafeDelete(mVertexShaderMetadata);
         SafeDelete(mFragmentShaderMetadata);
         mIsUpToDate = false;
-        ReceiveMessage(NodeMessage::NEEDS_REDRAW);
-      }
+      } 
+      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }
@@ -153,6 +157,18 @@ void Pass::Operate() {
 
 void Pass::Set(Globals* globals) {
   ASSERT(mHandle != -1);
+
+  RenderState::FaceMode faceMode = RenderState::FaceMode::FRONT;
+  float faceVal = mFaceModeSlot.Get();
+  if (faceVal > 0.666f) faceMode = RenderState::FaceMode::BACK;
+  else if (faceVal > 0.333f) faceMode = RenderState::FaceMode::FRONT_AND_BACK;
+  mRenderstate.mFaceMode = faceMode;
+
+  RenderState::BlendMode blendMode = RenderState::BlendMode::ALPHA;
+  float blendVal = mBlendModeSlot.Get();
+  if (blendVal > 0.666f) blendMode = RenderState::BlendMode::NORMAL;
+  else if (blendVal > 0.333f) blendMode = RenderState::BlendMode::ADDITIVE;
+  mRenderstate.mBlendMode = blendMode;
 
   OpenGL->SetRenderState(&mRenderstate);
   OpenGL->SetShaderProgram(mHandle);

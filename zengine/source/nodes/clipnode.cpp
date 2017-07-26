@@ -43,7 +43,7 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   if (!scene) return;
 
   scene->SetSceneTime(clipTime);
-  scene->Draw(globals);
+  scene->Draw(renderTarget, globals);
 }
 
 void ClipNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {

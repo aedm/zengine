@@ -37,7 +37,7 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   mRenderTarget->SetGBufferAsTarget(&mGlobals);
   OpenGL->Clear(true, true, 0x303030);
 
-  mScene->Draw(&mGlobals);
+  mScene->Draw(mRenderTarget, &mGlobals);
 
   /// Apply post-process to scene to framebuffer
   TheEngineShaders->ApplyPostProcess(mRenderTarget, &mGlobals);
@@ -66,9 +66,9 @@ void GeneralSceneWatcher::Init()
   Pass* defaultPass = new Pass();
   defaultPass->mFragmentStub.Connect(defaultFragment);
   defaultPass->mVertexStub.Connect(defaultVertex);
-  defaultPass->mRenderstate.DepthTest = true;
-  defaultPass->mRenderstate.Face = RenderState::FACE_FRONT_AND_BACK;
-  defaultPass->mRenderstate.BlendMode = RenderState::BLEND_ALPHA;
+  defaultPass->mRenderstate.mDepthTest = true;
+  defaultPass->mRenderstate.mFaceMode = RenderState::FaceMode::FRONT_AND_BACK;
+  defaultPass->mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
 
   mDefaultMaterial = new Material();
   mDefaultMaterial->mSolidPass.Connect(defaultPass);

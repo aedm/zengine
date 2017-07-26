@@ -3,6 +3,8 @@
 #include <include/resources/resourcemanager.h>
 
 
+static const int ShadowMapSize = 2048;
+
 RenderTarget::RenderTarget(Vec2 size)
   : mSize(0, 0) {
   Resize(size);
@@ -30,6 +32,18 @@ void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
   OpenGL->SetFrameBuffer(mColorBufferId);
 }
 
+void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
+  globals->RenderTargetSize = Vec2(ShadowMapSize, ShadowMapSize);
+  globals->RenderTargetSizeRecip = Vec2(1.0f / float(ShadowMapSize), 
+                                        1.0f / float(ShadowMapSize));
+  globals->DepthBufferSource = 0;
+  globals->GBufferSourceA = 0;
+  globals->GBufferSampleCount = 1;
+  globals->SecondaryTexture = 0;
+  OpenGL->SetFrameBuffer(mShadowBufferId);
+  OpenGL->SetViewport(0, 0, ShadowMapSize, ShadowMapSize);
+}
+
 void RenderTarget::Resize(Vec2 size) {
   if (size == mSize) return;
   DropResources();
@@ -43,19 +57,24 @@ void RenderTarget::Resize(Vec2 size) {
     width, height, TexelType::DEPTH32F, nullptr, true, false);
   mGBufferA = TheResourceManager->CreateGPUTexture(
     width, height, TexelType::ARGB16F, nullptr, true, false);
-  mGBufferId = OpenGL->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
+  mGBufferId = 
+    OpenGL->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
 
   /// Create secondary framebuffer
   mSecondaryTexture = TheResourceManager->CreateGPUTexture(
     width, height, TexelType::ARGB16F, nullptr, false, false);
-  mSecondaryFramebuffer = OpenGL->CreateFrameBuffer(0, mSecondaryTexture->mHandle, 0, false);
+  mSecondaryFramebuffer = 
+    OpenGL->CreateFrameBuffer(0, mSecondaryTexture->mHandle, 0, false);
 
   /// Create shadow map
-  mShadowTexture = TheResourceManager->CreateGPUTexture(
-    512, 512, TexelType::DEPTH32F, nullptr, false, false);
-  mShadowColorBuffer = TheResourceManager->CreateGPUTexture(
-    512, 512, TexelType::ARGB16F, nullptr, false, false);
-  mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture->mHandle, mShadowColorBuffer->mHandle, 0, false);
+  if (mShadowBufferId == 0) {
+    mShadowTexture = TheResourceManager->CreateGPUTexture(
+      ShadowMapSize, ShadowMapSize, TexelType::DEPTH32F, nullptr, false, false);
+    mShadowColorBuffer = TheResourceManager->CreateGPUTexture(
+      ShadowMapSize, ShadowMapSize, TexelType::ARGB16F, nullptr, false, false);
+    mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture->mHandle,
+                                                mShadowColorBuffer->mHandle, 0, false);
+  }
 
   /// Create gaussian ping-pong textures
   for (int i = 0; i < 3; i++) {

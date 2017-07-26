@@ -18,30 +18,28 @@ SceneNode::SceneNode()
 SceneNode::~SceneNode() {
 }
 
-void SceneNode::Draw(Globals* globals) {
+void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   CameraNode* camera = mCamera.GetNode();
   if (camera == nullptr) return;
-  camera->SetupGlobals(globals);
-
-  /// Skylight projection
-  Vec3 s = mShadowMapSize.Get();
-  Vec3 dir = mSkyLightDirection.Get();
-  globals->SkylightMatrix = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z)) * Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
-  //Vec4 test(1, 1, 1, 1);
-  //Vec4 tr = test * globals->SkylightMatrix;
 
   /// Skylight shadow
-  //NOT_IMPLEMENTED;
-  //OpenGL->SetFrameBuffer(renderTarget->mShadowBufferId);
-  //OpenGL->SetViewport(0, 0, 512, 512);
-  //OpenGL->Clear(true, true, 0xff00ff80);
-  //RenderDrawables(globals, PassType::SHADOW);
+  renderTarget->SetShadowBufferAsTarget(globals);
+  OpenGL->Clear(true, true, 0xff00ff80);
+  Vec3 s = mShadowMapSize.Get();
+  Vec3 dir = mSkyLightDirection.Get();
+  globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
+  globals->Camera = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z));
+  globals->World.LoadIdentity();
+  globals->SkylightProjection = globals->Projection;
+  globals->SkylightCamera = globals->Camera;
+  RenderDrawables(globals, PassType::SHADOW);
 
   /// Draw to G-Buffer
-  //renderTarget->SetGBufferAsTarget(&mGlobals);
-  ////mGlobals.SkylightTexture = renderTarget->mShadowTexture;
-  ////mGlobals.SkylightColorTexture = renderTarget->mShadowColorBuffer;
-  //TheDrawingAPI->Clear(true, true, 0x303030);
+  renderTarget->SetGBufferAsTarget(globals);
+  OpenGL->Clear(true, true, 0x303030);
+  camera->SetupGlobals(globals);
+  globals->SkylightTexture = renderTarget->mShadowTexture;
+  globals->SkylightColorTexture = renderTarget->mShadowColorBuffer;
   RenderDrawables(globals, PassType::SOLID);
 }
 

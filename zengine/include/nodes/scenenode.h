@@ -18,7 +18,7 @@ public:
   Vec3Slot mShadowMapSize;
   Vec3Slot mSkyLightDirection;
 
-  void Draw(Globals* globals);
+  void Draw(RenderTarget* renderTarget, Globals* globals);
 
   /// Sets the clip-relative time to all SceneTimeNode dependencies
   void SetSceneTime(float seconds);

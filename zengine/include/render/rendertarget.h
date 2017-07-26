@@ -14,6 +14,8 @@ public:
   /// Sets the final color buffer as render target, G-Buffer as source
   void SetColorBufferAsTarget(Globals* globals);
 
+  void SetShadowBufferAsTarget(Globals* globals);
+
   void Resize(Vec2 size);
   Vec2 GetSize();
 
@@ -23,7 +25,7 @@ public:
 
   /// G-buffer
   /// A: [4x16F] RGB: HDR final color, A: unused
-  /// B: [1x32] R: Last chain link in A-buffer linked list
+  /// B: [1x32] R: Last chain link in A-buffer linked list (todo)
   FrameBufferId mGBufferId = 0;
   Texture* mDepthBuffer = nullptr;
   Texture* mGBufferA = nullptr;
@@ -34,7 +36,7 @@ public:
   //Texture* mSecondaryDepth = nullptr;
 
   /// Final color buffer (framebuffer or texture)
-  /// Default frambuffer id is 0
+  /// Default framebuffer id is 0
   FrameBufferId mColorBufferId = 0;
 
   /// A-buffer, holds OIT fragments

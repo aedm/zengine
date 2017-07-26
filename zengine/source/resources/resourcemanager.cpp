@@ -103,8 +103,10 @@ Texture* ResourceManager::CreateTexture(int width, int height, TexelType type,
 }
 
 Texture* ResourceManager::CreateGPUTexture(int width, int height, TexelType type, 
-                                           void* texelData, bool multiSample, bool doesRepeat) {
-  TextureHandle handle = OpenGL->CreateTexture(width, height, type, multiSample, doesRepeat, false);
+                                           void* texelData, bool multiSample,
+                                           bool doesRepeat) {
+  TextureHandle handle = 
+    OpenGL->CreateTexture(width, height, type, multiSample, doesRepeat, false);
   if (texelData) {
     OpenGL->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling

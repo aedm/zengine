@@ -43,18 +43,18 @@ UiPainter::UiPainter() {
   /// Shaders
   Pass* pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
   ConnectToStubParameter(pass, false, "uColor", &mColor);
-  pass->mRenderstate.DepthTest = false;
+  pass->mRenderstate.mDepthTest = false;
   mSolidColorMaterial.mSolidPass.Connect(pass);
   
   pass = Util::LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
   ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
-  pass->mRenderstate.DepthTest = false;
+  pass->mRenderstate.mDepthTest = false;
   mSolidTextureMaterial.mSolidPass.Connect(pass);
 
   pass = Util::LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
   ConnectToStubParameter(pass, false, "uColor", &mColor);
   ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
-  pass->mRenderstate.DepthTest = false;
+  pass->mRenderstate.mDepthTest = false;
   mTextTextureMaterial.mSolidPass.Connect(pass);
 
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
@@ -185,7 +185,8 @@ void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft,
   mGlobals.RenderTargetSizeRecip = 
     Vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
 
-  mGlobals.View.LoadIdentity();
+  mGlobals.Camera.LoadIdentity();
+  mGlobals.World.LoadIdentity();
   mGlobals.Projection = 
     Matrix::Ortho(topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y);
   mGlobals.Transformation = mGlobals.Projection;

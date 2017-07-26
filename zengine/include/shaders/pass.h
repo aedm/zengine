@@ -28,6 +28,8 @@ public:
 
   StubSlot mFragmentStub;
   StubSlot mVertexStub;
+  FloatSlot mFaceModeSlot;
+  FloatSlot mBlendModeSlot;
 
   void Set(Globals* globals);
 

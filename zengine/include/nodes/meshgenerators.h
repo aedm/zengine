@@ -12,4 +12,7 @@ protected:
   FloatSlot mSizeZ;
 
   virtual void Operate() override;
+
+  /// Handle received messages
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
 };
