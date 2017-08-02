@@ -33,6 +33,7 @@ using namespace std;
   ITEM(USAGE_SECONDARY_TEXTURE,                   TEXTURE,		  SecondaryTexture)         \
   ITEM(USAGE_SKYLIGHT_TEXTURE,                    TEXTURE,		  SkylightTexture)          \
   ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,              TEXTURE,		  SkylightColorTexture)     \
+  ITEM(USAGE_SKYLIGHT_TEXTURE_SIZE_RECIP,         FLOAT,        SkylightTextureSizeRecip) \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,                TEXTURE,      PPGauss)		              \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE,     VEC2,         PPGaussPixelSize)		      \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE,  VEC2,         PPGaussRelativeSize)		  \

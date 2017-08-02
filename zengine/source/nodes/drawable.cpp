@@ -7,6 +7,7 @@ static SharedString MeshSlotName = make_shared<string>("Mesh");
 static SharedString MoveSlotName = make_shared<string>("Move");
 static SharedString RotateSlotName = make_shared<string>("Rotate");
 static SharedString ChildrenSlotName = make_shared<string>("Children");
+static SharedString ScaleSlotName = make_shared<string>("Scale");
 static SharedString InstancesSlotName = make_shared<string>("Instances");
 
 Drawable::Drawable()
@@ -16,6 +17,7 @@ Drawable::Drawable()
   , mMove(this, MoveSlotName)
   , mRotate(this, RotateSlotName)
   , mChildren(this, ChildrenSlotName, true)
+  , mScale(this, ScaleSlotName)
   , mInstances(this, InstancesSlotName)
 {
   mInstances.SetDefaultValue(1);
@@ -30,15 +32,21 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
 
   if (mChildren.GetMultiNodes().size() == 0 && !(material && meshNode)) return;
 
+  Vec3 movv = mMove.Get();
+  if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
+    Matrix move = Matrix::Translate(mMove.Get());
+    globals.World = globals.World * move;
+  }
   Vec3 rotv = mRotate.Get();
   if (rotv.x != 0 || rotv.y != 0 || rotv.z != 0) {
     Matrix rotate = Matrix::Rotate(Quaternion::FromEuler(rotv.x, rotv.y, rotv.z));
     globals.World = globals.World * rotate;
   }
-  Vec3 movv = mMove.Get();
-  if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
-    Matrix move = Matrix::Translate(mMove.Get());
-    globals.World = globals.World * move;
+  float scalev = mScale.Get();
+  if (scalev != 0.0f) {
+    float s = powf(2.0f, scalev);
+    Matrix scale = Matrix::Scale(Vec3(s, s, s));
+    globals.World = globals.World * scale;
   }
   
   globals.View = globals.Camera * globals.World;

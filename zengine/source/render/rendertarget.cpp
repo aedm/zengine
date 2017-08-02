@@ -22,6 +22,7 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   globals->GBufferSourceA = 0;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
   globals->SecondaryTexture = mSecondaryTexture;
+  globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
   OpenGL->SetFrameBuffer(mGBufferId);
   OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
@@ -40,6 +41,7 @@ void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
   globals->GBufferSourceA = 0;
   globals->GBufferSampleCount = 1;
   globals->SecondaryTexture = 0;
+  globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
   OpenGL->SetFrameBuffer(mShadowBufferId);
   OpenGL->SetViewport(0, 0, ShadowMapSize, ShadowMapSize);
 }

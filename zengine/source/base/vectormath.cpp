@@ -333,9 +333,16 @@ Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio
 Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) {
   /// Generate view matrix for position camera 	
   /// http://wiki.delphigl.com/index.php/gluLookAt
+  const float epsilon = 0.001f;
 
   Vec3 f = -(target - position).Normal();
   Vec3 s = -f.Cross(up.Normal());
+  float sl = s.Length();
+  if (fabs(sl) < epsilon) {
+    s = -f.Cross(Vec3(up.y, up.z, up.x).Normal());
+    sl = s.Length();
+  }
+  s /= sl;
   Vec3 u = -s.Cross(f);
 
   Matrix m;

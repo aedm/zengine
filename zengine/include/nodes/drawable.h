@@ -18,6 +18,7 @@ public:
   DrawableSlot mChildren;
   Vec3Slot mMove;
   Vec3Slot mRotate;
+  FloatSlot mScale;
   FloatSlot mInstances;
 
   void Draw(Globals* globals, PassType passType, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);

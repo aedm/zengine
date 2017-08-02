@@ -26,9 +26,11 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
   Vec3 s = mShadowMapSize.Get();
-  Vec3 dir = mSkyLightDirection.Get();
+  Vec3 lightDir = mSkyLightDirection.Get().Normal();
+  //globals->Camera = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z));
+  globals->Camera = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
+
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
-  globals->Camera = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z));
   globals->World.LoadIdentity();
   globals->SkylightProjection = globals->Projection;
   globals->SkylightCamera = globals->Camera;

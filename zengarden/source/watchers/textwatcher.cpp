@@ -18,6 +18,7 @@ void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   mTextEdit = new QTextEdit(watcherWidget);
+  mTextEdit->setCurrentFont(QFont("Consolas", 9));
   mLayout->addWidget(mTextEdit);
   mTextEdit->setText(QString::fromStdString(stringNode->Get()));
 
