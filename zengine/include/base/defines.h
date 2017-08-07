@@ -44,7 +44,7 @@ template<typename T>
 void SafeDelete(T*& Object) { delete Object; Object = 0; }
 
 template<typename T, int N>
-UINT ElementCount(const T (&arr)[N]) { return N; }
+constexpr UINT ElementCount(const T (&arr)[N]) { return N; }
 
 typedef		ULONG		IndexEntry;
 

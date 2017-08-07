@@ -173,7 +173,7 @@
     <ClCompile Include="source\watchers\moviewatcher.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\util\c4dloader.cpp">
+    <ClCompile Include="source\util\meshhloader.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -291,7 +291,7 @@
     <ClInclude Include="source\watchers\moviewatcher.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\util\c4dloader.h">
+    <ClInclude Include="source\util\meshloader.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

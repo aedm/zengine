@@ -67,8 +67,8 @@ void GeneralSceneWatcher::Init()
   defaultPass->mFragmentStub.Connect(defaultFragment);
   defaultPass->mVertexStub.Connect(defaultVertex);
   defaultPass->mRenderstate.mDepthTest = true;
-  defaultPass->mRenderstate.mFaceMode = RenderState::FaceMode::FRONT_AND_BACK;
-  defaultPass->mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
+  defaultPass->mFaceModeSlot.SetDefaultValue(0);
+  defaultPass->mBlendModeSlot.SetDefaultValue(0);
 
   mDefaultMaterial = new Material();
   mDefaultMaterial->mSolidPass.Connect(defaultPass);

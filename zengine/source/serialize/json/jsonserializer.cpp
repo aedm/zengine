@@ -258,7 +258,8 @@ void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, SSpli
   nodeValue.AddMember("points", pointArray, *mAllocator);
 }
 
-void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node) {
+void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, 
+                                          TextureNode* node) {
   Texture* texture = node->Get();
   ASSERT(texture->mTexelData);
   string b64 = base64_encode((UCHAR*)texture->mTexelData, texture->mTexelDataByteCount);
@@ -273,10 +274,10 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, TextureNo
 void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue, 
                                              StaticMeshNode* node) {
   Mesh* mesh = node->GetMesh();
-  ASSERT(mesh->mIndexCount == 0);
   ASSERT(mesh->mRawVertexData != nullptr);
   nodeValue.AddMember("format", mesh->mFormat->mBinaryFormat, *mAllocator);
   nodeValue.AddMember("vertexcount", mesh->mVertexCount, *mAllocator);
+  nodeValue.AddMember("indexcount", mesh->mIndexCount, *mAllocator);
 
   UINT floatCount = mesh->mVertexCount * mesh->mFormat->mStride / sizeof(float);
   float* attribs = reinterpret_cast<float*>(mesh->mRawVertexData);
@@ -285,6 +286,14 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
     attribArray.PushBack(double(attribs[i]), *mAllocator);
   }
   nodeValue.AddMember("vertices", attribArray, *mAllocator);  
+
+  if (mesh->mIndexCount > 0) {
+    rapidjson::Value indexArray(rapidjson::kArrayType);
+    for (UINT i = 0; i < mesh->mIndexCount; i++) {
+      indexArray.PushBack(UINT(mesh->mIndexData[i]), *mAllocator);
+    }
+    nodeValue.AddMember("indices", indexArray, *mAllocator);
+  }
 }
 
 void JSONSerializer::SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node) {

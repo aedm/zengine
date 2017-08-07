@@ -190,8 +190,8 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   UINT vertexCount = value["vertexcount"].GetInt();
   VertexFormat* format = TheResourceManager->GetVertexFormat(binaryFormat);
   Mesh* mesh = TheResourceManager->CreateMesh();
-  mesh->AllocateVertices(format, vertexCount);
 
+  mesh->AllocateVertices(format, vertexCount);
   vector<float> rawVertices(vertexCount * format->mStride / sizeof(float));
   const rapidjson::Value& jsonVertices = value["vertices"];
   for (UINT i = 0; i < jsonVertices.Size(); i++) {
@@ -199,9 +199,19 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   }
   mesh->UploadVertices(&rawVertices[0]);
 
+  if (value.HasMember("indices")) {
+    UINT indexCount = value["indexcount"].GetInt();
+    mesh->AllocateIndices(indexCount);
+    vector<IndexEntry> indices(indexCount);
+    const rapidjson::Value& jsonIndices = value["indices"];
+    for (UINT i = 0; i < jsonIndices.Size(); i++) {
+      indices[i] = IndexEntry(jsonIndices[i].GetUint());
+    }
+    mesh->UploadIndices(&indices[0]);
+  }
+
   node->Set(mesh);
 }
-
 
 
 void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, SSpline* node) {

@@ -34,7 +34,7 @@ void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
 }
 
 void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
-  globals->RenderTargetSize = Vec2(ShadowMapSize, ShadowMapSize);
+  globals->RenderTargetSize = Vec2(float(ShadowMapSize), float(ShadowMapSize));
   globals->RenderTargetSizeRecip = Vec2(1.0f / float(ShadowMapSize), 
                                         1.0f / float(ShadowMapSize));
   globals->DepthBufferSource = 0;

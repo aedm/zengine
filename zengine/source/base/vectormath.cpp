@@ -343,7 +343,7 @@ Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) 
     sl = s.Length();
   }
   s /= sl;
-  Vec3 u = -s.Cross(f);
+  Vec3 u = s.Cross(f);
 
   Matrix m;
   m.m[0] = s.x;	  m.m[1] = s.y;	  m.m[2] = s.z;	  m.m[3] = 0;

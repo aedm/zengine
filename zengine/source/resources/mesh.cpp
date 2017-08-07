@@ -7,6 +7,7 @@
 VertexFormat* VertexPos::format;
 VertexFormat* VertexPosNorm::format;
 VertexFormat* VertexPosUVNorm::format;
+VertexFormat* VertexPosUVNormTangent::format;
 VertexFormat* VertexPosUV::format;
 
 VertexFormat::VertexFormat(UINT binaryFormat) {
@@ -128,6 +129,9 @@ void Mesh::UploadIndices(const IndexEntry* indices) {
   void* mappedIndices = OpenGL->MapIndexBuffer(mIndexHandle);
   memcpy(mappedIndices, indices, mIndexCount * sizeof(IndexEntry));
   OpenGL->UnMapIndexBuffer(mIndexHandle);
+
+  mIndexData.resize(mIndexCount);
+  memcpy(&mIndexData[0], indices, mIndexCount * sizeof(IndexEntry));
 }
 
 void Mesh::UploadVertices(void* vertices) {

@@ -14,7 +14,7 @@ enum VertexAttributeMask {
   VERTEXATTRIB_POSITION_MASK = 1 << (UINT)VertexAttributeUsage::POSITION,
   VERTEXATTRIB_TEXCOORD_MASK = 1 << (UINT)VertexAttributeUsage::TEXCOORD,
   VERTEXATTRIB_NORMAL_MASK = 1 << (UINT)VertexAttributeUsage::NORMAL,
-  VERTEXATTRIB_BINORMAL_MASK = 1 << (UINT)VertexAttributeUsage::BINORMAL,
+  VERTEXATTRIB_TANGENT_MASK = 1 << (UINT)VertexAttributeUsage::TANGENT,
   //VERTEXATTRIB_COLOR_MASK			= 1 << VERTEXATTRIB_COLOR
 };
 
@@ -43,6 +43,17 @@ struct VertexPosUVNorm {
   /// Vertex format descriptor for this struct
   static VertexFormat* format;
 };
+
+struct VertexPosUVNormTangent {
+  Vec3 position;
+  Vec2 uv;
+  Vec3 normal;
+  Vec3 tangent;
+
+  /// Vertex format descriptor for this struct
+  static VertexFormat* format;
+};
+
 
 struct VertexPosUV {
   Vec3 position;
@@ -113,8 +124,9 @@ public:
 
   VertexFormat* mFormat;
 
-  /// Raw vertex data for deserialization
+  /// Raw mesh data for deserialization
   void* mRawVertexData = nullptr;
+  vector<IndexEntry> mIndexData;
 };
 
 template<typename T, int N>

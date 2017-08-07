@@ -1,6 +1,9 @@
 #include "util.h"
 #include <QtCore/QDir>
 #include <memory>
+#include <assimp/Importer.hpp>      // C++ importer interface
+#include <assimp/scene.h>           // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
 
 using namespace std;
 
@@ -55,12 +58,12 @@ namespace Util {
     }
     return Vec3(v[1].toFloat(), v[2].toFloat(), v[3].toFloat());
   }
-  
-  OWNERSHIP Mesh* LoadMesh(const QString& fileName) {
+
+  OWNERSHIP Mesh* LoadMesh2(const QString& fileName) {
     unique_ptr<char> fileContent(ReadFileQt(fileName));
     QString contentString(fileContent.get());
     QStringList lines = contentString.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
-    
+
     vector<Vec3> coords;
     vector<Vec3> normals;
     vector<Vec2> texcoord;
@@ -71,19 +74,16 @@ namespace Util {
       if (line.startsWith("v ")) {
         /// Vertex definition
         coords.push_back(ObjLineToVec3(line));
-      }
-      else if (line.startsWith("vn ")) {
+      } else if (line.startsWith("vn ")) {
         /// Normal definition
         normals.push_back(ObjLineToVec3(line));
-      }
-      else if (line.startsWith("vt ")) {
+      } else if (line.startsWith("vt ")) {
         /// Texcoord definition
         Vec3 t = ObjLineToVec3(line);
         texcoord.push_back(Vec2(t.x, t.y));
-      }
-      else if (line.startsWith("f ")) {
+      } else if (line.startsWith("f ")) {
         /// Face definition
-        QStringList t = line.right(line.length()-2).split(' ', QString::SkipEmptyParts);
+        QStringList t = line.right(line.length() - 2).split(' ', QString::SkipEmptyParts);
         for (QString& s : t) {
           QStringList a = s.split('/');
           triplets.push_back({a[0].toUInt(), a[2].toUInt(), a[1].toUInt()});
@@ -97,7 +97,7 @@ namespace Util {
       vertices[i].position = coords[triplets[i].c - 1];
       vertices[i].normal = normals[triplets[i].n - 1];
       UINT tindex = triplets[i].t;
-      vertices[i].uv = tindex == 0 ? Vec2(0, 0) : texcoord[tindex-1];
+      vertices[i].uv = tindex == 0 ? Vec2(0, 0) : texcoord[tindex - 1];
     }
 
     Mesh* mesh = TheResourceManager->CreateMesh();
@@ -107,8 +107,82 @@ namespace Util {
     return mesh;
   }
 
-  StubNode* LoadStub(const QString& fileName)
-  {
+  static Vec3 ToVec3(const aiVector3D& v) {
+    return Vec3(v.x, v.y, v.z);
+  }
+
+  OWNERSHIP Mesh* LoadMesh(const QString& fileName) {
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(fileName.toStdString(),
+                                             aiProcess_CalcTangentSpace |
+                                             aiProcess_Triangulate |
+                                             aiProcess_JoinIdenticalVertices |
+                                             aiProcess_SortByPType |
+                                             aiProcess_FlipWindingOrder |
+                                             aiProcess_GenSmoothNormals);
+    if (!scene) {
+      ERR(importer.GetErrorString());
+      return nullptr;
+    }
+    if (!scene->HasMeshes()) {
+      ERR("File has no meshes");
+      return nullptr;
+    }
+    if (scene->mNumMeshes > 1) {
+      WARN("File has more than one mesh, importing first one.");
+    }
+
+    const aiMesh* mesh = scene->mMeshes[0];
+    if (!mesh->HasFaces()) {
+      ERR("Mesh has no faces.");
+      return nullptr;
+    }
+    if (!mesh->HasNormals()) {
+      ERR("Mesh has no normals.");
+      return nullptr;
+    }
+    if (!mesh->HasTangentsAndBitangents()) {
+      ERR("Mesh has no tangents.");
+      return nullptr;
+    }
+    if (mesh->GetNumUVChannels() == 0) {
+      ERR("Mesh has no UV.");
+      return nullptr;
+    }
+
+    INFO("Importing mesh: %d faces, %d vertices", mesh->mNumFaces, mesh->mNumVertices);
+
+    vector<IndexEntry> indices;
+    for (UINT i = 0; i < mesh->mNumFaces; i++) {
+      aiFace& face = mesh->mFaces[i];
+      if (face.mNumIndices != 3) {
+        ERR("Face #%d is not triangulated.", i);
+        return nullptr;
+      }
+      for (UINT o = 0; o < 3; o++) {
+        indices.push_back(face.mIndices[o]);
+      }
+    }
+
+    vector<VertexPosUVNormTangent> vertices(mesh->mNumVertices);
+    for (UINT i = 0; i < mesh->mNumVertices; i++) {
+      vertices[i].position = ToVec3(mesh->mVertices[i]);
+      Vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
+      vertices[i].uv = Vec2(uv.x, uv.y);
+      vertices[i].normal = ToVec3(mesh->mNormals[i]);
+      vertices[i].tangent = ToVec3(mesh->mTangents[i]);
+    }
+
+    Mesh* zenmesh = TheResourceManager->CreateMesh();
+    zenmesh->AllocateVertices(VertexPosUVNormTangent::format, vertices.size());
+    zenmesh->UploadVertices(&vertices[0]);
+    zenmesh->AllocateIndices(indices.size());
+    zenmesh->UploadIndices(&indices[0]);
+
+    return zenmesh;
+  }
+
+  StubNode* LoadStub(const QString& fileName) {
     unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
     /// TODO: register this as an engine node
     StubNode* stub = new StubNode();

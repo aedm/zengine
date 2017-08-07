@@ -21,37 +21,52 @@ void CubeMeshNode::Operate() {
   float y = mSizeY.Get();
   float z = mSizeZ.Get();
 
-  VertexPosUVNorm vertices[] = {
+  VertexPosUVNormTangent vertices[] = {
     {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0)},
-    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0)},
     {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0)},
+    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0)},
     {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0)},
 
     {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0)},
     {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0)},
     {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0)},
 
     {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0)},
     {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0)},
+    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0)},
     {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0)},
 
     {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0)},
-    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0)},
     {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0)},
+    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0)},
     {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0)},
 
     {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1)},
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1)},
     {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1)},
     {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1)},
 
     {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1)},
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1)},
     {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1)},
+    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1)},
     {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, 0, -1)},
   };
+
+  Vec3 tangents[] = {
+    Vec3(0, -1, 0),
+    Vec3(0, -1, 0),
+    Vec3(-1, 0, 0),
+    Vec3(-1, 0, 0),
+    Vec3(-1, 0, 0),
+    Vec3(-1, 0, 0),
+  };
+
+  for (int i = 0; i < 6; i++) {
+    for (int o = 0; o < 4; o++) {
+      vertices[i * 4 + o].tangent = tangents[i];
+    }
+  }
 
   IndexEntry indexes[3 * 2 * 6];
   int a = 0;

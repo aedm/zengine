@@ -2,7 +2,6 @@
 #include "nodewidget.h"
 #include "../util/uipainter.h"
 #include "../util/util.h"
-#include "../util/c4dloader.h"
 #include "../commands/graphcommands.h"
 #include "prototypes.h"
 #include "../zengarden.h"
@@ -565,8 +564,8 @@ void GraphWatcher::HandleDragEnterEvent(QDragEnterEvent* event) {
   if (urlList.size() != 1) return;
 
   QString fileName = urlList.at(0).toLocalFile();
-  if (fileName.endsWith(".obj") || fileName.endsWith(".png")
-    || fileName.endsWith(".jpg")) {
+  if (fileName.endsWith(".obj") || fileName.endsWith(".3ds") || 
+      fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
     event->acceptProposedAction();
   }
 }
@@ -580,9 +579,8 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
 
   QString fileName = urlList.at(0).toLocalFile();
   QFileInfo fileInfo(fileName);
-  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "c4d") {
-    Mesh* mesh = fileInfo.suffix() == "c4d" ? 
-      Util::LoadC4DMesh(fileName) : Util::LoadMesh(fileName);
+  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds") {
+    Mesh* mesh = Util::LoadMesh(fileName);
     MeshNode* node = StaticMeshNode::Create(mesh);
     node->SetName(fileInfo.fileName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));

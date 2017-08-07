@@ -27,7 +27,7 @@ extern const int gVariableByteSizes[];
 	ITEM(POSITION,		NodeType::VEC3,		"aPosition"	) \
 	ITEM(TEXCOORD,		NodeType::VEC2,		"aTexCoord"	) \
 	ITEM(NORMAL,		  NodeType::VEC3,		"aNormal"	) \
-	ITEM(BINORMAL,		NodeType::VEC3,		"aBinormal"	) \
+	ITEM(TANGENT,		  NodeType::VEC3,		"aTangent"	) \
 
 
 /// Possible variable types in vertex attributes
