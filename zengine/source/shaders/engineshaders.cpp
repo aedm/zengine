@@ -94,15 +94,15 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
 
 void EngineShaders::BuildPostProcessPasses() {
   StubNode* fullscreenVertex =
-    TheEngineStubs->GetStub("postproc-fullscreen-vertex");
+    TheEngineStubs->GetStub("postprocess/fullscreen-vertex");
   StubNode* gaussianHorizontalFirst =
-    TheEngineStubs->GetStub("postproc-gaussianblur-horizontal-first");
+    TheEngineStubs->GetStub("postprocess/gaussianblur-horizontal-first");
   StubNode* gaussianHorizontal =
-    TheEngineStubs->GetStub("postproc-gaussianblur-horizontal");
+    TheEngineStubs->GetStub("postprocess/gaussianblur-horizontal");
   StubNode* gaussianVertical =
-    TheEngineStubs->GetStub("postproc-gaussianblur-vertical");
+    TheEngineStubs->GetStub("postprocess/gaussianblur-vertical");
   StubNode* gaussianBlend =
-    TheEngineStubs->GetStub("postproc-gaussianblur-blend");
+    TheEngineStubs->GetStub("postprocess/gaussianblur-blend");
 
   mPostProcess_GaussianBlurHorizontal.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurHorizontal.mFragmentStub.Connect(gaussianHorizontal);
@@ -160,4 +160,10 @@ void EngineShaders::BuildPostProcessPasses() {
   mFullScreenQuad = TheResourceManager->CreateMesh();
   mFullScreenQuad->SetIndices(quadIndices);
   mFullScreenQuad->SetVertices(quadVertices);
+}
+
+void EngineShaders::BuildMaterialPasses() {
+  StubNode* fullscreenVertex =
+    TheEngineStubs->GetStub("postproc-fullscreen-vertex");
+
 }

@@ -10,9 +10,12 @@ public:
   ~EngineShaders();
 
   void ApplyPostProcess(RenderTarget* renderTarget, Globals* globals);
-    
+   
+  Pass mSolidShadowPass;
+
 private:
   void BuildPostProcessPasses();
+  void BuildMaterialPasses();
 
   Pass mPostProcess_GaussianBlurHorizontal_First;
   Pass mPostProcess_GaussianBlurHorizontal;

@@ -78,9 +78,16 @@ public:
   /// Subclasses of Slot have a properly typed GetNode() method.
   Node* GetAbstractNode() const;
 
-  /// Returns all connected nodes (only for multislot)
-  const vector<Node*>& GetMultiNodes() const;
+  /// Returns the number of connected nodes (only for multislot)
+  UINT GetMultiNodeCount() const;
 
+  /// Returns the 'index'th connected node reference (only for multislot)
+  Node* GetMultiNode(UINT index) const;
+
+  /// Returns the multinodes *without* forwarding,
+  /// ie. not calling Node::GetReferencedNode()
+  vector<Node*> GetDirectMultiNodes() const;
+  
   /// Type of object this slot accepts
   virtual bool DoesAcceptType(NodeType type) const;
 
@@ -133,8 +140,14 @@ public:
   /// Deepest nodes come first. 
   void GenerateTransitiveClosure(vector<Node*>& oResultm, bool includeHiddenSlots);
 
+  /// Returns a node which can actually do what it claims to do. Most nodes
+  /// return "this", but there are a few exceptions that refer to a different node:
+  /// - Ghost nodes are references to other nodes (TODO)
+  /// - Composite nodes have internal, hidden nodes that do the heavy lifting
+  virtual Node* GetReferencedNode();
+
 protected:
-  Node(NodeType type);
+  Node(NodeType type, bool isForwarderNode = false);
 
   /// For cloning
   Node(const Node& original);
@@ -170,7 +183,6 @@ private:
   /// Add or remove slot to/from notification list
   void ConnectToSlot(Slot* slot);
   void DisconnectFromSlot(Slot* slot);
-
 
   /// ---------------- Editor-specific parts ----------------
   /// This section can be disabled without hurting the engine.

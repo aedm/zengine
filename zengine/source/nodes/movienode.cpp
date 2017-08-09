@@ -75,8 +75,8 @@ void MovieNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
 
 void MovieNode::SortClips() {
   for (auto& track : mTracks) track.clear();
-  for (Node* node : mClips.GetMultiNodes()) {
-    ClipNode* clipNode = static_cast<ClipNode*>(node);
+  for (UINT i = 0; i < mClips.GetMultiNodeCount(); i++) {
+    ClipNode* clipNode = static_cast<ClipNode*>(mClips.GetMultiNode(i));
     int trackNumber = int(clipNode->mTrackNumber.Get());
     if (trackNumber < 0) trackNumber = 0;
     if (trackNumber >= mTracks.size()) trackNumber = int(mTracks.size() - 1);

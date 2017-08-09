@@ -30,7 +30,7 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
   MeshNode* meshNode = mMesh.GetNode();
   Globals globals = *oldGlobals;
 
-  if (mChildren.GetMultiNodes().size() == 0 && !(material && meshNode)) return;
+  if (mChildren.GetMultiNodeCount() == 0 && !(material && meshNode)) return;
 
   Vec3 movv = mMove.Get();
   if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
@@ -69,8 +69,8 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
     }
   }
 
-  for (Node* node : mChildren.GetMultiNodes()) {
-    static_cast<Drawable*>(node)->Draw(&globals, passType);
+  for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
+    static_cast<Drawable*>(mChildren.GetMultiNode(i))->Draw(&globals, passType);
   }
 }
 

@@ -10,6 +10,7 @@
 #include "propertyeditor/propertyeditor.h"
 #include <zengine.h>
 #include <QtCore/QTime>
+#include <QtCore/QDir>
 #include <bass.h>
 
 class ZenGarden: public QMainWindow {
@@ -88,7 +89,8 @@ private:
   void RestartMovieTimer();
 
   /// Engine shaders
-  void LoadEngineShaders(QString& path);
+  void LoadEngineShaders(QDir& dir);
+  QDir mEngineShadersDir;
   QFileSystemWatcher mEngineShadersFolderWatcher;
 
   virtual void keyPressEvent(QKeyEvent* event) override;

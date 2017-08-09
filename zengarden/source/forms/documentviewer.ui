@@ -47,7 +47,7 @@
       <item>
        <widget class="QPushButton" name="openButton">
         <property name="text">
-         <string>Open</string>
+         <string>  Open</string>
         </property>
        </widget>
       </item>
@@ -86,6 +86,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="zengarden.qrc"/>
+ </resources>
  <connections/>
 </ui>

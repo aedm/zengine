@@ -68,7 +68,7 @@ void DocumentWatcher::OnChildNameChange() {
 void DocumentWatcher::RefreshGraphList() {
   Document* doc = static_cast<Document*>(mNode);
   mModel->clear();
-  for (Node* node : doc->mGraphs.GetMultiNodes()) {
+  for (Node* node : doc->mGraphs.GetDirectMultiNodes()) {
     Graph* graph = static_cast<Graph*>(node);
     QStandardItem* item = new QStandardItem(CreateDisplayedName(graph));
     item->setData(QVariant::fromValue(graph), GraphNodeRole);

@@ -10,7 +10,7 @@ EngineStubs::~EngineStubs() {
   mStubs.clear();
 }
 
-void EngineStubs::SetStubSource(const string& name, const string& source) {
+void EngineStubs::SetStubSource(const std::string& name, const std::string& source) {
   StubNode* stub;
   auto it = mStubs.find(name);
   if (it == mStubs.end()) {

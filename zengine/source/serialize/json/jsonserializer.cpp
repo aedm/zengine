@@ -46,7 +46,8 @@ void JSONSerializer::Traverse(Node* root) {
   for (auto slotPair : root->GetSerializableSlots()) {
     Slot* slot = slotPair.second;
     if (slot->mIsMultiSlot) {
-      for (Node* node : slot->GetMultiNodes()) {
+      for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
+        Node* node = slot->GetMultiNode(i);
         auto it = mNodes.find(node);
         if (it == mNodes.end()) {
           Traverse(node);
@@ -163,7 +164,8 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
       /// Save multislot
       if (slot->mIsMultiSlot) {
         rapidjson::Value connections(rapidjson::kArrayType);
-        for (Node* connectedNode : slot->GetMultiNodes()) {
+        for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
+          Node* connectedNode = slot->GetMultiNode(i);
           int connectedID = mNodes.at(connectedNode);
           connections.PushBack(connectedID, *mAllocator);
         }

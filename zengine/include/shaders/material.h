@@ -17,3 +17,15 @@ protected:
 };
 
 typedef TypedSlot<NodeType::MATERIAL, Material> MaterialSlot;
+
+
+class SolidMaterial: public Node {
+public:
+  SolidMaterial();
+  virtual ~SolidMaterial();
+
+private:
+  Material mMaterial;
+  Pass mShadowPass;
+  Pass mSolidPass;
+};

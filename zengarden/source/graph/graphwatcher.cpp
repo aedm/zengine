@@ -47,12 +47,12 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
 
   /// Draw connections
   ThePainter->mColor.Set(Vec4(1, 1, 1, 1));
-  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+  for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     shared_ptr<NodeWidget> nodeWidget = mWidgetMap.at(node);
     for (int i = 0; i < nodeWidget->mWidgetSlots.size(); i++) {
       Slot* slot = nodeWidget->mWidgetSlots[i]->mSlot;
       if (slot->mIsMultiSlot) {
-        for (Node* connectedNode : slot->GetMultiNodes()) {
+        for (Node* connectedNode : slot->GetDirectMultiNodes()) {
           shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget != NULL) {
             /// Draw connection
@@ -92,7 +92,7 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   }
 
   /// Draw nodes
-  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+  for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     mWidgetMap.at(node)->Paint();
   }
 
@@ -144,7 +144,7 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   GetGLWidget()->makeCurrent();
   Graph* graph = dynamic_cast<Graph*>(mNode);
-  for (Node* node : graph->mNodes.GetMultiNodes()) {
+  for (Node* node : graph->mNodes.GetDirectMultiNodes()) {
     shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
     mWidgetMap[node] = widget;
   }
@@ -278,7 +278,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
       mCurrentState = State::DEFAULT;
       break;
     case State::SELECT_RECTANGLE:
-      for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+      for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
         shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
         if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
       }
@@ -356,7 +356,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
     }
     break;
     case State::SELECT_RECTANGLE:
-      for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+      for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
         shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
         widget->mIsSelected = HasIntersection(mOriginalMousePos,
           mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
@@ -508,7 +508,7 @@ Graph* GraphWatcher::GetGraph() {
 
 void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
   /// Create widgets for newly added nodes
-  for (Node* node : GetGraph()->mNodes.GetMultiNodes()) {
+  for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     auto it = mWidgetMap.find(node);
     if (it == mWidgetMap.end()) {
       shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
@@ -518,7 +518,7 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
   }
 
   /// Remove widgets of removed nodes
-  auto& nodes = GetGraph()->mNodes.GetMultiNodes();
+  auto& nodes = GetGraph()->mNodes.GetDirectMultiNodes();
   while (true) {
     bool found = false;
     for (auto it : mWidgetMap) {

@@ -101,12 +101,22 @@ void Slot::DisconnectAll(bool notifyOwner) {
 
 Node* Slot::GetAbstractNode() const {
   ASSERT(!mIsMultiSlot);
-  return mNode;
+  return mNode ? mNode->GetReferencedNode() : nullptr;
 }
 
 
-const vector<Node*>& Slot::GetMultiNodes() const {
-  ASSERT(mIsMultiSlot);
+UINT Slot::GetMultiNodeCount() const {
+  return UINT(mMultiNodes.size());
+}
+
+
+Node* Slot::GetMultiNode(UINT index) const {
+  ASSERT(index >= 0 && index < mMultiNodes.size());
+  return mMultiNodes[index]->GetReferencedNode();
+}
+
+
+std::vector<Node*> Slot::GetDirectMultiNodes() const {
   return mMultiNodes;
 }
 
@@ -154,8 +164,8 @@ bool Slot::IsDefaulted() {
 }
 
 
-Node::Node(NodeType type)
-  : mType(type) 
+Node::Node(NodeType type, bool isForwarderNode)
+  : mType(type)
 {
   mIsUpToDate = false;
   mIsProperlyConnected = true;
@@ -163,7 +173,7 @@ Node::Node(NodeType type)
 
 
 Node::Node(const Node& original)
-  : mType(original.mType) 
+  : mType(original.mType)
 {}
 
 
@@ -193,6 +203,10 @@ void Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
   // Overload this
 }
 
+
+Node* Node::GetReferencedNode() {
+  return this;
+}
 
 void Node::SendMsg(NodeMessage message, void* payload) {
   for (Slot* slot : mDependants) {
@@ -252,8 +266,8 @@ void Node::Update() {
   if (!mIsUpToDate && mIsProperlyConnected) {
     for(Slot* slot : mPublicSlots) {
       if (slot->mIsMultiSlot) {
-        for (Node* node : slot->GetMultiNodes()) {
-          node->Update();
+        for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
+          slot->GetMultiNode(i)->Update();
         }
       } else {
         Node* node = slot->GetAbstractNode();
@@ -380,8 +394,8 @@ private:
 
     for (Slot* slot : slots) {
       if (slot->mIsMultiSlot) {
-        for (Node* dependency : slot->GetMultiNodes()) {
-          Traverse(dependency);
+        for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
+          Traverse(slot->GetMultiNode(i));
         }
       } else if (!slot->IsDefaulted()) {
         Node* dependency = slot->GetAbstractNode();

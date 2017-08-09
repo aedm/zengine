@@ -87,10 +87,11 @@ void ZenGarden::InitModules() {
   InitZengine();
 
   /// Load Zengine files
-  QString engineShadersFolder("engine/common/");
+  mEngineShadersDir = QDir("engine/main/");
   connect(&mEngineShadersFolderWatcher, SIGNAL(fileChanged(const QString&)),
     this, SLOT(LoadEngineShader(const QString&)));
-  LoadEngineShaders(engineShadersFolder);
+  LoadEngineShaders(mEngineShadersDir);
+  TheEngineStubs->OnLoadFinished();
 
   InitPainter();
   Prototypes::Init();
@@ -121,18 +122,22 @@ void ZenGarden::RestartMovieTimer() {
   if (mPlayMovie) PlayMusic(mMovieCursor);
 }
 
-void ZenGarden::LoadEngineShaders(QString& path) {
+void ZenGarden::LoadEngineShaders(QDir& dir) {
   static const QString shaderSuffix("shader");
+  std::string a = dir.absolutePath().toStdString();
 
-  QDir dir(path);
   for (QFileInfo& fileInfo : dir.entryInfoList()) {
-    if (!fileInfo.isDir() && fileInfo.completeSuffix() == shaderSuffix) {
+    if (fileInfo.fileName().startsWith(".")) continue;
+    std::string b = fileInfo.absoluteFilePath().toStdString();
+    if (fileInfo.isDir()) {
+      LoadEngineShaders(QDir(fileInfo.absoluteFilePath()));
+    } 
+    else if (fileInfo.completeSuffix() == shaderSuffix) {
       QString filePath = fileInfo.absoluteFilePath();
       LoadEngineShader(filePath);
       mEngineShadersFolderWatcher.addPath(filePath);
     }
   }
-  TheEngineStubs->OnLoadFinished();
 }
 
 
@@ -158,7 +163,9 @@ void ZenGarden::LoadEngineShader(const QString& path) {
   QFileInfo fileInfo(path);
   INFO("loading '%s'", fileInfo.fileName().toLatin1().data());
   unique_ptr<char> stubSource(Util::ReadFileQt(path));
-  TheEngineStubs->SetStubSource(fileInfo.baseName().toStdString(),
+  QString relativePath = mEngineShadersDir.relativeFilePath(path);
+  QString stubName = relativePath.left(relativePath.lastIndexOf("."));
+  TheEngineStubs->SetStubSource(stubName.toStdString(),
     string(stubSource.get()));
 }
 

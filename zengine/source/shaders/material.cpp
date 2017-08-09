@@ -1,4 +1,5 @@
 #include <include/shaders/material.h>
+#include <include/shaders/engineshaders.h>
 
 REGISTER_NODECLASS(Material, "Material");
 
@@ -31,4 +32,16 @@ Pass* Material::GetPass(PassType passType) {
   }
   SHOULD_NOT_HAPPEN;
   return nullptr;
+}
+
+
+SolidMaterial::SolidMaterial()
+  : Node(NodeType::MATERIAL)
+{
+  //mMaterial.mShadowPass.Connect(TheEngineShaders->mSolidShadowPass);
+}
+
+
+SolidMaterial::~SolidMaterial() {
+
 }
