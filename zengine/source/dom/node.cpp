@@ -99,9 +99,15 @@ void Slot::DisconnectAll(bool notifyOwner) {
 }
 
 
-Node* Slot::GetAbstractNode() const {
+Node* Slot::GetReferencedNode() const {
   ASSERT(!mIsMultiSlot);
   return mNode ? mNode->GetReferencedNode() : nullptr;
+}
+
+
+Node* Slot::GetDirectNode() const {
+  ASSERT(!mIsMultiSlot);
+  return mNode;
 }
 
 
@@ -110,7 +116,7 @@ UINT Slot::GetMultiNodeCount() const {
 }
 
 
-Node* Slot::GetMultiNode(UINT index) const {
+Node* Slot::GetReferencedMultiNode(UINT index) const {
   ASSERT(index >= 0 && index < mMultiNodes.size());
   return mMultiNodes[index]->GetReferencedNode();
 }
@@ -253,7 +259,7 @@ void Node::ReceiveMessage(NodeMessage message, Slot* slot, void* payload) {
 void Node::CheckConnections() {
   for (Slot* slot : mPublicSlots) {
     /// TODO: handle multislots
-    if (!slot->mIsMultiSlot && slot->GetAbstractNode() == NULL) {
+    if (!slot->mIsMultiSlot && slot->GetReferencedNode() == NULL) {
       mIsProperlyConnected = false;
       return;
     }
@@ -267,10 +273,10 @@ void Node::Update() {
     for(Slot* slot : mPublicSlots) {
       if (slot->mIsMultiSlot) {
         for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
-          slot->GetMultiNode(i)->Update();
+          slot->GetReferencedMultiNode(i)->Update();
         }
       } else {
-        Node* node = slot->GetAbstractNode();
+        Node* node = slot->GetReferencedNode();
         if (node) node->Update();
       }
     }
@@ -395,10 +401,10 @@ private:
     for (Slot* slot : slots) {
       if (slot->mIsMultiSlot) {
         for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
-          Traverse(slot->GetMultiNode(i));
+          Traverse(slot->GetReferencedMultiNode(i));
         }
       } else if (!slot->IsDefaulted()) {
-        Node* dependency = slot->GetAbstractNode();
+        Node* dependency = slot->GetReferencedNode();
         if (dependency != nullptr) Traverse(dependency);
       }
     }

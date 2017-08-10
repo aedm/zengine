@@ -163,7 +163,12 @@ void EngineShaders::BuildPostProcessPasses() {
 }
 
 void EngineShaders::BuildMaterialPasses() {
-  StubNode* fullscreenVertex =
-    TheEngineStubs->GetStub("postproc-fullscreen-vertex");
+  mSolidShadowPass.mVertexStub.Connect(
+    TheEngineStubs->GetStub("material/solid/shadowPass-vertex"));
+  mSolidShadowPass.mFragmentStub.Connect(
+    TheEngineStubs->GetStub("material/solid/shadowPass-fragment"));
 
+  mSolidShadowPass.mRenderstate.mDepthTest = true;
+  mSolidShadowPass.mBlendModeSlot.SetDefaultValue(1.0f); // normal
+  mSolidShadowPass.mFaceModeSlot.SetDefaultValue(1.0f); // back
 }

@@ -94,7 +94,7 @@ void ShaderBuilder::CollectDependencies(Node* root) {
 
   if (root->GetType() == NodeType::SHADER_STUB) {
     for (auto slotPair : static_cast<StubNode*>(root)->mParameterSlotMap) {
-      Node* node = slotPair.second->GetAbstractNode();
+      Node* node = slotPair.second->GetDirectNode();
       if (node == nullptr) {
         WARN("Incomplete shader graph.");
         throw exception();
@@ -196,7 +196,7 @@ void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
         StubParameter* param = stubMeta->parameters[i];
         if (param->mType == NodeType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
-          Node* paramNode = slot->GetAbstractNode();
+          Node* paramNode = slot->GetReferencedNode();
           if (paramNode == nullptr) {
             /// Node not connected to param
             ERR("Sampler not connected");
@@ -256,7 +256,7 @@ void ShaderBuilder::GenerateSourceMain(stringstream& stream) {
       for (StubParameter* param : stubMeta->parameters) {
         if (param->mType != NodeType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
-          Node* paramNode = slot->GetAbstractNode();
+          Node* paramNode = slot->GetReferencedNode();
           if (paramNode == nullptr) {
             /// Node not connected to param
             ERR("Parameter not connected");

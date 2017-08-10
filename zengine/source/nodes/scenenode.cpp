@@ -47,7 +47,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
 
 void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
-    Drawable* drawable = static_cast<Drawable*>(mDrawables.GetMultiNode(i));
+    Drawable* drawable = static_cast<Drawable*>(mDrawables.GetReferencedMultiNode(i));
     drawable->Draw(globals, passType);
   }
 }

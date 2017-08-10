@@ -70,7 +70,7 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
   }
 
   for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
-    static_cast<Drawable*>(mChildren.GetMultiNode(i))->Draw(&globals, passType);
+    static_cast<Drawable*>(mChildren.GetReferencedMultiNode(i))->Draw(&globals, passType);
   }
 }
 

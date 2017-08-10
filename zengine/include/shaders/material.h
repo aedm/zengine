@@ -24,8 +24,14 @@ public:
   SolidMaterial();
   virtual ~SolidMaterial();
 
+  virtual Node* GetReferencedNode() override;
+
+protected:
+  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+
 private:
   Material mMaterial;
-  Pass mShadowPass;
   Pass mSolidPass;
+
+  Slot mGhostSlot;
 };

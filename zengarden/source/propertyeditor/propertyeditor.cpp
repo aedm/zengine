@@ -74,21 +74,21 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
     /// TODO: use dynamic_cast
     if (slot->DoesAcceptType(NodeType::FLOAT) &&
-        slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
+        slot->GetReferencedNode()->GetType() != NodeType::SHADER_STUB) {
       /// Float slots
-      auto slotNode = dynamic_cast<ValueNode<NodeType::FLOAT>*>(slot->GetAbstractNode());
+      auto slotNode = dynamic_cast<ValueNode<NodeType::FLOAT>*>(slot->GetReferencedNode());
       watcher = slotNode->Watch<FloatWatcher>(
         slotNode, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
     } else if (slot->DoesAcceptType(NodeType::VEC3) &&
-               slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
+               slot->GetReferencedNode()->GetType() != NodeType::SHADER_STUB) {
       /// Vec3 slots
-      auto slotNode = dynamic_cast<ValueNode<NodeType::VEC3>*>(slot->GetAbstractNode());
+      auto slotNode = dynamic_cast<ValueNode<NodeType::VEC3>*>(slot->GetReferencedNode());
       watcher = slotNode->Watch<Vec3Watcher>(
         slotNode, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
     } else if (slot->DoesAcceptType(NodeType::VEC4) &&
-               slot->GetAbstractNode()->GetType() != NodeType::SHADER_STUB) {
+               slot->GetReferencedNode()->GetType() != NodeType::SHADER_STUB) {
       /// Vec4 slots
-      auto slotNode = dynamic_cast<ValueNode<NodeType::VEC4>*>(slot->GetAbstractNode());
+      auto slotNode = dynamic_cast<ValueNode<NodeType::VEC4>*>(slot->GetReferencedNode());
       watcher = slotNode->Watch<Vec4Watcher>(
         slotNode, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
     }
@@ -113,7 +113,7 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     QPushButton* sourceButton = new QPushButton("Edit source", watcherWidget);
     watcherWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
       ZenGarden::GetInstance()->Watch(
-        stub->mSource.GetAbstractNode(), WatcherPosition::RIGHT_TAB);
+        stub->mSource.GetReferencedNode(), WatcherPosition::RIGHT_TAB);
     });
     mLayout->addWidget(sourceButton);
   }
@@ -123,11 +123,11 @@ void DefaultPropertyEditor::OnSlotConnectionChanged(Slot* slot) {
   auto it = mSlotWatchers.find(slot);
   if (it != mSlotWatchers.end()) {
     shared_ptr<WatcherUI> watcher = it->second;
-    Node* node = slot->GetAbstractNode();
+    Node* node = slot->GetReferencedNode();
     if (node->GetType() == NodeType::SHADER_STUB) {
       node->RemoveWatcher(watcher.get());
     } else {
-      slot->GetAbstractNode()->AssignWatcher(watcher);
+      slot->GetReferencedNode()->AssignWatcher(watcher);
       WatcherUI* watcherPtr = watcher.get();
       if (slot->DoesAcceptType(NodeType::FLOAT)) {
         ASSERT(dynamic_cast<FloatWatcher*>(watcherPtr));

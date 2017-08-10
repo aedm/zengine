@@ -135,7 +135,7 @@ void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
         HandleSourceChange();
         SendMsg(NodeMessage::VALUE_CHANGED);
       }
-      else if (slot->GetAbstractNode()->GetType() == NodeType::SHADER_STUB) {
+      else if (slot->GetReferencedNode()->GetType() == NodeType::SHADER_STUB) {
         SendMsg(NodeMessage::VALUE_CHANGED);
       }
       else {

@@ -74,15 +74,18 @@ public:
   /// and reinserts it at the "TargetIndex" position. Only for multislots.
   void ChangeNodeIndex(Node* node, UINT targetIndex);
 
-  /// Returns connected node (errorlog & nullptr if multislot)
+  /// Returns referenced connected node (single slots only)
   /// Subclasses of Slot have a properly typed GetNode() method.
-  Node* GetAbstractNode() const;
+  Node* GetReferencedNode() const;
+
+  /// Returns directly connected node, no reference following (single slots only)
+  Node* GetDirectNode() const;
 
   /// Returns the number of connected nodes (only for multislot)
   UINT GetMultiNodeCount() const;
 
   /// Returns the 'index'th connected node reference (only for multislot)
-  Node* GetMultiNode(UINT index) const;
+  Node* GetReferencedMultiNode(UINT index) const;
 
   /// Returns the multinodes *without* forwarding,
   /// ie. not calling Node::GetReferencedNode()
@@ -276,6 +279,6 @@ public:
     : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}
 
   N* GetNode() {
-    return static_cast<N*>(GetAbstractNode());
+    return static_cast<N*>(GetReferencedNode());
   }
 };

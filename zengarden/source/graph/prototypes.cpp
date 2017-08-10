@@ -23,6 +23,7 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<GlobalTimeNode>());
   AddPrototype(registry->GetNodeClass<Material>());
+  AddPrototype(registry->GetNodeClass<SolidMaterial>());
   AddPrototype(registry->GetNodeClass<Drawable>());
   AddPrototype(registry->GetNodeClass<CameraNode>());
   AddPrototype(registry->GetNodeClass<SceneNode>());

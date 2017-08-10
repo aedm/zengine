@@ -63,7 +63,7 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
         }
       } else {
         /// TODO: remove code duplication
-        Node* connectedNode = slot->GetAbstractNode();
+        Node* connectedNode = slot->GetDirectNode();
         if (connectedNode) {
           shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget != NULL) {
@@ -317,7 +317,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
       if (slot->mIsMultiSlot) {
         /// HACK HACK HACK
         slot->DisconnectAll(true);
-      } else if (slot->GetAbstractNode()) {
+      } else if (slot->GetReferencedNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
     }

@@ -46,15 +46,14 @@ void JSONSerializer::Traverse(Node* root) {
   for (auto slotPair : root->GetSerializableSlots()) {
     Slot* slot = slotPair.second;
     if (slot->mIsMultiSlot) {
-      for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
-        Node* node = slot->GetMultiNode(i);
+      for (Node* node : slot->GetDirectMultiNodes()) {
         auto it = mNodes.find(node);
         if (it == mNodes.end()) {
           Traverse(node);
         }
       }
     } else {
-      Node* node = slot->GetAbstractNode();
+      Node* node = slot->GetDirectNode();
       if (node == nullptr || slot->IsDefaulted()) continue;
       auto it = mNodes.find(node);
       if (it == mNodes.end()) {
@@ -164,8 +163,7 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
       /// Save multislot
       if (slot->mIsMultiSlot) {
         rapidjson::Value connections(rapidjson::kArrayType);
-        for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
-          Node* connectedNode = slot->GetMultiNode(i);
+        for (Node* connectedNode : slot->GetDirectMultiNodes()) {
           int connectedID = mNodes.at(connectedNode);
           connections.PushBack(connectedID, *mAllocator);
         }
@@ -173,7 +171,7 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
           connections, *mAllocator);
       }
       else {
-        Node* connectedNode = slot->GetAbstractNode();
+        Node* connectedNode = slot->GetDirectNode();
 
         FloatSlot* floatSlot;
         Vec2Slot* vec2Slot;
@@ -309,7 +307,7 @@ void JSONSerializer::SerializeValueSlot(rapidjson::Value& slotsObject, Slot* slo
                                         rapidjson::Value& defaultValue) {
   rapidjson::Value slotValue(rapidjson::kObjectType);
   slotValue.AddMember("default", defaultValue, *mAllocator);
-  Node* connectedNode = slot->GetAbstractNode();
+  Node* connectedNode = slot->GetReferencedNode();
   if (!slot->IsDefaulted()) {
     int connectedID = mNodes.at(connectedNode);
     slotValue.AddMember("id", connectedID, *mAllocator);

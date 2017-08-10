@@ -133,8 +133,8 @@ ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
 
 template<NodeType T>
 const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const {
-  ASSERT(GetAbstractNode()->GetType() == T)
-  return static_cast<ValueNode<T>*>(GetAbstractNode())->Get();
+  ASSERT(GetReferencedNode()->GetType() == T)
+  return static_cast<ValueNode<T>*>(GetReferencedNode())->Get();
 }
 
 
@@ -195,7 +195,7 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
 
 template<NodeType T>
 bool ValueSlot<T>::IsDefaulted() {
-  return GetAbstractNode() == &mDefault;
+  return GetReferencedNode() == &mDefault;
 }
 
 
