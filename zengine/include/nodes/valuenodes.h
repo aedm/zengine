@@ -161,7 +161,7 @@ bool ValueSlot<T>::Connect(Node* target) {
   if (mNode) mNode->DisconnectFromSlot(this);
   mNode = target ? target : &mDefault;
   mNode->ConnectToSlot(this);
-  mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+  TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
   return true;
 }
 
@@ -178,7 +178,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
   }
   mNode = &mDefault;
   mDefault.ConnectToSlot(this);
-  mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+  TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
 }
 
 
@@ -188,7 +188,7 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   if (mNode == &mDefault) return;
   mDefault.ConnectToSlot(this);
   if (notifyOwner) {
-    mOwner->ReceiveMessage(NodeMessage::SLOT_CONNECTION_CHANGED, this);
+    TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
   }
 }
 

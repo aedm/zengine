@@ -127,7 +127,7 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
-void StubNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void StubNode::HandleMessage(NodeMessage message, Slot* slot) {
   /// Stubs send a VALUE_CHANGED message is the shader needs to be rebuilt
   switch (message) {
     case NodeMessage::VALUE_CHANGED:

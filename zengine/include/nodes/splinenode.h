@@ -34,7 +34,7 @@ public:
 	SSpline();
   virtual ~SSpline();
 
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 
   FloatSlot mTimeSlot;
 

@@ -16,10 +16,10 @@ Material::Material()
 Material::~Material() {}
 
 
-void Material::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void Material::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
-      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }
@@ -41,7 +41,7 @@ REGISTER_NODECLASS(SolidMaterial, "Solid Material");
 
 SolidMaterial::SolidMaterial()
   : Node(NodeType::MATERIAL)
-  , mGhostSlot(NodeType::ALLOW_ALL, this, nullptr, false, false, false, false)
+  , mGhostSlot(NodeType::ALLOW_ALL, this, nullptr, false, false, false, true)
 {
   mMaterial.mShadowPass.Connect(&TheEngineShaders->mSolidShadowPass);
 
@@ -56,10 +56,7 @@ SolidMaterial::SolidMaterial()
   mMaterial.mSolidPass.Connect(&mSolidPass);
 
   mGhostSlot.Connect(&mMaterial);
-
-  for (Slot* slot : mSolidPass.mFragmentStub.GetNode()->GetPublicSlots()) {
-    AddSlot(slot, true, true, true);
-  }
+  SetupSlots();
 }
 
 
@@ -71,12 +68,20 @@ Node* SolidMaterial::GetReferencedNode() {
   return &mMaterial;
 }
 
-void SolidMaterial::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
-//   switch (message) {
-//     case NodeMessage::SLOT_CONNECTION_CHANGED:
-//     case NodeMessage::VALUE_CHANGED:
-//       ReceiveMessage(NodeMessage::NEEDS_REDRAW);
-//       break;
-//     default: break;
-//   }
+void SolidMaterial::HandleMessage(NodeMessage message, Slot* slot) {
+   switch (message) {
+     case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
+       SetupSlots();
+       break;
+     default: break;
+   }
+}
+
+void SolidMaterial::SetupSlots() {
+  ClearSlots();
+  AddSlot(&mGhostSlot, false, false, false);
+
+  for (Slot* slot : mSolidPass.mFragmentStub.GetNode()->GetPublicSlots()) {
+    AddSlot(slot, true, true, true);
+  }
 }

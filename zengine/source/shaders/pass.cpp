@@ -30,7 +30,7 @@ Pass::~Pass()
   RemoveUniformSlots();
 }
 
-void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void Pass::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:
@@ -39,7 +39,7 @@ void Pass::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
         SafeDelete(mFragmentShaderMetadata);
         mIsUpToDate = false;
       } 
-      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }

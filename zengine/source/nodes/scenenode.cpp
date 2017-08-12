@@ -52,15 +52,14 @@ void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
   }
 }
 
-void SceneNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
-  Node::HandleMessage(message, slot, payload);
+void SceneNode::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
       mIsUpToDate = false;
       break;
     case NodeMessage::VALUE_CHANGED:
     case NodeMessage::SLOT_CONNECTION_CHANGED:
-      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }

@@ -42,7 +42,7 @@ public:
   RenderState mRenderstate;
 
 protected:
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 
   /// Creates the shader program
   virtual void Operate();

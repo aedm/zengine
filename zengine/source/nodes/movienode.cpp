@@ -60,7 +60,7 @@ float MovieNode::CalculateMovieLength() {
   return length;
 }
 
-void MovieNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void MovieNode::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:

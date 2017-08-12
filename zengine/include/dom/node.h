@@ -8,9 +8,17 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <deque>
 
 using namespace std;
 using namespace fastdelegate;
+
+class Node;
+class Watcher;
+class Slot;
+class MessageQueue;
+
+extern MessageQueue TheMessageQueue;
 
 /// Notifications that nodes send to each other when something changed.
 /// An accompanying void* payload can also be set for each event type.
@@ -44,8 +52,29 @@ enum class NodeMessage {
   NODE_POSITION_CHANGED,
 };
 
-class Node;
-class Watcher;
+class MessageQueue {
+  friend class Node;
+
+public:
+  void Enqueue(Node* node, NodeMessage nodeMessage, Slot* slot = nullptr);
+
+private:
+  struct Message {
+    Node* node;
+    Slot* slot;
+    NodeMessage message;
+
+    bool operator < (const Message& other) const;
+  };
+
+  std::set<Message> mMessageSet;
+  std::deque<Message> mMessageQueue;
+  bool mIsInProgress = false;
+
+  void ProcessAllMessages();
+  void RemoveNode(Node* node);
+};
+
 
 /// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
@@ -125,8 +154,9 @@ protected:
 class Node {
   friend class Slot;
   friend class Watcher;
+  friend class MessageQueue;
   template<NodeType T> friend class ValueSlot;
-
+  
 public:
   virtual ~Node();
 
@@ -161,14 +191,11 @@ protected:
   /// Main operation
   virtual void Operate() {}
 
-  /// Receives message through a slot
-  void ReceiveMessage(NodeMessage message, Slot* slot = nullptr, void* payload = nullptr);
-
   /// Sends a message to dependants. ('SendMessage' is already defined in WinUser.h)
-  void SendMsg(NodeMessage message, void* payload = nullptr);
+  void SendMsg(NodeMessage message);
 
   /// Handle received messages
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload);
+  virtual void HandleMessage(NodeMessage message, Slot* slot);
 
   /// Output type
   NodeType mType;
@@ -186,6 +213,9 @@ private:
   /// Add or remove slot to/from notification list
   void ConnectToSlot(Slot* slot);
   void DisconnectFromSlot(Slot* slot);
+
+  /// Receives message through a slot
+  void ReceiveMessage(NodeMessage message, Slot* slot = nullptr);
 
   /// ---------------- Editor-specific parts ----------------
   /// This section can be disabled without hurting the engine.

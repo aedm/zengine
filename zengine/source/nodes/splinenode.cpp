@@ -37,7 +37,7 @@ SSpline::~SSpline() {
 }
 
 
-void SSpline::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void SSpline::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED:
       InvalidateCurrentValue();

@@ -77,7 +77,7 @@ void CameraNode::SetupGlobals(Globals* globals) {
 
 CameraNode::~CameraNode() {}
 
-void CameraNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void CameraNode::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:

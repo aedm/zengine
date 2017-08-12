@@ -12,6 +12,7 @@
 :param vec3 Ambient
 :param vec3 Diffuse
 :param vec3 Specular
+:param vec3 Emissive
 :param float SpecularPower
 :param float SampleSpread
 :param float Spread
@@ -286,6 +287,6 @@ SHADER
   // -------------
   // Final color
 
-  color += shadow * (diffuse + specular);
+  color += shadow * (diffuse + specular) + Emissive;
   FragColor = vec4(color, 1);
 }

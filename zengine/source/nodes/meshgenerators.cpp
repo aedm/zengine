@@ -84,8 +84,7 @@ void CubeMeshNode::Operate() {
   mMesh->SetIndices(indexes);
 }
 
-void CubeMeshNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
-  Node::HandleMessage(message, slot, payload);
+void CubeMeshNode::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED:
       if (mIsUpToDate) {

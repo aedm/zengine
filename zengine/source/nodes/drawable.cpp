@@ -74,11 +74,11 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
   }
 }
 
-void Drawable::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void Drawable::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:
-      ReceiveMessage(NodeMessage::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
       break;
     default: break;
   }

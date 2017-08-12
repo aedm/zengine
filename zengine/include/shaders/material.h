@@ -13,7 +13,7 @@ public:
   Pass* GetPass(PassType passType);
 
 protected:
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 };
 
 typedef TypedSlot<NodeType::MATERIAL, Material> MaterialSlot;
@@ -27,9 +27,11 @@ public:
   virtual Node* GetReferencedNode() override;
 
 protected:
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 
 private:
+  void SetupSlots();
+
   Material mMaterial;
   Pass mSolidPass;
 

@@ -27,7 +27,7 @@ protected:
   void RenderDrawables(Globals* globals, PassType passType);
 
   /// Handle received messages
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 
 private:
   vector<Node*> mTransitiveClosure;

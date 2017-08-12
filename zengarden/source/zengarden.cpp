@@ -49,6 +49,7 @@ ZenGarden::ZenGarden(QWidget *parent)
 }
 
 ZenGarden::~ZenGarden() {
+  DeleteDocument();
   DisposeModules();
 }
 

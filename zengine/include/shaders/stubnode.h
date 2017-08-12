@@ -143,7 +143,7 @@ protected:
 	void HandleSourceChange();
 
 	/// Handle received messages
-	virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+	virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 
 	/// Metadata
 	StubMetadata* mMetadata;

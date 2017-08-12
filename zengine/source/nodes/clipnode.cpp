@@ -46,13 +46,11 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   scene->Draw(renderTarget, globals);
 }
 
-void ClipNode::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void ClipNode::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::VALUE_CHANGED:
       SendMsg(NodeMessage::VALUE_CHANGED);
       break;
-    default:
-      Node::HandleMessage(message, slot, payload);
-      break;
+    default: break;
   }
 }

@@ -26,7 +26,7 @@ public:
 
 protected:
   /// Handle received messages
-  virtual void HandleMessage(NodeMessage message, Slot* slot, void* payload) override;
+  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
 };
 
 typedef TypedSlot<NodeType::CAMERA, CameraNode> CameraSlot;
