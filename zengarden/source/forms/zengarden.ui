@@ -299,7 +299,14 @@
     <addaction name="actionSaveAs"/>
     <addaction name="actionOpen"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionDocumentProperties"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
   </widget>
   <action name="actionSaveAs">
    <property name="text">
@@ -323,6 +330,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionDocumentProperties">
+   <property name="text">
+    <string>Properties...</string>
    </property>
   </action>
  </widget>

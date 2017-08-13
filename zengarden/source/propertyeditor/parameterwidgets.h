@@ -24,6 +24,8 @@ public:
   void SetReadOnly(bool readOnly);
 
   void Set(float value);
+  void SetRange(float minimum, float maximum);
+
   float Get();
 
 private:
@@ -62,6 +64,7 @@ public:
 
   /// Set the value of the editor
   void Set(float value);
+  void SetRange(float minimum, float maximum);
 
   /// Subscribe to get value updates
   Event<FloatEditor*, float> onValueChange;
@@ -91,7 +94,8 @@ protected:
 /// A parameter panel item for FloatNodes
 class FloatWatcher: public WatcherUI {
 public:
-  FloatWatcher(ValueNode<NodeType::FLOAT>* node, QString name, bool readOnly);
+  FloatWatcher(ValueNode<NodeType::FLOAT>* node, FloatSlot* slot, QString name, 
+               bool readOnly);
   virtual ~FloatWatcher() {}
 
   /// Enable/disable editing
@@ -101,10 +105,14 @@ public:
 
 private:
   virtual void OnRedraw() override;
+  void UpdateRange();
 
   FloatEditor* mEditorX = nullptr;
   bool mIsReadOnly = false;
   QString mName;
+
+  /// The slot through which the Node is inspected
+  FloatSlot* mSlot = nullptr;
 
   void HandleValueChange(FloatEditor* editor, float value);
 };
@@ -113,7 +121,8 @@ private:
 /// A parameter panel item for Vec3Nodes
 class Vec3Watcher: public WatcherUI {
 public:
-  Vec3Watcher(ValueNode<NodeType::VEC3>* node, QString name, bool readOnly);
+  Vec3Watcher(ValueNode<NodeType::VEC3>* node, Vec3Slot* slot, QString name, 
+              bool readOnly);
   virtual ~Vec3Watcher() {}
 
   /// Enable/disable editing
@@ -123,12 +132,16 @@ public:
 
 private:
   virtual void OnRedraw() override;
+  void UpdateRange();
 
   FloatEditor* mEditorX = nullptr;
   FloatEditor* mEditorY = nullptr;
   FloatEditor* mEditorZ = nullptr;
   bool mIsReadOnly = false;
   QString mName;
+
+  /// The slot through which the Node is inspected
+  Vec3Slot* mSlot = nullptr;
 
   void HandleValueChange(FloatEditor* editor, float value);
 };

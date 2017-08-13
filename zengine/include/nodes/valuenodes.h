@@ -95,9 +95,13 @@ public:
   typedef typename NodeTypes<T>::Type ValueType;
 
   ValueSlot(Node* owner, SharedString name, bool isMultiSlot = false,
-            bool isPublic = true, bool isSerializable = true);
+            bool isPublic = true, bool isSerializable = true,
+            float minimum = 0.0f, float maximum = 1.0f);
 
   const ValueType& Get() const;
+
+  /// Return minimum & maximum
+  Vec2 GetRange() const;
 
   /// Sets the value of the built-in Node.
   void SetDefaultValue(const ValueType& value);
@@ -120,13 +124,19 @@ public:
 protected:
   /// Default value
   StaticValueNode<T> mDefault;
+  float mMinimum;
+  float mMaximum;
 };
 
 
 template<NodeType T>
 ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
-                        bool isPublic, bool isSerializable)
-  : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {
+                        bool isPublic, bool isSerializable,
+                        float minimum, float maximum)
+  : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable)
+  , mMinimum(minimum)
+  , mMaximum(maximum)
+{
   Connect(&mDefault);
 }
 
@@ -135,6 +145,12 @@ template<NodeType T>
 const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const {
   ASSERT(GetReferencedNode()->GetType() == T)
   return static_cast<ValueNode<T>*>(GetReferencedNode())->Get();
+}
+
+
+template<NodeType T>
+Vec2 ValueSlot<T>::GetRange() const {
+  return Vec2(mMinimum, mMaximum);
 }
 
 
@@ -211,13 +227,13 @@ typedef ValueSlot<NodeType::FLOAT>			FloatSlot;
 typedef ValueSlot<NodeType::VEC2>			  Vec2Slot;
 typedef ValueSlot<NodeType::VEC3>			  Vec3Slot;
 typedef ValueSlot<NodeType::VEC4>			  Vec4Slot;
-typedef ValueSlot<NodeType::MATRIX44>		Matrix4Slot;
+//typedef ValueSlot<NodeType::MATRIX44>		Matrix4Slot;
 
 typedef StaticValueNode<NodeType::FLOAT>	  FloatNode;
 typedef StaticValueNode<NodeType::VEC2>	    Vec2Node;
 typedef StaticValueNode<NodeType::VEC3>	    Vec3Node;
 typedef StaticValueNode<NodeType::VEC4>		  Vec4Node;
-typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
+//typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
 
 
 ///// Explicit template type instantiations

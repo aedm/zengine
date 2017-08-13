@@ -18,6 +18,7 @@ public:
 
   /// Get stub source by name
   StubNode* GetStub(const string& name);
+  string GetSource(const string& name);
 
   /// Engine stutbs loaded, create built-in material passes and shaders
   void OnLoadFinished();

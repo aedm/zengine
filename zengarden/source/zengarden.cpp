@@ -42,6 +42,8 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
+  connect(mUI.actionDocumentProperties, SIGNAL(triggered()), this, 
+          SLOT(HandleDocumentPropertiesMenu()));
 
   mUI.timelineWidget->hide();
 
@@ -432,6 +434,10 @@ void ZenGarden::HandleMenuOpen() {
 
   int milliseconds = myTimer.elapsed();
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
+}
+
+void ZenGarden::HandleDocumentPropertiesMenu() {
+  SetNodeForPropertyEditor(mDocument);
 }
 
 void ZenGarden::DeleteDocument() {

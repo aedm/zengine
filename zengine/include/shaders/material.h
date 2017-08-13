@@ -34,6 +34,8 @@ private:
 
   Material mMaterial;
   Pass mSolidPass;
+  StubNode mSolidVertexStub;
+  StubNode mSolidFragmentStub;
 
   Slot mGhostSlot;
 };

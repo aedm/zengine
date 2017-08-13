@@ -13,7 +13,7 @@
 :param vec3 Diffuse
 :param vec3 Specular
 :param vec3 Emissive
-:param float SpecularPower
+:param float SpecularPower min=0 max=50 def=5
 :param float SampleSpread
 :param float Spread
 :param float MaxSpread

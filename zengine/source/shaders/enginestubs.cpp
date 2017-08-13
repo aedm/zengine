@@ -26,6 +26,10 @@ StubNode* EngineStubs::GetStub(const string& name) {
   return mStubs.at(name);
 }
 
+std::string EngineStubs::GetSource(const string& name) {
+  return mStubs.at(name)->mSource.GetDefaultValue();
+}
+
 void EngineStubs::OnLoadFinished() {
   TheEngineShaders = new EngineShaders();
 }

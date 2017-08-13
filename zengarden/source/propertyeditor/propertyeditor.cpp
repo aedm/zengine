@@ -76,15 +76,20 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     if (slot->DoesAcceptType(NodeType::FLOAT) &&
         slot->GetReferencedNode()->GetType() != NodeType::SHADER_STUB) {
       /// Float slots
-      auto slotNode = dynamic_cast<ValueNode<NodeType::FLOAT>*>(slot->GetReferencedNode());
-      watcher = slotNode->Watch<FloatWatcher>(
-        slotNode, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
+      auto floatSlot = dynamic_cast<FloatSlot*>(slot);
+      auto slotNode =
+        dynamic_cast<ValueNode<NodeType::FLOAT>*>(slot->GetReferencedNode());
+      watcher = slotNode->Watch<FloatWatcher>(slotNode, floatSlot,
+                                              QString::fromStdString(*slot->GetName()),
+                                              !slot->IsDefaulted());
     } else if (slot->DoesAcceptType(NodeType::VEC3) &&
                slot->GetReferencedNode()->GetType() != NodeType::SHADER_STUB) {
       /// Vec3 slots
+      auto vec3Slot = dynamic_cast<Vec3Slot*>(slot);
       auto slotNode = dynamic_cast<ValueNode<NodeType::VEC3>*>(slot->GetReferencedNode());
-      watcher = slotNode->Watch<Vec3Watcher>(
-        slotNode, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
+      watcher = slotNode->Watch<Vec3Watcher>(slotNode, vec3Slot,
+                                             QString::fromStdString(*slot->GetName()),
+                                             !slot->IsDefaulted());
     } else if (slot->DoesAcceptType(NodeType::VEC4) &&
                slot->GetReferencedNode()->GetType() != NodeType::SHADER_STUB) {
       /// Vec4 slots
@@ -101,9 +106,9 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
       mSlotWatchers[slot] = watcher;
     } else {
       /// General slots, just add a label
-      QLabel* slotLabel =
-        new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
-      mLayout->addWidget(slotLabel);
+      //QLabel* slotLabel =
+      //  new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
+      //mLayout->addWidget(slotLabel);
     }
   }
 
@@ -157,10 +162,11 @@ void StaticFloatEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
   static const QString valueString("value");
-  auto watcher = mNode->Watch<FloatWatcher>(static_cast<FloatNode*>(mNode), valueString, false);
-  mValueWatcherWidget = new WatcherWidget(watcherWidget, watcher, WatcherPosition::PROPERTY_PANEL);
+  auto watcher = mNode->Watch<FloatWatcher>(static_cast<FloatNode*>(mNode), nullptr, 
+                                            valueString, false);
+  mValueWatcherWidget = new WatcherWidget(watcherWidget, watcher, 
+                                          WatcherPosition::PROPERTY_PANEL);
   mLayout->addWidget(mValueWatcherWidget);
-  //mValueWatcherWidget->onWatcherDeath = Delegate(this, &StaticFloatEditor::RemoveStaticWatcher);
 }
 
 void StaticFloatEditor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {
@@ -177,11 +183,11 @@ void StaticVec3Editor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
   static const QString valueString("value");
-  auto watcher = mNode->Watch<Vec3Watcher>(static_cast<Vec3Node*>(mNode), valueString, false);
-  mValueWatcherWidget = new WatcherWidget(watcherWidget, watcher, WatcherPosition::PROPERTY_PANEL);
+  auto watcher = mNode->Watch<Vec3Watcher>(static_cast<Vec3Node*>(mNode), nullptr,
+                                           valueString, false);
+  mValueWatcherWidget = new WatcherWidget(watcherWidget, watcher, 
+                                          WatcherPosition::PROPERTY_PANEL);
   mLayout->addWidget(mValueWatcherWidget);
-  //mValueWatcherWidget->onWatcherDeath =
-  //  Delegate(this, &StaticVec3Editor::RemoveStaticWatcher);
 }
 
 void StaticVec3Editor::RemoveStaticWatcher(WatcherWidget* watcherWidget) {

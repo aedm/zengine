@@ -10,4 +10,6 @@ public:
 
   GraphSlot mGraphs;
   MovieSlot mMovie;
+
+  FloatSlot mBPM;
 };

@@ -34,7 +34,7 @@ void Slider::paintEvent(QPaintEvent *e) {
     else painter.setBrush(palette().highlight().color());
 
     int widthPx = widgetSize.width() - 2;
-    int full = float(widthPx) * mValue / (mMaximum - mMinimum);
+    int full = float(widthPx) * (mValue - mMinimum) / (mMaximum - mMinimum);
     if (full > widthPx) full = widthPx;
     else if (full < 0) full = 0;
     painter.drawRect(1, 1, full, widgetSize.height() - 2);
@@ -58,7 +58,8 @@ void Slider::mouseMoveEvent(QMouseEvent * event) {
 
 void Slider::HandleMouse(QMouseEvent * event) {
   if (mMaximum > mMinimum) {
-    float newValue = float(event->x() + 1) * (mMaximum - mMinimum) / float(width());
+    float newValue = 
+      mMinimum + float(event->x() + 1) * (mMaximum - mMinimum) / float(width());
     if (mValue != newValue) {
       onValueChange(newValue);
     }
@@ -74,6 +75,12 @@ void Slider::Set(float value) {
     this->mValue = value;
     update();
   }
+}
+
+void Slider::SetRange(float minimum, float maximum) {
+  mMinimum = minimum;
+  mMaximum = maximum;
+  update();
 }
 
 void Slider::SetReadOnly(bool readOnly) {
@@ -155,6 +162,10 @@ void FloatEditor::Set(float value) {
   mSlider->Set(value);
 }
 
+void FloatEditor::SetRange(float minimum, float maximum) {
+  mSlider->SetRange(minimum, maximum);
+}
+
 void FloatEditor::SetReadOnly(bool readOnly) {
   mSlider->SetReadOnly(readOnly);
   mTextBox->setReadOnly(readOnly);
@@ -162,16 +173,26 @@ void FloatEditor::SetReadOnly(bool readOnly) {
 }
 
 
-FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, QString name, bool readOnly)
+FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, FloatSlot* slot, 
+                           QString name, bool readOnly)
   : WatcherUI(node) 
   , mName(name)
   , mIsReadOnly(readOnly)
+  , mSlot(slot)
 {}
 
 
 void FloatWatcher::OnRedraw() {
   float value = static_cast<ValueNode<NodeType::FLOAT>*>(mNode)->Get();
   mEditorX->Set(value);
+}
+
+
+void FloatWatcher::UpdateRange() {
+  if (mSlot) {
+    Vec2 range = mSlot->GetRange();
+    mEditorX->SetRange(range.x, range.y);
+  }
 }
 
 
@@ -194,6 +215,7 @@ void FloatWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->addWidget(mEditorX);
 
   SetReadOnly(mIsReadOnly);
+  UpdateRange();
 }
 
 void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
@@ -204,10 +226,12 @@ void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
 }
 
 
-Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, QString name, bool readOnly)
+Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, Vec3Slot* slot, QString name, 
+                         bool readOnly)
   : WatcherUI(node) 
   , mName(name)
   , mIsReadOnly(readOnly)
+  , mSlot(slot)
 {}
 
 
@@ -218,6 +242,15 @@ void Vec3Watcher::OnRedraw() {
   mEditorZ->Set(value.z);
 }
 
+
+void Vec3Watcher::UpdateRange() {
+  if (mSlot) {
+    Vec2 range = mSlot->GetRange();
+    mEditorX->SetRange(range.x, range.y);
+    mEditorY->SetRange(range.x, range.y);
+    mEditorZ->SetRange(range.x, range.y);
+  }
+}
 
 void Vec3Watcher::SetReadOnly(bool readOnly) {
   mIsReadOnly = readOnly;
@@ -239,17 +272,19 @@ void Vec3Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   mEditorX = new FloatEditor(watcherWidget, mName + ".x", value.x);
   mEditorX->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
-  layout->addWidget(mEditorX);
 
   mEditorY = new FloatEditor(watcherWidget, mName + ".y", value.y);
   mEditorY->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
-  layout->addWidget(mEditorY);
 
   mEditorZ = new FloatEditor(watcherWidget, mName + ".z", value.z);
   mEditorZ->onValueChange += Delegate(this, &Vec3Watcher::HandleValueChange);
+
+  layout->addWidget(mEditorX);
+  layout->addWidget(mEditorY);
   layout->addWidget(mEditorZ);
 
   SetReadOnly(mIsReadOnly);
+  UpdateRange();
 }
 
 void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {

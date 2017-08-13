@@ -45,10 +45,13 @@ SolidMaterial::SolidMaterial()
 {
   mMaterial.mShadowPass.Connect(&TheEngineShaders->mSolidShadowPass);
 
-  mSolidPass.mVertexStub.Connect(
-    TheEngineStubs->GetStub("material/solid/solidPass-vertex"));
-  mSolidPass.mFragmentStub.Connect(
-    TheEngineStubs->GetStub("material/solid/solidPass-fragment"));
+  mSolidVertexStub.mSource.SetDefaultValue(
+    TheEngineStubs->GetSource("material/solid/solidPass-vertex"));
+  mSolidFragmentStub.mSource.SetDefaultValue(
+    TheEngineStubs->GetSource("material/solid/solidPass-fragment"));
+
+  mSolidPass.mVertexStub.Connect(&mSolidVertexStub);
+  mSolidPass.mFragmentStub.Connect(&mSolidFragmentStub);
 
   mSolidPass.mRenderstate.mDepthTest = true;
   mSolidPass.mBlendModeSlot.SetDefaultValue(1.0f); // normal
@@ -81,7 +84,7 @@ void SolidMaterial::SetupSlots() {
   ClearSlots();
   AddSlot(&mGhostSlot, false, false, false);
 
-  for (Slot* slot : mSolidPass.mFragmentStub.GetNode()->GetPublicSlots()) {
+  for (Slot* slot : mSolidFragmentStub.GetPublicSlots()) {
     AddSlot(slot, true, true, true);
   }
 }

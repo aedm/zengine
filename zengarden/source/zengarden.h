@@ -116,4 +116,5 @@ private slots:
   void HandleMenuSaveAs();
   void HandleMenuNew();
   void HandleMenuOpen();
+  void HandleDocumentPropertiesMenu();
 };
