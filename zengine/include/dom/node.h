@@ -21,7 +21,6 @@ class MessageQueue;
 extern MessageQueue TheMessageQueue;
 
 /// Notifications that nodes send to each other when something changed.
-/// An accompanying void* payload can also be set for each event type.
 enum class NodeMessage {
   /// Some slots were added or removed.
   SLOT_STRUCTURE_CHANGED,

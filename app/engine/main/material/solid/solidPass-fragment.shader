@@ -239,11 +239,11 @@ SHADER
   vec3 normal = normalize(vNormal);
   vec3 tangent = normalize(vTangent);
   vec3 binormal = cross(normal, tangent);
-
-  vec3 n = normalize(texture(NormalMap, fract(vTexCoord * NormalMapScale)).xyz * 2 - 1);
   mat3 normalSpace = mat3(tangent, binormal, normal);
+
+  vec3 n = normalize(texture(NormalMap, vTexCoord * NormalMapScale).xyz * 2.0 - 1.0);
   vec3 np = normalSpace * n;
-  normal = normalize(normal + np * NormalMapIntensity);
+  normal = normalize(mix(normal, np, NormalMapIntensity));
 
 
   float cosa = dot(light, normal);

@@ -101,7 +101,7 @@ void ResourceManager::DiscardMesh(Mesh* meshInstance) {
 
 Texture* ResourceManager::CreateTexture(int width, int height, TexelType type,
                                         OWNERSHIP void* texelData) {
-  TextureHandle handle = OpenGL->CreateTexture(width, height, type, false, false, true);
+  TextureHandle handle = OpenGL->CreateTexture(width, height, type, false, true, true);
   if (texelData) {
     OpenGL->UploadTextureData(handle, width, height, type, texelData);
     // TODO: error handling

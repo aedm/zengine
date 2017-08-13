@@ -9,6 +9,7 @@ static const UINT BloomEffectMaxResolution = 256;
 
 EngineShaders::EngineShaders() {
   BuildPostProcessPasses();
+  BuildMaterialPasses();
 }
 
 EngineShaders::~EngineShaders() {
@@ -169,6 +170,6 @@ void EngineShaders::BuildMaterialPasses() {
     TheEngineStubs->GetStub("material/solid/shadowPass-fragment"));
 
   mSolidShadowPass.mRenderstate.mDepthTest = true;
-  mSolidShadowPass.mBlendModeSlot.SetDefaultValue(1.0f); // normal
+  mSolidShadowPass.mBlendModeSlot.SetDefaultValue(0.0f); // normal
   mSolidShadowPass.mFaceModeSlot.SetDefaultValue(1.0f); // back
 }

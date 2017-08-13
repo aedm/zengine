@@ -20,7 +20,7 @@ const Vec3& FloatsToVec3Node::Get() {
   return mValue;
 }
 
-void FloatsToVec3Node::HandleMessage(NodeMessage message, Slot* slot, void* payload) {
+void FloatsToVec3Node::HandleMessage(NodeMessage message, Slot* slot) {
   switch (message) {
     case NodeMessage::SLOT_CONNECTION_CHANGED:
     case NodeMessage::VALUE_CHANGED:

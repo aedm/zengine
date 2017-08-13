@@ -140,7 +140,7 @@ const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const {
 
 template<NodeType T>
 void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
-  ASSERT(IsDefaulted());
+//  ASSERT(IsDefaulted());
   mDefault.Set(value);
 }
 
