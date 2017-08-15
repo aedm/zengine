@@ -17,6 +17,8 @@ public:
 
   Vec3Slot mShadowMapSize;
   Vec3Slot mSkyLightDirection;
+  Vec3Slot mSkyLightColor;
+  FloatSlot mSkyLightAmbient;
 
   void Draw(RenderTarget* renderTarget, Globals* globals);
 

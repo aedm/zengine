@@ -18,8 +18,12 @@ using namespace std;
   ITEM(USAGE_MATRIX_SKYLIGHT_CAMERA,              MATRIX44,		  SkylightCamera)           \
   ITEM(USAGE_MATRIX_SKYLIGHT_PROJECTION,          MATRIX44,		  SkylightProjection)       \
   ITEM(USAGE_MATRIX_SKYLIGHT_TRANSFORMATION,      MATRIX44,		  SkylightTransformation)   \
-  ITEM(USAGE_NOISEMAP_SIZE,			                  VEC2,			    NoiseMapSize)			        \
-  ITEM(USAGE_NOISEMAP_SIZE_RECIP,		              VEC2,			    NoiseMapSizeRecip)		    \
+  ITEM(USAGE_SKYLIGHT_TEXTURE,                    TEXTURE,		  SkylightTexture)          \
+  ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,              TEXTURE,		  SkylightColorTexture)     \
+  ITEM(USAGE_SKYLIGHT_TEXTURE_SIZE_RECIP,         FLOAT,        SkylightTextureSizeRecip) \
+  ITEM(USAGE_SKYLIGHT_DIRECTION,                  VEC3,		      SkylightDirection)        \
+  ITEM(USAGE_SKYLIGHT_COLOR,                      VEC3,		      SkylightColor)            \
+  ITEM(USAGE_SKYLIGHT_AMBIENT,                    FLOAT,		    SkylightAmbient)          \
   ITEM(USAGE_RENDERTARGET_SIZE,		                VEC2,			    RenderTargetSize)		      \
   ITEM(USAGE_RENDERTARGET_SIZE_RECIP,	            VEC2,			    RenderTargetSizeRecip)	  \
   ITEM(USAGE_VIEWPORT_SIZE,			                  VEC2,			    ViewportSize)			        \
@@ -31,9 +35,6 @@ using namespace std;
   ITEM(USAGE_GBUFFER_SOURCE_A,                    TEXTURE,		  GBufferSourceA)	          \
   ITEM(USAGE_GBUFFER_SAMPLE_COUNT,		            FLOAT,        GBufferSampleCount)       \
   ITEM(USAGE_SECONDARY_TEXTURE,                   TEXTURE,		  SecondaryTexture)         \
-  ITEM(USAGE_SKYLIGHT_TEXTURE,                    TEXTURE,		  SkylightTexture)          \
-  ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,              TEXTURE,		  SkylightColorTexture)     \
-  ITEM(USAGE_SKYLIGHT_TEXTURE_SIZE_RECIP,         FLOAT,        SkylightTextureSizeRecip) \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,                TEXTURE,      PPGauss)		              \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE,     VEC2,         PPGaussPixelSize)		      \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE,  VEC2,         PPGaussRelativeSize)		  \

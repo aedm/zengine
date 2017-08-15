@@ -22,12 +22,12 @@ struct ShaderUniform {
   ShaderUniform(NodeType type, const string& name, Node* node,
                       ShaderGlobalType globalType, bool isMultiSampler, bool isShadow);
 
-  NodeType type;
-  string name;
-  Node* node;
-  ShaderGlobalType globalType;
-  bool isMultiSampler; // type is "sampler2DMS"
-  bool isShadow; // type is "sampler2DShadow"
+  NodeType mType;
+  string mName;
+  Node* mNode;
+  ShaderGlobalType mGlobalType;
+  bool mIsMultiSampler; // type is "sampler2DMS"
+  bool mIsShadow; // type is "sampler2DShadow"
 };
 
 

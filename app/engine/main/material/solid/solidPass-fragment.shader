@@ -9,26 +9,26 @@
 :input vec3 vModelSpacePos
 :input vec3 vViewSpacePos
 
-:param vec3 Ambient
-:param vec3 Diffuse
-:param vec3 Specular
-:param vec3 Emissive
+:param vec3 Color
+:param float Specular
 :param float SpecularPower min=0 max=50 def=5
+:param vec3 Emissive
 :param float SampleSpread
 :param float Spread
 :param float MaxSpread
-:param vec3 LightDir
+:param sampler2D Texture
 :param sampler2D NormalMap
 :param float NormalMapIntensity
-:param float NormalMapScale
-
+:param vec3 TextureScale
 
 :global sampler2D gSkylightTexture
 :global sampler2D gSkylightColorTexture
+:global vec3 gSkylightDirection
+:global vec3 gSkylightColor
+:global float gSkylightAmbient
 :global mat4 gCamera
 :global mat4 gView
-:global float gSkylightTextureSizeRecip;
-
+:global float gSkylightTextureSizeRecip
 
 const int poissonCount = 198;
 vec3 poissonDisk[198] = vec3[](
@@ -234,27 +234,30 @@ vec3 poissonDisk[198] = vec3[](
 
 SHADER
 {
-  vec3 color = Ambient;
-  vec3 light = (vec4(normalize(LightDir), 0) * gCamera).xyz;
+  vec3 light = (vec4(normalize(gSkylightDirection), 0) * gCamera).xyz;
   vec3 normal = normalize(vNormal);
   vec3 tangent = normalize(vTangent);
-  vec3 binormal = cross(normal, tangent);
+  vec3 binormal = cross(tangent, normal);
   mat3 normalSpace = mat3(tangent, binormal, normal);
 
-  vec3 n = normalize(texture(NormalMap, vTexCoord * NormalMapScale).xyz * 2.0 - 1.0);
+#if defined NormalMap_CONNECTED
+  vec3 n = normalize(texture(NormalMap, vTexCoord * TextureScale.xy).xyz * 2.0 - 1.0);
   vec3 np = normalSpace * n;
   normal = normalize(mix(normal, np, NormalMapIntensity));
+#endif
 
+  vec3 diffuseColor = gSkylightColor * (1 - gSkylightAmbient);
+  vec3 ambientColor = gSkylightColor * gSkylightAmbient;
+  vec3 specularColor = gSkylightColor * Specular;
 
   float cosa = dot(light, normal);
   if (cosa < 0) cosa = 0; 
-  vec3 diffuse = Diffuse * cosa;
-
+  vec3 diffuse = diffuseColor * cosa;
 
   vec3 pointToEye = normalize(vViewSpacePos);
   vec3 lightMirror = reflect(light, normal);
   float coss = dot(pointToEye, lightMirror);
-  vec3 specular = Specular * pow(max(coss, 0.0), SpecularPower);
+  vec3 specular = specularColor * pow(max(coss, 0.0), SpecularPower);
 
   
   // -------------
@@ -286,7 +289,12 @@ SHADER
 
   // -------------
   // Final color
-
-  color += shadow * (diffuse + specular) + Emissive;
+    vec3 lightAffectedColor = Color * (ambientColor + shadow * (diffuse + specular));
+  #ifdef Texture_CONNECTED
+    lightAffectedColor *= texture(Texture, vTexCoord * TextureScale.xy).rgb;
+  #endif  
+  
+  
+  vec3 color = lightAffectedColor + Emissive;
   FragColor = vec4(color, 1);
 }

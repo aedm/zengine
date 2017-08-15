@@ -143,6 +143,9 @@ void StubNode::HandleMessage(NodeMessage message, Slot* slot) {
       }
       break;
     case NodeMessage::SLOT_CONNECTION_CHANGED:
+      if (slot == &mSource) {
+        HandleSourceChange();
+      }
       SendMsg(NodeMessage::VALUE_CHANGED);
       break;
     default:

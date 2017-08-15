@@ -69,30 +69,30 @@ void Pass::Operate() {
   INFO("Building render pipeline...");
 
   for (auto sampler : mVertexShaderMetadata->mSamplers) {
-    if (sampler->node) {
-      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false, false);
-      slot->Connect(sampler->node);
+    if (sampler->mNode) {
+      Slot* slot = new Slot(sampler->mNode->GetType(), this, nullptr, false, false, false, false);
+      slot->Connect(sampler->mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto uniform : mVertexShaderMetadata->mUniforms) {
-    if (uniform->node) {
-      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false, false);
-      slot->Connect(uniform->node);
+    if (uniform->mNode) {
+      Slot* slot = new Slot(uniform->mNode->GetType(), this, nullptr, false, false, false, false);
+      slot->Connect(uniform->mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto sampler : mFragmentShaderMetadata->mSamplers) {
-    if (sampler->node) {
-      Slot* slot = new Slot(sampler->node->GetType(), this, nullptr, false, false, false, false);
-      slot->Connect(sampler->node);
+    if (sampler->mNode) {
+      Slot* slot = new Slot(sampler->mNode->GetType(), this, nullptr, false, false, false, false);
+      slot->Connect(sampler->mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto uniform : mFragmentShaderMetadata->mUniforms) {
-    if (uniform->node) {
-      Slot* slot = new Slot(uniform->node->GetType(), this, nullptr, false, false, false, false);
-      slot->Connect(uniform->node);
+    if (uniform->mNode) {
+      Slot* slot = new Slot(uniform->mNode->GetType(), this, nullptr, false, false, false, false);
+      slot->Connect(uniform->mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
@@ -112,19 +112,19 @@ void Pass::Operate() {
   /// Collect uniforms from shader stage sources
   map<string, ShaderUniform*> uniformMap;
   for (auto sampler : mVertexShaderMetadata->mUniforms) {
-    uniformMap[sampler->name] = sampler;
+    uniformMap[sampler->mName] = sampler;
   }
   for (auto sampler : mFragmentShaderMetadata->mUniforms) {
-    uniformMap[sampler->name] = sampler;
+    uniformMap[sampler->mName] = sampler;
   }
 
   /// Collect samplers
   map<string, ShaderUniform*> samplerMap;
   for (auto sampler : mVertexShaderMetadata->mSamplers) {
-    samplerMap[sampler->name] = sampler;
+    samplerMap[sampler->mName] = sampler;
   }
   for (auto sampler : mFragmentShaderMetadata->mSamplers) {
-    samplerMap[sampler->name] = sampler;
+    samplerMap[sampler->mName] = sampler;
   }
 
   /// Merge uniform info
@@ -132,9 +132,9 @@ void Pass::Operate() {
     ShaderUniform* sourceUniform = uniformMap.at(samplerDesc.Name);
     PassUniform passUniform;
     passUniform.handle = samplerDesc.Handle;
-    passUniform.node = sourceUniform->node;
-    passUniform.globalType = sourceUniform->globalType;
-    passUniform.type = sourceUniform->type;
+    passUniform.node = sourceUniform->mNode;
+    passUniform.globalType = sourceUniform->mGlobalType;
+    passUniform.type = sourceUniform->mType;
     mUniforms.push_back(passUniform);
   }
 
@@ -143,9 +143,9 @@ void Pass::Operate() {
     ShaderUniform* sourceUniform = samplerMap.at(samplerDesc.Name);
     PassUniform passUniform;
     passUniform.handle = samplerDesc.Handle;
-    passUniform.node = sourceUniform->node;
-    passUniform.globalType = sourceUniform->globalType;
-    passUniform.type = sourceUniform->type;
+    passUniform.node = sourceUniform->mNode;
+    passUniform.globalType = sourceUniform->mGlobalType;
+    passUniform.type = sourceUniform->mType;
     mSamplers.push_back(passUniform);
   }
 

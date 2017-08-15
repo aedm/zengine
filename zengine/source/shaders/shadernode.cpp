@@ -11,8 +11,7 @@ ShaderMetadata::ShaderMetadata(
   , mOutputs(outputs)
   , mUniforms(uniforms)
   , mSamplers(samplers)
-  , mSource(source)
-{}
+  , mSource(source) {}
 
 ShaderMetadata::~ShaderMetadata() {
   for (auto x : mInputs) delete x;
@@ -23,15 +22,16 @@ ShaderMetadata::~ShaderMetadata() {
 
 ShaderVariable::ShaderVariable(NodeType _type, const string& _name, int _layout)
   : name(_name)
-  , type(_type) 
+  , type(_type)
   , layout(_layout) {}
 
 
-ShaderUniform::ShaderUniform(NodeType _type, const string& _name, Node* _node,
-                                         ShaderGlobalType _globalType, bool _isMultiSampler, bool _isShadow)
-  : type(_type)
-  , name(_name)
-  , node(_node)
-  , globalType(_globalType) 
-  , isMultiSampler(_isMultiSampler)
-  , isShadow(_isShadow) {}
+ShaderUniform::ShaderUniform(NodeType type, const string& name, Node* node,
+                             ShaderGlobalType globalType, 
+                             bool isMultiSampler, bool isShadow)
+  : mType(type)
+  , mName(name)
+  , mNode(node)
+  , mGlobalType(globalType)
+  , mIsMultiSampler(isMultiSampler)
+  , mIsShadow(isShadow) {}

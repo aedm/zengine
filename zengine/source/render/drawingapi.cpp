@@ -676,8 +676,12 @@ TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     } else {
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                      mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+      if (mipmap) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+      } else {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
     auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;

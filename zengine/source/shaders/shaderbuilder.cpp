@@ -8,7 +8,7 @@ OWNERSHIP ShaderMetadata* ShaderBuilder::FromStub(StubNode* stub, const string& 
   }
 
   ShaderBuilder builder(stub, prefix);
-  return new ShaderMetadata(builder.mInputs, builder.mOutputs, builder.mUniforms, 
+  return new ShaderMetadata(builder.mInputs, builder.mOutputs, builder.mUniforms,
                             builder.mSamplers, builder.sourceStream.str());
 }
 
@@ -58,7 +58,7 @@ void ShaderBuilder::CollectStubMetadata(Node* node) {
 
   /// Globals
   for (auto global : stubMeta->globals) {
-    ShaderUniform* uniform = 
+    ShaderUniform* uniform =
       new ShaderUniform(global->type, global->name, nullptr, global->usage, global->isMultiSampler, global->isShadow);
     if (global->type == NodeType::TEXTURE) {
       mSamplers.push_back(uniform);
@@ -99,6 +99,13 @@ void ShaderBuilder::CollectDependencies(Node* root) {
         WARN("Incomplete shader graph.");
         throw exception();
       }
+      if (slotPair.first->mType == NodeType::TEXTURE) {
+        TextureNode* textureNode = dynamic_cast<TextureNode*>(node);
+        ASSERT(textureNode);
+        if (textureNode->Get() != nullptr) {
+          mDefines.push_back(*slotPair.first->mName + "_CONNECTED");
+        }
+      }
       if (mDataMap.find(node) == mDataMap.end()) {
         CollectDependencies(node);
       }
@@ -137,10 +144,12 @@ void ShaderBuilder::GenerateSlots() {
       /// TODO: move this into a separate function
       if (node->GetType() == NodeType::TEXTURE) {
         mSamplers.push_back(new ShaderUniform(
-          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL, false, false));
+          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL, false, 
+          false));
       } else {
         mUniforms.push_back(new ShaderUniform(
-          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL, false, false));
+          node->GetType(), data->VariableName, node, ShaderGlobalType::LOCAL, false, 
+          false));
       }
     }
   }
@@ -172,14 +181,21 @@ void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {
 
   /// Uniforms
   for (auto uniform : mUniforms) {
-    stream << "uniform " << GetTypeString(uniform->type) << ' ' <<
-      uniform->name << ';' << endl;
+    stream << "uniform " << GetTypeString(uniform->mType) << ' ' <<
+      uniform->mName << ';' << endl;
   }
 
   /// Samplers
   for (auto uniform : mSamplers) {
-    stream << "uniform " << GetTypeString(uniform->type, uniform->isMultiSampler, uniform->isShadow) << ' ' <<
-      uniform->name << ';' << endl;
+    stream << "uniform " << 
+      GetTypeString(uniform->mType, uniform->mIsMultiSampler, uniform->mIsShadow) << 
+      ' ' << uniform->mName << ';' << endl;
+    TextureNode* textureNode = dynamic_cast<TextureNode*>(uniform->mNode);
+  }
+
+  /// Defines
+  for (auto define : mDefines) {
+    stream << "#define " << define << endl;
   }
 }
 
@@ -203,7 +219,7 @@ void ShaderBuilder::GenerateSourceFunctions(stringstream& stream) {
             throw exception();
           }
           NodeData* samplerData = mDataMap.at(paramNode);
-          stream << "#define " << *param->mName << ' ' << 
+          stream << "#define " << *param->mName << ' ' <<
             samplerData->VariableName << endl;
         }
       }

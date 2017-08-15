@@ -58,4 +58,7 @@ private:
   vector<ShaderVariable*>	mOutputs;
   vector<ShaderUniform*> mUniforms;
   vector<ShaderUniform*> mSamplers;
+
+  /// Things that need to be #define'd at the beginning of the shader code
+  vector<string> mDefines;
 };

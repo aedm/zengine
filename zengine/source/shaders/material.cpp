@@ -45,10 +45,10 @@ SolidMaterial::SolidMaterial()
 {
   mMaterial.mShadowPass.Connect(&TheEngineShaders->mSolidShadowPass);
 
-  mSolidVertexStub.mSource.SetDefaultValue(
-    TheEngineStubs->GetSource("material/solid/solidPass-vertex"));
-  mSolidFragmentStub.mSource.SetDefaultValue(
-    TheEngineStubs->GetSource("material/solid/solidPass-fragment"));
+  mSolidVertexStub.mSource.Connect(
+    TheEngineStubs->GetStub("material/solid/solidPass-vertex")->mSource.GetDirectNode());
+  mSolidFragmentStub.mSource.Connect(
+    TheEngineStubs->GetStub("material/solid/solidPass-fragment")->mSource.GetDirectNode());
 
   mSolidPass.mVertexStub.Connect(&mSolidVertexStub);
   mSolidPass.mFragmentStub.Connect(&mSolidFragmentStub);

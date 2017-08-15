@@ -6,6 +6,8 @@ static SharedString DrawablesSlotName = make_shared<string>("Drawables");
 static SharedString CameraSlotName = make_shared<string>("Camera");
 static SharedString ShadowMapSizeSlotName = make_shared<string>("Shadow map size");
 static SharedString SkylightDirectionSlotName = make_shared<string>("Skylight direction");
+static SharedString SkylightColorSlotName = make_shared<string>("Skylight color");
+static SharedString SkylightAmbientSlotName = make_shared<string>("Ambient factor");
 
 SceneNode::SceneNode()
   : Node(NodeType::SCENE)
@@ -13,6 +15,8 @@ SceneNode::SceneNode()
   , mCamera(this, CameraSlotName)
   , mShadowMapSize(this, ShadowMapSizeSlotName)
   , mSkyLightDirection(this, SkylightDirectionSlotName)
+  , mSkyLightColor(this, SkylightColorSlotName)
+  , mSkyLightAmbient(this, SkylightAmbientSlotName)
 {}
 
 SceneNode::~SceneNode() {
@@ -25,15 +29,18 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   /// Skylight shadow
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
+
   Vec3 s = mShadowMapSize.Get();
   Vec3 lightDir = mSkyLightDirection.Get().Normal();
-  //globals->Camera = Matrix::Rotate(Quaternion::FromEuler(dir.x, dir.y, dir.z));
-  globals->Camera = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
 
+  globals->Camera = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
   globals->World.LoadIdentity();
   globals->SkylightProjection = globals->Projection;
   globals->SkylightCamera = globals->Camera;
+  globals->SkylightDirection = mSkyLightDirection.Get();
+  globals->SkylightColor = mSkyLightColor.Get();
+  globals->SkylightAmbient = mSkyLightAmbient.Get();
   RenderDrawables(globals, PassType::SHADOW);
 
   /// Draw to G-Buffer
