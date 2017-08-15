@@ -56,6 +56,9 @@ protected:
   QPoint mOriginalMousePos;
 
   void UpdateRangeLabels();
+  void UpdateTimeEdit();
+  void UpdateValueEdit();
+
   void SelectPoint(int index);
 
   SSpline* GetSpline();
@@ -65,6 +68,9 @@ private slots:
   void RemovePoint();
   void AddPoint();
   void ToggleLinear();
+
+  void HandleTimeEdited();
+  void HandleValueEdited();
 };
 
 typedef SplineWatcher<NodeType::FLOAT> FloatSplineWatcher;

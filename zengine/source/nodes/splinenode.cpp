@@ -169,9 +169,10 @@ void SSpline::calculateTangent(int index) {
 }
 
 void SSpline::InvalidateCurrentValue() {
-  if (!mIsUpToDate) return;
-  mIsUpToDate = false;
-  SendMsg(NodeMessage::VALUE_CHANGED);
+  if (mIsUpToDate) {
+    mIsUpToDate = false;
+    SendMsg(NodeMessage::VALUE_CHANGED);
+  }
   NotifyWatchers(&Watcher::OnRedraw);
 }
 

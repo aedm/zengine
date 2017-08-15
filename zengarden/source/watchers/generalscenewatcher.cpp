@@ -8,6 +8,9 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
   : WatcherUI(node)
 {
   if (node->GetType() != NodeType::SCENE) {
+    mDefaultScene.mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
+    mDefaultScene.mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
+    mDefaultScene.mSkyLightAmbient.SetDefaultValue(0.2f);
     mDefaultScene.mCamera.Connect(&mCamera);
     mScene = &mDefaultScene;
     mRenderForwarder = mDefaultScene.Watch<RenderForwarder>(&mDefaultScene);
@@ -97,8 +100,8 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
     Vec3 orientation = mCamera.mOrientation.Get();
-    orientation.y = mOriginalOrientation.y - float(diff.x()) / 300.0f;
-    orientation.x = mOriginalOrientation.x - float(diff.y()) / 300.0f;
+    orientation.y = mOriginalOrientation.y + float(diff.x()) / 300.0f;
+    orientation.x = mOriginalOrientation.x + float(diff.y()) / 300.0f;
     mCamera.mOrientation.SetDefaultValue(orientation);
   }
   else if (event->buttons() & Qt::RightButton) {

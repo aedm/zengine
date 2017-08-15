@@ -40,9 +40,16 @@ void SplineWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mUI.autotangentCheckBox->setFocusPolicy(Qt::NoFocus);
   mUI.breakpointCheckBox->setFocusPolicy(Qt::NoFocus);
 
-  watcherWidget->connect(mUI.addPointButton, &QPushButton::pressed, [=]() { AddPoint(); });
-  watcherWidget->connect(mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
-  watcherWidget->connect(mUI.linearCheckBox, &QPushButton::pressed, [=]() { ToggleLinear(); });
+  watcherWidget->connect(
+    mUI.addPointButton, &QPushButton::pressed, [=]() { AddPoint(); });
+  watcherWidget->connect(
+    mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
+  watcherWidget->connect(
+    mUI.linearCheckBox, &QPushButton::pressed, [=]() { ToggleLinear(); });
+  watcherWidget->connect(
+    mUI.timeLineEdit, &QLineEdit::editingFinished, [=]() { HandleTimeEdited(); });
+  watcherWidget->connect(
+    mUI.valueLineEdit, &QLineEdit::editingFinished, [=]() { HandleValueEdited(); });
 }
 
 
@@ -81,6 +88,36 @@ void SplineWatcher<T>::ToggleLinear() {
   if (mSelectedPointIndex >= 0) {
     GetSpline()->setLinear(mSelectedPointIndex, 
                            !GetSpline()->getPoint(mSelectedPointIndex).isLinear);
+  }
+}
+
+
+template<NodeType T>
+void SplineWatcher<T>::HandleValueEdited() {
+  if (mSelectedPointIndex < 0) return;
+  QString uiString = mUI.valueLineEdit->text();
+  bool ok;
+  float f = uiString.toFloat(&ok);
+  if (ok) {
+    SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+    auto point = spline->getPoint(mSelectedPointIndex);
+    spline->setPointValue(mSelectedPointIndex, point.time, f);
+    mUI.valueLineEdit->clearFocus();
+  }
+}
+
+
+template<NodeType T>
+void SplineWatcher<T>::HandleTimeEdited() {
+  if (mSelectedPointIndex < 0) return;
+  QString uiString = mUI.timeLineEdit->text();
+  bool ok;
+  float f = uiString.toFloat(&ok);
+  if (ok) {
+    SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+    auto point = spline->getPoint(mSelectedPointIndex);
+    spline->setPointValue(mSelectedPointIndex, f, point.value);
+    mUI.timeLineEdit->clearFocus();
   }
 }
 
@@ -240,27 +277,60 @@ void SplineWatcher<T>::SelectPoint(int index) {
   if (index < 0 && mSelectedPointIndex == index) return;
   if (index >= GetSpline()->getNumPoints()) index = -1;
   mSelectedPointIndex = index;
-  mUI.pointIndexLabel->setText(QString("Point #%1").arg(QString::number(index)));
   if (index >= 0) {
     const SSplinePoint& p = dynamic_cast<SSpline*>(GetNode())->getPoint(index);
-    mUI.pointTimeValueLabel->setText(QString("t:%1 v:%2").arg(
-      QString::number(p.time, 'f', 2), QString::number(p.value, 'f', 2)));
     mUI.removePointButton->setEnabled(true);
     mUI.linearCheckBox->setEnabled(true);
     mUI.linearCheckBox->setChecked(p.isLinear);
   } else {
-    mUI.pointTimeValueLabel->setText(QString(""));
     mUI.removePointButton->setEnabled(false);
     mUI.linearCheckBox->setEnabled(false);
   }
+  UpdateTimeEdit();
+  UpdateValueEdit();
+  UpdateRangeLabels();
 }
+
+
+
+template<NodeType T>
+void SplineWatcher<T>::UpdateTimeEdit() {
+  if (mSelectedPointIndex < 0) {
+    mUI.timeLineEdit->setText("");
+    mUI.timeLineEdit->setEnabled(false);
+    return;
+  }
+  const SSplinePoint& p = 
+    dynamic_cast<SSpline*>(GetNode())->getPoint(mSelectedPointIndex);
+  mUI.timeLineEdit->setEnabled(true);
+  mUI.timeLineEdit->setText(QString::number(p.time, 'f'));
+}
+
+
+template<NodeType T>
+void SplineWatcher<T>::UpdateValueEdit() {
+  if (mSelectedPointIndex < 0) {
+    mUI.valueLineEdit->setText("");
+    mUI.valueLineEdit->setEnabled(false);
+    return;
+  }
+  const SSplinePoint& p =
+    dynamic_cast<SSpline*>(GetNode())->getPoint(mSelectedPointIndex);
+  mUI.valueLineEdit->setEnabled(true);
+  mUI.valueLineEdit->setText(QString::number(p.value, 'f'));
+}
+
 
 template<NodeType T>
 void SplineWatcher<T>::UpdateRangeLabels() {
-  mUI.xRangeLabel->setText(QString("X: %1 .. %2")
-                           .arg(QString::number(mXRange.x, 'f', 2), QString::number(mXRange.y, 'f', 2)));
-  mUI.yRangeLabel->setText(QString("Y: %1 .. %2")
-                           .arg(QString::number(mYRange.x, 'f', 2), QString::number(mYRange.y, 'f', 2)));
+  QString pointIndex = 
+    mSelectedPointIndex < 0 ? "-" : QString::number(mSelectedPointIndex);
+  mUI.statusLabel->setText(QString("Point #%1, X: [%2..%3], Y: [%4..%5]")
+                           .arg(pointIndex,
+                                QString::number(mXRange.x, 'f', 2),
+                                QString::number(mXRange.y, 'f', 2), 
+                                QString::number(mYRange.x, 'f', 2), 
+                                QString::number(mYRange.y, 'f', 2)));
 }
 
 
