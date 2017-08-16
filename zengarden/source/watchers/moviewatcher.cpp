@@ -15,6 +15,10 @@ void MovieWatcher::OnRedraw() {
   GetGLWidget()->update();
 }
 
+void MovieWatcher::OnTimeEdited(float time) {
+  ZenGarden::GetInstance()->SetMovieCursor(time);
+}
+
 void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
   GetGLWidget()->OnPaint += Delegate(this, &MovieWatcher::Paint);

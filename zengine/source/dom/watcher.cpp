@@ -25,5 +25,5 @@ void Watcher::OnSlotConnectionChanged(Slot* slot) {}
 void Watcher::OnSlotStructureChanged() {}
 void Watcher::OnGraphPositionChanged() {}
 void Watcher::OnSplineControlPointsChanged() {}
-void Watcher::OnSplineTimeChanged() {}
+void Watcher::OnTimeEdited(float time) {}
 void Watcher::OnChildNameChange() {}

@@ -81,7 +81,7 @@ template<NodeType T>
 void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
   if (mValue == newValue) return;
   mValue = newValue;
-  SendMsg(NodeMessage::VALUE_CHANGED);
+  SendMsg(MessageType::VALUE_CHANGED);
 }
 
 
@@ -177,7 +177,7 @@ bool ValueSlot<T>::Connect(Node* target) {
   if (mNode) mNode->DisconnectFromSlot(this);
   mNode = target ? target : &mDefault;
   mNode->ConnectToSlot(this);
-  TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+  TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
   return true;
 }
 
@@ -194,7 +194,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
   }
   mNode = &mDefault;
   mDefault.ConnectToSlot(this);
-  TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+  TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
 }
 
 
@@ -204,7 +204,7 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   if (mNode == &mDefault) return;
   mDefault.ConnectToSlot(this);
   if (notifyOwner) {
-    TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+    TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
   }
 }
 

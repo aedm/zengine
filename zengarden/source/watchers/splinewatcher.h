@@ -22,7 +22,7 @@ protected:
 
   virtual void OnRedraw() override;
   virtual void OnSplineControlPointsChanged() override;
-  virtual void OnSplineTimeChanged() override;
+  virtual void OnTimeEdited(float time) override;
 
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);

@@ -99,7 +99,7 @@ void SplineWatcher<T>::HandleValueEdited() {
   bool ok;
   float f = uiString.toFloat(&ok);
   if (ok) {
-    SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+    SSpline* spline = GetSpline();
     auto point = spline->getPoint(mSelectedPointIndex);
     spline->setPointValue(mSelectedPointIndex, point.time, f);
     mUI.valueLineEdit->clearFocus();
@@ -114,7 +114,7 @@ void SplineWatcher<T>::HandleTimeEdited() {
   bool ok;
   float f = uiString.toFloat(&ok);
   if (ok) {
-    SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+    SSpline* spline = GetSpline();
     auto point = spline->getPoint(mSelectedPointIndex);
     spline->setPointValue(mSelectedPointIndex, f, point.value);
     mUI.timeLineEdit->clearFocus();
@@ -124,12 +124,12 @@ void SplineWatcher<T>::HandleTimeEdited() {
 
 template<NodeType T>
 SSpline* SplineWatcher<T>::GetSpline() {
-  return dynamic_cast<SSpline*>(GetNode());
+  return SafeCast<SSpline*>(GetNode());
 }
 
 
 template<NodeType T>
-void SplineWatcher<T>::OnSplineTimeChanged() {
+void SplineWatcher<T>::OnTimeEdited(float time) {
   mSplineWidget->update();
 }
 
@@ -165,7 +165,7 @@ void SplineWatcher<T>::HandleMouseMove(QMouseEvent* event) {
     }
     break;
     case SplineWatcher::State::TIME_MOVE:
-      ZenGarden::GetInstance()->SetMovieCursor(ScreenToTime(event->pos().x()));
+      GetSpline()->mSceneTimeNode.EditTime(ScreenToTime(event->pos().x()));
       break;
     default:
     {
@@ -177,7 +177,7 @@ void SplineWatcher<T>::HandleMouseMove(QMouseEvent* event) {
       float yCursor = mYRange.x + float(event->pos().y()) * yDelta / height;
       float xMouse = float(event->pos().x());
       float yMouse = float(event->pos().y());
-      SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+      SSpline* spline = GetSpline();
       int newIndex = -1;
       for (int i = 0; i < spline->getNumPoints(); i++) {
         const SSplinePoint& p = spline->getPoint(i);
@@ -222,15 +222,14 @@ void SplineWatcher<T>::HandleMouseLeftDown(QMouseEvent* event) {
     SelectPoint(mHoveredPointIndex);
     mOriginalMousePos = event->pos();
 
-    SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+    SSpline* spline = GetSpline();
     const SSplinePoint& p = spline->getPoint(mHoveredPointIndex);
     mOriginalTime = p.time;
     mOriginalValue = p.value;
   } else {
     /// Move time
     mState = SplineWatcher::State::TIME_MOVE;
-    /// TODO: fix this, it's broken
-    ZenGarden::GetInstance()->SetMovieCursor(ScreenToTime(event->pos().x()));
+    GetSpline()->mSceneTimeNode.EditTime(ScreenToTime(event->pos().x()));
     SelectPoint(-1);
   }
 }
@@ -278,7 +277,7 @@ void SplineWatcher<T>::SelectPoint(int index) {
   if (index >= GetSpline()->getNumPoints()) index = -1;
   mSelectedPointIndex = index;
   if (index >= 0) {
-    const SSplinePoint& p = dynamic_cast<SSpline*>(GetNode())->getPoint(index);
+    const SSplinePoint& p = GetSpline()->getPoint(index);
     mUI.removePointButton->setEnabled(true);
     mUI.linearCheckBox->setEnabled(true);
     mUI.linearCheckBox->setChecked(p.isLinear);
@@ -300,8 +299,7 @@ void SplineWatcher<T>::UpdateTimeEdit() {
     mUI.timeLineEdit->setEnabled(false);
     return;
   }
-  const SSplinePoint& p = 
-    dynamic_cast<SSpline*>(GetNode())->getPoint(mSelectedPointIndex);
+  const SSplinePoint& p = GetSpline()->getPoint(mSelectedPointIndex);
   mUI.timeLineEdit->setEnabled(true);
   mUI.timeLineEdit->setText(QString::number(p.time, 'f'));
 }
@@ -314,8 +312,7 @@ void SplineWatcher<T>::UpdateValueEdit() {
     mUI.valueLineEdit->setEnabled(false);
     return;
   }
-  const SSplinePoint& p =
-    dynamic_cast<SSpline*>(GetNode())->getPoint(mSelectedPointIndex);
+  const SSplinePoint& p = GetSpline()->getPoint(mSelectedPointIndex);
   mUI.valueLineEdit->setEnabled(true);
   mUI.valueLineEdit->setText(QString::number(p.value, 'f'));
 }
@@ -384,7 +381,7 @@ void SplineWatcher<NodeType::FLOAT>::DrawSpline(QPaintEvent* ev) {
     beat++;
   }
 
-  SSpline* spline = dynamic_cast<SSpline*>(GetNode());
+  SSpline* spline = GetSpline();
 
   /// Draw scene time
   painter.setPen(QColor(80, 200, 80));

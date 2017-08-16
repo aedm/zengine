@@ -17,6 +17,18 @@
 #define NOT_IMPLEMENTED ASSERT(false);
 #define SHOULD_NOT_HAPPEN ASSERT(false);
 
+
+template<typename T, typename K>
+T SafeCast(K object) {
+  #ifdef _DEBUG
+  T cast = dynamic_cast<T>(object);
+  ASSERT(cast != nullptr);
+  return cast;
+  #else 
+  return static_cast<T>(object);
+  #endif
+}
+
 /// Logging facility 
 
 class Document;

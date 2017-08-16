@@ -19,7 +19,7 @@ public:
   float CalculateMovieLength();
 
 protected:
-  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
+  virtual void HandleMessage(Message* message) override;
 
 private:
   // Tracks ordered by starting time of clips

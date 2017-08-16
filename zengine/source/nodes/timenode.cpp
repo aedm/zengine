@@ -22,3 +22,10 @@ void GlobalTimeNode::HandleTimeChange(float milliseconds) {
 SceneTimeNode::SceneTimeNode()
   : FloatNode() 
 {}
+
+void SceneTimeNode::EditTime(float time) {
+  if (time == mValue) return;
+  mValue = time;
+  SendMsg(MessageType::SCENE_TIME_EDITED);
+  SendMsg(MessageType::VALUE_CHANGED);
+}

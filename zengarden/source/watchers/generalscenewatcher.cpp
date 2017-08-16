@@ -114,8 +114,8 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
 
 void GeneralSceneWatcher::Tick(float globalTime) {
   /// Use movie cursor as scene time
-  float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
-  mScene->SetSceneTime(movieCursor);
+  //float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
+  //mScene->SetSceneTime(movieCursor);
 }
 
 void GeneralSceneWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event) {

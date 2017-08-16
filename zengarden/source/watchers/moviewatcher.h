@@ -10,6 +10,7 @@ public:
   virtual ~MovieWatcher();
 
   virtual void OnRedraw() override;
+  virtual void OnTimeEdited(float time) override;
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:

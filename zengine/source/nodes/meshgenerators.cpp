@@ -84,12 +84,12 @@ void CubeMeshNode::Operate() {
   mMesh->SetIndices(indexes);
 }
 
-void CubeMeshNode::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::VALUE_CHANGED:
+void CubeMeshNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::VALUE_CHANGED:
       if (mIsUpToDate) {
         mIsUpToDate = false;
-        SendMsg(NodeMessage::VALUE_CHANGED);
+        SendMsg(MessageType::VALUE_CHANGED);
       }
       break;
     default: break;

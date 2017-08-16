@@ -25,15 +25,19 @@ public:
   /// Sets the clip-relative time to all SceneTimeNode dependencies
   void SetSceneTime(float seconds);
 
+  /// Gets the currect time cursor
+  float GetSceneTime();
+
 protected:
   void RenderDrawables(Globals* globals, PassType passType);
 
   /// Handle received messages
-  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
+  virtual void HandleMessage(Message* message) override;
 
 private:
   vector<Node*> mTransitiveClosure;
-  vector<SceneTimeNode*> mDependentSceneTimeNodes;
+  Slot mSceneTimes;
+  float mSceneTime = 0.0f;
 
   void CalculateRenderDependencies();
 };

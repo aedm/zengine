@@ -12,8 +12,8 @@ const int gVariableByteSizes[] = {
 
 MessageQueue TheMessageQueue;
 
-void MessageQueue::Enqueue(Node* node, NodeMessage nodeMessage, Slot* slot) {
-  Message message = {node, slot, nodeMessage};
+void MessageQueue::Enqueue(Node* source, Node* target, MessageType type, Slot* slot) {
+  Message message = {source, target, slot, type};
   if (mMessageSet.find(message) != mMessageSet.end()) return;
   mMessageQueue.push_back(message);
   mMessageSet.insert(message);
@@ -30,7 +30,7 @@ void MessageQueue::ProcessAllMessages() {
     Message message = mMessageQueue.front();
     mMessageQueue.pop_front();
     mMessageSet.erase(message);
-    message.node->ReceiveMessage(message.message, message.slot);
+    message.mTarget->ReceiveMessage(&message);
   }
 }
 
@@ -38,19 +38,22 @@ void MessageQueue::RemoveNode(Node* node) {
 start:
   for (auto it = mMessageQueue.begin(); it != mMessageQueue.end(); it++) {
     Message message = *it;
-    if (message.node != node) continue;
+    if (message.mTarget != node) continue;
     mMessageQueue.erase(it);
     mMessageSet.erase(message);
     goto start;
   }
 }
 
-bool MessageQueue::Message::operator<(const Message& other) const {
-  if (this->node < other.node) return true;
-  if (this->node == other.node) {
-    if (this->slot < other.slot) return true;
-    if (this->slot == other.slot) {
-      if (this->message < other.message) return true;
+bool Message::operator<(const Message& other) const {
+  if (this->mTarget < other.mTarget) return true;
+  if (this->mTarget == other.mTarget) {
+    if (this->mSource < other.mSource) return true;
+    if (this->mSource == other.mSource) {
+      if (this->mSlot < other.mSlot) return true;
+      if (this->mSlot == other.mSlot) {
+        if (this->mType < other.mType) return true;
+      }
     }
   }
   return false;
@@ -66,7 +69,7 @@ Slot::Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot,
   mName = name;
   mOwner->AddSlot(this, isPublic, isSerializable, isTraversable);
   if (isPublic) {
-    mOwner->ReceiveMessage(NodeMessage::SLOT_STRUCTURE_CHANGED, this);
+    TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_STRUCTURE_CHANGED, this);
   }
 }
 
@@ -92,14 +95,14 @@ bool Slot::Connect(Node* target) {
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
     /// TODO: merge these
-    TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+    TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
   } else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
       /// TODO: merge these
-      TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
     }
   }
   return true;
@@ -112,7 +115,8 @@ void Slot::Disconnect(Node* target) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+        TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, 
+                                this);
         return;
       }
     }
@@ -132,13 +136,15 @@ void Slot::DisconnectAll(bool notifyOwner) {
     }
     mMultiNodes.clear();
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED, 
+                              this);
     }
   } else {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(mOwner, NodeMessage::SLOT_CONNECTION_CHANGED, this);
+      TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED, 
+                              this);
     }
   }
 }
@@ -248,47 +254,46 @@ NodeType Node::GetType() const {
 }
 
 
-void Node::HandleMessage(NodeMessage message, Slot* slot) {
-  // Overload this
-}
+void Node::HandleMessage(Message* message) {}
 
 
 Node* Node::GetReferencedNode() {
   return this;
 }
 
-void Node::SendMsg(NodeMessage message) {
+void Node::SendMsg(MessageType message) {
   for (Slot* slot : mDependants) {
-    TheMessageQueue.Enqueue(slot->mOwner, message, slot);
+    TheMessageQueue.Enqueue(this, slot->mOwner, message, slot);
   }
 }
 
 
-void Node::ReceiveMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
+void Node::ReceiveMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::SLOT_CONNECTION_CHANGED:
       CheckConnections();
       /// Notifies dependants about transitive closure change
-      TheMessageQueue.Enqueue(this, NodeMessage::TRANSITIVE_CLOSURE_CHANGED, slot);
-      NotifyWatchers(&Watcher::OnSlotConnectionChanged, slot);
+      TheMessageQueue.Enqueue(message->mSource, this, 
+                              MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot);
+      NotifyWatchers(&Watcher::OnSlotConnectionChanged, message->mSlot);
       break;
-    case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
+    case MessageType::TRANSITIVE_CLOSURE_CHANGED:
       /// Bubbles up transitive closure notifications
-      SendMsg(NodeMessage::TRANSITIVE_CLOSURE_CHANGED);
+      SendMsg(MessageType::TRANSITIVE_CLOSURE_CHANGED);
       break;
-    case NodeMessage::NEEDS_REDRAW:
+    case MessageType::NEEDS_REDRAW:
       /// Bubbles up redraw command
-      SendMsg(NodeMessage::NEEDS_REDRAW);
+      SendMsg(MessageType::NEEDS_REDRAW);
       NotifyWatchers(&Watcher::OnRedraw);
       break;
-    case NodeMessage::NODE_NAME_CHANGED:
+    case MessageType::NODE_NAME_CHANGED:
       NotifyWatchers(&Watcher::OnChildNameChange);
       break;
     default:
       break;
   }
 
-  HandleMessage(message, slot);
+  HandleMessage(message);
 }
 
 
@@ -343,7 +348,7 @@ Node::~Node() {
 void Node::SetName(const string& name) {
   mName = name;
   NotifyWatchers(&Watcher::OnNameChange);
-  SendMsg(NodeMessage::NODE_NAME_CHANGED);
+  SendMsg(MessageType::NODE_NAME_CHANGED);
 }
 
 const string& Node::GetName() const {
@@ -362,7 +367,7 @@ const Vec2 Node::GetPosition() const {
 
 void Node::SetSize(const Vec2 size) {
   mSize = size;
-  TheMessageQueue.Enqueue(this, NodeMessage::NODE_POSITION_CHANGED);
+  TheMessageQueue.Enqueue(nullptr, this, MessageType::NODE_POSITION_CHANGED);
 }
 
 const Vec2 Node::GetSize() const {

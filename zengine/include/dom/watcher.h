@@ -37,7 +37,7 @@ public:
   virtual void OnSplineControlPointsChanged();
   
   /// Splines only: input time changes
-  virtual void OnSplineTimeChanged();
+  virtual void OnTimeEdited(float time);
 
 protected:
   Watcher(Node* node);

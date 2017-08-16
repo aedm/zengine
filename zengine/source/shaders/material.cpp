@@ -16,10 +16,10 @@ Material::Material()
 Material::~Material() {}
 
 
-void Material::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
+void Material::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::SLOT_CONNECTION_CHANGED:
+      TheMessageQueue.Enqueue(nullptr, this, MessageType::NEEDS_REDRAW);
       break;
     default: break;
   }
@@ -71,9 +71,9 @@ Node* SolidMaterial::GetReferencedNode() {
   return &mMaterial;
 }
 
-void SolidMaterial::HandleMessage(NodeMessage message, Slot* slot) {
-   switch (message) {
-     case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
+void SolidMaterial::HandleMessage(Message* message) {
+   switch (message->mType) {
+     case MessageType::TRANSITIVE_CLOSURE_CHANGED:
        SetupSlots();
        break;
      default: break;

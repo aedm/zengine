@@ -77,11 +77,11 @@ void CameraNode::SetupGlobals(Globals* globals) {
 
 CameraNode::~CameraNode() {}
 
-void CameraNode::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-    case NodeMessage::VALUE_CHANGED:
-      SendMsg(NodeMessage::NEEDS_REDRAW);
+void CameraNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::SLOT_CONNECTION_CHANGED:
+    case MessageType::VALUE_CHANGED:
+      SendMsg(MessageType::NEEDS_REDRAW);
       break;
     default: break;
   }

@@ -18,4 +18,8 @@ private:
 class SceneTimeNode: public FloatNode {
 public:
   SceneTimeNode();
+
+  /// Manually sets time. This function has the same effect as Set(), except
+  /// it sends different signal indicating user input.
+  void EditTime(float time);
 };

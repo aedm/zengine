@@ -13,7 +13,7 @@ public:
 
   virtual const Vec3& Get() override;
 
-  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
+  virtual void HandleMessage(Message* message) override;
 
 protected:
   virtual void Operate() override;

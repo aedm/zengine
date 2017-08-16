@@ -30,7 +30,7 @@ StaticMeshNode* StaticMeshNode::Create(OWNERSHIP Mesh* mesh) {
 void StaticMeshNode::Set(OWNERSHIP Mesh* mesh) {
   if (mMesh) TheResourceManager->DiscardMesh(mMesh);
   mMesh = mesh;
-  SendMsg(NodeMessage::VALUE_CHANGED);
+  SendMsg(MessageType::VALUE_CHANGED);
 }
 
 

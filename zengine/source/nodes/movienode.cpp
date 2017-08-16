@@ -19,8 +19,7 @@ MovieNode::~MovieNode() {
 }
 
 void MovieNode::Draw(RenderTarget* renderTarget, float time) {
-  renderTarget->SetGBufferAsTarget(&mGlobals);
-
+  bool clipFound = false;
   for (vector<ClipNode*>& track : mTracks) {
     int clipIndex = 0;
     int clipCount = int(track.size());
@@ -31,14 +30,21 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
       if (startTime <= time && endTime > time) {
         /// Render clip
         clip->Draw(renderTarget, &mGlobals, time - startTime);
+        clipFound = true;
         break;
       }
       if (startTime > time) break;
     }
   }
-
-  /// Apply post-process to scene to framebuffer
-  TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+  
+  if (clipFound) {
+    /// Apply post-process to scene to framebuffer
+    TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+  }
+  else {
+    renderTarget->SetColorBufferAsTarget(&mGlobals);
+    OpenGL->Clear(true, true);
+  }
 }
 
 int MovieNode::GetTrackCount() {
@@ -60,15 +66,24 @@ float MovieNode::CalculateMovieLength() {
   return length;
 }
 
-void MovieNode::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-    case NodeMessage::VALUE_CHANGED:
-      if (slot == &mClips) {
+void MovieNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::SLOT_CONNECTION_CHANGED:
+    case MessageType::VALUE_CHANGED:
+      if (message->mSlot == &mClips) {
         SortClips();
         NotifyWatchers(&Watcher::OnRedraw);
       }
       break;
+    case MessageType::SCENE_TIME_EDITED:
+    {
+      ClipNode* clipNode = SafeCast<ClipNode*>(message->mSource);
+      SceneNode* scene = clipNode->mSceneSlot.GetNode();
+      if (!scene) return;
+      float time = clipNode->mStartTime.Get() + scene->GetSceneTime();
+      NotifyWatchers(&Watcher::OnTimeEdited, time);
+      break;
+    }
     default: break;
   }
 }

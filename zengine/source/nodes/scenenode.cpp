@@ -17,6 +17,7 @@ SceneNode::SceneNode()
   , mSkyLightDirection(this, SkylightDirectionSlotName)
   , mSkyLightColor(this, SkylightColorSlotName)
   , mSkyLightAmbient(this, SkylightAmbientSlotName)
+  , mSceneTimes(NodeType::FLOAT, this, nullptr, true, false, false, false)
 {}
 
 SceneNode::~SceneNode() {
@@ -54,43 +55,58 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
 
 void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
-    Drawable* drawable = static_cast<Drawable*>(mDrawables.GetReferencedMultiNode(i));
+    Drawable* drawable = SafeCast<Drawable*>(mDrawables.GetReferencedMultiNode(i));
     drawable->Draw(globals, passType);
   }
 }
 
-void SceneNode::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::TRANSITIVE_CLOSURE_CHANGED:
+void SceneNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::TRANSITIVE_CLOSURE_CHANGED:
       mIsUpToDate = false;
       break;
-    case NodeMessage::VALUE_CHANGED:
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
+    case MessageType::VALUE_CHANGED:
+    case MessageType::SLOT_CONNECTION_CHANGED:
+      TheMessageQueue.Enqueue(this, this, MessageType::NEEDS_REDRAW);
       break;
+    case MessageType::SCENE_TIME_EDITED:
+    {
+      auto source = SafeCast<SceneTimeNode*>(message->mSource);
+      mSceneTime = source->Get();
+      for (Node* node : mSceneTimes.GetDirectMultiNodes()) {
+        if (node != source) {
+          SafeCast<SceneTimeNode*>(node)->Set(mSceneTime);
+        }
+      }
+      SendMsg(MessageType::SCENE_TIME_EDITED);
+      break;
+    }
     default: break;
   }
 }
 
 void SceneNode::CalculateRenderDependencies() {
   mTransitiveClosure.clear();
-  mDependentSceneTimeNodes.clear();
   GenerateTransitiveClosure(mTransitiveClosure, true);
   for (Node* node : mTransitiveClosure) {
     if (IsInstanceOf<SceneTimeNode>(node)) {
-      SceneTimeNode* sceneTimeNode = dynamic_cast<SceneTimeNode*>(node);
+      SceneTimeNode* sceneTimeNode = static_cast<SceneTimeNode*>(node);
       ASSERT(sceneTimeNode);
-      mDependentSceneTimeNodes.push_back(sceneTimeNode);
+      mSceneTimes.Connect(sceneTimeNode);
     }
   }
 }
 
-void SceneNode::SetSceneTime(float seconds) {
+void SceneNode::SetSceneTime(float time) {
   if (!mIsUpToDate) {
     CalculateRenderDependencies();
     mIsUpToDate = true;
   }
-  for (SceneTimeNode* sceneTimeNode : mDependentSceneTimeNodes) {
-    sceneTimeNode->Set(seconds);
+  for (Node* node : mSceneTimes.GetDirectMultiNodes()) {
+    SafeCast<SceneTimeNode*>(node)->Set(time);
   }
+}
+
+float SceneNode::GetSceneTime() {
+  return mSceneTime;
 }

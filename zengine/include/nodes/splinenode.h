@@ -34,9 +34,7 @@ public:
 	SSpline();
   virtual ~SSpline();
 
-  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
-
-  FloatSlot mTimeSlot;
+  virtual void HandleMessage(Message* message) override;
 
   virtual const float& Get() override;
 
@@ -56,6 +54,12 @@ public:
   /// Calculates tangents of the Nth control point
 	void calculateTangent(int index);					
 
+  /// Scene time node
+  SceneTimeNode mSceneTimeNode;
+
+  /// Time slot, connected to mSceneTimeNode
+  FloatSlot mTimeSlot;
+
 protected:
   /// Control points of spline
 	vector<SSplinePoint>	points;					
@@ -68,9 +72,6 @@ protected:
 
   /// Last queried point (cache)
 	int	lastIndex = 0;
-
-  /// Scene time node
-  SceneTimeNode mSceneTimeNode;
 
   void InvalidateCurrentValue();
   virtual void Operate();

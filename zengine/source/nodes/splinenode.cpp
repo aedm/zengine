@@ -37,11 +37,11 @@ SSpline::~SSpline() {
 }
 
 
-void SSpline::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::VALUE_CHANGED:
+void SSpline::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::VALUE_CHANGED:
       InvalidateCurrentValue();
-      NotifyWatchers(&Watcher::OnSplineTimeChanged);
+      NotifyWatchers(&Watcher::OnTimeEdited, mSceneTimeNode.Get());
       break;
     default:
       break;
@@ -171,7 +171,7 @@ void SSpline::calculateTangent(int index) {
 void SSpline::InvalidateCurrentValue() {
   if (mIsUpToDate) {
     mIsUpToDate = false;
-    SendMsg(NodeMessage::VALUE_CHANGED);
+    SendMsg(MessageType::VALUE_CHANGED);
   }
   NotifyWatchers(&Watcher::OnRedraw);
 }

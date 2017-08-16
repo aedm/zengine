@@ -20,7 +20,7 @@ public:
   void Draw(RenderTarget* renderTarget, Globals* globals, float clipTime);
 
 protected:
-  virtual void HandleMessage(NodeMessage message, Slot* slot) override;
+  virtual void HandleMessage(Message* message) override;
 
 };
 

@@ -33,6 +33,7 @@ typedef			int							UniformId;
 typedef			int							AttributeId;
 typedef			int							SamplerId;
 typedef			UINT					  FrameBufferId;
+typedef		  ULONG		        IndexEntry;
 
 
 /// Other
@@ -45,8 +46,6 @@ void SafeDelete(T*& Object) { delete Object; Object = 0; }
 
 template<typename T, int N>
 constexpr UINT ElementCount(const T (&arr)[N]) { return N; }
-
-typedef		ULONG		IndexEntry;
 
 /// Texel types
 enum class TexelType

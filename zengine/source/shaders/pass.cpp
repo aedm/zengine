@@ -30,16 +30,16 @@ Pass::~Pass()
   RemoveUniformSlots();
 }
 
-void Pass::HandleMessage(NodeMessage message, Slot* slot) {
-  switch (message) {
-    case NodeMessage::SLOT_CONNECTION_CHANGED:
-    case NodeMessage::VALUE_CHANGED:
-      if (slot == &mVertexStub || slot == &mFragmentStub) {
+void Pass::HandleMessage(Message* message) {
+  switch (message->mType) {
+    case MessageType::SLOT_CONNECTION_CHANGED:
+    case MessageType::VALUE_CHANGED:
+      if (message->mSlot == &mVertexStub || message->mSlot == &mFragmentStub) {
         SafeDelete(mVertexShaderMetadata);
         SafeDelete(mFragmentShaderMetadata);
         mIsUpToDate = false;
       } 
-      TheMessageQueue.Enqueue(this, NodeMessage::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(nullptr, this, MessageType::NEEDS_REDRAW);
       break;
     default: break;
   }

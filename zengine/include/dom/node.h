@@ -20,8 +20,9 @@ class MessageQueue;
 
 extern MessageQueue TheMessageQueue;
 
-/// Notifications that nodes send to each other when something changed.
-enum class NodeMessage {
+
+/// Notification types that nodes send to each other when something happened.
+enum class MessageType {
   /// Some slots were added or removed.
   SLOT_STRUCTURE_CHANGED,
 
@@ -49,23 +50,28 @@ enum class NodeMessage {
 
   /// Position of the node changed
   NODE_POSITION_CHANGED,
+
+  /// Scene time is manually edited in a spline editor
+  SCENE_TIME_EDITED,
 };
+
+struct Message {
+  Node* mSource;
+  Node* mTarget;
+  Slot* mSlot;
+  MessageType mType;
+
+  bool operator < (const Message& other) const;
+};
+
 
 class MessageQueue {
   friend class Node;
 
 public:
-  void Enqueue(Node* node, NodeMessage nodeMessage, Slot* slot = nullptr);
+  void Enqueue(Node* source, Node* target, MessageType type, Slot* slot = nullptr);
 
 private:
-  struct Message {
-    Node* node;
-    Slot* slot;
-    NodeMessage message;
-
-    bool operator < (const Message& other) const;
-  };
-
   std::set<Message> mMessageSet;
   std::deque<Message> mMessageQueue;
   bool mIsInProgress = false;
@@ -191,10 +197,10 @@ protected:
   virtual void Operate() {}
 
   /// Sends a message to dependants. ('SendMessage' is already defined in WinUser.h)
-  void SendMsg(NodeMessage message);
+  void SendMsg(MessageType message);
 
   /// Handle received messages
-  virtual void HandleMessage(NodeMessage message, Slot* slot);
+  virtual void HandleMessage(Message* message);
 
   /// Output type
   NodeType mType;
@@ -214,7 +220,7 @@ private:
   void DisconnectFromSlot(Slot* slot);
 
   /// Receives message through a slot
-  void ReceiveMessage(NodeMessage message, Slot* slot = nullptr);
+  void ReceiveMessage(Message* message);
 
   /// ---------------- Editor-specific parts ----------------
   /// This section can be disabled without hurting the engine.
