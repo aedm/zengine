@@ -27,12 +27,12 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Drawable>());
   AddPrototype(registry->GetNodeClass<CameraNode>());
   AddPrototype(registry->GetNodeClass<SceneNode>());
-  AddPrototype(registry->GetNodeClass<SSpline>());
+  AddPrototype(registry->GetNodeClass<FloatSplineNode>());
   
   AddPrototype(registry->GetNodeClass<CubeMeshNode>());
 
-  SSpline x;
-  x.getNumPoints();
+  FloatSplineNode x;
+  x.Get();
 
   LoadStubs();
 

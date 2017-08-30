@@ -16,6 +16,13 @@ const EnumMapperA TexelTypeMapper[] = {
   {"", -1}
 };
 
+const EnumMapperA SplineLayerMapper[] = {
+  {"base", UINT(SplineLayer::BASE)},
+  {"noise", UINT(SplineLayer::NOISE)},
+  {"", -1}
+};
+
+
 JSONSerializer::JSONSerializer(Node* root) {
   mJsonDocument.SetObject();
   mAllocator = &mJsonDocument.GetAllocator();
@@ -98,26 +105,19 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   /// Save node content
   if (IsInstanceOf<FloatNode>(node)) {
     SerializeFloatNode(v, static_cast<FloatNode*>(node));
-  }
-  else if (IsInstanceOf<Vec2Node>(node)) {
+  } else if (IsInstanceOf<Vec2Node>(node)) {
     SerializeVec2Node(v, static_cast<Vec2Node*>(node));
-  } 
-  else if (IsInstanceOf<Vec3Node>(node)) {
+  } else if (IsInstanceOf<Vec3Node>(node)) {
     SerializeVec3Node(v, static_cast<Vec3Node*>(node));
-  } 
-  else if (IsInstanceOf<Vec4Node>(node)) {
+  } else if (IsInstanceOf<Vec4Node>(node)) {
     SerializeVec4Node(v, static_cast<Vec4Node*>(node));
-  } 
-  else if (IsInstanceOf<SSpline>(node)) {
-    SerializeFloatSplineNode(v, static_cast<SSpline*>(node));
-  } 
-  else if (IsInstanceOf<TextureNode>(node)) {
+  } else if (IsInstanceOf<FloatSplineNode>(node)) {
+    SerializeFloatSplineNode(v, static_cast<FloatSplineNode*>(node));
+  } else if (IsInstanceOf<TextureNode>(node)) {
     SerializeTextureNode(v, static_cast<TextureNode*>(node));
-  }
-  else if (IsInstanceOf<StaticMeshNode>(node)) {
+  } else if (IsInstanceOf<StaticMeshNode>(node)) {
     SerializeStaticMeshNode(v, static_cast<StaticMeshNode*>(node));
-  } 
-  else if (IsInstanceOf<StubNode>(node)) {
+  } else if (IsInstanceOf<StubNode>(node)) {
     SerializeStubNode(v, static_cast<StubNode*>(node));
   }
 
@@ -125,8 +125,7 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   return v;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec)
-{
+rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec) {
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
   jsonObject.AddMember("y", vec.y, *mAllocator);
@@ -151,8 +150,7 @@ rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) {
 }
 
 
-void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node)
-{
+void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node) {
   /// Save slots
   if (node->GetSerializableSlots().size() > 0) {
     rapidjson::Value slotsObject(rapidjson::kObjectType);
@@ -168,9 +166,8 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
           connections.PushBack(connectedID, *mAllocator);
         }
         slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
-          connections, *mAllocator);
-      }
-      else {
+                              connections, *mAllocator);
+      } else {
         Node* connectedNode = slot->GetDirectNode();
 
         FloatSlot* floatSlot;
@@ -183,7 +180,7 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
         if ((floatSlot = dynamic_cast<FloatSlot*>(slot)) != nullptr) {
           rapidjson::Value defaultValue(floatSlot->GetDefaultValue());
           SerializeValueSlot(slotsObject, slot, defaultValue);
-        } 
+        }
 
         /// Save Vec2Slot
         else if ((vec2Slot = dynamic_cast<Vec2Slot*>(slot)) != nullptr) {
@@ -217,7 +214,7 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
           if (connectedNode != nullptr && !slot->IsDefaulted()) {
             int connectedID = mNodes.at(connectedNode);
             slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
-              connectedID, *mAllocator);
+                                  connectedID, *mAllocator);
           }
         }
       }
@@ -243,22 +240,28 @@ void JSONSerializer::SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* no
   nodeValue.AddMember("value", SerializeVec4(node->Get()), *mAllocator);
 }
 
-void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, SSpline* node) {
-  rapidjson::Value pointArray(rapidjson::kArrayType);
-  for (UINT i = 0; i < node->getNumPoints(); i++) {
-    const SSplinePoint& point = node->getPoint(i);
-    rapidjson::Value p(rapidjson::kObjectType);
-    p.AddMember("time", point.time, *mAllocator);
-    p.AddMember("value", point.value, *mAllocator);
-    p.AddMember("autotangent", point.isAutoangent, *mAllocator);
-    p.AddMember("breakpoint", point.isBreakpoint, *mAllocator);
-    p.AddMember("linear", point.isLinear, *mAllocator);
-    pointArray.PushBack(p, *mAllocator);
+void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, FloatSplineNode* node) {
+  for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT); layer++) {
+    SplineFloatComponent* component = node->GetComponent(SplineLayer(layer));
+    auto& points = component->GetPoints();
+    rapidjson::Value pointArray(rapidjson::kArrayType);
+    for (UINT i = 0; i < points.size(); i++) {
+      const SplinePoint& point = points[i];
+      rapidjson::Value p(rapidjson::kObjectType);
+      p.AddMember("time", point.mTime, *mAllocator);
+      p.AddMember("value", point.mValue, *mAllocator);
+      p.AddMember("autotangent", point.mIsAutoangent, *mAllocator);
+      p.AddMember("breakpoint", point.mIsBreakpoint, *mAllocator);
+      p.AddMember("linear", point.mIsLinear, *mAllocator);
+      pointArray.PushBack(p, *mAllocator);
+    }
+    const char* fieldName = EnumMapperA::GetStringFromEnum(SplineLayerMapper, layer);
+    nodeValue.AddMember(rapidjson::GenericStringRef<char>(fieldName), pointArray,
+                        *mAllocator);
   }
-  nodeValue.AddMember("points", pointArray, *mAllocator);
 }
 
-void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue, 
+void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
                                           TextureNode* node) {
   Texture* texture = node->Get();
   ASSERT(texture->mTexelData);
@@ -266,12 +269,12 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
   nodeValue.AddMember("type", rapidjson::Value(
-    EnumMapperA::GetStringFromEnum(TexelTypeMapper, int(texture->mType)), *mAllocator), 
+    EnumMapperA::GetStringFromEnum(TexelTypeMapper, int(texture->mType)), *mAllocator),
     *mAllocator);
   nodeValue.AddMember("base64", b64, *mAllocator);
 }
 
-void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue, 
+void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
                                              StaticMeshNode* node) {
   Mesh* mesh = node->GetMesh();
   ASSERT(mesh->mRawVertexData != nullptr);
@@ -285,7 +288,7 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
   for (UINT i = 0; i < floatCount; i++) {
     attribArray.PushBack(double(attribs[i]), *mAllocator);
   }
-  nodeValue.AddMember("vertices", attribArray, *mAllocator);  
+  nodeValue.AddMember("vertices", attribArray, *mAllocator);
 
   if (mesh->mIndexCount > 0) {
     rapidjson::Value indexArray(rapidjson::kArrayType);

@@ -31,6 +31,7 @@ enum class NodeType {
   DOCUMENT,
   MOVIE,
   CLIP,
+  PROPERTIES,
   
   /// Empty stub value type
   NONE,

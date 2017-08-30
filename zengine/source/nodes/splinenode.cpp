@@ -4,40 +4,44 @@
 #include <include/nodes/scenenode.h>
 #include <math.h>
 
-REGISTER_NODECLASS(SSpline, "Float Spline");
+REGISTER_NODECLASS(FloatSplineNode, "Float Spline");
 
-#define EPSILON			0.0001f
+const float Epsilon = 0.0001f;
 
 static SharedString TimeSlotName = make_shared<string>("Time");
+static SharedString PropertiesSlotName = make_shared<string>("Properties");
+static SharedString NoiseEnabledSlotName = make_shared<string>("Noise enabled");
+static SharedString NoiseVelocitySlotName = make_shared<string>("Noise velocity");
 
-SSplinePoint::SSplinePoint()
-{
-  tangentBefore = tangentAfter = 0.0f;
-  time = 0.0f;
-  value = 0.0f;
+SplinePoint::SplinePoint() {
+  mTangentBefore = mTangentAfter = 0.0f;
+  mTime = 0.0f;
+  mValue = 0.0f;
 }
 
 
-void SSplinePoint::setValue(float time, float value) {
-  this->time = time;
-  this->value = value;
+void SplinePoint::SetValue(float time, float value) {
+  this->mTime = time;
+  this->mValue = value;
 }
 
 
-SSpline::SSpline()
+FloatSplineNode::FloatSplineNode()
   : ValueNode<NodeType::FLOAT>()
   , mTimeSlot(this, TimeSlotName, false, false, false)
-{
+  , mPropertiesSlot(this, PropertiesSlotName, false, false)
+  , mNoiseEnabled(this, NoiseEnabledSlotName)
+  , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) {
   mTimeSlot.Connect(&mSceneTimeNode);
 }
 
 
-SSpline::~SSpline() {
+FloatSplineNode::~FloatSplineNode() {
   mTimeSlot.Disconnect(&mSceneTimeNode);
 }
 
 
-void SSpline::HandleMessage(Message* message) {
+void FloatSplineNode::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::VALUE_CHANGED:
       InvalidateCurrentValue();
@@ -48,127 +52,105 @@ void SSpline::HandleMessage(Message* message) {
   }
 }
 
-const float& SSpline::Get() {
+const float& FloatSplineNode::Get() {
   Update();
   return currentValue;
 }
 
-float SSpline::getValue(float time) {
-  if (points.size() == 0) return defaultValue;
-
-  if (lastIndex >= int(points.size())) lastIndex = 0;
-  if (lastIndex < -1) lastIndex = -1;
-  while (lastIndex < int(points.size()) - 1 && points[lastIndex + 1].time <= time) {
-    lastIndex++;
-  }
-  while (lastIndex >= 0 && points[lastIndex].time > time) {
-    lastIndex--;
-  }
-
-  SSplinePoint* before = lastIndex >= 0 ? &points[lastIndex] : nullptr;
-  SSplinePoint* after = lastIndex < int(points.size()) - 1 ? &points[lastIndex + 1] : nullptr;
-
-  if (before && after)
-    if (before->isLinear) {
-      float dt = after->time - before->time;
-      if (dt <= EPSILON) return before->value; 
-      return (after->value * (time - before->time) + before->value * (after->time - time)) / dt;
-    } else {
-      float dt = after->time - before->time;
-      float ft = (time - before->time) / dt;
-
-      float ea = before->value;
-      float eb = dt * before->tangentAfter;
-      float ec = 3.0f * (after->value - before->value) - dt * (2.0f * before->tangentAfter + after->tangentBefore);
-      float ed = -2.0f * (after->value - before->value) + dt * (before->tangentAfter + after->tangentBefore);
-
-      return ea + ft*eb + ft*ft*ec + ft*ft*ft*ed;
-    }
-  return before ? before->value : after ? after->value : defaultValue;
+float FloatSplineNode::GetNoiseValue(float time) {
+  if (mNoiseEnabled.Get() < 0.5f) return 0.0f;
+  float noiseVelocity = mNoiseVelocity.Get();
+  float noiseRatio = mNoiseLayer.Get(time) * 0.33f;
+  float t = time * noiseVelocity;
+  return noiseRatio * (sinf(t * 0.67f) + cosf(t * 2.43f) + cosf(t * 3.81f + 0.5f));
 }
 
-
-int SSpline::addPoint(float time, float value) {
+int SplineFloatComponent::AddPoint(float time, float value) {
   int i = 0;
-  while (i < points.size() && points[i].time <= time) i++;
+  while (i < mPoints.size() && mPoints[i].mTime <= time) i++;
 
-  SSplinePoint tmp;
-  tmp.time = time;
-  tmp.value = value;
-  tmp.isAutoangent = true;
-  tmp.isBreakpoint = false;
-  tmp.isLinear = i > 0 ? points[i - 1].isLinear : false;
+  SplinePoint tmp;
+  tmp.mTime = time;
+  tmp.mValue = value;
+  tmp.mIsAutoangent = true;
+  tmp.mIsBreakpoint = false;
+  tmp.mIsLinear = i > 0 ? mPoints[i - 1].mIsLinear : false;
 
-  points.insert(points.begin() + i, tmp);
+  mPoints.insert(mPoints.begin() + i, tmp);
 
-  calculateTangent(i - 1);
-  calculateTangent(i);
-  calculateTangent(i + 1);
+  CalculateTangent(i - 1);
+  CalculateTangent(i);
+  CalculateTangent(i + 1);
 
-  InvalidateCurrentValue();
   return i;
 }
 
-void SSpline::setPointValue(int index, float time, float value) {
-  if (index < 0 || index >= int(points.size())) return;
-  SSplinePoint& point = points[index];
+void SplineFloatComponent::SetPointValue(int index, float time, float value) {
+  if (index < 0 || index >= int(mPoints.size())) return;
+  SplinePoint& point = mPoints[index];
 
-  if (index > 0 && points[index - 1].time > time) time = points[index - 1].time;
-  if (index < points.size() - 1 && points[index + 1].time < time) {
-    time = points[index + 1].time;
+  if (index > 0 && mPoints[index - 1].mTime > time) time = mPoints[index - 1].mTime;
+  if (index < mPoints.size() - 1 && mPoints[index + 1].mTime < time) {
+    time = mPoints[index + 1].mTime;
   }
 
-  point.time = time;
-  point.value = value;
-  calculateTangent(index - 1);
-  calculateTangent(index);
-  calculateTangent(index + 1);
-  InvalidateCurrentValue();
+  point.mTime = time;
+  point.mValue = value;
+  CalculateTangent(index - 1);
+  CalculateTangent(index);
+  CalculateTangent(index + 1);
 }
 
-void SSpline::setAutotangent(int index, bool autotangent) {
+void FloatSplineNode::SetAutotangent(SplineLayer layer, int index, bool autotangent) {
+  SplineFloatComponent* component = GetComponent(layer);
+  auto& points = component->mPoints;
   if (index >= 0 && index < int(points.size())) {
-    SSplinePoint& point = points[index];
-    point.isAutoangent = autotangent;
-    calculateTangent(index);
+    SplinePoint& point = points[index];
+    point.mIsAutoangent = autotangent;
+    component->CalculateTangent(index);
     InvalidateCurrentValue();
   }
 }
 
-void SSpline::setBreakpoint(int index, bool breakpoint) {
-  if (index >= 0 && index < int(points.size())) {
-    SSplinePoint& point = points[index];
-    point.isBreakpoint = breakpoint;
-    calculateTangent(index);
-    InvalidateCurrentValue();
-  }
-}
-
-void SSpline::setLinear(int index, bool linear) {
-  if (index >= 0 && index < int(points.size())) {
-    SSplinePoint& point = points[index];
-    point.isLinear = linear;
-    InvalidateCurrentValue();
-  }
-}
-
-void SSpline::calculateTangent(int index) {
-  if (index < 0 || index >= int(points.size())) return;
-  SSplinePoint& point = points[index];
-  if (point.isAutoangent) {
+void SplineFloatComponent::CalculateTangent(int index) {
+  if (index < 0 || index >= int(mPoints.size())) return;
+  SplinePoint& point = mPoints[index];
+  if (point.mIsAutoangent) {
     float ym = 0.0f;
-    if (index > 0 && index < points.size() - 1) {
-      SSplinePoint& prev = points[index - 1];
-      SSplinePoint& next = points[index + 1];
-      float xm = next.time - prev.time;
-      ym = next.value - prev.value;
-      if (xm > EPSILON) ym /= xm;
+    if (index > 0 && index < mPoints.size() - 1) {
+      SplinePoint& prev = mPoints[index - 1];
+      SplinePoint& next = mPoints[index + 1];
+      float xm = next.mTime - prev.mTime;
+      ym = next.mValue - prev.mValue;
+      if (xm > Epsilon) ym /= xm;
     }
-    point.tangentAfter = point.tangentBefore = ym;
+    point.mTangentAfter = point.mTangentBefore = ym;
   }
 }
 
-void SSpline::InvalidateCurrentValue() {
+float FloatSplineNode::EvaluateLinearSpline(vector<SplinePoint>& points, float time) {
+  if (points.size() == 0) return 0.0f;
+  if (points.size() == 1) return points[0].mValue;
+
+  /// Binary search
+  UINT i1 = 0;
+  UINT i2 = UINT(points.size() - 1);
+  while (i1 < i2) {
+    UINT center = (i1 + i2 + 1) / 2;
+    if (points[center].mTime > time) {
+      i2 = center - 1;
+    } else {
+      i1 = center;
+    }
+  }
+
+  SplinePoint& p1 = points[i1];
+  SplinePoint& p2 = points[i1 + 1];
+  if (p2.mTime - p1.mTime < Epsilon) return p1.mValue;
+  return p1.mValue + (p2.mValue - p1.mValue) * (time - p1.mTime) / (p2.mTime - p1.mTime);
+}
+
+void FloatSplineNode::InvalidateCurrentValue() {
   if (mIsUpToDate) {
     mIsUpToDate = false;
     SendMsg(MessageType::VALUE_CHANGED);
@@ -176,19 +158,105 @@ void SSpline::InvalidateCurrentValue() {
   NotifyWatchers(&Watcher::OnRedraw);
 }
 
-void SSpline::Operate() {
-  currentValue = getValue(mTimeSlot.Get());
+void FloatSplineNode::Operate() {
+  currentValue = GetValue(mTimeSlot.Get());
 }
 
-void SSpline::removePoint(int index) {
+float FloatSplineNode::GetValue(float time) {
+  return mBaseLayer.Get(time) + GetNoiseValue(time);
+}
+
+
+const std::vector<SplinePoint>& SplineComponent::GetPoints() {
+  return mPoints;
+}
+
+int SplineComponent::FindPointIndexBefore(float time) {
+  int i = mLastIndex;
+  if (i >= int(mPoints.size())) i = 0;
+  while (i < int(mPoints.size()) - 1 && mPoints[i + 1].mTime <= time) i++;
+  while (i >= 0 && mPoints[i].mTime > time) i--;
+  mLastIndex = i;
+  return i;
+}
+
+float SplineFloatComponent::Get(float time) {
+  int index = FindPointIndexBefore(time);
+
+  SplinePoint* before = index >= 0 ? &mPoints[index] : nullptr;
+  SplinePoint* after = index < int(mPoints.size()) - 1 ? &mPoints[index + 1] : nullptr;
+
+  if (before && after)
+    if (before->mIsLinear) {
+      float dt = after->mTime - before->mTime;
+      if (dt <= Epsilon) return before->mValue;
+      return (after->mValue * (time - before->mTime) + 
+              before->mValue * (after->mTime - time)) / dt;
+    } else {
+      float dt = after->mTime - before->mTime;
+      float ft = (time - before->mTime) / dt;
+
+      float ea = before->mValue;
+      float eb = dt * before->mTangentAfter;
+      float ec = 3.0f * (after->mValue - before->mValue) - 
+        dt * (2.0f * before->mTangentAfter + after->mTangentBefore);
+      float ed = -2.0f * (after->mValue - before->mValue) + 
+        dt * (before->mTangentAfter + after->mTangentBefore);
+
+      return ea + ft*eb + ft*ft*ec + ft*ft*ft*ed;
+    }
+  return before ? before->mValue : after ? after->mValue : 0.0f;
+}
+
+
+
+
+SplineFloatComponent* FloatSplineNode::GetComponent(SplineLayer layer) {
+  switch (layer) {
+    case SplineLayer::BASE:
+      return &mBaseLayer;
+    case SplineLayer::NOISE:
+      return &mNoiseLayer;
+    default:
+      SHOULD_NOT_HAPPEN;
+      return nullptr;
+  }
+}
+
+int FloatSplineNode::AddPoint(SplineLayer layer, float time, float value) {
+  int index = GetComponent(layer)->AddPoint(time, value);
+  InvalidateCurrentValue();
+  return index;
+}
+
+void FloatSplineNode::SetPointValue(SplineLayer layer, int index, float time, float value) {
+  GetComponent(layer)->SetPointValue(index, time, value);
+  InvalidateCurrentValue();
+}
+
+void FloatSplineNode::RemovePoint(SplineLayer layer, int index) {
+  auto& points = GetComponent(layer)->mPoints;
   points.erase(points.begin() + index);
   InvalidateCurrentValue();
 }
 
-UINT SSpline::getNumPoints() {
-  return UINT(points.size());
+void FloatSplineNode::SetBreakpoint(SplineLayer layer, int index, bool breakpoint) {
+  SplineComponent* component = GetComponent(layer);
+  auto& points = component->mPoints;
+  if (index >= 0 && index < int(points.size())) {
+    SplinePoint& point = points[index];
+    point.mIsBreakpoint = breakpoint;
+    component->CalculateTangent(index);
+    InvalidateCurrentValue();
+  }
 }
 
-const SSplinePoint& SSpline::getPoint(int index) {
-  return points[index];
+void FloatSplineNode::SetLinear(SplineLayer layer, int index, bool linear) {
+  SplineComponent* component = GetComponent(layer);
+  auto& points = component->mPoints;
+  if (index >= 0 && index < int(points.size())) {
+    SplinePoint& point = points[index];
+    point.mIsLinear = linear;
+    InvalidateCurrentValue();
+  }
 }

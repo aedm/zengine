@@ -445,6 +445,10 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
     /// Open "add new node" window
     Node* node = ThePrototypes->AskUser(mWatcherWidget, QCursor::pos());
     if (node) {
+      FloatSplineNode* spline = dynamic_cast<FloatSplineNode*>(node);
+      if (spline) {
+        spline->mPropertiesSlot.Connect(ZenGarden::GetInstance()->GetPropertiesNode());
+      }
       TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
       TheCommandStack->Execute(new MoveNodeCommand(node, mCurrentMousePos));
     }

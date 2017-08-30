@@ -51,7 +51,10 @@ protected:
   
   VType mOriginalValue;
   int mHoveredPointIndex = -1;
+  SplineLayer mHoveredLayer;
+
   int mSelectedPointIndex = -2;
+  SplineLayer mSelectedLayer = SplineLayer::NONE;
 
   QPoint mOriginalMousePos;
 
@@ -59,14 +62,16 @@ protected:
   void UpdateTimeEdit();
   void UpdateValueEdit();
 
-  void SelectPoint(int index);
+  void SelectPoint(SplineLayer layer, int index);
 
-  SSpline* GetSpline();
+  FloatSplineNode* GetSpline();
 
 private slots:
   void DrawSpline(QPaintEvent* ev);
+  void DrawSplineComponentControl(QPainter& painter, SplineLayer component);
+
   void RemovePoint();
-  void AddPoint();
+  void AddPoint(SplineLayer layer);
   void ToggleLinear();
 
   void HandleTimeEdited();

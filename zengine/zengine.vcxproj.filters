@@ -185,6 +185,7 @@
     <ClInclude Include="include\nodes\timenode.h">
       <Filter>include\nodes</Filter>
     </ClInclude>
+    <ClInclude Include="include\nodes\propertiesnode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -293,6 +294,7 @@
     <ClCompile Include="source\render\drawingapi.cpp">
       <Filter>source\render\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="source\nodes\propertiesnode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

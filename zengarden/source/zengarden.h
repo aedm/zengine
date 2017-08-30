@@ -46,6 +46,9 @@ public:
   /// Event that fires when the movie cursor changes
   Event<float> mOnMovieCursorChange;
 
+  /// Returns the PropertiesNode associated with the current document
+  PropertiesNode* GetPropertiesNode();
+
 private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);
@@ -116,5 +119,5 @@ private slots:
   void HandleMenuSaveAs();
   void HandleMenuNew();
   void HandleMenuOpen();
-  void HandleDocumentPropertiesMenu();
+  void HandlePropertiesMenu();
 };

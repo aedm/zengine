@@ -13,6 +13,7 @@
 using namespace std;
 
 extern const EnumMapperA TexelTypeMapper[];
+extern const EnumMapperA SplineLayerMapper[];
 
 class JSONSerializer {
 public:
@@ -34,7 +35,7 @@ private:
   void SerializeVec2Node(rapidjson::Value& nodeValue, Vec2Node* node);
   void SerializeVec3Node(rapidjson::Value& nodeValue, Vec3Node* node);
   void SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* node);
-  void SerializeFloatSplineNode(rapidjson::Value& nodeValue, SSpline* node);
+  void SerializeFloatSplineNode(rapidjson::Value& nodeValue, FloatSplineNode* node);
 
   void SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node);
   void SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node);

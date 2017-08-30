@@ -23,7 +23,7 @@ private:
   void DeserializeVec2Node(const rapidjson::Value& value, Vec2Node* node);
   void DeserializeVec3Node(const rapidjson::Value& value, Vec3Node* node);
   void DeserializeVec4Node(const rapidjson::Value& value, Vec4Node* node);
-  void DeserializeFloatSplineNode(const rapidjson::Value& value, SSpline* node);
+  void DeserializeFloatSplineNode(const rapidjson::Value& value, FloatSplineNode* node);
 
   void DeserializeTextureNode(const rapidjson::Value& value, TextureNode* node);
   void DeserializeStubNode(const rapidjson::Value& value, StubNode* node);

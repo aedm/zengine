@@ -1,58 +1,142 @@
 #pragma once
 
-//#include "../base/vectormath.h"
 #include "valuenodes.h"
 #include "timenode.h"
+#include "propertiesnode.h"
 #include <vector>
 
 using namespace std;
+class FloatSplineNode;
 
-struct SSplinePoint
+struct SplinePoint
 {
-	SSplinePoint();
+	SplinePoint();
 
-	float			time;
-	float			value;
-	float			tangentBefore, tangentAfter;
+	float	mTime;
+	float	mValue;
+	float	mTangentBefore, mTangentAfter;
 
   // Is next section is linear or curved
-  bool isLinear;							
+  bool mIsLinear;
 
   // If true, tangents are automatically calculated
-	bool isAutoangent;					
+	bool mIsAutoangent;					
 
   // Indicates breakpoint (tangents are not continuous)
-	bool isBreakpoint;						
+	bool mIsBreakpoint;						
 
-	void setValue(float time, float value);
+	void SetValue(float time, float value);
 };
 
 
-class SSpline: public ValueNode<NodeType::FLOAT>
-{
+/// A simple spline component consisting of one set of points. Acts as a component 
+/// to spline nodes which have several layers of basic splines. In each layer there is
+/// one spline component.
+class SplineComponent {
+  friend class FloatSplineNode;
+
 public:
-	SSpline();
-  virtual ~SSpline();
+  /// Having a virtual destructor makes sure the class has RTTI information
+  virtual ~SplineComponent() {}
 
-  virtual void HandleMessage(Message* message) override;
+  /// Returns the points of the spline
+  const vector<SplinePoint>& GetPoints();
 
-  virtual const float& Get() override;
+protected:
+  /// Disallow direct instantiation
+  SplineComponent() {}
 
-	float getValue (float time);
+  /// Finds the last spline point which's time is not greater than the argument
+  /// Returns -1 if there are no points before (or exactly at) the argument
+  int FindPointIndexBefore(float time);
 
-  UINT getNumPoints();
-	const SSplinePoint& getPoint(int index);
+  /// Key points
+  vector<SplinePoint> mPoints;
 
-	int addPoint (float time, float value);	
-	void removePoint (int index);	
+  /// Recalculates tangents for a given index
+  virtual void CalculateTangent(int index) = 0;
 
-	void setPointValue (int index, float time, float value);
-	void setBreakpoint(int index, bool breakpoint);
-	void setLinear(int index, bool linear);
-	void setAutotangent(int index, bool autotangent);
+private:
+  /// Cache of the last found index for performance reasons
+  int mLastIndex = -1;
+};
+
+
+/// A simple float spline component
+class SplineFloatComponent: public SplineComponent {
+  friend class FloatSplineNode;
+
+public:
+  SplineFloatComponent() {}
+  virtual ~SplineFloatComponent() {}
+
+  float Get(float time);
+
+protected:
+  /// Adds a point to the spline, returns its index
+  int AddPoint(float time, float value);
+
+  /// Sets a point's time and value
+  void SetPointValue(int index, float time, float value);
 
   /// Calculates tangents of the Nth control point
-	void calculateTangent(int index);					
+  virtual void CalculateTangent(int index) override;
+};
+
+
+/// Spline layers
+enum class SplineLayer {
+  /// Base layer
+  BASE,
+
+  /// Additional modifier layers
+  NOISE,
+  //BEAT_SPIKE,
+  //BEAT_QUANTIZER,
+
+  /// Number of layers
+  COUNT,
+  NONE = COUNT,
+};
+
+
+class FloatSplineNode: public ValueNode<NodeType::FLOAT>
+{
+public:
+	FloatSplineNode();
+  virtual ~FloatSplineNode();
+
+  /// Returns spline value at current scene time
+  virtual const float& Get() override;
+
+  /// Returns spline components value at a given time
+  float GetValue(float time);
+
+  /// Is noise component enabled?
+  FloatSlot mNoiseEnabled;
+  FloatSlot mNoiseVelocity;
+
+  /// Adds a point to the spline, returns its index
+  int AddPoint(SplineLayer layer, float time, float value);
+
+  /// Sets a point's time and value
+  void SetPointValue(SplineLayer layer, int index, float time, float value);
+
+  /// Removes a point at 'index'
+  void RemovePoint(SplineLayer layer, int index);
+
+  /// Sets whether the spline is C1 continuous at the Nth point, or the 
+  /// tangents are independent (C0)
+  void SetBreakpoint(SplineLayer layer, int index, bool breakpoint);
+
+  /// Sets whether the segment after a given point is linear or not
+  void SetLinear(SplineLayer layer, int index, bool linear);
+
+  /// Sets whether tangents should be automatically calculated for a given point
+  void SetAutotangent(SplineLayer layer, int index, bool autotangent);
+
+  /// Returns the component in a certain layer
+  SplineFloatComponent* GetComponent(SplineLayer layer);
 
   /// Scene time node
   SceneTimeNode mSceneTimeNode;
@@ -60,18 +144,23 @@ public:
   /// Time slot, connected to mSceneTimeNode
   FloatSlot mTimeSlot;
 
-protected:
-  /// Control points of spline
-	vector<SSplinePoint>	points;					
+  /// Document properties, they specify the current BPM
+  PropertiesSlot mPropertiesSlot;
 
-  /// Default value of an empty spline
-	float	defaultValue = 0.0f;	
+protected:
+  virtual void HandleMessage(Message* message) override;
+
+  /// Computer noise value
+  float GetNoiseValue(float time);
+
+  float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
+
+  /// Control points of spline
+  SplineFloatComponent mBaseLayer;
+  SplineFloatComponent mNoiseLayer;
 
   /// Current value
   float currentValue;
-
-  /// Last queried point (cache)
-	int	lastIndex = 0;
 
   void InvalidateCurrentValue();
   virtual void Operate();

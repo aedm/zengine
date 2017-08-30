@@ -103,9 +103,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="addPointButton">
+       <widget class="QPushButton" name="addBasePointButton">
         <property name="text">
-         <string>Add new</string>
+         <string>New base layer point</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addNoisePointButton">
+        <property name="text">
+         <string>New noise layer point</string>
         </property>
        </widget>
       </item>

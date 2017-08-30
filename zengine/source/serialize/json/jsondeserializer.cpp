@@ -58,8 +58,8 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   else if (IsInstanceOf<Vec4Node>(node)) {
     DeserializeVec4Node(value, static_cast<Vec4Node*>(node));
   } 
-  else if (IsInstanceOf<SSpline>(node)) {
-    DeserializeFloatSplineNode(value, static_cast<SSpline*>(node));
+  else if (IsInstanceOf<FloatSplineNode>(node)) {
+    DeserializeFloatSplineNode(value, static_cast<FloatSplineNode*>(node));
   } 
   else if (IsInstanceOf<TextureNode>(node)) {
     DeserializeTextureNode(value, static_cast<TextureNode*>(node));
@@ -214,16 +214,22 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
 }
 
 
-void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, SSpline* node) {
-  const rapidjson::Value& jsonPoints = value["points"];
-  for (UINT i = 0; i < jsonPoints.Size(); i++) {
-    auto& jsonPoint = jsonPoints[i];
-    float time(jsonPoint["time"].GetDouble());
-    float value(jsonPoint["value"].GetDouble());
-    int pIndex = node->addPoint(time, value);
-    node->setAutotangent(pIndex, jsonPoint["autotangent"].GetBool());
-    node->setBreakpoint(pIndex, jsonPoint["breakpoint"].GetBool());
-    node->setLinear(pIndex, jsonPoint["linear"].GetBool());
+void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, FloatSplineNode* node) {
+  for (UINT l = UINT(SplineLayer::BASE); l < UINT(SplineLayer::COUNT); l++) {
+    const char* fieldName = EnumMapperA::GetStringFromEnum(SplineLayerMapper, l);
+    if (!value.HasMember(fieldName)) continue;
+
+    SplineLayer layer = SplineLayer(l);
+    const rapidjson::Value& jsonPoints = value[fieldName];
+    for (UINT i = 0; i < jsonPoints.Size(); i++) {
+      auto& jsonPoint = jsonPoints[i];
+      float time(jsonPoint["time"].GetDouble());
+      float value(jsonPoint["value"].GetDouble());
+      int pIndex = node->AddPoint(layer, time, value);
+      node->SetAutotangent(layer, pIndex, jsonPoint["autotangent"].GetBool());
+      node->SetBreakpoint(layer, pIndex, jsonPoint["breakpoint"].GetBool());
+      node->SetLinear(layer, pIndex, jsonPoint["linear"].GetBool());
+    }
   }
 }
 

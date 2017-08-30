@@ -43,7 +43,7 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
   connect(mUI.actionDocumentProperties, SIGNAL(triggered()), this, 
-          SLOT(HandleDocumentPropertiesMenu()));
+          SLOT(HandlePropertiesMenu()));
 
   mUI.timelineWidget->hide();
 
@@ -230,6 +230,12 @@ void ZenGarden::SetSceneNodeForClip(SceneNode* sceneNode) {
   editor->SetSceneNodeForSelectedClip(sceneNode);
 }
 
+
+PropertiesNode* ZenGarden::GetPropertiesNode() {
+  return SafeCast<PropertiesNode*>(mDocument->mProperties.GetDirectNode());
+}
+
+
 void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   QTabWidget* tabWidget = nullptr;
   switch (watcherPosition) {
@@ -270,7 +276,7 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   } else {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
-      watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<SSpline*>(node));
+      watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<FloatSplineNode*>(node));
       watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
     }
   }
@@ -344,9 +350,8 @@ void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
 void ZenGarden::CreateNewDocument() {
   DeleteDocument();
   mDocument = new Document();
-
-  MovieNode* movie = new MovieNode();
-  mDocument->mMovie.Connect(movie);
+  mDocument->mProperties.Connect(new PropertiesNode());
+  mDocument->mMovie.Connect(new MovieNode());
 
   Graph* graph = new Graph();
   mDocument->mGraphs.Connect(graph);
@@ -426,6 +431,11 @@ void ZenGarden::HandleMenuOpen() {
     mDocument->mMovie.Connect(movieNode);
   }
 
+  /// Make sure a PropertiesNode exists in the document.
+  if (!mDocument->mProperties.GetNode()) {
+    mDocument->mProperties.Connect(new PropertiesNode());
+  }
+
   /// Open first graph
   Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
   Watch(graph, WatcherPosition::RIGHT_TAB);
@@ -436,8 +446,8 @@ void ZenGarden::HandleMenuOpen() {
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
 }
 
-void ZenGarden::HandleDocumentPropertiesMenu() {
-  SetNodeForPropertyEditor(mDocument);
+void ZenGarden::HandlePropertiesMenu() {
+  SetNodeForPropertyEditor(mDocument->mProperties.GetDirectNode());
 }
 
 void ZenGarden::DeleteDocument() {

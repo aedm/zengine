@@ -106,6 +106,7 @@
     <ClInclude Include="include\dom\graph.h" />
     <ClInclude Include="include\dom\node.h" />
     <ClInclude Include="include\dom\nodetype.h" />
+    <ClInclude Include="include\nodes\propertiesnode.h" />
     <ClInclude Include="include\dom\watcher.h" />
     <ClInclude Include="include\nodes\cameranode.h" />
     <ClInclude Include="include\nodes\clipnode.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="source\nodes\meshgenerators.cpp" />
     <ClCompile Include="source\nodes\meshnode.cpp" />
     <ClCompile Include="source\nodes\movienode.cpp" />
+    <ClCompile Include="source\nodes\propertiesnode.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
     <ClCompile Include="source\nodes\timenode.cpp" />
     <ClCompile Include="source\nodes\splinenode.cpp" />

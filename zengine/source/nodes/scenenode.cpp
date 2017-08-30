@@ -87,6 +87,7 @@ void SceneNode::HandleMessage(Message* message) {
 
 void SceneNode::CalculateRenderDependencies() {
   mTransitiveClosure.clear();
+  mSceneTimes.DisconnectAll(false);
   GenerateTransitiveClosure(mTransitiveClosure, true);
   for (Node* node : mTransitiveClosure) {
     if (IsInstanceOf<SceneTimeNode>(node)) {
