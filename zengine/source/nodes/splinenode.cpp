@@ -29,7 +29,6 @@ void SplinePoint::SetValue(float time, float value) {
 FloatSplineNode::FloatSplineNode()
   : ValueNode<NodeType::FLOAT>()
   , mTimeSlot(this, TimeSlotName, false, false, false)
-  , mPropertiesSlot(this, PropertiesSlotName, false, false)
   , mNoiseEnabled(this, NoiseEnabledSlotName)
   , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) {
   mTimeSlot.Connect(&mSceneTimeNode);

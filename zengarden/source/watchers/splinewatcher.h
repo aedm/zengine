@@ -8,11 +8,10 @@
 
 class SplineWidget;
 
-template<NodeType T>
-class SplineWatcher: public WatcherUI {
+class FloatSplineWatcher: public WatcherUI {
 public:
-  SplineWatcher(Node* node);
-  virtual ~SplineWatcher();
+  FloatSplineWatcher(Node* node);
+  virtual ~FloatSplineWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   
@@ -31,9 +30,12 @@ protected:
   void HandleMouseMove(QMouseEvent* event);
   void HandleMouseWheel(QWheelEvent* event);
 
-  typedef typename NodeTypes<T>::Type VType;
   QPointF ToScreenCoord(float time, float value);
   float ScreenToTime(int xPos);
+  Vec2 ScreenToPoint(QPoint& pos);
+
+  Vec2 GetStepsPerPixel();
+  QPointF GetPixelsPerStep();
 
   enum class State {
     DEFAULT,
@@ -41,15 +43,16 @@ protected:
     POINT_MOVE,
     TIME_MOVE,
   };
-
   State mState = State::DEFAULT;
 
-  Vec2 mXRange, mYRange;
-  Vec2 mXRangeOriginal, mYRangeOriginal;
-  
-  float mOriginalTime;
-  
-  VType mOriginalValue;
+  //Vec2 mXRange, mYRange;
+  //Vec2 mXRangeOriginal, mYRangeOriginal;
+  //float mOriginalTime;
+  //float mOriginalValue;
+  Vec2 mLeftCenterPoint = Vec2(0, 0);
+  Vec2 mZoomLevel = Vec2(0, 0);
+  Vec2 mOriginalPoint;
+
   int mHoveredPointIndex = -1;
   SplineLayer mHoveredLayer;
 
@@ -77,6 +80,4 @@ private slots:
   void HandleTimeEdited();
   void HandleValueEdited();
 };
-
-typedef SplineWatcher<NodeType::FLOAT> FloatSplineWatcher;
 

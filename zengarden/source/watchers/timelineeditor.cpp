@@ -1,8 +1,8 @@
 #include "timelineeditor.h"
 #include "../zengarden.h"
 
-const float DefaultPixelsPerSecond = 100.0f;
-const int TrackHeightPixels = 20;
+static const float DefaultPixelsPerSecond = 100.0f;
+static const int TrackHeightPixels = 20;
 
 TimelineEditor::TimelineEditor(MovieNode* movieNode)
   : WatcherUI(movieNode) 
@@ -87,7 +87,8 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
   painter.fillRect(QRect(0, 0, width, TrackHeightPixels), QBrush(QColor(120, 120, 120)));
 
   float timeMarksInterval = powf(0.5f, roundf(mZoomLevel));
-  float firstMarkToDraw = timeMarksInterval * floorf(mTimelineStartTime / timeMarksInterval);
+  float firstMarkToDraw = 
+    timeMarksInterval * floorf(mTimelineStartTime / timeMarksInterval);
   float lastMarkToDraw = ScreenToTime(width);
   painter.setPen(QColor(0, 0, 0));
   for (float time = firstMarkToDraw; time < lastMarkToDraw; time += timeMarksInterval) {

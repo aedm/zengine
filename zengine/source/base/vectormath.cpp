@@ -42,8 +42,24 @@ bool Vec2::operator==(const Vec2& op) const {
   return x == op.x && y == op.y;
 }
 
+Vec2& Vec2::operator+=(const Vec2& op) {
+  x += op.x;
+  y += op.y;
+  return *this;
+}
+
+Vec2& Vec2::operator-=(const Vec2& op) {
+  x -= op.x;
+  y -= op.y;
+  return *this;
+}
+
 float Vec2::Length() const {
   return sqrtf(x*x + y*y);
+}
+
+Vec2 Vec2::Dot(const Vec2& op) const {
+  return Vec2(x * op.x, y * op.y);
 }
 
 Vec3::Vec3() {}

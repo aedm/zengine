@@ -144,9 +144,6 @@ public:
   /// Time slot, connected to mSceneTimeNode
   FloatSlot mTimeSlot;
 
-  /// Document properties, they specify the current BPM
-  PropertiesSlot mPropertiesSlot;
-
 protected:
   virtual void HandleMessage(Message* message) override;
 
