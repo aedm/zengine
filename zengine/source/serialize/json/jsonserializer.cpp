@@ -19,6 +19,9 @@ const EnumMapperA TexelTypeMapper[] = {
 const EnumMapperA SplineLayerMapper[] = {
   {"base", UINT(SplineLayer::BASE)},
   {"noise", UINT(SplineLayer::NOISE)},
+  {"beat_spike_intensity", UINT(SplineLayer::BEAT_SPIKE_INTENSITY)},
+  {"beat_spike_frequency", UINT(SplineLayer::BEAT_SPIKE_FREQUENCY)},
+  {"beat_quantizer", UINT(SplineLayer::BEAT_QUANTIZER)},
   {"", -1}
 };
 

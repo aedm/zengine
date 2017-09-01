@@ -12,6 +12,10 @@ static SharedString TimeSlotName = make_shared<string>("Time");
 static SharedString PropertiesSlotName = make_shared<string>("Properties");
 static SharedString NoiseEnabledSlotName = make_shared<string>("Noise enabled");
 static SharedString NoiseVelocitySlotName = make_shared<string>("Noise velocity");
+static SharedString BeatSpikeEnabledSlotName = make_shared<string>("Beat spike enabled");
+static SharedString BeatSpikeLengthSlotName = make_shared<string>("Beat spike length");
+static SharedString BeatSpikeEasingSlotName = make_shared<string>("Beat spike easing");
+static SharedString BeatQuantizerFrequencySlotName = make_shared<string>("Quantizer freq");
 
 SplinePoint::SplinePoint() {
   mTangentBefore = mTangentAfter = 0.0f;
@@ -30,8 +34,16 @@ FloatSplineNode::FloatSplineNode()
   : ValueNode<NodeType::FLOAT>()
   , mTimeSlot(this, TimeSlotName, false, false, false)
   , mNoiseEnabled(this, NoiseEnabledSlotName)
-  , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) {
+  , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) 
+  , mBeatSpikeEnabled(this, BeatSpikeEnabledSlotName)
+  , mBeatSpikeLength(this, BeatSpikeLengthSlotName)
+  , mBeatSpikeEasing(this, BeatSpikeEasingSlotName)
+  , mBeatQuantizerFrequency(this, BeatQuantizerFrequencySlotName)
+{
   mTimeSlot.Connect(&mSceneTimeNode);
+  mNoiseVelocity.SetDefaultValue(20.0f);
+  mBeatSpikeEasing.SetDefaultValue(1.0f);
+  mBeatSpikeLength.SetDefaultValue(0.5f);
 }
 
 
@@ -62,6 +74,33 @@ float FloatSplineNode::GetNoiseValue(float time) {
   float noiseRatio = mNoiseLayer.Get(time) * 0.33f;
   float t = time * noiseVelocity;
   return noiseRatio * (sinf(t * 0.67f) + cosf(t * 2.43f) + cosf(t * 3.81f + 0.5f));
+}
+
+float FloatSplineNode::GetBeatSpikeValue(float time) {
+  if (mBeatSpikeEnabled.Get() < 0.5f) return 0.0f;
+
+  float freq = mBeatSpikeFrequencyLayer.Get(time);
+  if (freq < Epsilon) return 0.0f;
+
+  float length = mBeatSpikeLength.Get();
+  if (length < Epsilon) return 0.0f;
+
+  float subBeat = time - freq * floorf(time / freq);
+  if (subBeat > length) return 0.0f;
+
+  float intensity = mBeatSpikeIntensityLayer.Get(time);
+  float easing = mBeatSpikeEasing.Get();
+
+  float t = 1.0f - subBeat / length;
+  return intensity * powf(t, easing);
+}
+
+float FloatSplineNode::GetBeatQuantizerValue(float time) {
+  float freq = mBeatQuantizerFrequency.Get();
+  if (freq < Epsilon) return 0.0f;
+  
+  float t = freq * floorf(time / freq);
+  return mBeatQuantizerLayer.Get(t);
 }
 
 int SplineFloatComponent::AddPoint(float time, float value) {
@@ -162,7 +201,8 @@ void FloatSplineNode::Operate() {
 }
 
 float FloatSplineNode::GetValue(float time) {
-  return mBaseLayer.Get(time) + GetNoiseValue(time);
+  return mBaseLayer.Get(time) + GetNoiseValue(time) + GetBeatSpikeValue(time) +
+    GetBeatQuantizerValue(time);
 }
 
 
@@ -208,14 +248,19 @@ float SplineFloatComponent::Get(float time) {
 }
 
 
-
-
 SplineFloatComponent* FloatSplineNode::GetComponent(SplineLayer layer) {
   switch (layer) {
     case SplineLayer::BASE:
       return &mBaseLayer;
     case SplineLayer::NOISE:
       return &mNoiseLayer;
+    case SplineLayer::BEAT_SPIKE_FREQUENCY:
+      return &mBeatSpikeFrequencyLayer;
+    case SplineLayer::BEAT_SPIKE_INTENSITY:
+      return &mBeatSpikeIntensityLayer;
+    case SplineLayer::BEAT_QUANTIZER:
+      return &mBeatQuantizerLayer;
+      break;
     default:
       SHOULD_NOT_HAPPEN;
       return nullptr;

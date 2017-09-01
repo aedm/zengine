@@ -91,8 +91,11 @@ enum class SplineLayer {
 
   /// Additional modifier layers
   NOISE,
-  //BEAT_SPIKE,
-  //BEAT_QUANTIZER,
+
+  BEAT_SPIKE_FREQUENCY,
+  BEAT_SPIKE_INTENSITY,
+
+  BEAT_QUANTIZER,
 
   /// Number of layers
   COUNT,
@@ -112,9 +115,15 @@ public:
   /// Returns spline components value at a given time
   float GetValue(float time);
 
-  /// Is noise component enabled?
+  /// Noise component
   FloatSlot mNoiseEnabled;
   FloatSlot mNoiseVelocity;
+
+  /// Beat spike component
+  FloatSlot mBeatSpikeEnabled;
+  FloatSlot mBeatSpikeLength;
+  FloatSlot mBeatSpikeEasing;
+  FloatSlot mBeatQuantizerFrequency;
 
   /// Adds a point to the spline, returns its index
   int AddPoint(SplineLayer layer, float time, float value);
@@ -147,14 +156,19 @@ public:
 protected:
   virtual void HandleMessage(Message* message) override;
 
-  /// Computer noise value
+  /// Computer layer values
   float GetNoiseValue(float time);
+  float GetBeatSpikeValue(float time);
+  float GetBeatQuantizerValue(float time);
 
   float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
 
   /// Control points of spline
   SplineFloatComponent mBaseLayer;
   SplineFloatComponent mNoiseLayer;
+  SplineFloatComponent mBeatSpikeIntensityLayer;
+  SplineFloatComponent mBeatSpikeFrequencyLayer;
+  SplineFloatComponent mBeatQuantizerLayer;
 
   /// Current value
   float currentValue;

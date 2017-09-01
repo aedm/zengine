@@ -45,10 +45,6 @@ protected:
   };
   State mState = State::DEFAULT;
 
-  //Vec2 mXRange, mYRange;
-  //Vec2 mXRangeOriginal, mYRangeOriginal;
-  //float mOriginalTime;
-  //float mOriginalValue;
   Vec2 mLeftCenterPoint = Vec2(0, 0);
   Vec2 mZoomLevel = Vec2(0, 0);
   Vec2 mOriginalPoint;

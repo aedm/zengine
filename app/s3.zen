@@ -7,8 +7,8 @@
     "graphs": [
      2
     ],
-    "movie": 17,
-    "properties": 4
+    "movie": 16,
+    "properties": 18
    }
   },
   {
@@ -17,64 +17,24 @@
    "slots": {
     "nodes": [
      3,
+     4,
      5,
      6,
-     8,
+     11,
      12,
-     15,
      14,
-     9,
-     7,
-     10,
      13,
-     16,
-     11
+     8,
+     7,
+     9,
+     15,
+     10
     ]
    }
   },
   {
    "node": "Float Spline",
    "id": 3,
-   "position": {
-    "x": 42.0,
-    "y": -119.0
-   },
-   "base": [],
-   "noise": [
-    {
-     "time": 5.651763916015625,
-     "value": 0.06054685264825821,
-     "autotangent": true,
-     "breakpoint": false,
-     "linear": false
-    }
-   ],
-   "slots": {
-    "Noise enabled": {
-     "default": 0.7898550629615784
-    },
-    "Noise velocity": {
-     "default": 37.60869598388672
-    },
-    "Properties": 4
-   }
-  },
-  {
-   "node": "Properties",
-   "id": 4,
-   "position": {
-    "x": -431602080.0,
-    "y": -431602080.0
-   },
-   "slots": {
-    "BPM": {
-     "default": 138.0
-    }
-   }
-  },
-  {
-   "node": "Float Spline",
-   "id": 5,
    "position": {
     "x": -302.0,
     "y": -34.0
@@ -104,254 +64,86 @@
      "linear": false
     }
    ],
+   "beat_spike_frequency": [
+    {
+     "time": 4.958000183105469,
+     "value": 0.5,
+     "autotangent": true,
+     "breakpoint": false,
+     "linear": false
+    }
+   ],
+   "beat_spike_intensity": [
+    {
+     "time": 2.6000001430511476,
+     "value": -0.4833332896232605,
+     "autotangent": true,
+     "breakpoint": false,
+     "linear": false
+    }
+   ],
    "slots": {
     "Noise enabled": {
-     "default": 0.9130434989929199
+     "default": 0.26811593770980837
     },
     "Noise velocity": {
      "default": 74.56521606445313
-    }
-   }
-  },
-  {
-   "node": "Scene",
-   "id": 6,
-   "position": {
-    "x": 216.0,
-    "y": -50.0
-   },
-   "slots": {
-    "Drawables": [
-     7,
-     12
-    ],
-    "Camera": 15,
-    "Skylight color": {
-     "default": {
-      "x": 0.760869562625885,
-      "y": 0.7028985619544983,
-      "z": 0.695652186870575
-     }
     },
-    "Shadow map size": {
-     "default": {
-      "x": 30.0,
-      "y": 30.0,
-      "z": 50.0
-     }
+    "Beat spike enabled": {
+     "default": 0.7898550629615784
     },
-    "Skylight direction": {
-     "default": {
-      "x": 0.9347826242446899,
-      "y": 0.6594203114509583,
-      "z": 0.5144927501678467
-     }
+    "Beat spike length": {
+     "default": 0.7246376872062683
     },
-    "Ambient factor": {
-     "default": 0.12318840622901917
-    }
-   }
-  },
-  {
-   "node": "Drawable",
-   "id": 7,
-   "name": "asdfasdf",
-   "position": {
-    "x": 195.0,
-    "y": 215.0
-   },
-   "slots": {
-    "Instances": {
-     "default": 1.0
-    },
-    "Material": 8,
-    "Mesh": 9,
-    "Children": [
-     10
-    ],
-    "Rotate": {
-     "default": {
-      "x": 0.021739130839705468,
-      "y": 1.1304347515106202,
-      "z": 0.0
-     }
-    },
-    "Move": {
-     "default": {
-      "x": 0.0,
-      "y": -1.7391303777694703,
-      "z": 0.0
-     }
-    },
-    "Scale": {
-     "default": -0.2246376872062683
-    }
-   }
-  },
-  {
-   "node": "Solid Material",
-   "id": 8,
-   "position": {
-    "x": -133.0,
-    "y": -358.0
-   },
-   "slots": {
-    "Spread": {
-     "default": 16.0
-    },
-    "Color": {
-     "default": {
-      "x": 1.0,
-      "y": 1.0,
-      "z": 1.0
-     }
-    },
-    "Emissive": {
-     "default": {
-      "x": 0.0,
-      "y": 0.0,
-      "z": 0.0
-     }
-    },
-    "Specular": {
-     "default": 0.21739129722118379
-    },
-    "SpecularPower": {
-     "default": 3.1014492511749269
-    },
-    "MaxSpread": {
-     "default": 7.599999904632568
-    },
-    "SampleSpread": {
-     "default": 4.666666507720947
-    },
-    "NormalMapIntensity": {
-     "default": 1.0
-    },
-    "TextureScale": {
-     "default": {
-      "x": 6.0,
-      "y": 6.0,
-      "z": 0.0
-     }
-    }
-   }
-  },
-  {
-   "node": "Cube",
-   "id": 9,
-   "name": "ilyenkocka",
-   "position": {
-    "x": 55.0,
-    "y": 294.0
-   },
-   "slots": {
-    "SizeX": {
-     "default": 50.0
-    },
-    "SizeY": {
-     "default": 0.296999990940094
-    },
-    "SizeZ": {
-     "default": 50.0
-    }
-   }
-  },
-  {
-   "node": "Drawable",
-   "id": 10,
-   "position": {
-    "x": -133.0,
-    "y": 254.0
-   },
-   "slots": {
-    "Instances": {
-     "default": 6.059999942779541
-    },
-    "Material": 8,
-    "Mesh": 11,
-    "Children": [],
-    "Rotate": {
-     "default": {
-      "x": 1.1304347515106202,
-      "y": 5.4782609939575199,
-      "z": 0.0
-     }
-    },
-    "Move": {
-     "default": {
-      "x": -3.949275255203247,
-      "y": 0.6594203114509583,
-      "z": 7.601449489593506
-     }
-    },
-    "Scale": {
-     "default": 1.0
-    }
-   }
-  },
-  {
-   "node": "Cube",
-   "id": 11,
-   "name": "ground",
-   "position": {
-    "x": -329.0,
-    "y": 215.0
-   },
-   "slots": {
-    "SizeX": {
-     "default": 0.13768115639686585
-    },
-    "SizeY": {
-     "default": 0.11594203114509583
-    },
-    "SizeZ": {
+    "Beat spike easing": {
      "default": 7.601449489593506
     }
    }
   },
   {
-   "node": "Drawable",
-   "id": 12,
-   "name": "123123",
+   "node": "Float Spline",
+   "id": 4,
    "position": {
-    "x": 35.0,
-    "y": 75.0
+    "x": 42.0,
+    "y": -119.0
    },
+   "base": [],
+   "noise": [
+    {
+     "time": 5.651763916015625,
+     "value": 0.06054685264825821,
+     "autotangent": true,
+     "breakpoint": false,
+     "linear": false
+    }
+   ],
+   "beat_spike_frequency": [],
+   "beat_spike_intensity": [],
    "slots": {
-    "Instances": {
+    "Noise enabled": {
+     "default": 0.18115942180156709
+    },
+    "Noise velocity": {
+     "default": 37.60869598388672
+    },
+    "Beat spike enabled": {
+     "default": 0.0
+    },
+    "Beat spike length": {
+     "default": 0.5
+    },
+    "Beat spike easing": {
      "default": 1.0
-    },
-    "Material": 8,
-    "Mesh": 13,
-    "Children": [],
-    "Rotate": {
-     "default": {
-      "x": 4.6086955070495609,
-      "y": -2.818840503692627,
-      "z": 0.49275362491607668
-     },
-     "id": 14
-    },
-    "Move": {
-     "default": {
-      "x": -2.13043475151062,
-      "y": 4.463768005371094,
-      "z": 4.637681007385254
-     }
-    },
-    "Scale": {
-     "default": -5.094202995300293
     }
    }
   },
   {
    "node": "Static Mesh",
-   "id": 13,
+   "id": 5,
    "name": "olvadt-torusz.3ds",
    "position": {
-    "x": -352.0,
-    "y": 92.0
+    "x": -340.0,
+    "y": 117.0
    },
    "format": 15,
    "vertexcount": 703,
@@ -11983,33 +11775,278 @@
    ]
   },
   {
+   "node": "Scene",
+   "id": 6,
+   "position": {
+    "x": 216.0,
+    "y": -50.0
+   },
+   "slots": {
+    "Drawables": [
+     7,
+     12
+    ],
+    "Shadow map size": {
+     "default": {
+      "x": 30.0,
+      "y": 30.0,
+      "z": 50.0
+     }
+    },
+    "Camera": 14,
+    "Skylight direction": {
+     "default": {
+      "x": 0.9347826242446899,
+      "y": 0.6594203114509583,
+      "z": 0.5144927501678467
+     }
+    },
+    "Skylight color": {
+     "default": {
+      "x": 0.760869562625885,
+      "y": 0.7028985619544983,
+      "z": 0.695652186870575
+     }
+    },
+    "Ambient factor": {
+     "default": 0.12318840622901917
+    }
+   }
+  },
+  {
+   "node": "Drawable",
+   "id": 7,
+   "name": "asdfasdf",
+   "position": {
+    "x": 195.0,
+    "y": 215.0
+   },
+   "slots": {
+    "Rotate": {
+     "default": {
+      "x": 0.021739130839705468,
+      "y": 1.1304347515106202,
+      "z": 0.0
+     }
+    },
+    "Mesh": 8,
+    "Children": [
+     9
+    ],
+    "Material": 11,
+    "Move": {
+     "default": {
+      "x": 0.0,
+      "y": -1.7391303777694703,
+      "z": 0.0
+     }
+    },
+    "Instances": {
+     "default": 1.0
+    },
+    "Scale": {
+     "default": -0.2246376872062683
+    }
+   }
+  },
+  {
+   "node": "Cube",
+   "id": 8,
+   "name": "ilyenkocka",
+   "position": {
+    "x": 55.0,
+    "y": 294.0
+   },
+   "slots": {
+    "SizeX": {
+     "default": 50.0
+    },
+    "SizeY": {
+     "default": 0.296999990940094
+    },
+    "SizeZ": {
+     "default": 50.0
+    }
+   }
+  },
+  {
+   "node": "Drawable",
+   "id": 9,
+   "position": {
+    "x": -133.0,
+    "y": 254.0
+   },
+   "slots": {
+    "Rotate": {
+     "default": {
+      "x": 1.1304347515106202,
+      "y": 5.4782609939575199,
+      "z": 0.0
+     }
+    },
+    "Mesh": 10,
+    "Children": [],
+    "Material": 11,
+    "Move": {
+     "default": {
+      "x": -3.949275255203247,
+      "y": 0.6594203114509583,
+      "z": 7.601449489593506
+     }
+    },
+    "Instances": {
+     "default": 6.059999942779541
+    },
+    "Scale": {
+     "default": 1.0
+    }
+   }
+  },
+  {
+   "node": "Cube",
+   "id": 10,
+   "name": "ground",
+   "position": {
+    "x": -329.0,
+    "y": 215.0
+   },
+   "slots": {
+    "SizeX": {
+     "default": 0.13768115639686585
+    },
+    "SizeY": {
+     "default": 0.11594203114509583
+    },
+    "SizeZ": {
+     "default": 7.601449489593506
+    }
+   }
+  },
+  {
+   "node": "Solid Material",
+   "id": 11,
+   "position": {
+    "x": -133.0,
+    "y": -358.0
+   },
+   "slots": {
+    "Color": {
+     "default": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+     }
+    },
+    "Specular": {
+     "default": 0.21739129722118379
+    },
+    "SpecularPower": {
+     "default": 3.1014492511749269
+    },
+    "Emissive": {
+     "default": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+     }
+    },
+    "SampleSpread": {
+     "default": 4.666666507720947
+    },
+    "MaxSpread": {
+     "default": 7.599999904632568
+    },
+    "Spread": {
+     "default": 16.0
+    },
+    "NormalMapIntensity": {
+     "default": 1.0
+    },
+    "TextureScale": {
+     "default": {
+      "x": 6.0,
+      "y": 6.0,
+      "z": 0.0
+     }
+    }
+   }
+  },
+  {
+   "node": "Drawable",
+   "id": 12,
+   "name": "123123",
+   "position": {
+    "x": 35.0,
+    "y": 75.0
+   },
+   "slots": {
+    "Rotate": {
+     "default": {
+      "x": 4.6086955070495609,
+      "y": -2.818840503692627,
+      "z": 0.49275362491607668
+     },
+     "id": 13
+    },
+    "Mesh": 5,
+    "Children": [],
+    "Material": 11,
+    "Move": {
+     "default": {
+      "x": -2.13043475151062,
+      "y": 4.463768005371094,
+      "z": 4.637681007385254
+     }
+    },
+    "Instances": {
+     "default": 1.0
+    },
+    "Scale": {
+     "default": -5.094202995300293
+    }
+   }
+  },
+  {
    "node": "Floats To Vec3",
-   "id": 14,
+   "id": 13,
    "position": {
     "x": -139.0,
     "y": -9.0
    },
    "slots": {
+    "Z": {
+     "default": -0.8188405632972717
+    },
     "X": {
      "default": 0.0,
-     "id": 5
+     "id": 3
     },
     "Y": {
      "default": 1.7681159973144532
-    },
-    "Z": {
-     "default": -0.8188405632972717
     }
    }
   },
   {
    "node": "Camera",
-   "id": 15,
+   "id": 14,
    "position": {
     "x": 186.0,
     "y": -338.0
    },
    "slots": {
+    "Field of view": {
+     "default": 1.1014492511749268
+    },
+    "ShakeTime": {
+     "default": 0.0,
+     "id": 15
+    },
+    "Far Z": {
+     "default": 1000.0
+    },
+    "Near Z": {
+     "default": 1.0
+    },
     "Orientation": {
      "default": {
       "x": 0.3550724685192108,
@@ -12017,24 +12054,8 @@
       "z": 0.36231884360313418
      }
     },
-    "ShakeTime": {
-     "default": 0.0,
-     "id": 16
-    },
-    "Near Z": {
-     "default": 1.0
-    },
-    "Field of view": {
-     "default": 1.1014492511749268
-    },
-    "Far Z": {
-     "default": 1000.0
-    },
     "Distance": {
      "default": 15.0
-    },
-    "ShakeSpeed": {
-     "default": 1.2898551225662232
     },
     "Target": {
      "default": {
@@ -12045,13 +12066,16 @@
     },
     "Shake": {
      "default": 0.021739130839705468,
-     "id": 3
+     "id": 4
+    },
+    "ShakeSpeed": {
+     "default": 1.2898551225662232
     }
    }
   },
   {
    "node": "Global Time",
-   "id": 16,
+   "id": 15,
    "position": {
     "x": 52.0,
     "y": -164.0
@@ -12059,34 +12083,34 @@
   },
   {
    "node": "Movie",
-   "id": 17,
+   "id": 16,
    "position": {
     "x": -431602080.0,
     "y": -431602080.0
    },
    "slots": {
     "clips": [
-     18
+     17
     ]
    }
   },
   {
    "node": "Clip",
-   "id": 18,
+   "id": 17,
    "position": {
     "x": -431602080.0,
     "y": -431602080.0
    },
    "slots": {
     "scene": 6,
-    "Clear color buffer": {
-     "default": 0.0
-    },
-    "Start time": {
+    "Clear depth buffer": {
      "default": 0.0
     },
     "Clip Length": {
      "default": 20.0
+    },
+    "Start time": {
+     "default": 0.0
     },
     "Track": {
      "default": 0.0
@@ -12094,8 +12118,21 @@
     "Copy to secondary buffer": {
      "default": 0.0
     },
-    "Clear depth buffer": {
+    "Clear color buffer": {
      "default": 0.0
+    }
+   }
+  },
+  {
+   "node": "Properties",
+   "id": 18,
+   "position": {
+    "x": -431602080.0,
+    "y": -431602080.0
+   },
+   "slots": {
+    "BPM": {
+     "default": 138.0
     }
    }
   }
