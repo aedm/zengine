@@ -5,10 +5,10 @@
 
 class ShaderBuilder {
 public:
-  static OWNERSHIP ShaderMetadata* FromStub(StubNode* stub, const string& prefix);
+  static OWNERSHIP ShaderMetadata* FromStub(StubNode* stub, bool isVertexShader);
 
 private:
-  ShaderBuilder(StubNode* stub, const string& prefix);
+  ShaderBuilder(StubNode* stub, bool isVertexShader);
   ~ShaderBuilder();
 
   struct NodeData {
@@ -41,7 +41,7 @@ private:
 
   static const string& GetTypeString(NodeType type, bool isMultiSampler = false, bool isShadow = false);
 
-  string prefix;
+  const bool mIsVertexShader;
 
   /// Topologic order of dependencies
   vector<Node*> mDependencies;

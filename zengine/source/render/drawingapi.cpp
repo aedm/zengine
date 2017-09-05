@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 void CheckGLError() {
-  GLenum error = glGetError();  ASSERT(error == GL_NO_ERROR);
+  GLenum error = glGetError();  //ASSERT(error == GL_NO_ERROR);
 }
 #else
 #	define CheckGLError()
@@ -130,6 +130,8 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
   GLint result;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
   if (result == GL_FALSE) {
+    INFO("\n%s", source);
+
     /// Get the shader info log
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
     char *log = new char[length];
@@ -153,13 +155,11 @@ OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
   /// Compile shaders
   if (!CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource)) {
     WARN(L"Vertex shader compilation failed.");
-    INFO("\n%s", vertexSource);
     glDeleteProgram(program);
     return NULL;
   }
   if (!CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource)) {
     WARN(L"Fragment shader compilation failed.");
-    INFO("\n%s", fragmentSource);
     glDeleteProgram(program);
     return NULL;
   }
@@ -817,6 +817,7 @@ void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
   glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
                     dstX0, dstY0, dstX1, dstY1,
                     GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  CheckGLError();
 }
 
 

@@ -49,7 +49,7 @@ StubNode::~StubNode() {
   SafeDelete(mMetadata);
 }
 
-void StubNode::HandleSourceChange() {
+void StubNode::Operate() {
   /// Regenerate metadata
   StubMetadata* metadata = StubAnalyzer::FromText(mSource.Get().c_str());
   if (metadata == nullptr) {
@@ -109,6 +109,7 @@ void StubNode::HandleSourceChange() {
 
   /// Index the new slots
   for (auto it = mParameterSlotMap.begin(); it != mParameterSlotMap.end(); ++it) {
+    ASSERT(it->second != nullptr);
     mParameterNameSlotMap[*it->first->mName] = it->second;
   }
 
@@ -132,7 +133,7 @@ void StubNode::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::VALUE_CHANGED:
       if (message->mSlot == &mSource) {
-        HandleSourceChange();
+        mIsUpToDate = false;
         SendMsg(MessageType::VALUE_CHANGED);
       }
       else if (message->mSlot->GetReferencedNode()->GetType() == NodeType::SHADER_STUB) {
@@ -144,7 +145,7 @@ void StubNode::HandleMessage(Message* message) {
       break;
     case MessageType::SLOT_CONNECTION_CHANGED:
       if (message->mSlot == &mSource) {
-        HandleSourceChange();
+        mIsUpToDate = false;
       }
       SendMsg(MessageType::VALUE_CHANGED);
       break;

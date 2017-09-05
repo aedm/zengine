@@ -19,6 +19,8 @@ public:
   Vec3Slot mSkyLightDirection;
   Vec3Slot mSkyLightColor;
   FloatSlot mSkyLightAmbient;
+  FloatSlot mSkyLightSpread;
+  FloatSlot mSkyLightSampleSpread;
 
   void Draw(RenderTarget* renderTarget, Globals* globals);
 

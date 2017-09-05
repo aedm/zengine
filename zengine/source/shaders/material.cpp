@@ -83,7 +83,8 @@ void SolidMaterial::HandleMessage(Message* message) {
 void SolidMaterial::SetupSlots() {
   ClearSlots();
   AddSlot(&mGhostSlot, false, false, false);
-
+  
+  mSolidFragmentStub.Update();
   for (Slot* slot : mSolidFragmentStub.GetPublicSlots()) {
     AddSlot(slot, true, true, true);
   }

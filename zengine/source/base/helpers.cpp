@@ -10,45 +10,44 @@
 
 Logger* TheLogger = new Logger();
 
+static const int LogMessageMaxLength = 30000;
+static wchar_t TempStringW[LogMessageMaxLength];
+static char TempStringA[LogMessageMaxLength];
+
 void Logger::Log2(LogSeverity severity, const wchar_t* logString, ...) {
-  wchar_t tmp[4096];
   va_list args;
   va_start(args, logString);
-  vswprintf(tmp, 4096, logString, args);
+  vswprintf(TempStringW, LogMessageMaxLength, logString, args);
   va_end(args);
-  onLog(LogMessage(severity, tmp));
+  onLog(LogMessage(severity, TempStringW));
 }
 
 void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
                       const wchar_t* logString, ...) {
-  wchar_t tmp[4096];
-  int funlen = swprintf(tmp, 4096, function);
+  int funlen = swprintf(TempStringW, LogMessageMaxLength, function);
 
   va_list args;
   va_start(args, logString);
-  vswprintf(tmp + funlen, 4096 - funlen, logString, args);
+  vswprintf(TempStringW + funlen, LogMessageMaxLength - funlen, logString, args);
   va_end(args);
 
-  onLog(LogMessage(severity, tmp));
+  onLog(LogMessage(severity, TempStringW));
 }
 
 void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
                       const char* logString, ...) {
   /// God, this is bad.
-  char tmp_ascii[4096];
-
   va_list args;
   va_start(args, logString);
-  _vsnprintf(tmp_ascii, 4096, logString, args);
+  _vsnprintf(TempStringA, LogMessageMaxLength, logString, args);
   va_end(args);
 
-  string tmp_string(tmp_ascii);
+  string tmp_string(TempStringA);
   wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
 
-  wchar_t tmp[4096];
-  swprintf(tmp, 4096, L"%s%s", function, tmp_wstring.c_str());
+  swprintf(TempStringW, LogMessageMaxLength, L"%s%s", function, tmp_wstring.c_str());
 
-  onLog(LogMessage(severity, tmp));
+  onLog(LogMessage(severity, TempStringW));
 }
 
 LogMessage::LogMessage(LogSeverity severity, const wchar_t* message) {

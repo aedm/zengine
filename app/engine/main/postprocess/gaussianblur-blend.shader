@@ -12,10 +12,6 @@
 :output vec4 FragColor
 
 
-float rand(vec2 co) {
-  return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
-}
-
 SHADER
 {             
   vec3 bloomPixel = texture2D(gPPGauss, vTexCoord * gPPGaussRelativeSize).rgb;
@@ -33,6 +29,6 @@ SHADER
   }
   
   vec4 color = vec4(bloom, 0.0) + vec4(pixel / float(sampleCount), 1.0);
-  float dither = (rand(vTexCoord) - 0.5) / 256.0;
+  float dither = (Noise(vTexCoord) - 0.5) / 256.0;
   FragColor = color + dither;
 }

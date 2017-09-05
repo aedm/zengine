@@ -47,32 +47,32 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   }
 
   if (IsInstanceOf<FloatNode>(node)) {
-    DeserializeFloatNode(value, static_cast<FloatNode*>(node));
+    DeserializeFloatNode(value, SafeCast<FloatNode*>(node));
   }
   else if (IsInstanceOf<Vec2Node>(node)) {
-    DeserializeVec2Node(value, static_cast<Vec2Node*>(node));
+    DeserializeVec2Node(value, SafeCast<Vec2Node*>(node));
   } 
   else if (IsInstanceOf<Vec3Node>(node)) {
-    DeserializeVec3Node(value, static_cast<Vec3Node*>(node));
+    DeserializeVec3Node(value, SafeCast<Vec3Node*>(node));
   } 
   else if (IsInstanceOf<Vec4Node>(node)) {
-    DeserializeVec4Node(value, static_cast<Vec4Node*>(node));
+    DeserializeVec4Node(value, SafeCast<Vec4Node*>(node));
   } 
   else if (IsInstanceOf<FloatSplineNode>(node)) {
-    DeserializeFloatSplineNode(value, static_cast<FloatSplineNode*>(node));
+    DeserializeFloatSplineNode(value, SafeCast<FloatSplineNode*>(node));
   } 
   else if (IsInstanceOf<TextureNode>(node)) {
-    DeserializeTextureNode(value, static_cast<TextureNode*>(node));
+    DeserializeTextureNode(value, SafeCast<TextureNode*>(node));
   }
   else if (IsInstanceOf<StaticMeshNode>(node)) {
-    DeserializeStaticMeshNode(value, static_cast<StaticMeshNode*>(node));
+    DeserializeStaticMeshNode(value, SafeCast<StaticMeshNode*>(node));
   } 
   else if (IsInstanceOf<StubNode>(node)) {
-    DeserializeStubNode(value, static_cast<StubNode*>(node));
+    DeserializeStubNode(value, SafeCast<StubNode*>(node));
   } 
   else if (IsInstanceOf<Document>(node)) {
     ASSERT(mDocument == nullptr);
-    mDocument = static_cast<Document*>(node);
+    mDocument = SafeCast<Document*>(node);
   }
 }
 
@@ -238,6 +238,7 @@ void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
                                            StubNode* node) {
   string source = value["source"].GetString();
   node->mSource.SetDefaultValue(source);
+  node->Update();
 }
 
 

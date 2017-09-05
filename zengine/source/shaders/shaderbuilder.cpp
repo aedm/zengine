@@ -1,19 +1,21 @@
 #include "shaderbuilder.h"
+#include <include/shaders/enginestubs.h>
 #include <exception>
 
-OWNERSHIP ShaderMetadata* ShaderBuilder::FromStub(StubNode* stub, const string& prefix) {
+OWNERSHIP ShaderMetadata* ShaderBuilder::FromStub(StubNode* stub, bool isVertexShader) {
   if (stub == nullptr) {
     ERR("stub is nullptr");
     return nullptr;
   }
 
-  ShaderBuilder builder(stub, prefix);
+  ShaderBuilder builder(stub, isVertexShader);
   return new ShaderMetadata(builder.mInputs, builder.mOutputs, builder.mUniforms,
                             builder.mSamplers, builder.sourceStream.str());
 }
 
-ShaderBuilder::ShaderBuilder(StubNode* stub, const string& prefix) {
-  this->prefix = prefix;
+ShaderBuilder::ShaderBuilder(StubNode* stub, bool isVertexShader) 
+  : mIsVertexShader(isVertexShader)
+{
   StubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
     ERR("stub has no metadata.");
@@ -21,8 +23,10 @@ ShaderBuilder::ShaderBuilder(StubNode* stub, const string& prefix) {
   }
 
   INFO("Building shader source for '%s'...", stubMeta->name.c_str());
+  StubNode* uberShader = TheEngineStubs->GetStub("uber");
 
   try {
+    CollectDependencies(uberShader);
     CollectDependencies(stub);
     GenerateNames();
     for (Node* node : mDependencies) {
@@ -93,7 +97,9 @@ void ShaderBuilder::CollectDependencies(Node* root) {
   mDataMap[root] = data;
 
   if (root->GetType() == NodeType::SHADER_STUB) {
-    for (auto slotPair : static_cast<StubNode*>(root)->mParameterSlotMap) {
+    StubNode* stubNode = SafeCast<StubNode*>(root);
+    stubNode->Update();
+    for (auto slotPair : stubNode->mParameterSlotMap) {
       Node* node = slotPair.second->GetDirectNode();
       if (node == nullptr) {
         WARN("Incomplete shader graph.");
@@ -131,7 +137,8 @@ void ShaderBuilder::GenerateNames() {
       data->VariableName = string(tmp);
     } else {
       /// It's a uniform
-      sprintf_s(tmp, "%s_uniform_%d", prefix.c_str(), ++uniformIndex);
+      sprintf_s(tmp, "%s_uniform_%d", (mIsVertexShader ? "vertex" : "fragment"), 
+                ++uniformIndex);
       data->VariableName = string(tmp);
     }
   }
@@ -157,6 +164,8 @@ void ShaderBuilder::GenerateSlots() {
 
 void ShaderBuilder::GenerateSource() {
   sourceStream << "#version 430 core" << endl;
+  sourceStream << "#define " << 
+    (mIsVertexShader ? "VERTEX_SHADER" : "FRAGMENT_SHADER") << endl;
   GenerateSourceHeader(sourceStream);
   GenerateSourceFunctions(sourceStream);
   GenerateSourceMain(sourceStream);
@@ -173,16 +182,16 @@ void ShaderBuilder::GenerateSourceHeader(stringstream& stream) {
   /// Outputs
   for (auto var : mOutputs) {
     if (var->layout >= 0) {
-      stream << "layout (location = " << var->layout << ') ';
+      stream << "layout (location = " << var->layout << ") ";
     }
-    stream << "out " << GetTypeString(var->type) << ' ' <<
-      var->name << ';' << endl;
+    stream << "out " << GetTypeString(var->type) << " " <<
+      var->name << ";" << endl;
   }
 
   /// Uniforms
   for (auto uniform : mUniforms) {
-    stream << "uniform " << GetTypeString(uniform->mType) << ' ' <<
-      uniform->mName << ';' << endl;
+    stream << "uniform " << GetTypeString(uniform->mType) << " " <<
+      uniform->mName << ";" << endl;
   }
 
   /// Samplers

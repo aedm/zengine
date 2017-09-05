@@ -28,6 +28,7 @@ void ConnectToStubParameter(Pass* pass, bool vertexShader,
     ERR("ShaderStub not connected to pass.");
     return;
   }
+  stub->Update();
   Slot* stubSlot = stub->GetSlotByParameterName(string(parameterName));
   if (!stubSlot) {
     ERR("No shader parameter called %s.", parameterName);

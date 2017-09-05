@@ -8,17 +8,24 @@ static SharedString ShadowMapSizeSlotName = make_shared<string>("Shadow map size
 static SharedString SkylightDirectionSlotName = make_shared<string>("Skylight direction");
 static SharedString SkylightColorSlotName = make_shared<string>("Skylight color");
 static SharedString SkylightAmbientSlotName = make_shared<string>("Ambient factor");
+static SharedString SkylightSpreadSlotName = make_shared<string>("Shadow spread");
+static SharedString SkylightSampleSpreadSlotName = make_shared<string>("Sample spread");
 
 SceneNode::SceneNode()
   : Node(NodeType::SCENE)
   , mDrawables(this, DrawablesSlotName, true)
   , mCamera(this, CameraSlotName)
-  , mShadowMapSize(this, ShadowMapSizeSlotName)
+  , mShadowMapSize(this, ShadowMapSizeSlotName, false, true, true, 0.0f, 100.0f)
   , mSkyLightDirection(this, SkylightDirectionSlotName)
   , mSkyLightColor(this, SkylightColorSlotName)
   , mSkyLightAmbient(this, SkylightAmbientSlotName)
+  , mSkyLightSpread(this, SkylightSpreadSlotName, false, true, true, 0.0f, 30.0f)
+  , mSkyLightSampleSpread(this, SkylightSampleSpreadSlotName, false, true, true, 0.0f, 20.0f)
   , mSceneTimes(NodeType::FLOAT, this, nullptr, true, false, false, false)
-{}
+{
+  mSkyLightSpread.SetDefaultValue(10.0f);
+  mSkyLightSampleSpread.SetDefaultValue(5.0f);
+}
 
 SceneNode::~SceneNode() {
 }
@@ -34,7 +41,13 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   Vec3 s = mShadowMapSize.Get();
   Vec3 lightDir = mSkyLightDirection.Get().Normal();
 
-  globals->Camera = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
+  //Vec3 target = camera->mTarget.Get();
+  Matrix lookat = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
+  Matrix target = Matrix::Translate(-camera->mTarget.Get());
+  //Matrix distance = Matrix::Translate(Vec3(0, 0, -camera->mDistance.Get()));
+  globals->Camera = lookat * target;
+  //globals->Camera = Matrix::LookAt(target-lightDir, target, Vec3(0, 1, 0));
+
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
   globals->World.LoadIdentity();
   globals->SkylightProjection = globals->Projection;
@@ -42,6 +55,8 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightDirection = mSkyLightDirection.Get();
   globals->SkylightColor = mSkyLightColor.Get();
   globals->SkylightAmbient = mSkyLightAmbient.Get();
+  globals->SkylightSpread = mSkyLightSpread.Get();
+  globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
   RenderDrawables(globals, PassType::SHADOW);
 
   /// Draw to G-Buffer

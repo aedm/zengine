@@ -2,6 +2,7 @@
 #include <include/shaders/pass.h>
 #include <include/shaders/stubnode.h>
 #include <include/shaders/shadernode.h>
+#include <include/shaders/enginestubs.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 
@@ -9,6 +10,7 @@ REGISTER_NODECLASS(Pass, "Pass");
 
 static SharedString VertesStubSlotName = make_shared<string>("Vertex shader");
 static SharedString FragmentStubSlotName = make_shared<string>("Fragment shader");
+static SharedString UberShaderStubSlotName = make_shared<string>("Uber Shader");
 static SharedString FaceModeSlotName = make_shared<string>("Face mode");
 static SharedString BlendModeSlotName = make_shared<string>("Blending");
 
@@ -18,11 +20,13 @@ Pass::Pass()
   , mFragmentStub(this, FragmentStubSlotName)
   , mFaceModeSlot(this, FaceModeSlotName)
   , mBlendModeSlot(this, BlendModeSlotName)
+  , mUberShader(this, UberShaderStubSlotName, false, false, false)
   , mHandle(-1) 
 {
   mRenderstate.mDepthTest = true;
   mRenderstate.mFaceMode = RenderState::FaceMode::FRONT;
   mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
+  mUberShader.Connect(TheEngineStubs->GetStub("uber"));
 }
 
 Pass::~Pass() 
@@ -34,7 +38,8 @@ void Pass::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::SLOT_CONNECTION_CHANGED:
     case MessageType::VALUE_CHANGED:
-      if (message->mSlot == &mVertexStub || message->mSlot == &mFragmentStub) {
+      if (message->mSlot == &mVertexStub || message->mSlot == &mFragmentStub || 
+          message->mSlot == &mUberShader) {
         SafeDelete(mVertexShaderMetadata);
         SafeDelete(mFragmentShaderMetadata);
         mIsUpToDate = false;
@@ -55,10 +60,10 @@ void Pass::Operate() {
 
   /// Recreates shader metadata if needed
   if (mVertexShaderMetadata == nullptr) {
-    mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode(), "vertex");
+    mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode(), true);
   }
   if (mFragmentShaderMetadata == nullptr) {
-    mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode(), "fragment");
+    mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode(), false);
   }
 
   /// Both fragment and vertex metadata are needed

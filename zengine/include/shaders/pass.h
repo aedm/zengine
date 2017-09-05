@@ -28,6 +28,7 @@ public:
 
   StubSlot mFragmentStub;
   StubSlot mVertexStub;
+  StubSlot mUberShader;
   FloatSlot mFaceModeSlot;
   FloatSlot mBlendModeSlot;
 

@@ -24,6 +24,8 @@ using namespace std;
   ITEM(USAGE_SKYLIGHT_DIRECTION,                  VEC3,		      SkylightDirection)        \
   ITEM(USAGE_SKYLIGHT_COLOR,                      VEC3,		      SkylightColor)            \
   ITEM(USAGE_SKYLIGHT_AMBIENT,                    FLOAT,		    SkylightAmbient)          \
+  ITEM(USAGE_SKYLIGHT_SPREAD,                     FLOAT,		    SkylightSpread)           \
+  ITEM(USAGE_SKYLIGHT_SAMPLE_SPREAD,              FLOAT,		    SkylightSampleSpread)     \
   ITEM(USAGE_RENDERTARGET_SIZE,		                VEC2,			    RenderTargetSize)		      \
   ITEM(USAGE_RENDERTARGET_SIZE_RECIP,	            VEC2,			    RenderTargetSizeRecip)	  \
   ITEM(USAGE_VIEWPORT_SIZE,			                  VEC2,			    ViewportSize)			        \
@@ -141,7 +143,7 @@ public:
 
 protected:
 	/// Performs metadata analysis on the new stub source.
-	void HandleSourceChange();
+	virtual void Operate() override;
 
 	/// Handle received messages
   virtual void HandleMessage(Message* message) override;

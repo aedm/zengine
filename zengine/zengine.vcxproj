@@ -167,7 +167,10 @@
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\resourcemanager.cpp" />
     <ClCompile Include="source\resources\texture.cpp" />
-    <ClCompile Include="source\serialize\json\base64\base64.cpp" />
+    <ClCompile Include="source\serialize\json\base64\base64.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
     <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
     <ClCompile Include="source\serialize\json\jsonserializer.cpp" />
     <ClCompile Include="source\shaders\engineshaders.cpp" />
