@@ -507,13 +507,15 @@ Graph* GraphWatcher::GetGraph() {
 
 
 void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
+  bool changed = false;
+
   /// Create widgets for newly added nodes
   for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     auto it = mWidgetMap.find(node);
     if (it == mWidgetMap.end()) {
       shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
       mWidgetMap[node] = widget;
-      GetGLWidget()->update();
+      changed = true;
     }
   }
 
@@ -527,10 +529,19 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
         shared_ptr<NodeWidget> widget = it.second;
         mWidgetMap.erase(node);
         found = true;
+        changed = true;
         break;
       }
     }
     if (!found) break;
+  }
+
+  if (changed) {
+    mSelectedNodeWidgets.clear();
+    mHoveredWidget.reset();
+    mClickedWidget.reset();
+    mCurrentState = State::DEFAULT;
+    GetGLWidget()->update();
   }
 }
 

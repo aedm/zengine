@@ -129,7 +129,7 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
 }
 
 void StubNode::HandleMessage(Message* message) {
-  /// Stubs send a VALUE_CHANGED message is the shader needs to be rebuilt
+  /// Stubs send a VALUE_CHANGED message if the shader needs to be rebuilt
   switch (message->mType) {
     case MessageType::VALUE_CHANGED:
       if (message->mSlot == &mSource) {

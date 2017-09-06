@@ -25,6 +25,10 @@ SceneNode::SceneNode()
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
+  mShadowMapSize.SetDefaultValue(Vec3(30, 30, 50));
+  mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 0.5f, 0.5f));
+  mSkyLightColor.SetDefaultValue(Vec3(1, 1, 1));
+  mSkyLightAmbient.SetDefaultValue(0.2f);
 }
 
 SceneNode::~SceneNode() {

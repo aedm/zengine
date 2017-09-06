@@ -243,6 +243,36 @@ float CalculateSoftShadow(vec3 lightProjectionCoord, float sampleSpread, float s
   return shadow;
 }  
 
+float CalculateSoftShadow2(vec3 lightProjectionCoord, float sampleSpread, float spread, vec3 threshold) {
+  vec3 s = lightProjectionCoord * 0.5 + vec3(0.5, 0.5, 0.500);
+
+  // Calculate penumbra
+  float distance = 0;
+  float distCount = 0;
+  for (int i=0; i<poissonCount; i++) {
+    vec3 poisson = poissonDisk[i];
+    vec2 sampleCoord = poisson.xy;
+    vec2 p = s.xy + sampleCoord * gSkylightTextureSizeRecip * sampleSpread;
+    float shadowZ = texture(gSkylightTexture, p).z;
+    if (shadowZ + threshold.z < s.z) {
+	  if (poisson.z < threshold.y && s.z - shadowZ < threshold.x) return 0.0;
+      distance += s.z - shadowZ;
+      distCount += 1.0;
+    }
+  }
+  if (distCount > 0) distance /= distCount;
+  float sp = distance * spread;
+  
+  float shadow = 0;
+  for (int i=0; i<poissonCount; i++) {
+    vec2 sampleCoord = poissonDisk[i].xy;
+    vec2 p = s.xy + sampleCoord * gSkylightTextureSizeRecip * sp;
+    shadow += (texture(gSkylightTexture, p).z < s.z) ? 0 : 1.0;
+  }
+  shadow /= poissonCount;
+  return shadow;
+} 
+
 vec3 ApplyNormalMap(vec3 normal, vec3 tangent, sampler2D normalMap, vec2 texCoord, float intensity) {
   vec3 normalNorm = normalize(normal);
 

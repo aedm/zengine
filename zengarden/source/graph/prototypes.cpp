@@ -112,7 +112,7 @@ void Prototypes::LoadStubFolder(QString folder, Category* category) {
     else if (fileInfo.completeSuffix() == shaderSuffix) {
       INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
       StubNode* stub = Util::LoadStub(fileInfo.absoluteFilePath());
-
+      stub->Update();
       NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass<StubNode>();
       Prototype* prototype = new Prototype();
       prototype->mNodeClass = nodeClass;
