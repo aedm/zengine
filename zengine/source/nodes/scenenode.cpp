@@ -65,7 +65,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
 
   /// Draw to G-Buffer
   renderTarget->SetGBufferAsTarget(globals);
-  OpenGL->Clear(true, true, 0x303030);
+  //OpenGL->Clear(true, true, 0x303030);
   camera->SetupGlobals(globals);
   globals->SkylightTexture = renderTarget->mShadowTexture;
   globals->SkylightColorTexture = renderTarget->mShadowColorBuffer;

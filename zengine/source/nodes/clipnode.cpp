@@ -37,6 +37,7 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   
   bool clearColor = mClearColorBuffer.Get() >= 0.5f;
   bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
+  renderTarget->SetGBufferAsTarget(globals);
   OpenGL->Clear(clearColor, clearDepth);
 
   SceneNode* scene = mSceneSlot.GetNode();
