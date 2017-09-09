@@ -13,7 +13,7 @@ using namespace std;
 
 const wstring EngineFolder = L"engine/main/";
 const wstring ShaderExtension = L".shader";
-//#define FULLSCREEN
+#define FULLSCREEN
 
 
 /// HACK HACK HACK
@@ -147,15 +147,23 @@ int CALLBACK WinMain(
   /// Initialize Zengine
   InitZengine();
   OpenGL->OnContextSwitch();
-  OpenGL->Clear(true, true, 0x80008000);
-  SwapBuffers(hDC);
 
   LoadEngineShaders();
   Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
   RenderTarget* renderTarget = new RenderTarget(windowSize);
 
   /// Load demo file
-  char* json = System::ReadFile(L"demo.zen");
+  char* json = System::ReadFile(L"loading.zen");
+  Document* loading = FromJSON(string(json));
+  ASSERT(loading);
+  delete json;
+
+  /// Show loading screen
+  loading->mMovie.GetNode()->Draw(renderTarget, 0);
+  SwapBuffers(hDC);
+
+  /// Load demo file
+  json = System::ReadFile(L"demo.zen");
   Document* doc = FromJSON(string(json));
   ASSERT(doc);
   delete json;
