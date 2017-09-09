@@ -10,6 +10,6 @@ Document::Document()
   : Node(NodeType::DOCUMENT)
   , mGraphs(this, GraphSlotName, true)
   , mMovie(this, MovieSlotName)
-  , mProperties(this, PropertiesSlotName, false, false)
+  , mProperties(this, PropertiesSlotName, false, true)
 {
 }

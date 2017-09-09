@@ -30,8 +30,8 @@ char* System::ReadFile(const wchar_t* fileName) {
 
 void System::ReadFilesInFolder(const wchar_t* folder, const wchar_t* filter,
                                vector<wstring>& oFileList) {
-  wchar_t currentDir[512];
-  _wgetcwd(currentDir, 511);
+  wchar_t currentDir[1024];
+  _wgetcwd(currentDir, 1023);
 
   int err = _wchdir(folder);
 

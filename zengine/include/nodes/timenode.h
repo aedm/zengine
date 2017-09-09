@@ -11,7 +11,7 @@ public:
   static Event<float> OnTimeChanged;
 
 private:
-  void HandleTimeChange(float milliseconds);
+  void HandleTimeChange(float beats);
 };
 
 /// This node stores the scene time

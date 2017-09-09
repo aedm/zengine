@@ -16,11 +16,9 @@ GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
     mRenderForwarder = mDefaultScene.Watch<RenderForwarder>(&mDefaultScene);
     mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
   }
-  GlobalTimeNode::OnTimeChanged += Delegate(this, &GeneralSceneWatcher::Tick);
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
-  GlobalTimeNode::OnTimeChanged -= Delegate(this, &GeneralSceneWatcher::Tick);
   mRenderForwarder = nullptr;
   SafeDelete(mDrawable);
   SafeDelete(mRenderTarget);
@@ -110,12 +108,6 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
     distance = mOriginalDistance - float(diff.y()) / 2.0f;
     mCamera.mDistance.SetDefaultValue(distance);
   }
-}
-
-void GeneralSceneWatcher::Tick(float globalTime) {
-  /// Use movie cursor as scene time
-  //float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
-  //mScene->SetSceneTime(movieCursor);
 }
 
 void GeneralSceneWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event) {

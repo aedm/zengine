@@ -31,6 +31,8 @@ public:
   float GetSceneTime();
 
 protected:
+  virtual void Operate() override;
+
   void RenderDrawables(Globals* globals, PassType passType);
 
   /// Handle received messages

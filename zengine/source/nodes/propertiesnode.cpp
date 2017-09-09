@@ -8,5 +8,5 @@ PropertiesNode::PropertiesNode()
   : Node(NodeType::PROPERTIES)
   , mBPM(this, BPMSlotName, false, true, true, 60, 160) 
 {
-  mBPM.SetDefaultValue(138);
+  mBPM.SetDefaultValue(135);
 }

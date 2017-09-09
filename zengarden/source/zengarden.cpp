@@ -119,8 +119,15 @@ void ZenGarden::DisposeModules() {
   CloseZengine();
 }
 
+float ZenGarden::GetElapsedBeats() {
+  float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
+  int elapsed = mTime.elapsed();
+  float beats = bps * float(elapsed) / 1000.0f;
+  return beats;
+}
+
 void ZenGarden::RestartMovieTimer() {
-  mMovieStartTime = mTime.elapsed() - int(mMovieCursor * 1000.0f);
+  mMovieStartBeat = GetElapsedBeats() - mMovieCursor;
   mOnMovieCursorChange(mMovieCursor);
   if (mPlayMovie) PlayMusic(mMovieCursor);
 }
@@ -202,8 +209,8 @@ Node* ZenGarden::GetNodeInPropertyEditor() {
 }
 
 
-void ZenGarden::SetMovieCursor(float seconds) {
-  mMovieCursor = seconds;
+void ZenGarden::SetMovieCursor(float beats) {
+  mMovieCursor = beats;
   RestartMovieTimer();
 }
 
@@ -215,7 +222,7 @@ void ZenGarden::SetClipCursor(float seconds) {
 
 
 float ZenGarden::GetGlobalTime() {
-  return float(mTime.elapsed()) / 1000.0f;
+  return GetElapsedBeats();
 }
 
 float ZenGarden::GetMovieCursor() {
@@ -389,12 +396,12 @@ void ZenGarden::HandleMenuSaveAs() {
 }
 
 void ZenGarden::Tick() {
-  int elapsed = mTime.elapsed();
+  float elapsedBeats = GetElapsedBeats();
   if (mPlayMovie) {
-    mMovieCursor = float(elapsed - mMovieStartTime) / 1000.0f;
+    mMovieCursor = elapsedBeats - mMovieStartBeat;
     mOnMovieCursorChange(mMovieCursor);
   }
-  GlobalTimeNode::OnTimeChanged(float(elapsed) / 1000.0f);
+  GlobalTimeNode::OnTimeChanged(elapsedBeats);
   QTimer::singleShot(10, this, SLOT(Tick()));
 }
 
@@ -476,9 +483,13 @@ void ZenGarden::LoadMusic() {
   mBassMusicChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_PRESCAN);
 }
 
-void ZenGarden::PlayMusic(float seconds) {
+void ZenGarden::PlayMusic(float beats) {
+  float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
+  float seconds = beats / bps;
   if (mBassMusicChannel < 0) return;
-  BASS_ChannelSetPosition(mBassMusicChannel, BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds), BASS_POS_BYTE);
+  BASS_ChannelSetPosition(mBassMusicChannel, 
+                          BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds), 
+                          BASS_POS_BYTE);
   BASS_ChannelPlay(mBassMusicChannel, FALSE);
 }
 

@@ -11,6 +11,11 @@
 
 using namespace std;
 
+const wstring EngineFolder = L"engine/main/";
+const wstring ShaderExtension = L".shader";
+//#define FULLSCREEN
+
+
 /// HACK HACK HACK
 void hack() {
 #define FORCE(a) a force_##a;
@@ -28,6 +33,7 @@ void hack() {
   FORCE(SceneNode);
   FORCE(MovieNode);
   FORCE(ClipNode);
+  FORCE(PropertiesNode);
 }
 
 
@@ -54,20 +60,30 @@ void Log(LogMessage Message) {
 }
 
 
+void LoadEngineShaderFolder(const wstring& folder) {
+  vector<wstring> engineStubSourceFiles;
+  System::ReadFilesInFolder(folder.c_str(), L"*", engineStubSourceFiles);
+  for (wstring& fileName : engineStubSourceFiles) {
+    if (fileName[fileName.length() - 1] == L'.') continue;
+    if (wstring(fileName.end() - 7, fileName.end()) == ShaderExtension) {
+      string stubName(fileName.begin() + EngineFolder.length(), 
+                      fileName.end() - ShaderExtension.length());
+      string source(System::ReadFile(fileName.c_str()));
+      TheEngineStubs->SetStubSource(stubName, source);;
+    } else {
+      LoadEngineShaderFolder((fileName + L"/").c_str());
+    }
+  }
+}
+
+
 void LoadEngineShaders() {
   vector<wstring> engineStubSourceFiles;
-  System::ReadFilesInFolder(L"data/engine/", L"*.shader", engineStubSourceFiles);
-  for (wstring& fileName : engineStubSourceFiles) {
-    string stubName(fileName.begin() + 12, fileName.end() - 7);
-    string source(System::ReadFile(fileName.c_str()));
-    TheEngineStubs->SetStubSource(stubName, source);;
-  }
+  LoadEngineShaderFolder(EngineFolder);
   TheEngineStubs->OnLoadFinished();
 }
 
-#define FULLSCREEN
 
-//void main() {
 int CALLBACK WinMain(
   _In_ HINSTANCE hInstance,
   _In_ HINSTANCE hPrevInstance,
@@ -131,6 +147,9 @@ int CALLBACK WinMain(
   /// Initialize Zengine
   InitZengine();
   OpenGL->OnContextSwitch();
+  OpenGL->Clear(true, true, 0x80008000);
+  SwapBuffers(hDC);
+
   LoadEngineShaders();
   Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
   RenderTarget* renderTarget = new RenderTarget(windowSize);
@@ -141,9 +160,16 @@ int CALLBACK WinMain(
   ASSERT(doc);
   delete json;
 
+  /// Compile shaders
+  vector<Node*> nodes;
+  doc->GenerateTransitiveClosure(nodes, false);
+  for (Node* node : nodes) node->Update();
+
   /// Calculate demo length
   MovieNode* movieNode = doc->mMovie.GetNode();
   float movieLength = movieNode->CalculateMovieLength();
+
+  float bps = doc->mProperties.GetNode()->mBPM.Get() / 60.0f;;
 
   /// Start music
   BASS_ChannelSetPosition(chan, BASS_ChannelSeconds2Bytes(chan, 0), BASS_POS_BYTE);
@@ -162,7 +188,7 @@ int CALLBACK WinMain(
     if (GetAsyncKeyState(VK_ESCAPE)) break;
 
     /// Measure elapsed time
-    float time = float(timeGetTime() - startTime) / 1000.0f;
+    float time = bps * float(timeGetTime() - startTime) / 1000.0f;
     if (time > movieLength) break;
     GlobalTimeNode::OnTimeChanged(time);
 

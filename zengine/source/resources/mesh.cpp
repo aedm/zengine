@@ -71,7 +71,7 @@ void Mesh::Render(const vector<ShaderAttributeDesc>& usedAttributes,
                   UINT instanceCount, 
                   PrimitiveTypeEnum primitive) const 
 {
-    /// Set vertex buffer and attributes
+  /// Set vertex buffer and attributes
   OpenGL->SetVertexBuffer(mVertexHandle);
     for (const ShaderAttributeDesc& desc : usedAttributes) {
       VertexAttribute* attribute = mFormat->mAttributesArray[(UINT)desc.Usage];

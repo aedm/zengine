@@ -212,7 +212,7 @@ const std::vector<SplinePoint>& SplineComponent::GetPoints() {
 
 int SplineComponent::FindPointIndexBefore(float time) {
   int i = mLastIndex;
-  if (i >= int(mPoints.size())) i = 0;
+  if (i >= int(mPoints.size())) i = -1;
   while (i < int(mPoints.size()) - 1 && mPoints[i + 1].mTime <= time) i++;
   while (i >= 0 && mPoints[i].mTime > time) i--;
   mLastIndex = i;

@@ -105,6 +105,7 @@ void Pass::Operate() {
   const string& vertexSource = mVertexShaderMetadata->mSource;
   const string& fragmentSource = mFragmentShaderMetadata->mSource;
 
+  INFO("Building shader program...");
   ShaderCompileDesc* shaderCompileDesc = OpenGL->CreateShaderFromSource(
     vertexSource.c_str(), fragmentSource.c_str());
   if (shaderCompileDesc == nullptr) {
@@ -175,6 +176,7 @@ void Pass::Set(Globals* globals) {
   else if (blendVal > 0.333f) blendMode = RenderState::BlendMode::ADDITIVE;
   mRenderstate.mBlendMode = blendMode;
 
+  
   OpenGL->SetRenderState(&mRenderstate);
   OpenGL->SetShaderProgram(mHandle);
 

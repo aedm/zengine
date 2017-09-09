@@ -46,7 +46,7 @@ protected:
   virtual void HandleMessage(Message* message) override;
 
   /// Creates the shader program
-  virtual void Operate();
+  virtual void Operate() override;
 
   /// Removes all hidden uniform slots
   void RemoveUniformSlots();

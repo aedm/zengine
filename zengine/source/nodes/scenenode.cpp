@@ -72,6 +72,10 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   RenderDrawables(globals, PassType::SOLID);
 }
 
+void SceneNode::Operate() {
+  CalculateRenderDependencies();
+}
+
 void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
     Drawable* drawable = SafeCast<Drawable*>(mDrawables.GetReferencedMultiNode(i));
@@ -118,10 +122,7 @@ void SceneNode::CalculateRenderDependencies() {
 }
 
 void SceneNode::SetSceneTime(float time) {
-  if (!mIsUpToDate) {
-    CalculateRenderDependencies();
-    mIsUpToDate = true;
-  }
+  Update();
   for (Node* node : mSceneTimes.GetDirectMultiNodes()) {
     SafeCast<SceneTimeNode*>(node)->Set(time);
   }

@@ -79,7 +79,15 @@ void FloatSplineWatcher::AddPoint(SplineLayer layer) {
 
 void FloatSplineWatcher::RemovePoint() {
   if (mSelectedPointIndex >= 0) {
-    GetSpline()->RemovePoint(mSelectedLayer, mSelectedPointIndex);
+    FloatSplineNode* spline = GetSpline();
+    spline->RemovePoint(mSelectedLayer, mSelectedPointIndex);
+    int pointsCount = spline->GetComponent(mSelectedLayer)->GetPoints().size();
+    if (mSelectedPointIndex >= pointsCount) {
+      mSelectedPointIndex = pointsCount - 1;
+      if (mSelectedPointIndex < 0) {
+        mSelectedLayer = SplineLayer::NONE;
+      }
+    }
   }
 }
 

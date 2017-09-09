@@ -81,11 +81,12 @@ private:
 
   /// Global time elapsed since app launch
   QTime mTime;
+  float GetElapsedBeats();
 
   /// Global time when movie started playing in milliseconds
-  int mMovieStartTime;
+  float mMovieStartBeat;
 
-  /// Current movie cursor position in seconds, updates when movie is playing
+  /// Current movie cursor position in beats, updates when movie is playing
   float mMovieCursor;
 
   bool mPlayMovie = false;
@@ -101,7 +102,7 @@ private:
   /// Music related
   DWORD mBassMusicChannel = -1;
   void LoadMusic();
-  void PlayMusic(float seconds);
+  void PlayMusic(float beats);
   void StopMusic();
 
 private slots:

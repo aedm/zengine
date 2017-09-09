@@ -68,9 +68,6 @@ private:
   Drawable* mDrawable = nullptr;
 
   Globals mGlobals;
-
-  /// Updates scene times
-  void Tick(float globalTime);
 };
 
 

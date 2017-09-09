@@ -15,8 +15,8 @@ GlobalTimeNode::~GlobalTimeNode() {
   OnTimeChanged -= Delegate(this, &GlobalTimeNode::HandleTimeChange);
 }
 
-void GlobalTimeNode::HandleTimeChange(float milliseconds) {
-  Set(milliseconds);
+void GlobalTimeNode::HandleTimeChange(float beats) {
+  Set(beats);
 }
 
 SceneTimeNode::SceneTimeNode()
