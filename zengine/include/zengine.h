@@ -15,7 +15,7 @@
 #include "resources/texture.h"
 
 #include "shaders/stubnode.h"
-#include "shaders/shadernode.h"
+#include "shaders/shadersource.h"
 #include "shaders/pass.h"
 #include "shaders/material.h"
 #include "shaders/enginestubs.h"

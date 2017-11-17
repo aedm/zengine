@@ -45,7 +45,8 @@ protected:
 };
 
 
-/// One attribute as vertex buffer element
+/// An attribute of a vertex format, eg. position or UV
+/// TODO: make this part of VertexFormat
 struct VertexAttribute {
   VertexAttributeUsage Usage;
   int Size;
@@ -53,42 +54,43 @@ struct VertexAttribute {
 };
 
 
-/// One attribute as shader input
-struct ShaderAttributeDesc {
-  NodeType Type;
-  AttributeId Handle;
-  VertexAttributeUsage Usage;
-  string Name;
-};
-
-
-/// Uniform properties in a compiled shader
-struct ShaderUniformDesc {
-  /// Type (float, vec2...)
-  NodeType UniformType;
-
-  /// Uniform ID
-  UniformId Handle;
-
-  string Name;
-};
-
-
-/// Sampler properties in a compiled shader
-struct ShaderSamplerDesc {
-  /// Sampler ID
-  SamplerId Handle;
-
-  string Name;
-};
-
-
 /// Output of platform-dependent shader compilation
-struct ShaderCompileDesc {
+/// All metadata is determined by the shader compiler of the OpenGL driver.
+struct ShaderProgram {
+
+  /// Vertex attributes, pipeline input
+  struct Attribute {
+    string mName;
+    NodeType mType;
+    AttributeId mHandle;
+    VertexAttributeUsage mUsage;
+  };
+
+  /// Uniform properties returned by the driver
+  struct Uniform {
+    /// Uniform name, must match the generated name inside the uniform block
+    string mName;
+
+    /// Type (float, vec2...)
+    NodeType mType;
+
+    /// Data offset inside the uniform block
+    UINT mOffset;
+  };
+
+  /// Sampler properties returned by the driver
+  struct Sampler {
+    /// Uniform name, must match the generated sampler name
+    string mName;
+
+    /// Sampler ID
+    SamplerId mHandle;
+  };
+
   ShaderHandle Handle;
-  vector<ShaderUniformDesc> Uniforms;
-  vector<ShaderAttributeDesc> Attributes;
-  vector<ShaderSamplerDesc> Samplers;
+  vector<Uniform> Uniforms;
+  vector<Attribute> Attributes;
+  vector<Sampler> Samplers;
 };
 
 
@@ -108,7 +110,7 @@ public:
   void OnContextSwitch();
 
   /// Shader functions
-  OWNERSHIP ShaderCompileDesc* CreateShaderFromSource(const char* VertexSource, 
+  OWNERSHIP ShaderProgram* CreateShaderFromSource(const char* VertexSource, 
                                                       const char* FragmentSource);
   void SetShaderProgram(ShaderHandle Handle);
   void SetUniform(UniformId Id, NodeType Type, const void* Values);
@@ -120,7 +122,7 @@ public:
   void* MapVertexBuffer(VertexBufferHandle Handle);
   void UnMapVertexBuffer(VertexBufferHandle Handle);
   AttributeMapper* CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs, 
-                                         const vector<ShaderAttributeDesc>& ShaderAttribs, 
+                                         const vector<ShaderProgram::Attribute>& ShaderAttribs, 
                                          UINT Stride);
   void SetVertexBuffer(VertexBufferHandle Handle);
   void EnableVertexAttribute(UINT Index, NodeType Type, UINT Offset, UINT Stride);

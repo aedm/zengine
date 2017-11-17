@@ -148,7 +148,7 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
 }
 
 
-OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
+OWNERSHIP ShaderProgram* OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
   GLuint program = glCreateProgram();
 
@@ -187,8 +187,49 @@ OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
     return NULL;
   }
 
-  ShaderCompileDesc* builder = new ShaderCompileDesc;
+  ShaderProgram* builder = new ShaderProgram;
   builder->Handle = program;
+
+  /// Query uniform blocks
+  GLint uniformBlockCount;
+  glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES,
+                          &uniformBlockCount);
+  /// There should only be "vertexUniforms" and "fragmentUniforms"
+  ASSERT(uniformBlockCount == 2);
+
+  int vui = glGetUniformBlockIndex(program, "vertexUniforms");
+  int fui = glGetUniformBlockIndex(program, "fragmentUniforms");
+
+  /// OpenGL has issues
+  const GLenum blockProperties[] = {GL_NUM_ACTIVE_VARIABLES};
+  const GLenum activeUnifProp[] = {GL_ACTIVE_VARIABLES};
+  const GLenum unifProperties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET};
+
+  for (int blockIx = 0; blockIx < uniformBlockCount; ++blockIx) {
+    char temp[1000];
+    glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx, 1000, nullptr, temp);
+
+    GLint numActiveUnifs = 0;
+    glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, 1, blockProperties, 1,
+                           nullptr, &numActiveUnifs);
+
+    if (!numActiveUnifs) continue;
+
+    vector<GLint> blockUnifs(numActiveUnifs);
+    glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, 1, activeUnifProp,
+                           numActiveUnifs, NULL, &blockUnifs[0]);
+
+    for (int unifIx = 0; unifIx < numActiveUnifs; ++unifIx) {
+      GLint values[4];
+      glGetProgramResourceiv(program, GL_UNIFORM, blockUnifs[unifIx], 4, unifProperties,
+                             4, nullptr, values);
+
+      /// Get the name
+      std::string name(values[0], 0);
+      glGetProgramResourceName(program, GL_UNIFORM, blockUnifs[unifIx], values[0],
+                               nullptr, &name[0]);
+    }
+  }
 
   /// Create uniforms list
   GLint uniformCount;
@@ -207,21 +248,21 @@ OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
     GLint location = glGetUniformLocation(program, name);
     //ASSERT(i == location);
     if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE || type == GL_SAMPLER_2D_SHADOW) {
-      ShaderSamplerDesc sampler;
-      sampler.Handle = location;
-      sampler.Name = name;
+      ShaderProgram::Sampler sampler;
+      sampler.mHandle = location;
+      sampler.mName = name;
       builder->Samplers.push_back(sampler);
     } else {
-      ShaderUniformDesc uniform;
-      uniform.Handle = location;
-      uniform.Name = name;
+      ShaderProgram::Uniform uniform;
+      uniform.mHandle = location;
+      uniform.mName = name;
       switch (type) {
-        case GL_FLOAT:		uniform.UniformType = NodeType::FLOAT;		break;
-        case GL_FLOAT_VEC2:	uniform.UniformType = NodeType::VEC2;		break;
-        case GL_FLOAT_VEC3:	uniform.UniformType = NodeType::VEC3;		break;
-        case GL_FLOAT_VEC4:	uniform.UniformType = NodeType::VEC4;		break;
-        case GL_FLOAT_MAT4:	uniform.UniformType = NodeType::MATRIX44;	break;
-        default: NOT_IMPLEMENTED; uniform.UniformType = (NodeType)-1; break;
+        case GL_FLOAT:		uniform.mType = NodeType::FLOAT;		break;
+        case GL_FLOAT_VEC2:	uniform.mType = NodeType::VEC2;		break;
+        case GL_FLOAT_VEC3:	uniform.mType = NodeType::VEC3;		break;
+        case GL_FLOAT_VEC4:	uniform.mType = NodeType::VEC4;		break;
+        case GL_FLOAT_MAT4:	uniform.mType = NodeType::MATRIX44;	break;
+        default: NOT_IMPLEMENTED; uniform.mType = (NodeType)-1; break;
       }
       builder->Uniforms.push_back(uniform);
     }
@@ -244,7 +285,8 @@ OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
     GLsizei size;
     GLenum type;
 
-    glGetActiveAttrib(program, i, attributeNameMaxLength, &nameLength, &size, &type, name);
+    glGetActiveAttrib(program, i, attributeNameMaxLength, &nameLength, &size, &type,
+                      name);
 
     /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
     AttributeId location = glGetAttribLocation(program, name);
@@ -252,22 +294,22 @@ OWNERSHIP ShaderCompileDesc* OpenGLAPI::CreateShaderFromSource(
     /// Shader compiler reports gl_InstanceID as an attribute at -1, who knows why.
     if (location < 0) continue;
 
-    ShaderAttributeDesc attribute;
-    attribute.Handle = location;
-    attribute.Name = name;
+    ShaderProgram::Attribute attribute;
+    attribute.mHandle = location;
+    attribute.mName = name;
     switch (type) {
-      case GL_FLOAT:		attribute.Type = NodeType::FLOAT;		break;
-      case GL_FLOAT_VEC2:	attribute.Type = NodeType::VEC2;		break;
-      case GL_FLOAT_VEC3:	attribute.Type = NodeType::VEC3;		break;
-      case GL_FLOAT_VEC4:	attribute.Type = NodeType::VEC4;		break;
-      default: NOT_IMPLEMENTED; attribute.Type = (NodeType)-1;	break;
+      case GL_FLOAT:		attribute.mType = NodeType::FLOAT;		break;
+      case GL_FLOAT_VEC2:	attribute.mType = NodeType::VEC2;		break;
+      case GL_FLOAT_VEC3:	attribute.mType = NodeType::VEC3;		break;
+      case GL_FLOAT_VEC4:	attribute.mType = NodeType::VEC4;		break;
+      default: NOT_IMPLEMENTED; attribute.mType = (NodeType)-1;	break;
     }
 
     /// Map attribute name to usage
     bool found = false;
     for (UINT o = 0; o < (UINT)VertexAttributeUsage::COUNT; o++) {
       if (strcmp(gVertexAttributeName[o], name) == 0) {
-        attribute.Usage = (VertexAttributeUsage)o;
+        attribute.mUsage = (VertexAttributeUsage)o;
         found = true;
         break;
       }
@@ -294,23 +336,23 @@ void OpenGLAPI::SetUniform(UniformId id, NodeType type, const void* values) {
   CheckGLError();
 
   switch (type) {
-    case NodeType::FLOAT:		  
-      glUniform1f(id, *(const GLfloat*)values);					        
+    case NodeType::FLOAT:
+      glUniform1f(id, *(const GLfloat*)values);
       break;
-    case NodeType::VEC2:		  
-      glUniform2fv(id, 1, (const GLfloat*)values);				      
+    case NodeType::VEC2:
+      glUniform2fv(id, 1, (const GLfloat*)values);
       break;
-    case NodeType::VEC3:		  
-      glUniform3fv(id, 1, (const GLfloat*)values);				      
+    case NodeType::VEC3:
+      glUniform3fv(id, 1, (const GLfloat*)values);
       break;
-    case NodeType::VEC4:		  
-      glUniform4fv(id, 1, (const GLfloat*)values);				      
+    case NodeType::VEC4:
+      glUniform4fv(id, 1, (const GLfloat*)values);
       break;
-    case NodeType::MATRIX44:	
-      glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);	
+    case NodeType::MATRIX44:
+      glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
       break;
-    default: 
-      NOT_IMPLEMENTED; 
+    default:
+      NOT_IMPLEMENTED;
       break;
   }
   CheckGLError();
@@ -415,16 +457,16 @@ void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
 
 AttributeMapper* OpenGLAPI::CreateAttributeMapper(
   const vector<VertexAttribute>& bufferAttribs,
-  const vector<ShaderAttributeDesc>& shaderAttribs, UINT stride) {
+  const vector<ShaderProgram::Attribute>& shaderAttribs, UINT stride) {
   AttributeMapperOpenGL* mapper = new AttributeMapperOpenGL();
   mapper->Stride = stride;
 
-  for (const ShaderAttributeDesc& shaderAttr : shaderAttribs) {
+  for (const ShaderProgram::Attribute& shaderAttr : shaderAttribs) {
     bool found = false;
     for (const VertexAttribute& bufferAttr : bufferAttribs) {
-      if (bufferAttr.Usage == shaderAttr.Usage) {
+      if (bufferAttr.Usage == shaderAttr.mUsage) {
         MappedAttributeOpenGL attr;
-        attr.Index = shaderAttr.Handle;
+        attr.Index = shaderAttr.mHandle;
         switch (gVertexAttributeType[(UINT)bufferAttr.Usage]) {
           case NodeType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
           case NodeType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
@@ -665,7 +707,7 @@ TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
     GLint internalFormat;
     GLenum format, glType;
     GetTextureType(type, internalFormat, format, glType);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
                             ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
                             internalFormat, width, height, false);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
@@ -700,7 +742,7 @@ void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
   GLenum format;
   GLenum glType;
   GetTextureType(type, internalFormat, format, glType);
-  glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType, 
+  glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType,
                texelData);
   if (generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
   CheckGLError();
@@ -739,7 +781,7 @@ void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
 }
 
 
-void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex, 
+void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex,
                            bool isRenderTarget) {
   CheckGLError();
   SetActiveTexture(slotIndex);
@@ -770,7 +812,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
     /// No target buffer
   } else if (!targetBufferB) {
     CheckGLError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target, 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
                            targetBufferA, 0);
     GLuint attachments[] = {GL_COLOR_ATTACHMENT0};
     CheckGLError();

@@ -1,7 +1,7 @@
 #include "shaderbuilder.h"
 #include <include/shaders/pass.h>
 #include <include/shaders/stubnode.h>
-#include <include/shaders/shadernode.h>
+#include <include/shaders/shadersource.h>
 #include <include/shaders/enginestubs.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
@@ -58,17 +58,11 @@ void Pass::Operate() {
   mHandle = -1;
   RemoveUniformSlots();
 
-  /// Recreates shader metadata if needed
-  if (mVertexShaderMetadata == nullptr) {
-    mVertexShaderMetadata = ShaderBuilder::FromStub(mVertexStub.GetNode(), true);
-  }
-  if (mFragmentShaderMetadata == nullptr) {
-    mFragmentShaderMetadata = ShaderBuilder::FromStub(mFragmentStub.GetNode(), false);
-  }
-
-  /// Both fragment and vertex metadata are needed
-  if (mFragmentShaderMetadata == nullptr || mVertexShaderMetadata == nullptr) {
-    return;
+  /// Recreates shader source
+  if (mShaderSource == nullptr) {
+    mShaderSource = ShaderBuilder::FromStubs(mVertexStub.GetNode(),  
+                                             mFragmentStub.GetNode());
+    if (mShaderSource == nullptr) return;
   }
   
   INFO("Building render pipeline...");
@@ -106,7 +100,7 @@ void Pass::Operate() {
   const string& fragmentSource = mFragmentShaderMetadata->mSource;
 
   INFO("Building shader program...");
-  ShaderCompileDesc* shaderCompileDesc = OpenGL->CreateShaderFromSource(
+  ShaderProgram* shaderCompileDesc = OpenGL->CreateShaderFromSource(
     vertexSource.c_str(), fragmentSource.c_str());
   if (shaderCompileDesc == nullptr) {
     ERR("Missing shader compilation result.");
@@ -116,16 +110,16 @@ void Pass::Operate() {
   mHandle = shaderCompileDesc->Handle;
 
   /// Collect uniforms from shader stage sources
-  map<string, ShaderUniform*> uniformMap;
-  for (auto sampler : mVertexShaderMetadata->mUniforms) {
-    uniformMap[sampler->mName] = sampler;
+  map<string, ShaderSource::Uniform*> uniformMap;
+  for (auto uniform : mVertexShaderMetadata->mUniforms) {
+    uniformMap[uniform->mName] = uniform;
   }
-  for (auto sampler : mFragmentShaderMetadata->mUniforms) {
-    uniformMap[sampler->mName] = sampler;
+  for (auto uniform : mFragmentShaderMetadata->mUniforms) {
+    uniformMap[uniform->mName] = uniform;
   }
 
   /// Collect samplers
-  map<string, ShaderUniform*> samplerMap;
+  map<string, ShaderSource::Uniform*> samplerMap;
   for (auto sampler : mVertexShaderMetadata->mSamplers) {
     samplerMap[sampler->mName] = sampler;
   }
@@ -134,10 +128,10 @@ void Pass::Operate() {
   }
 
   /// Merge uniform info
-  for (auto samplerDesc : shaderCompileDesc->Uniforms) {
-    ShaderUniform* sourceUniform = uniformMap.at(samplerDesc.Name);
+  for (auto uniform : shaderCompileDesc->Uniforms) {
+    ShaderSource::Uniform* sourceUniform = uniformMap.at(uniform.mName);
     PassUniform passUniform;
-    passUniform.handle = samplerDesc.Handle;
+    passUniform.handle = uniform.Handle;
     passUniform.node = sourceUniform->mNode;
     passUniform.globalType = sourceUniform->mGlobalType;
     passUniform.type = sourceUniform->mType;
@@ -145,10 +139,10 @@ void Pass::Operate() {
   }
 
   /// Merge sampler info
-  for (auto samplerDesc : shaderCompileDesc->Samplers) {
-    ShaderUniform* sourceUniform = samplerMap.at(samplerDesc.Name);
+  for (auto sampler : shaderCompileDesc->Samplers) {
+    ShaderSource::Uniform* sourceUniform = samplerMap.at(sampler.mName);
     PassUniform passUniform;
-    passUniform.handle = samplerDesc.Handle;
+    passUniform.handle = sampler.mHandle;
     passUniform.node = sourceUniform->mNode;
     passUniform.globalType = sourceUniform->mGlobalType;
     passUniform.type = sourceUniform->mType;
@@ -223,7 +217,7 @@ void Pass::Set(Globals* globals) {
   }
 }
 
-const vector<ShaderAttributeDesc>& Pass::GetUsedAttributes() {
+const vector<ShaderProgram::Attribute>& Pass::GetUsedAttributes() {
   return mAttributes;
 }
 

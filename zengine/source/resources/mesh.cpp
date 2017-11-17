@@ -67,29 +67,28 @@ Mesh::~Mesh() {
   SafeDelete(mRawVertexData);
 }
 
-void Mesh::Render(const vector<ShaderAttributeDesc>& usedAttributes, 
-                  UINT instanceCount, 
-                  PrimitiveTypeEnum primitive) const 
-{
+void Mesh::Render(const vector<ShaderProgram::Attribute>& usedAttributes,
+                  UINT instanceCount,
+                  PrimitiveTypeEnum primitive) const {
   /// Set vertex buffer and attributes
   OpenGL->SetVertexBuffer(mVertexHandle);
-    for (const ShaderAttributeDesc& desc : usedAttributes) {
-      VertexAttribute* attribute = mFormat->mAttributesArray[(UINT)desc.Usage];
-      if (attribute != nullptr) {
-        OpenGL->EnableVertexAttribute(desc.Handle,
-                                             gVertexAttributeType[(UINT)desc.Usage], 
-                                             attribute->Offset,
-                                             mFormat->mStride);
-      } else {
-        SHOULD_NOT_HAPPEN;
-      }
-    }
-
-    if (mIndexHandle) {
-      OpenGL->Render(mIndexHandle, mIndexCount, primitive, instanceCount);
+  for (const ShaderProgram::Attribute& desc : usedAttributes) {
+    VertexAttribute* attribute = mFormat->mAttributesArray[(UINT)desc.mUsage];
+    if (attribute != nullptr) {
+      OpenGL->EnableVertexAttribute(desc.mHandle,
+                                    gVertexAttributeType[(UINT)desc.mUsage],
+                                    attribute->Offset,
+                                    mFormat->mStride);
     } else {
-      OpenGL->Render(0, mVertexCount, primitive, instanceCount);
+      SHOULD_NOT_HAPPEN;
     }
+  }
+
+  if (mIndexHandle) {
+    OpenGL->Render(mIndexHandle, mIndexCount, primitive, instanceCount);
+  } else {
+    OpenGL->Render(0, mVertexCount, primitive, instanceCount);
+  }
 }
 
 void Mesh::AllocateVertices(VertexFormat* format, UINT vertexCount) {

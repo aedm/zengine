@@ -64,6 +64,7 @@ struct VertexPosUV {
 };
 
 
+/// Describes the memory layout of a vertex format
 class VertexFormat {
   friend class ResourceManager;
 
@@ -71,14 +72,15 @@ class VertexFormat {
   ~VertexFormat();
 
 public:
-  void Set();
-  //void SetAttributeDefines(ShaderDefines& Defines);
-
   bool HasAttribute(VertexAttributeUsage attrib);
 
-  //VertexDeclaration			Declaration;
+  /// Size of all data of a single vertex in bytes
   int mStride;
+
+  /// Bit-by-bit representation of vertex attributes
   UINT mBinaryFormat;
+
+  /// List of vertex attributes
   vector<VertexAttribute> mAttributes;
 
   VertexAttribute* mAttributesArray[(UINT)VertexAttributeUsage::COUNT];
@@ -92,7 +94,7 @@ class Mesh {
   ~Mesh();
 
 public:
-  void Render(const vector<ShaderAttributeDesc>& usedAttributes,
+  void Render(const vector<ShaderProgram::Attribute>& usedAttributes,
               UINT instanceCount,
               PrimitiveTypeEnum primitive) const;
 

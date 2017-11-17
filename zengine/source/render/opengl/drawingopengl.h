@@ -48,7 +48,7 @@
 //  virtual void*				MapVertexBuffer(VertexBufferHandle Handle) override;
 //  virtual void				UnMapVertexBuffer(VertexBufferHandle Handle) override;
 //  virtual AttributeMapper*	CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs, 
-//                                                  const vector<ShaderAttributeDesc>& ShaderAttribs, UINT Stride) override;
+//                                                  const vector<ShaderProgram::Attribute>& ShaderAttribs, UINT Stride) override;
 //  virtual void				SetVertexBuffer(VertexBufferHandle Handle) override;
 //  virtual void				EnableVertexAttribute(UINT Index, NodeType Type, UINT Offset, UINT Stride) override;
 //

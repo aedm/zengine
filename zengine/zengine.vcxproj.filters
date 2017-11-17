@@ -137,9 +137,6 @@
     <ClInclude Include="include\dom\nodetype.h">
       <Filter>include\dom</Filter>
     </ClInclude>
-    <ClInclude Include="include\shaders\shadernode.h">
-      <Filter>include\shaders</Filter>
-    </ClInclude>
     <ClInclude Include="include\shaders\stubnode.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
@@ -186,6 +183,9 @@
       <Filter>include\nodes</Filter>
     </ClInclude>
     <ClInclude Include="include\nodes\propertiesnode.h" />
+    <ClInclude Include="include\shaders\shadersource.h">
+      <Filter>include\shaders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -245,9 +245,6 @@
     <ClCompile Include="source\dom\nodetype.cpp">
       <Filter>source\dom</Filter>
     </ClCompile>
-    <ClCompile Include="source\shaders\shadernode.cpp">
-      <Filter>source\shaders</Filter>
-    </ClCompile>
     <ClCompile Include="source\shaders\stubnode.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
@@ -295,6 +292,9 @@
       <Filter>source\render\opengl</Filter>
     </ClCompile>
     <ClCompile Include="source\nodes\propertiesnode.cpp" />
+    <ClCompile Include="source\shaders\shadersource.cpp">
+      <Filter>source\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">
