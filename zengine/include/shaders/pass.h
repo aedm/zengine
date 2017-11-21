@@ -26,15 +26,19 @@ struct PassUniform {
 class Pass: public Node {
 
   /// Associates a uniform to a Node to take its value from
-  class UniformMapper {
-    ShaderProgram::Uniform* mTargetUniform;
-    Node* mSourceNode;
+  struct UniformMapper {
+    UniformMapper(const ShaderProgram::Uniform* targetUniform, 
+                  const ShaderSource::Uniform* source);
+    const ShaderProgram::Uniform* mTarget;
+    const ShaderSource::Uniform* mSource;
   };
 
   /// Associates a sampler to a texture Node to take its value from
-  class SamplerMapper {
-    ShaderProgram::Sampler* mTargetSampler;
-    Node* mSourceNode;
+  struct SamplerMapper {
+    SamplerMapper(const ShaderProgram::Sampler* target, 
+                  const ShaderSource::Sampler* source);
+    const ShaderProgram::Sampler* mTarget;
+    const ShaderSource::Sampler* mSource;
   };
 
 public:
@@ -68,17 +72,22 @@ protected:
   /// Removes all hidden uniform slots
   void RemoveUniformSlots();
 
-  vector<UniformMapper>	mUniforms;
-  vector<SamplerMapper>	mSamplers;
-  vector<ShaderProgram::Attribute> mAttributes;
+  /// Generated shader source
+  shared_ptr<ShaderSource> mShaderSource;
 
-  //ShaderSource* mFragmentShaderMetadata = nullptr;
-  //ShaderSource* mVertexShaderMetadata = nullptr;
-  ShaderSource* mShaderSource = nullptr;
-
+  /// Generated slots
   vector<Slot*> mUniformAndSamplerSlots;
   
-  ShaderHandle mHandle;
+  /// Compiled and linked shader program
+  shared_ptr<ShaderProgram> mShaderProgram;
+
+  /// Mappers from nodes to used uniforms
+  vector<UniformMapper>	mUsedUniforms;
+  vector<SamplerMapper>	mUsedSamplers;
+
+  /// Client-side uniform buffer. 
+  /// Uniforms are assembled in this array and then uploaded to OpenGL
+  vector<char> mUniformArray;
 };
 
 typedef TypedSlot<NodeType::PASS, Pass> PassSlot;

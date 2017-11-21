@@ -5,17 +5,19 @@
 
 class ShaderBuilder {
 public:
-  static OWNERSHIP ShaderSource* FromStubs(StubNode* vertexStub, StubNode* fragmentStub);
-
-  OWNERSHIP ShaderSource* MakeShaderSource();
+  static shared_ptr<ShaderSource> FromStubs(StubNode* vertexStub, StubNode* fragmentStub);
 
 private:
   ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub);
   ~ShaderBuilder();
 
+  shared_ptr<ShaderSource> MakeShaderSource();
+
   /// How to reference a certain Node dependency within GLSL code? 
   /// Stubs translate to a function call and a variable to store its return value.
   struct StubReference {
+    StubReference(NodeType type);
+
     /// The variable name in the main function
     string mVariableName;
 
@@ -23,7 +25,7 @@ private:
     string mFunctionName;
 
     /// Stub return type
-    NodeType mType;
+    const NodeType mType;
   };
 
   /// Non-stub Nodes translate to a uniform/sampler value
@@ -51,7 +53,7 @@ private:
 
   /// Data for a single shader stage, eg. vertex or fragment shader
   struct ShaderStage {
-    ShaderStage();
+    ShaderStage(bool isVertexShader);
 
     /// Generates function and variable names for stub calls
     void GenerateStubNames();

@@ -7,7 +7,8 @@
 
 #ifdef _DEBUG
 void CheckGLError() {
-  GLenum error = glGetError();  //ASSERT(error == GL_NO_ERROR);
+  GLenum error = glGetError();  
+  ASSERT(error == GL_NO_ERROR);
 }
 #else
 #	define CheckGLError()
@@ -81,6 +82,7 @@ OpenGLAPI::OpenGLAPI() {
 
   glEnable(GL_MULTISAMPLE);
   OnContextSwitch();
+  CheckGLError();
 }
 
 
@@ -115,11 +117,13 @@ void OpenGLAPI::OnContextSwitch() {
     BoundTextureShadow[i] = (GLuint)-1;
     BoundMultisampleTextureShadow[i] = (GLuint)-1;
   }
+  CheckGLError();
 }
 
 
-static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
-                                   const char* source) {
+static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
+                                           const char* source) {
+  CheckGLError();
   /// Create shader object, set the source, and compile
   GLuint shader = glCreateShader(shaderType);
   GLint length = GLint(strlen(source));
@@ -138,30 +142,42 @@ static bool CompileAndAttachShader(GLuint program, GLuint shaderType,
     glGetShaderInfoLog(shader, length, &result, log);
     ERR(log);
     glDeleteShader(shader);
-    return false;
+    CheckGLError();
+    return 0;
   }
 
   glAttachShader(program, shader);
-  glDeleteShader(shader);
   CheckGLError();
-  return true;
+  return shader;
 }
 
 
-OWNERSHIP ShaderProgram* OpenGLAPI::CreateShaderFromSource(
+shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
+  CheckGLError();
   GLuint program = glCreateProgram();
 
+  CheckGLError();
   /// Compile shaders
-  if (!CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource)) {
+  ShaderHandle vertexShaderHandle =
+    CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource);
+  if (vertexShaderHandle == 0) {
     WARN(L"Vertex shader compilation failed.");
     glDeleteProgram(program);
-    return NULL;
+    CheckGLError();
+    return nullptr;
   }
-  if (!CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource)) {
+  ShaderHandle fragmentShaderHandle =
+    CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource);
+  if (fragmentShaderHandle == 0) {
     WARN(L"Fragment shader compilation failed.");
+
+    CheckGLError();
     glDeleteProgram(program);
-    return NULL;
+    CheckGLError();
+    glDeleteShader(vertexShaderHandle);
+    CheckGLError();
+    return nullptr;
   }
 
   /// Link program
@@ -179,155 +195,183 @@ OWNERSHIP ShaderProgram* OpenGLAPI::CreateShaderFromSource(
     } else {
       WARN("Shader compiler: %s", log);
     }
+    CheckGLError();
     delete log;
   }
 
   if (result == GL_FALSE) {
     glDeleteProgram(program);
-    return NULL;
+    glDeleteShader(vertexShaderHandle);
+    glDeleteShader(fragmentShaderHandle);
+    CheckGLError();
+    return nullptr;
   }
-
-  ShaderProgram* builder = new ShaderProgram;
-  builder->Handle = program;
 
   /// Query uniform blocks
   GLint uniformBlockCount;
   glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES,
                           &uniformBlockCount);
-  /// There should only be "vertexUniforms" and "fragmentUniforms"
-  ASSERT(uniformBlockCount == 2);
+  /// There should only be "Uniforms"
+  ASSERT(uniformBlockCount == 1);
 
-  int vui = glGetUniformBlockIndex(program, "vertexUniforms");
-  int fui = glGetUniformBlockIndex(program, "fragmentUniforms");
+  /// And it should be at index 0
+  int uniformBlockIndex = glGetUniformBlockIndex(program, "Uniforms");
+  ASSERT(uniformBlockIndex == 0);
 
-  /// OpenGL has issues
-  const GLenum blockProperties[] = {GL_NUM_ACTIVE_VARIABLES};
-  const GLenum activeUnifProp[] = {GL_ACTIVE_VARIABLES};
-  const GLenum unifProperties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET};
+  /// This is how OpenGL interface API works. Beautiful like a megmikrózott kefir.
+  /// Get the number of active uniforms inside the uniform block, and the block size.
+  const GLenum blockPropsList[] = {GL_NUM_ACTIVE_VARIABLES, GL_BUFFER_DATA_SIZE};
+  #pragma pack(push, 1)
+  struct { GLint mUniformCount, mSize; } blockProps;
+  #pragma pack(pop)
+  glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex,
+                         ElementCount(blockPropsList), blockPropsList, 
+                         ElementCount(blockPropsList), nullptr, 
+                         reinterpret_cast<GLint*>(&blockProps));
 
-  for (int blockIx = 0; blockIx < uniformBlockCount; ++blockIx) {
-    char temp[1000];
-    glGetProgramResourceName(program, GL_UNIFORM_BLOCK, blockIx, 1000, nullptr, temp);
+  //if (numActiveUnifs > 0) continue;
+  vector<ShaderProgram::Uniform> uniforms;
+  uniforms.reserve(blockProps.mUniformCount);
 
-    GLint numActiveUnifs = 0;
-    glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, 1, blockProperties, 1,
-                           nullptr, &numActiveUnifs);
+  std::vector<GLint> uniformLocations(blockProps.mUniformCount);
+  const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
+  glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex, 1, activeUnifProp, 
+                         blockProps.mUniformCount, nullptr, &uniformLocations[0]);
 
-    if (!numActiveUnifs) continue;
+  /// Query the properties of each uniform inside the block
+  const GLenum uniformProperties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET};
+  #pragma pack(push, 1)
+  struct { GLint mNameLength, mType, mLocation, mOffset; } values;
+  #pragma pack(pop)
 
-    vector<GLint> blockUnifs(numActiveUnifs);
-    glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, blockIx, 1, activeUnifProp,
-                           numActiveUnifs, NULL, &blockUnifs[0]);
+  for (int blockIndex = 0; blockIndex < blockProps.mUniformCount; ++blockIndex) {
+    glGetProgramResourceiv(program, GL_UNIFORM, uniformLocations[blockIndex],
+                           ElementCount(uniformProperties), uniformProperties, 
+                           ElementCount(uniformProperties), nullptr,
+                           reinterpret_cast<GLint*>(&values));
 
-    for (int unifIx = 0; unifIx < numActiveUnifs; ++unifIx) {
-      GLint values[4];
-      glGetProgramResourceiv(program, GL_UNIFORM, blockUnifs[unifIx], 4, unifProperties,
-                             4, nullptr, values);
+    /// Get the name
+    vector<char> name(values.mNameLength);
+    glGetProgramResourceName(program, GL_UNIFORM, uniformLocations[blockIndex],
+                             values.mNameLength, nullptr, &name[0]);
 
-      /// Get the name
-      std::string name(values[0], 0);
-      glGetProgramResourceName(program, GL_UNIFORM, blockUnifs[unifIx], values[0],
-                               nullptr, &name[0]);
+    NodeType nodeType = NodeType::NONE;
+    switch (values.mType) {
+      case GL_FLOAT:		  nodeType = NodeType::FLOAT;		  break;
+      case GL_FLOAT_VEC2:	nodeType = NodeType::VEC2;		  break;
+      case GL_FLOAT_VEC3:	nodeType = NodeType::VEC3;		  break;
+      case GL_FLOAT_VEC4:	nodeType = NodeType::VEC4;		  break;
+      case GL_FLOAT_MAT4:	nodeType = NodeType::MATRIX44;	break;
+      default: NOT_IMPLEMENTED; break;
     }
+
+    uniforms.push_back(
+      ShaderProgram::Uniform(string(&name[0]), nodeType, values.mOffset));
   }
 
-  /// Create uniforms list
+  /// Query samplers' list with the old OpenGL API
+  /// Interface API can't handle samplers :((((
+  vector<ShaderProgram::Sampler> samplers;
   GLint uniformCount;
   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
 
   GLint uniformNameMaxLength;
   glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformNameMaxLength);
-  char* name = new char[uniformNameMaxLength];
+  vector<char> samplerName(uniformNameMaxLength);
 
-  for (int i = 0; i < uniformCount; i++) {
+  for (int uniformIndex = 0; uniformIndex < uniformCount; uniformIndex++) {
     /// Request info about Nth uniform
     GLint nameLength;
     GLsizei size;
     GLenum type;
-    glGetActiveUniform(program, i, uniformNameMaxLength, &nameLength, &size, &type, name);
-    GLint location = glGetUniformLocation(program, name);
-    //ASSERT(i == location);
-    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE || type == GL_SAMPLER_2D_SHADOW) {
-      ShaderProgram::Sampler sampler;
-      sampler.mHandle = location;
-      sampler.mName = name;
-      builder->Samplers.push_back(sampler);
-    } else {
-      ShaderProgram::Uniform uniform;
-      uniform.mHandle = location;
-      uniform.mName = name;
-      switch (type) {
-        case GL_FLOAT:		uniform.mType = NodeType::FLOAT;		break;
-        case GL_FLOAT_VEC2:	uniform.mType = NodeType::VEC2;		break;
-        case GL_FLOAT_VEC3:	uniform.mType = NodeType::VEC3;		break;
-        case GL_FLOAT_VEC4:	uniform.mType = NodeType::VEC4;		break;
-        case GL_FLOAT_MAT4:	uniform.mType = NodeType::MATRIX44;	break;
-        default: NOT_IMPLEMENTED; uniform.mType = (NodeType)-1; break;
-      }
-      builder->Uniforms.push_back(uniform);
-    }
+    glGetActiveUniform(program, uniformIndex, uniformNameMaxLength, &nameLength, &size, 
+                       &type, &samplerName[0]);
+    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE || 
+        type == GL_SAMPLER_2D_SHADOW) {
+      GLint location = glGetUniformLocation(program, &samplerName[0]);
+      samplers.push_back(ShaderProgram::Sampler(string(&samplerName[0]), location));
+    } 
   }
-  delete name;
   CheckGLError();
-
 
   /// Create attributes list
   GLint attributeCount;
   glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &attributeCount);
 
+  vector<ShaderProgram::Attribute> attributes;
+  attributes.reserve(attributeCount);
+
   GLint attributeNameMaxLength;
   glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &attributeNameMaxLength);
-  name = new char[attributeNameMaxLength];
+  vector<char> attributeName(attributeNameMaxLength);
 
-  for (int i = 0; i < attributeCount; i++) {
+  for (int uniformIndex = 0; uniformIndex < attributeCount; uniformIndex++) {
     /// Request info about Nth attribute
     GLint nameLength;
     GLsizei size;
     GLenum type;
 
-    glGetActiveAttrib(program, i, attributeNameMaxLength, &nameLength, &size, &type,
-                      name);
+    glGetActiveAttrib(program, uniformIndex, attributeNameMaxLength, &nameLength, &size, 
+                      &type, &attributeName[0]);
 
     /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
-    AttributeId location = glGetAttribLocation(program, name);
+    AttributeId location = glGetAttribLocation(program, &attributeName[0]);
 
     /// Shader compiler reports gl_InstanceID as an attribute at -1, who knows why.
     if (location < 0) continue;
 
-    ShaderProgram::Attribute attribute;
-    attribute.mHandle = location;
-    attribute.mName = name;
+    NodeType nodeType = NodeType::NONE;
     switch (type) {
-      case GL_FLOAT:		attribute.mType = NodeType::FLOAT;		break;
-      case GL_FLOAT_VEC2:	attribute.mType = NodeType::VEC2;		break;
-      case GL_FLOAT_VEC3:	attribute.mType = NodeType::VEC3;		break;
-      case GL_FLOAT_VEC4:	attribute.mType = NodeType::VEC4;		break;
-      default: NOT_IMPLEMENTED; attribute.mType = (NodeType)-1;	break;
+      case GL_FLOAT:		  nodeType = NodeType::FLOAT;		break;
+      case GL_FLOAT_VEC2:	nodeType = NodeType::VEC2;		break;
+      case GL_FLOAT_VEC3:	nodeType = NodeType::VEC3;		break;
+      case GL_FLOAT_VEC4:	nodeType = NodeType::VEC4;		break;
+      default: NOT_IMPLEMENTED; break;
     }
 
     /// Map attribute name to usage
     bool found = false;
+    VertexAttributeUsage usage = VertexAttributeUsage::NONE;
     for (UINT o = 0; o < (UINT)VertexAttributeUsage::COUNT; o++) {
-      if (strcmp(gVertexAttributeName[o], name) == 0) {
-        attribute.mUsage = (VertexAttributeUsage)o;
+      if (strcmp(gVertexAttributeName[o], &attributeName[0]) == 0) {
+        usage = VertexAttributeUsage(o);
         found = true;
         break;
       }
     }
     if (!found) {
-      ERR("Unrecognized vertex attribute name: %s", name);
+      ERR("Unrecognized vertex attribute name: %s", attributeName);
     }
 
-    builder->Attributes.push_back(attribute);
+    attributes.push_back(
+      ShaderProgram::Attribute(string(&attributeName[0]), nodeType, location, usage));
   }
-
   CheckGLError();
-  return builder;
+
+  /// Create a uniform buffer object for the shader
+  GLuint uboHandle;
+  glGenBuffers(1, &uboHandle);
+  glBindBuffer(GL_UNIFORM_BUFFER, uboHandle);
+  glBufferData(GL_UNIFORM_BUFFER, blockProps.mSize, nullptr, GL_DYNAMIC_DRAW);
+  CheckGLError();
+
+  return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
+                                    uniforms, samplers, attributes, blockProps.mSize,
+                                    uboHandle);
 }
 
 
-void OpenGLAPI::SetShaderProgram(ShaderHandle handle) {
-  glUseProgram(handle);
+void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
+                                 void* uniforms) {
+  CheckGLError();
+  glUseProgram(program->mProgramHandle);
+  CheckGLError();
+
+  glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
+  glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
+  CheckGLError();
+
+  glBindBufferBase(GL_UNIFORM_BUFFER, 0, program->mUniformBufferHandle);
   CheckGLError();
 }
 
@@ -359,12 +403,6 @@ void OpenGLAPI::SetUniform(UniformId id, NodeType type, const void* values) {
 }
 
 
-void OpenGLAPI::DestroyShaderProgram(ShaderHandle handle) {
-  glDeleteProgram(handle);
-  CheckGLError();
-}
-
-
 VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
   VertexBufferHandle handle;
   glGenBuffers(1, &handle);
@@ -378,6 +416,7 @@ VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
 
 void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
   glDeleteBuffers(1, &handle);
+  CheckGLError();
 }
 
 
@@ -393,6 +432,7 @@ void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
   /// Please don't do anything else while a buffer is mapped
   ASSERT(BoundVertexBufferShadow == handle);
   glUnmapBuffer(GL_ARRAY_BUFFER);
+  CheckGLError();
 }
 
 
@@ -409,6 +449,7 @@ IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
 
 void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
   glDeleteBuffers(1, &handle);
+  CheckGLError();
 }
 
 
@@ -424,6 +465,7 @@ void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
   /// Please don't do anything else while a buffer is mapped
   ASSERT(BoundIndexBufferShadow == handle);
   glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+  CheckGLError();
 }
 
 
@@ -526,15 +568,16 @@ void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
 
 void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
                        PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
+  CheckGLError();
   if (indexBuffer != 0) {
     BindIndexBuffer(indexBuffer);
     CheckGLError();
     glDrawElementsInstanced(
       GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, InstanceCount);
-    CheckGLError();
   } else {
     glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, InstanceCount);
   }
+  CheckGLError();
 }
 
 
@@ -542,6 +585,7 @@ void OpenGLAPI::SetViewport(int x, int y, int width, int height,
                             float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
   glViewport(x, y, width, height);
   glDepthRange(depthMin, depthMax);
+  CheckGLError();
 }
 
 
@@ -558,6 +602,7 @@ void OpenGLAPI::SetRenderState(const RenderState* state) {
   SetDepthTest(state->mDepthTest);
   SetFaceMode(state->mFaceMode);
   SetBlendMode(state->mBlendMode);
+  CheckGLError();
 }
 
 
@@ -585,6 +630,7 @@ void OpenGLAPI::SetBlendMode(RenderState::BlendMode blendMode) {
       break;
   }
   mBlendMode = blendMode;
+  CheckGLError();
 }
 
 
@@ -592,6 +638,7 @@ void OpenGLAPI::BindReadFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferReadBuffer == framebuffer) return;
   BoundFrameBufferReadBuffer = framebuffer;
   glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+  CheckGLError();
 }
 
 
@@ -599,18 +646,21 @@ void OpenGLAPI::BindDrawFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferDrawBuffer == framebuffer) return;
   BoundFrameBufferDrawBuffer = framebuffer;
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+  CheckGLError();
 }
 
 
 void OpenGLAPI::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
   BindReadFramebuffer(framebuffer);
   glReadBuffer(mode);
+  CheckGLError();
 }
 
 
 void OpenGLAPI::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
   BindDrawFramebuffer(framebuffer);
   glDrawBuffer(mode);
+  CheckGLError();
 }
 
 
@@ -619,6 +669,7 @@ void OpenGLAPI::SetBlending(bool enable) {
   if (enable) glEnable(GL_BLEND);
   else glDisable(GL_BLEND);
   mBlendEnabled = enable;
+  CheckGLError();
 }
 
 
@@ -638,6 +689,7 @@ void OpenGLAPI::SetFaceMode(RenderState::FaceMode faceMode) {
       break;
   }
   mFaceMode = faceMode;
+  CheckGLError();
 }
 
 
@@ -654,6 +706,7 @@ void OpenGLAPI::SetClearColor(UINT clearColor) {
     IntColorToFloat((clearColor) & 0xff),
     1.0f);
   ClearColorShadow = clearColor;
+  CheckGLError();
 }
 
 
@@ -763,6 +816,7 @@ void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
 
 void OpenGLAPI::DeleteTexture(TextureHandle handle) {
   glDeleteTextures(1, &handle);
+  CheckGLError();
 }
 
 
@@ -770,6 +824,7 @@ void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
                                   TexelType type, void* texelData) {
   BindTexture(handle);
   SetTextureData(width, height, type, texelData, true);
+  CheckGLError();
 }
 
 
@@ -778,16 +833,17 @@ void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
                                      void* texelData) {
   BindTexture(handle);
   SetTextureSubData(width, x, y, height, type, texelData);
+  CheckGLError();
 }
 
 
-void OpenGLAPI::SetTexture(SamplerId sampler, TextureHandle texture, UINT slotIndex,
-                           bool isRenderTarget) {
+void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle texture, 
+                           UINT slotIndex, bool isRenderTarget) {
   CheckGLError();
   SetActiveTexture(slotIndex);
   if (isRenderTarget) BindMultisampleTexture(texture);
   else BindTexture(texture);
-  glUniform1i(sampler, slotIndex);
+  glUniform1i(sampler.mHandle, slotIndex);
   CheckGLError();
 }
 
@@ -836,12 +892,14 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
     ERR("Framebuffer incomplete, status: 0x%x\n", status);
   }
 
+  CheckGLError();
   return bufferId;
 }
 
 
 void OpenGLAPI::DeleteFrameBuffer(FrameBufferId frameBufferId) {
   glDeleteFramebuffers(1, &frameBufferId);
+  CheckGLError();
 }
 
 
@@ -867,6 +925,7 @@ void OpenGLAPI::SetActiveTexture(GLuint activeTextureIndex) {
   if (ActiveTextureShadow == activeTextureIndex) return;
   glActiveTexture(GL_TEXTURE0 + activeTextureIndex);
   ActiveTextureShadow = activeTextureIndex;
+  CheckGLError();
 }
 
 
@@ -874,6 +933,7 @@ void OpenGLAPI::BindTexture(GLuint textureID) {
   if (BoundTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D, textureID);
   BoundTextureShadow[ActiveTextureShadow] = textureID;
+  CheckGLError();
 }
 
 
@@ -881,6 +941,7 @@ void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
   if (BoundMultisampleTextureShadow[ActiveTextureShadow] == textureID) return;
   glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
   BoundMultisampleTextureShadow[ActiveTextureShadow] = textureID;
+  CheckGLError();
 }
 
 
@@ -907,8 +968,10 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, NodeType nodeType, UINT offset
       ERR(L"Unhandled vertex attribute type");
       break;
   }
+  CheckGLError();
   glEnableVertexAttribArray(index);
   glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)size_t(offset));
+  CheckGLError();
 }
 
 
@@ -924,3 +987,46 @@ void AttributeMapperOpenGL::Set() const {
     CheckGLError();
   }
 }
+
+ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
+                             ShaderHandle fragmentProgramHandle,
+                             vector<Uniform>& uniforms, vector<Sampler>& samplers,
+                             vector<Attribute>& attributes, UINT uniformBlockSize,
+                             ShaderHandle uniformBufferHandle)
+  : mProgramHandle(shaderHandle)
+  , mVertexShaderHandle(vertexProgramHandle)
+  , mFragmentShaderHandle(fragmentProgramHandle)
+  , mUniforms(uniforms)
+  , mSamplers(samplers)
+  , mAttributes(attributes)
+  , mUniformBlockSize(uniformBlockSize) 
+  , mUniformBufferHandle(uniformBufferHandle)
+{}
+
+ShaderProgram::~ShaderProgram() {
+  CheckGLError();
+  glDeleteShader(mProgramHandle);
+  CheckGLError();
+  glDeleteProgram(mVertexShaderHandle);
+  CheckGLError();
+  glDeleteProgram(mFragmentShaderHandle);
+  CheckGLError();
+  glDeleteBuffers(1, &mUniformBufferHandle);
+  CheckGLError();
+}
+
+ShaderProgram::Uniform::Uniform(const string& name, NodeType type, UINT offset)
+  : mName(name)
+  , mType(type)
+  , mOffset(offset) {}
+
+ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
+  : mName(name)
+  , mHandle(handle) {}
+
+ShaderProgram::Attribute::Attribute(const string& name, NodeType type,
+                                    AttributeId handle, VertexAttributeUsage usage)
+  : mName(name)
+  , mType(type)
+  , mHandle(handle)
+  , mUsage(usage) {}

@@ -37,7 +37,10 @@ enum class VertexAttributeUsage {
   VERTEXATTRIBUTE_LIST
 
   /// Number of possible vertex attributes
-  COUNT
+  COUNT,
+
+  /// Undetermined
+  NONE,
 };
 
 

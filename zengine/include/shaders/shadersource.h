@@ -12,7 +12,7 @@ struct ShaderSource {
     Uniform(const string& name, Node* node, ShaderGlobalType globalType, NodeType type);
 
     const string mName;
-    const Node* mNode;
+    Node* const mNode;
     const ShaderGlobalType mGlobalType;
     const NodeType mType;
   };
@@ -23,7 +23,7 @@ struct ShaderSource {
             bool isMultiSampler, bool isShadow);
 
     const string mName;
-    const Node* mNode;
+    Node* const mNode;
     const ShaderGlobalType mGlobalType;
     const bool mIsMultiSampler; // type is "sampler2DMS"
     const bool mIsShadow; // type is "sampler2DShadow"

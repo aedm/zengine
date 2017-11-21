@@ -13,7 +13,7 @@ extern OpenGLAPI* OpenGL;
 const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 8;
 
 /// TODO: query OpenGL for this value
-static const int MAX_COMBINED_TEXTURE_SLOTS = 48; 
+static const int MAX_COMBINED_TEXTURE_SLOTS = 48;
 
 /// All states of the rendering pipeline
 struct RenderState {
@@ -57,40 +57,56 @@ struct VertexAttribute {
 /// Output of platform-dependent shader compilation
 /// All metadata is determined by the shader compiler of the OpenGL driver.
 struct ShaderProgram {
-
-  /// Vertex attributes, pipeline input
-  struct Attribute {
-    string mName;
-    NodeType mType;
-    AttributeId mHandle;
-    VertexAttributeUsage mUsage;
-  };
-
   /// Uniform properties returned by the driver
   struct Uniform {
+    Uniform(const string& name, NodeType type, UINT offset);
+
     /// Uniform name, must match the generated name inside the uniform block
-    string mName;
+    const string mName;
 
     /// Type (float, vec2...)
-    NodeType mType;
+    const NodeType mType;
 
     /// Data offset inside the uniform block
-    UINT mOffset;
+    const UINT mOffset;
   };
 
   /// Sampler properties returned by the driver
   struct Sampler {
+    Sampler(const string& name, SamplerId handle);
+
     /// Uniform name, must match the generated sampler name
-    string mName;
+    const string mName;
 
     /// Sampler ID
-    SamplerId mHandle;
+    const SamplerId mHandle;
   };
 
-  ShaderHandle Handle;
-  vector<Uniform> Uniforms;
-  vector<Attribute> Attributes;
-  vector<Sampler> Samplers;
+  /// Vertex attributes, pipeline input
+  struct Attribute {
+    Attribute(const string& name, NodeType type, AttributeId handle, 
+              VertexAttributeUsage usage);
+
+    const string mName;
+    const NodeType mType;
+    const AttributeId mHandle;
+    const VertexAttributeUsage mUsage;
+  };
+
+  ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
+                ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
+                vector<Sampler>& samplers, vector<Attribute>& attributes,
+                UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
+  ~ShaderProgram();
+
+  const ShaderHandle mProgramHandle;
+  const ShaderHandle mVertexShaderHandle;
+  const ShaderHandle mFragmentShaderHandle;
+  const ShaderHandle mUniformBufferHandle;
+  const vector<Uniform> mUniforms;
+  const vector<Sampler> mSamplers;
+  const vector<Attribute> mAttributes;
+  const UINT mUniformBlockSize;
 };
 
 
@@ -110,19 +126,18 @@ public:
   void OnContextSwitch();
 
   /// Shader functions
-  OWNERSHIP ShaderProgram* CreateShaderFromSource(const char* VertexSource, 
-                                                      const char* FragmentSource);
-  void SetShaderProgram(ShaderHandle Handle);
+  shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
+                                                  const char* FragmentSource);
+  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
   void SetUniform(UniformId Id, NodeType Type, const void* Values);
-  void DestroyShaderProgram(ShaderHandle Handle);
 
   /// Vertex buffer handling
   VertexBufferHandle CreateVertexBuffer(UINT Size);
   void DestroyVertexBuffer(VertexBufferHandle Handle);
   void* MapVertexBuffer(VertexBufferHandle Handle);
   void UnMapVertexBuffer(VertexBufferHandle Handle);
-  AttributeMapper* CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs, 
-                                         const vector<ShaderProgram::Attribute>& ShaderAttribs, 
+  AttributeMapper* CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs,
+                                         const vector<ShaderProgram::Attribute>& ShaderAttribs,
                                          UINT Stride);
   void SetVertexBuffer(VertexBufferHandle Handle);
   void EnableVertexAttribute(UINT Index, NodeType Type, UINT Offset, UINT Stride);
@@ -152,14 +167,15 @@ public:
               UINT InstanceCount);
 
   /// Texture and surface handling
-  TextureHandle CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample, 
+  TextureHandle CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample,
                               bool doesRepeat, bool mipmap);
   void DeleteTexture(TextureHandle Handle);
-  void UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type, 
+  void UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type,
                          void* TexelData);
-  void UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height, 
+  void UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height,
                             TexelType Type, void* TexelData);
-  void SetTexture(SamplerId Sampler, TextureHandle Texture, UINT SlotIndex, bool isMultiSample);
+  void SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle Texture, 
+                  UINT SlotIndex, bool isMultiSample);
 
   /// Framebuffer operations
   FrameBufferId CreateFrameBuffer(TextureHandle depthBuffer,
@@ -168,12 +184,12 @@ public:
                                   bool isMultiSample);
   void DeleteFrameBuffer(FrameBufferId frameBufferId);
   void SetFrameBuffer(FrameBufferId frameBufferid);
-  void BlitFrameBuffer(FrameBufferId source, FrameBufferId target, 
+  void BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
                        int srcX0, int srcY0, int srcX1, int srcY1,
                        int dstX0, int dstY0, int dstX1, int dstY1);
 
   /// Render parameters
-  void SetViewport(int X, int Y, int Width, int Height, float DepthMin = 0.0f, 
+  void SetViewport(int X, int Y, int Width, int Height, float DepthMin = 0.0f,
                    float DepthMax = 1.0f);
   void SetRenderState(const RenderState* State);
 
@@ -181,7 +197,7 @@ public:
   void Clear(bool ColorBuffer = true, bool DepthBuffer = true, UINT RGBColor = 0);
 
 private:
-  void SetTextureData(UINT Width, UINT Height, TexelType Type, void* TexelData, 
+  void SetTextureData(UINT Width, UINT Height, TexelType Type, void* TexelData,
                       bool generateMipmap);
   void SetTextureSubData(UINT X, UINT Y, UINT Width, UINT Height, TexelType Type, void* TexelData);
 
@@ -211,10 +227,10 @@ private:
   FrameBufferId BoundFrameBufferReadBuffer;
   FrameBufferId BoundFrameBufferDrawBuffer;
   FrameBufferId BoundFrameBufferShadow;
-  
+
   VertexBufferHandle BoundVertexBufferShadow;
   IndexBufferHandle BoundIndexBufferShadow;
-  
+
   TextureHandle BoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
   TextureHandle BoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
   TextureHandle ActiveTextureShadow;

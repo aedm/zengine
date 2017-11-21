@@ -1,7 +1,6 @@
 #include "stubanalyzer.h"
 #include <include/shaders/valuestubslot.h>
 #include <include/shaders/stubnode.h>
-#include <include/shaders/shadernode.h>
 
 REGISTER_NODECLASS(StubNode, "Stub");
 

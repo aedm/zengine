@@ -2,8 +2,8 @@
 #include <include/shaders/enginestubs.h>
 #include <exception>
 
-OWNERSHIP ShaderSource* ShaderBuilder::FromStubs(StubNode* vertexStub,
-                                                 StubNode* fragmentStub) {
+shared_ptr<ShaderSource> ShaderBuilder::FromStubs(StubNode* vertexStub,
+                                                  StubNode* fragmentStub) {
   if (vertexStub == nullptr) {
     ERR("vertex stub is nullptr");
     return nullptr;
@@ -13,8 +13,9 @@ OWNERSHIP ShaderSource* ShaderBuilder::FromStubs(StubNode* vertexStub,
     return nullptr;
   }
 
-  ShaderBuilder builder(StubNode* vertexStub, StubNode* fragmentStub);
-  return builder.MakeShaderSource();
+  ShaderBuilder shaderBuilder(vertexStub, fragmentStub);
+
+  return shaderBuilder.MakeShaderSource();
 }
 
 
@@ -24,10 +25,13 @@ ShaderBuilder::InOutVariable::InOutVariable(NodeType type, const string& name, i
   , mLayout(layout) {}
 
 
-ShaderBuilder::ShaderStage::ShaderStage() {}
+ShaderBuilder::ShaderStage::ShaderStage(bool isVertexShader)
+  : mIsVertexShader(isVertexShader) {}
 
 
-ShaderBuilder::ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub) {
+ShaderBuilder::ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub)
+  : mVertexStage(true)
+  , mFragmentStage(false) {
   StubMetadata* vertexStubMeta = vertexStub->GetStubMetadata();
   if (vertexStubMeta == nullptr) {
     ERR("Vertex stub has no metadata.");
@@ -71,10 +75,10 @@ ShaderBuilder::ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub) {
 
 ShaderBuilder::~ShaderBuilder() {}
 
-OWNERSHIP ShaderSource* ShaderBuilder::MakeShaderSource() {
-  return new ShaderSource(mUniforms, mSamplers,
-                          mVertexStage.mSourceStream.str(),
-                          mFragmentStage.mSourceStream.str());
+shared_ptr<ShaderSource> ShaderBuilder::MakeShaderSource() {
+  return make_shared<ShaderSource>(mUniforms, mSamplers,
+                                   mVertexStage.mSourceStream.str(),
+                                   mFragmentStage.mSourceStream.str());
 }
 
 void ShaderBuilder::CollectInputsAndOutputs(Node* node, ShaderStage* shaderStage) {
@@ -113,10 +117,12 @@ void ShaderBuilder::TraverseDependencies(Node* root, ShaderStage* shaderStage,
 
   if (root->GetType() == NodeType::SHADER_STUB) {
     /// Assigns empty stub reference
-    shaderStage->mStubMap[root] = make_shared<StubReference>();
-
     StubNode* stubNode = SafeCast<StubNode*>(root);
     stubNode->Update();
+    
+    NodeType returnType = stubNode->GetStubMetadata()->returnType;
+    shaderStage->mStubMap[root] = make_shared<StubReference>(returnType);
+
     for (auto slotPair : stubNode->mParameterSlotMap) {
       Node* node = slotPair.second->GetDirectNode();
       if (node == nullptr) {
@@ -189,15 +195,15 @@ void ShaderBuilder::GenerateNames() {
   int uniformIndex = 0;
   for (auto& it : mUniformMap) {
     stringstream uniformName;
-    uniformName << "_var_" << ++uniformIndex;
+    uniformName << "_uniform_" << ++uniformIndex;
     it.second->mName = uniformName.str();
   }
 
   /// Generate names for samplers
   int samplerIndex = 0;
-  for (auto& it : mUniformMap) {
+  for (auto& it : mSamplerMap) {
     stringstream samplerName;
-    samplerName << "_var_" << ++samplerIndex;
+    samplerName << "_sampler_" << ++samplerIndex;
     it.second->mName = samplerName.str();
   }
 }
@@ -205,13 +211,14 @@ void ShaderBuilder::GenerateNames() {
 
 void ShaderBuilder::AddGlobalsToDependencies(ShaderStage* shaderStage) {
   for (Node* node : shaderStage->mDependencies) {
+    if (node->GetType() != NodeType::SHADER_STUB) continue;
+
     StubNode* stub = SafeCast<StubNode*>(node);
     StubMetadata* stubMeta = stub->GetStubMetadata();
     if (stubMeta == nullptr) {
       ERR("Can't build shader source.");
       throw exception();
     }
-    if (node->GetType() != NodeType::SHADER_STUB) continue;
 
     for (auto global : stubMeta->globals) {
       if (mUsedGlobals.find(global->usage) != mUsedGlobals.end()) continue;
@@ -273,7 +280,7 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   }
 
   /// Uniform block
-  shaderStage->mSourceStream << "layout(packed) uniform Uniforms {" << endl;
+  shaderStage->mSourceStream << "layout(shared) uniform Uniforms {" << endl;
   for (auto uniform : mUniforms) {
     shaderStage->mSourceStream << "  " << GetTypeString(uniform.mType) << " " <<
       uniform.mName << ";" << endl;
@@ -430,3 +437,5 @@ const string& ShaderBuilder::GetTypeString(NodeType type, bool isMultiSampler, b
   }
 }
 
+ShaderBuilder::StubReference::StubReference(NodeType type)
+  :mType(type) {}

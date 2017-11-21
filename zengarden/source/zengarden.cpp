@@ -459,6 +459,7 @@ void ZenGarden::HandlePropertiesMenu() {
 
 void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
+  mCommonGLWidget->makeCurrent();
 
   vector<Node*> nodes;
   mDocument->GenerateTransitiveClosure(nodes, false);
