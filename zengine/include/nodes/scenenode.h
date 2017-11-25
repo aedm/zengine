@@ -30,6 +30,9 @@ public:
   /// Gets the currect time cursor
   float GetSceneTime();
 
+  /// hack
+  void UpdateDependencies();
+
 protected:
   virtual void Operate() override;
 

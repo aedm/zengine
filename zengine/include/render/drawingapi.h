@@ -125,6 +125,11 @@ public:
   /// Resets renderer. Call this upon context switch.
   void OnContextSwitch();
 
+  /// Workaround for an nVidia driver bug. For some reason framebuffers
+  /// cannot be bound after shader compilation before SwapBuffers. 
+  /// This members marks whether shader compilation was done.
+  bool mProgramCompiledHack = false;
+
   /// Shader functions
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
                                                   const char* FragmentSource);

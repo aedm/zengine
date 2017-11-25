@@ -35,10 +35,11 @@ SceneNode::~SceneNode() {
 }
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
+  /// Get camera
   CameraNode* camera = mCamera.GetNode();
   if (camera == nullptr) return;
 
-  /// Skylight shadow
+  /// Pass #1: skylight shadow
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
 
@@ -63,12 +64,11 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
   RenderDrawables(globals, PassType::SHADOW);
 
-  /// Draw to G-Buffer
+  /// Pass #2: draw to G-Buffer
   renderTarget->SetGBufferAsTarget(globals);
   //OpenGL->Clear(true, true, 0x303030);
   camera->SetupGlobals(globals);
   globals->SkylightTexture = renderTarget->mShadowTexture;
-  globals->SkylightColorTexture = renderTarget->mShadowColorBuffer;
   RenderDrawables(globals, PassType::SOLID);
 }
 
@@ -130,4 +130,11 @@ void SceneNode::SetSceneTime(float time) {
 
 float SceneNode::GetSceneTime() {
   return mSceneTime;
+}
+
+void SceneNode::UpdateDependencies() {
+  /// Update dependencies
+  for (Node* node : mTransitiveClosure) {
+    if (this != node) node->Update();
+  }
 }

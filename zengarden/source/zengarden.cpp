@@ -165,6 +165,12 @@ void ZenGarden::keyPressEvent(QKeyEvent* event) {
     case Qt::Key_5:
       mUI.timelineWidget->setVisible(!mUI.timelineWidget->isVisible());
       return;
+    case Qt::Key_F12:
+      mUI.upperRightPanel->setVisible(!mUI.upperRightPanel->isVisible());
+      return;
+    case Qt::Key_F11:
+      mUI.bottomLeftPanel->setVisible(!mUI.bottomLeftPanel->isVisible());
+      return;
   }
   QMainWindow::keyPressEvent(event);
 }
@@ -360,10 +366,6 @@ void ZenGarden::CreateNewDocument() {
   mDocument->mProperties.Connect(new PropertiesNode());
   mDocument->mMovie.Connect(new MovieNode());
 
-  Graph* graph = new Graph();
-  mDocument->mGraphs.Connect(graph);
-
-  Watch(graph, WatcherPosition::RIGHT_TAB);
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
   SetupMovieWatcher();
 }
@@ -443,9 +445,17 @@ void ZenGarden::HandleMenuOpen() {
     mDocument->mProperties.Connect(new PropertiesNode());
   }
 
-  /// Open first graph
-  Graph* graph = static_cast<Graph*>(mDocument->mGraphs[0]);
-  Watch(graph, WatcherPosition::RIGHT_TAB);
+  /// Open "debug" node first -- nvidia Nsight workaround, it can only debug the
+  /// first OpenGL window
+  vector<Node*> nodes;
+  mDocument->GenerateTransitiveClosure(nodes, false);
+  for (Node* node : nodes) {
+    if (node->GetName() == "debug") {
+      Watch(node, WatcherPosition::UPPER_LEFT_TAB);
+      break;
+    }
+  }
+
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
   SetupMovieWatcher();
 

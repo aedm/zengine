@@ -7,7 +7,7 @@
 
 #ifdef _DEBUG
 void CheckGLError() {
-  GLenum error = glGetError();  
+  GLenum error = glGetError();
   ASSERT(error == GL_NO_ERROR);
 }
 #else
@@ -120,7 +120,6 @@ void OpenGLAPI::OnContextSwitch() {
   CheckGLError();
 }
 
-
 static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
                                            const char* source) {
   CheckGLError();
@@ -156,6 +155,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
   CheckGLError();
   GLuint program = glCreateProgram();
+  mProgramCompiledHack = true;
 
   CheckGLError();
   /// Compile shaders
@@ -225,8 +225,8 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   struct { GLint mUniformCount, mSize; } blockProps;
   #pragma pack(pop)
   glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex,
-                         ElementCount(blockPropsList), blockPropsList, 
-                         ElementCount(blockPropsList), nullptr, 
+                         ElementCount(blockPropsList), blockPropsList,
+                         ElementCount(blockPropsList), nullptr,
                          reinterpret_cast<GLint*>(&blockProps));
 
   //if (numActiveUnifs > 0) continue;
@@ -235,7 +235,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 
   std::vector<GLint> uniformLocations(blockProps.mUniformCount);
   const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
-  glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex, 1, activeUnifProp, 
+  glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex, 1, activeUnifProp,
                          blockProps.mUniformCount, nullptr, &uniformLocations[0]);
 
   /// Query the properties of each uniform inside the block
@@ -246,7 +246,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 
   for (int blockIndex = 0; blockIndex < blockProps.mUniformCount; ++blockIndex) {
     glGetProgramResourceiv(program, GL_UNIFORM, uniformLocations[blockIndex],
-                           ElementCount(uniformProperties), uniformProperties, 
+                           ElementCount(uniformProperties), uniformProperties,
                            ElementCount(uniformProperties), nullptr,
                            reinterpret_cast<GLint*>(&values));
 
@@ -284,13 +284,13 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     GLint nameLength;
     GLsizei size;
     GLenum type;
-    glGetActiveUniform(program, uniformIndex, uniformNameMaxLength, &nameLength, &size, 
+    glGetActiveUniform(program, uniformIndex, uniformNameMaxLength, &nameLength, &size,
                        &type, &samplerName[0]);
-    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE || 
+    if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE ||
         type == GL_SAMPLER_2D_SHADOW) {
       GLint location = glGetUniformLocation(program, &samplerName[0]);
       samplers.push_back(ShaderProgram::Sampler(string(&samplerName[0]), location));
-    } 
+    }
   }
   CheckGLError();
 
@@ -311,7 +311,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     GLsizei size;
     GLenum type;
 
-    glGetActiveAttrib(program, uniformIndex, attributeNameMaxLength, &nameLength, &size, 
+    glGetActiveAttrib(program, uniformIndex, attributeNameMaxLength, &nameLength, &size,
                       &type, &attributeName[0]);
 
     /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
@@ -361,7 +361,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 }
 
 
-void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
+void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
                                  void* uniforms) {
   CheckGLError();
   glUseProgram(program->mProgramHandle);
@@ -637,6 +637,8 @@ void OpenGLAPI::SetBlendMode(RenderState::BlendMode blendMode) {
 void OpenGLAPI::BindReadFramebuffer(GLuint framebuffer) {
   if (BoundFrameBufferReadBuffer == framebuffer) return;
   BoundFrameBufferReadBuffer = framebuffer;
+  CheckGLError();
+  ASSERT(glIsFramebuffer(framebuffer));
   glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
   CheckGLError();
 }
@@ -837,7 +839,7 @@ void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
 }
 
 
-void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle texture, 
+void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle texture,
                            UINT slotIndex, bool isRenderTarget) {
   CheckGLError();
   SetActiveTexture(slotIndex);
@@ -912,11 +914,18 @@ void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
 void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
                                 int srcX0, int srcY0, int srcX1, int srcY1,
                                 int dstX0, int dstY0, int dstX1, int dstY1) {
-  BindReadFramebuffer(source);
-  BindDrawFramebuffer(target);
-  glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
-                    dstX0, dstY0, dstX1, dstY1,
-                    GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+  CheckGLError();
+  //BindReadFramebuffer(source);
+  //BindDrawFramebuffer(target);
+  //glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
+  //                  dstX0, dstY0, dstX1, dstY1,
+  //                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+  glBlitNamedFramebuffer(source, target, 
+                         srcX0, srcY0, srcX1, srcY1,
+                         dstX0, dstY0, dstX1, dstY1,
+                         GL_COLOR_BUFFER_BIT, GL_LINEAR);
   CheckGLError();
 }
 
@@ -999,17 +1008,16 @@ ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgr
   , mUniforms(uniforms)
   , mSamplers(samplers)
   , mAttributes(attributes)
-  , mUniformBlockSize(uniformBlockSize) 
-  , mUniformBufferHandle(uniformBufferHandle)
-{}
+  , mUniformBlockSize(uniformBlockSize)
+  , mUniformBufferHandle(uniformBufferHandle) {}
 
 ShaderProgram::~ShaderProgram() {
   CheckGLError();
-  glDeleteShader(mProgramHandle);
+  glDeleteProgram(mProgramHandle);
   CheckGLError();
-  glDeleteProgram(mVertexShaderHandle);
+  glDeleteShader(mVertexShaderHandle);
   CheckGLError();
-  glDeleteProgram(mFragmentShaderHandle);
+  glDeleteShader(mFragmentShaderHandle);
   CheckGLError();
   glDeleteBuffers(1, &mUniformBufferHandle);
   CheckGLError();

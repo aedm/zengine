@@ -59,10 +59,10 @@ void Pass::Operate() {
                                              mFragmentStub.GetNode());
     if (!mShaderSource) return;
   }
-  INFO("--------------- VERTEX SHADER ----------------");
-  INFO(mShaderSource->mVertexSource.c_str());
-  INFO("--------------- FRAGMENT SHADER ----------------");
-  INFO(mShaderSource->mFragmentSource.c_str());
+  //INFO("--------------- VERTEX SHADER ----------------");
+  //INFO(mShaderSource->mVertexSource.c_str());
+  //INFO("--------------- FRAGMENT SHADER ----------------");
+  //INFO(mShaderSource->mFragmentSource.c_str());
 
   INFO("Building render pipeline...");
 
@@ -121,7 +121,8 @@ void Pass::Operate() {
 }
 
 void Pass::Set(Globals* globals) {
-  ASSERT(mShaderProgram.get());
+  Update();
+  if (!mShaderProgram) return;
 
   RenderState::FaceMode faceMode = RenderState::FaceMode::FRONT;
   float faceVal = mFaceModeSlot.Get();

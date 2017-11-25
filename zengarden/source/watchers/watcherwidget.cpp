@@ -95,7 +95,6 @@ void EventForwarderGLWidget::keyReleaseEvent(QKeyEvent* event) {
 
 void EventForwarderGLWidget::paintGL() {
   OpenGL->OnContextSwitch();
-  //TheDrawingAPI->SetViewport(0, 0, width(), height());
   OnPaint(this);
 }
 

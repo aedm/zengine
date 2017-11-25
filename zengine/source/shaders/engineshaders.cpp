@@ -42,7 +42,9 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
   UINT newHeight = height;
   for (UINT i = 0; i <= downsampleCount; i++) {
     FrameBufferId target = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    OpenGL->BlitFrameBuffer(source, target, 0, 0, width, height, 0, 0, newWidth, newHeight);
+    OpenGL->BlitFrameBuffer(source, target, 
+                            0, 0, width, height, 0, 0, 
+                            newWidth, newHeight);
     width = newWidth;
     height = newHeight;
     newWidth = (width / 2);

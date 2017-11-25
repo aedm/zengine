@@ -3,7 +3,7 @@
 #include <include/resources/resourcemanager.h>
 
 
-static const int ShadowMapSize = 2048;
+static const int ShadowMapSize = 4096;
 
 RenderTarget::RenderTarget(Vec2 size)
   : mSize(0, 0) {
@@ -72,10 +72,8 @@ void RenderTarget::Resize(Vec2 size) {
   if (mShadowBufferId == 0) {
     mShadowTexture = TheResourceManager->CreateGPUTexture(
       ShadowMapSize, ShadowMapSize, TexelType::DEPTH32F, nullptr, false, false);
-    mShadowColorBuffer = TheResourceManager->CreateGPUTexture(
-      ShadowMapSize, ShadowMapSize, TexelType::ARGB16F, nullptr, false, false);
     mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture->mHandle,
-                                                mShadowColorBuffer->mHandle, 0, false);
+                                                0, 0, false);
   }
 
   /// Create gaussian ping-pong textures

@@ -19,7 +19,6 @@ using namespace std;
   ITEM(USAGE_MATRIX_SKYLIGHT_PROJECTION,          MATRIX44,		  SkylightProjection)       \
   ITEM(USAGE_MATRIX_SKYLIGHT_TRANSFORMATION,      MATRIX44,		  SkylightTransformation)   \
   ITEM(USAGE_SKYLIGHT_TEXTURE,                    TEXTURE,		  SkylightTexture)          \
-  ITEM(USAGE_SKYLIGHT_COLOR_TEXTURE,              TEXTURE,		  SkylightColorTexture)     \
   ITEM(USAGE_SKYLIGHT_TEXTURE_SIZE_RECIP,         FLOAT,        SkylightTextureSizeRecip) \
   ITEM(USAGE_SKYLIGHT_DIRECTION,                  VEC3,		      SkylightDirection)        \
   ITEM(USAGE_SKYLIGHT_COLOR,                      VEC3,		      SkylightColor)            \

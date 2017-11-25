@@ -4,9 +4,8 @@
 
 Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
-GeneralSceneWatcher::GeneralSceneWatcher(Node* node) 
-  : WatcherUI(node)
-{
+GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
+  : WatcherUI(node) {
   if (node->GetType() != NodeType::SCENE) {
     mDefaultScene.mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
     mDefaultScene.mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
@@ -26,10 +25,20 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 
 void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
+  mScene->Update();
+  mScene->UpdateDependencies();
+
+  /// Nvidia driver will fail to bind framebuffers after shader compilation.
+  /// Just skip the frame if a shader was edited/updated.
+  /// TODO: revisit this every now and then.
+  if (OpenGL->mProgramCompiledHack) {
+    OpenGL->mProgramCompiledHack = false;
+    return;
+  }
+
   if (!mRenderTarget) {
-    GetGLWidget()->makeCurrent();
-    mRenderTarget =
-      new RenderTarget(Vec2(float(mWatcherWidget->width()), float(mWatcherWidget->height())));
+    mRenderTarget = new RenderTarget(Vec2(float(mWatcherWidget->width()),
+                                          float(mWatcherWidget->height())));
   }
 
   Vec2 size = Vec2(widget->width(), widget->height());
@@ -53,17 +62,19 @@ void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
   GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
-  GetGLWidget()->OnMouseRelease += Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
+  GetGLWidget()->OnMouseRelease += 
+    Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
   GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
   GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
   GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
 }
 
-void GeneralSceneWatcher::Init()
-{
-  StubNode* defaultVertex = Util::LoadStub("engine/scenewatcher/defaultvertex.shader");
-  StubNode* defaultFragment = Util::LoadStub("engine/scenewatcher/defaultfragment.shader");
-  
+void GeneralSceneWatcher::Init() {
+  StubNode* defaultVertex = 
+    Util::LoadStub("engine/scenewatcher/defaultvertex.shader");
+  StubNode* defaultFragment = 
+    Util::LoadStub("engine/scenewatcher/defaultfragment.shader");
+
   Pass* defaultPass = new Pass();
   defaultPass->mFragmentStub.Connect(defaultFragment);
   defaultPass->mVertexStub.Connect(defaultVertex);
@@ -101,8 +112,7 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
     orientation.y = mOriginalOrientation.y + float(diff.x()) / 300.0f;
     orientation.x = mOriginalOrientation.x + float(diff.y()) / 300.0f;
     mCamera.mOrientation.SetDefaultValue(orientation);
-  }
-  else if (event->buttons() & Qt::RightButton) {
+  } else if (event->buttons() & Qt::RightButton) {
     auto diff = event->pos() - mOriginalPosition;
     float distance = mCamera.mDistance.Get();
     distance = mOriginalDistance - float(diff.y()) / 2.0f;
@@ -135,8 +145,7 @@ void GeneralSceneWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* eve
 }
 
 RenderForwarder::RenderForwarder(SceneNode* node)
-  : Watcher(node)
-{}
+  : Watcher(node) {}
 
 void RenderForwarder::OnRedraw() {
   mOnRedraw();
