@@ -10,6 +10,9 @@ static SharedString SkylightColorSlotName = make_shared<string>("Skylight color"
 static SharedString SkylightAmbientSlotName = make_shared<string>("Ambient factor");
 static SharedString SkylightSpreadSlotName = make_shared<string>("Shadow spread");
 static SharedString SkylightSampleSpreadSlotName = make_shared<string>("Sample spread");
+static SharedString DOFEnabledSlotName = make_shared<string>("DOF enabled");
+static SharedString DOFFocusDistanceSlotName = make_shared<string>("DOF focus distance");
+static SharedString DOFBlurSlotName = make_shared<string>("DOF blur");
 
 SceneNode::SceneNode()
   : Node(NodeType::SCENE)
@@ -22,6 +25,9 @@ SceneNode::SceneNode()
   , mSkyLightSpread(this, SkylightSpreadSlotName, false, true, true, 0.0f, 30.0f)
   , mSkyLightSampleSpread(this, SkylightSampleSpreadSlotName, false, true, true, 0.0f, 20.0f)
   , mSceneTimes(NodeType::FLOAT, this, nullptr, true, false, false, false)
+  , mDOFEnabled(this, DOFEnabledSlotName) 
+  , mDOFFocusDistance(this, DOFFocusDistanceSlotName, false, true, true, 0.0f, 100.0f)
+  , mDOFBlur(this, DOFBlurSlotName, false, true, true, 0.0f, 30.0f)
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
@@ -29,12 +35,17 @@ SceneNode::SceneNode()
   mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 0.5f, 0.5f));
   mSkyLightColor.SetDefaultValue(Vec3(1, 1, 1));
   mSkyLightAmbient.SetDefaultValue(0.2f);
+  mDOFEnabled.SetDefaultValue(0.0f);
+  mDOFFocusDistance.SetDefaultValue(50.0f);
+  mDOFBlur.SetDefaultValue(10.0f);
 }
 
 SceneNode::~SceneNode() {
 }
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
+  bool directToScreen = globals->DirectToScreen > 0.5f;
+
   /// Get camera
   CameraNode* camera = mCamera.GetNode();
   if (camera == nullptr) return;
@@ -64,12 +75,23 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
   RenderDrawables(globals, PassType::SHADOW);
 
-  /// Pass #2: draw to G-Buffer
-  renderTarget->SetGBufferAsTarget(globals);
+  /// Pass #2: draw to G-Buffer / screen
+  if (directToScreen) {
+    renderTarget->SetColorBufferAsTarget(globals);
+  } else {
+    renderTarget->SetGBufferAsTarget(globals);
+  }
   //OpenGL->Clear(true, true, 0x303030);
   camera->SetupGlobals(globals);
   globals->SkylightTexture = renderTarget->mShadowTexture;
   RenderDrawables(globals, PassType::SOLID);
+
+  /// Hack: set DOF settings
+  if (!directToScreen) {
+    globals->PPDofEnabled = mDOFEnabled.Get();
+    globals->PPDofFocusDistance = mDOFFocusDistance.Get();
+    globals->PPDofBlur = mDOFBlur.Get();
+  }
 }
 
 void SceneNode::Operate() {

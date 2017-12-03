@@ -17,10 +17,32 @@ private:
   void BuildPostProcessPasses();
   void BuildMaterialPasses();
 
+  /// Copies resolved color to a postprocess buffer
+  /// in: Gbuffer (MSAA)
+  /// out: postprocess source buffer
+  void BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget, Globals* globals);
+
+  /// Generates depth of field effect
+  /// in: Gbuffer (MSAA)
+  /// out: DOF buffer (MSAA) + postprocess source buffer (no MSAA)
+  void ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals);
+
+  /// Shrinks postprocess texture and applies Gaussian blur to it
+  /// in: postprocess source buffer
+  /// out: postprocess source buffer
+  void GenerateBloomTexture(RenderTarget* renderTarget, Globals* globals);
+
+  /// Clamps MSAA pixels and adds bloom to them
+  /// in: Gbuffer (MSAA) + postprocess source buffer
+  /// out: screen
+  void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
+                         Texture* sourceColorMSAA);
+
   Pass mPostProcess_GaussianBlurHorizontal_First;
   Pass mPostProcess_GaussianBlurHorizontal;
   Pass mPostProcess_GaussianBlurVertical;
-  Pass mPostProcess_GaussianBlur_Blend;
+  Pass mPostProcess_GaussianBlur_Blend_MSAA;
+  Pass mPostProcess_DOF;
 
   Mesh* mFullScreenQuad = nullptr;
 };

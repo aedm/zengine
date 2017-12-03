@@ -8,6 +8,8 @@ OpenGLAPI* OpenGL = nullptr;
 EngineStubs* TheEngineStubs = nullptr;
 EngineShaders* TheEngineShaders = nullptr;
 
+bool PleaseNoNewResources = false;
+
 Event<> OnZengineInitDone;
 
 /// Initializes Zengine. Returns true if everything went okay.

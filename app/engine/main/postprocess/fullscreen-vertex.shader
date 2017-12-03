@@ -4,7 +4,6 @@
 :input vec2 aTexCoord;
 
 :output vec2 vTexCoord
-:output vec3 vNormal
 
 SHADER
 {

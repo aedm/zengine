@@ -21,6 +21,9 @@ public:
   FloatSlot mSkyLightAmbient;
   FloatSlot mSkyLightSpread;
   FloatSlot mSkyLightSampleSpread;
+  FloatSlot mDOFEnabled;
+  FloatSlot mDOFFocusDistance;
+  FloatSlot mDOFBlur;
 
   void Draw(RenderTarget* renderTarget, Globals* globals);
 

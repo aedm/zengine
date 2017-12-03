@@ -13,27 +13,30 @@ public:
 
   /// Sets the final color buffer as render target, G-Buffer as source
   void SetColorBufferAsTarget(Globals* globals);
-
   void SetShadowBufferAsTarget(Globals* globals);
 
   void Resize(Vec2 size);
   Vec2 GetSize();
 
-  /// Gaussian half-resolution ping-pong buffers, for intermediate blurred images
-  Texture* mGaussTextures[3] = {nullptr, nullptr};
-  FrameBufferId mGaussFramebuffers[3] = {0, 0};
+  FrameBufferId GetPostprocessSourceFramebufferId();
+  FrameBufferId GetPostprocessTargetFramebufferId();
+  Texture* GetPostprocessSourceTexture();
+  void SwapPostprocessBuffers();
 
-  /// G-buffer
+  /// G-buffer (MSAA)
   /// A: [4x16F] RGB: HDR final color, A: unused
   /// B: [1x32] R: Last chain link in A-buffer linked list (todo)
   FrameBufferId mGBufferId = 0;
   Texture* mDepthBuffer = nullptr;
   Texture* mGBufferA = nullptr;
 
+  /// Depth of field result texture (MSAA)
+  FrameBufferId mDOFBufferId = 0;
+  Texture* mDOFColorTexture = nullptr;
+
   /// Secondary texture. For some fx.
   FrameBufferId mSecondaryFramebuffer = 0;
   Texture* mSecondaryTexture = nullptr;
-  //Texture* mSecondaryDepth = nullptr;
 
   /// Final color buffer (framebuffer or texture)
   /// Default framebuffer id is 0
@@ -54,4 +57,13 @@ private:
   Vec2 mSize;
 
   void DropResources();
+
+  /// Gaussian half-resolution ping-pong buffers, for intermediate blurred images
+  Texture* mPostprocessTextures[2] = {nullptr, nullptr};
+  FrameBufferId mPostprocessFramebuffers[2] = {0, 0};
+
+  /// Current postprocess draw framebuffer index (the other one is the source)
+  int mPostprocessTargetBufferIndex = 0;
+
+
 };

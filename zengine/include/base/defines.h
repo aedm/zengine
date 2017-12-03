@@ -56,3 +56,6 @@ enum class TexelType
 	ARGB32F,
   DEPTH32F,
 };
+
+/// This is a debug value
+extern bool PleaseNoNewResources;

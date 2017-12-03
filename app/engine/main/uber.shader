@@ -1,7 +1,8 @@
 :name "UberShader"
 :returns void
 
-const int poissonCount = 109;
+//const int poissonCount = 109;
+const int poissonCount = 30;
 vec3 poissonDisk[109] = vec3[](
   vec3(0, 0, 0),
   vec3(0.22047275640740338, 2.0245790958599343, 2.0365482443858056),
@@ -116,6 +117,8 @@ vec3 poissonDisk[109] = vec3[](
 :global float gSkylightTextureSizeRecip
 :global sampler2D gSkylightTexture
 
+const float Pi = 3.1415926535;
+
 float Noise(vec2 co) {
   return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
@@ -184,21 +187,26 @@ float CalculateSoftShadow2(vec3 lightProjectionCoord, float sampleSpread, float 
   return shadow;
 } 
 
+#ifdef FRAGMENT_SHADER
+
 float CalculateSoftShadow3(vec3 lightProjectionCoord, mat4 skylightProjection, vec3 skyNormal, vec3 skyTangent, vec3 skyBinormal, float sampleSpread, float spread) {
   //if (skyNormal.z < 0) return 0;
   
-  vec3 s = lightProjectionCoord * 0.5 + vec3(0.5, 0.5, 0.5 -0.001);
+  vec3 s = lightProjectionCoord * 0.5 + vec3(0.5, 0.5, 0.5 - 0.0000 /*- 0.001 / skyNormal.z*/);
 
   vec3 sdx = (vec4(skyTangent, 0) * skylightProjection).xyz; 
   vec3 sdy = (vec4(skyBinormal, 0) * skylightProjection).xyz; 
-  //sdx.z *= 0.5;
-  //sdy.z *= 0.5;
+  
+  float rand = Noise(gl_FragCoord.xy + vec2(10.2341234, 0.934367) * gl_FragCoord.z);
+  float sinrand = sin(rand);
+  float cosrand = cos(rand);
+  mat2 rotrand = mat2(cosrand, sinrand, sinrand, -cosrand);
   
   // Calculate penumbra
   float distance = 0;
   float distCount = 0;
   for (int i=0; i<poissonCount; i++) {
-    vec2 pd = poissonDisk[i].xy * sampleSpread * 0.01;
+    vec2 pd = rotrand * poissonDisk[i].xy * sampleSpread * 0.01;
 	vec3 sMod = s + pd.x * sdx + pd.y * sdy;
 	vec3 pmod = pd.x * sdx + pd.y * sdy;
     float shadowZ = texture(gSkylightTexture, sMod.xy).z;
@@ -212,13 +220,15 @@ float CalculateSoftShadow3(vec3 lightProjectionCoord, mat4 skylightProjection, v
   
   float shadow = 0;
   for (int i=0; i<poissonCount; i++) {
-    vec2 pd = poissonDisk[i].xy * sp;
+    vec2 pd = rotrand * poissonDisk[i].xy * sp;
 	vec3 sMod = s + pd.x * sdx + pd.y * sdy;
     shadow += (texture(gSkylightTexture, sMod.xy).z < sMod.z) ? 0 : 1.0;
   }
   shadow /= poissonCount;
   return shadow;
 } 
+
+#endif
 
 vec3 ApplyNormalMap(vec3 normal, vec3 tangent, sampler2D normalMap, vec2 texCoord, float intensity) {
   vec3 normalNorm = normalize(normal);

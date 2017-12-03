@@ -39,6 +39,10 @@ using namespace std;
   ITEM(USAGE_POSTPROCESS_GAUSSTEX,                TEXTURE,      PPGauss)		              \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE,     VEC2,         PPGaussPixelSize)		      \
   ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE,  VEC2,         PPGaussRelativeSize)		  \
+  ITEM(USAGE_POSTPROCESS_DOF_ENABLED,		          FLOAT,        PPDofEnabled)             \
+  ITEM(USAGE_POSTPROCESS_DOF_FOCUS_DISTANCE,		  FLOAT,        PPDofFocusDistance)       \
+  ITEM(USAGE_POSTPROCESS_DOF_BLUR,		            FLOAT,        PPDofBlur)                \
+  ITEM(USAGE_DIRECT_TO_SCREEN,		                FLOAT,        DirectToScreen)           \
 
 
 enum class ShaderGlobalType {

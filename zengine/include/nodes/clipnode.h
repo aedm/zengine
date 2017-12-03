@@ -16,7 +16,9 @@ public:
   FloatSlot mClearColorBuffer;
   FloatSlot mClearDepthBuffer;
   FloatSlot mCopyToSecondaryBuffer;
-  
+
+  FloatSlot mApplyPostprocessBefore;
+
   void Draw(RenderTarget* renderTarget, Globals* globals, float clipTime);
 
 protected:

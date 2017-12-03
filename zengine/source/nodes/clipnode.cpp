@@ -9,6 +9,7 @@ static SharedString TrackNumberSlotName = make_shared<string>("Track");
 static SharedString ClearColorBufferSlotName = make_shared<string>("Clear color buffer");
 static SharedString ClearDepthBufferSlotName = make_shared<string>("Clear depth buffer");
 static SharedString CopyToSecondaryBufferSlotName = make_shared<string>("Copy to secondary buffer");
+static SharedString ApplyPostprocessBeforeSlotName = make_shared<string>("After postprocess");
 
 ClipNode::ClipNode()
   : Node(NodeType::CLIP)
@@ -19,6 +20,7 @@ ClipNode::ClipNode()
   , mClearColorBuffer(this, ClearColorBufferSlotName)
   , mClearDepthBuffer(this, ClearDepthBufferSlotName)
   , mCopyToSecondaryBuffer(this, CopyToSecondaryBufferSlotName)
+  , mApplyPostprocessBefore(this, ApplyPostprocessBeforeSlotName)
 {}
 
 ClipNode::~ClipNode() {
@@ -37,8 +39,15 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   
   bool clearColor = mClearColorBuffer.Get() >= 0.5f;
   bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
-  renderTarget->SetGBufferAsTarget(globals);
-  OpenGL->Clear(clearColor, clearDepth);
+  if (clearDepth || clearColor) {
+    if (globals->DirectToScreen >= 0.5f) {
+      renderTarget->SetColorBufferAsTarget(globals);
+    }
+    else {
+      renderTarget->SetGBufferAsTarget(globals);
+    }
+    OpenGL->Clear(clearColor, clearDepth);
+  }
 
   SceneNode* scene = mSceneSlot.GetNode();
   if (!scene) return;

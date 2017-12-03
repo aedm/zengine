@@ -3,7 +3,7 @@
 #include <include/resources/resourcemanager.h>
 
 
-static const int ShadowMapSize = 4096;
+static const int ShadowMapSize = 2048;
 
 RenderTarget::RenderTarget(Vec2 size)
   : mSize(0, 0) {
@@ -28,9 +28,12 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
 }
 
 void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
+  globals->RenderTargetSize = mSize;
+  globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = mDepthBuffer;
   globals->GBufferSourceA = mGBufferA;
   OpenGL->SetFrameBuffer(mColorBufferId);
+  OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
 void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
@@ -62,7 +65,13 @@ void RenderTarget::Resize(Vec2 size) {
   mGBufferId = 
     OpenGL->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
 
-  /// Create secondary framebuffer
+  /// Create framebuffer for DOF result
+  mDOFColorTexture = TheResourceManager->CreateGPUTexture(
+    width, height, TexelType::ARGB16F, nullptr, true, false);
+  mDOFBufferId =
+    OpenGL->CreateFrameBuffer(0, mDOFColorTexture->mHandle, 0, true);
+
+  /// Create secondary framebuffer, no MSAA
   mSecondaryTexture = TheResourceManager->CreateGPUTexture(
     width, height, TexelType::ARGB16F, nullptr, false, false);
   mSecondaryFramebuffer = 
@@ -72,15 +81,17 @@ void RenderTarget::Resize(Vec2 size) {
   if (mShadowBufferId == 0) {
     mShadowTexture = TheResourceManager->CreateGPUTexture(
       ShadowMapSize, ShadowMapSize, TexelType::DEPTH32F, nullptr, false, false);
-    mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture->mHandle,
-                                                0, 0, false);
+    mShadowBufferId = 
+      OpenGL->CreateFrameBuffer(mShadowTexture->mHandle, 0, 0, false);
   }
 
   /// Create gaussian ping-pong textures
-  for (int i = 0; i < 3; i++) {
-    mGaussTextures[i] = TheResourceManager->CreateGPUTexture(
-      width, height, TexelType::ARGB16F, nullptr, false, false); // don't multisample these
-    mGaussFramebuffers[i] = OpenGL->CreateFrameBuffer(0, mGaussTextures[i]->mHandle, 0, false);
+  for (UINT i = 0; i < ElementCount(mPostprocessTextures); i++) {
+    // Don't multisample these
+    mPostprocessTextures[i] = TheResourceManager->CreateGPUTexture(
+      width, height, TexelType::ARGB16F, nullptr, false, false); 
+    mPostprocessFramebuffers[i] = 
+      OpenGL->CreateFrameBuffer(0, mPostprocessTextures[i]->mHandle, 0, false);
   }
 }
 
@@ -88,12 +99,28 @@ Vec2 RenderTarget::GetSize() {
   return mSize;
 }
 
+FrameBufferId RenderTarget::GetPostprocessSourceFramebufferId() {
+  return mPostprocessFramebuffers[1 - mPostprocessTargetBufferIndex];
+}
+
+FrameBufferId RenderTarget::GetPostprocessTargetFramebufferId() {
+  return mPostprocessFramebuffers[mPostprocessTargetBufferIndex];
+}
+
+Texture* RenderTarget::GetPostprocessSourceTexture() {
+  return mPostprocessTextures[1 - mPostprocessTargetBufferIndex];
+}
+
+void RenderTarget::SwapPostprocessBuffers() {
+  mPostprocessTargetBufferIndex = 1 - mPostprocessTargetBufferIndex;
+}
+
 void RenderTarget::DropResources() {
   OpenGL->DeleteFrameBuffer(mGBufferId);
   TheResourceManager->DiscardTexture(mDepthBuffer);
   TheResourceManager->DiscardTexture(mGBufferA);
-  for (int i = 0; i < 2; i++) {
-    OpenGL->DeleteFrameBuffer(mGaussFramebuffers[i]);
-    TheResourceManager->DiscardTexture(mGaussTextures[i]);
+  for (UINT i = 0; i < ElementCount(mPostprocessTextures); i++) {
+    OpenGL->DeleteFrameBuffer(mPostprocessFramebuffers[i]);
+    TheResourceManager->DiscardTexture(mPostprocessTextures[i]);
   }
 }

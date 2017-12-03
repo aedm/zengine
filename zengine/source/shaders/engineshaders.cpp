@@ -16,17 +16,63 @@ EngineShaders::~EngineShaders() {
   TheResourceManager->DiscardMesh(mFullScreenQuad);
 }
 
-void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* globals) {
-  mPostProcess_GaussianBlurHorizontal_First.Update();
-  mPostProcess_GaussianBlurHorizontal.Update();
-  mPostProcess_GaussianBlurVertical.Update();
-  mPostProcess_GaussianBlur_Blend.Update();
-  if (!mPostProcess_GaussianBlurHorizontal.isComplete()
-      || !mPostProcess_GaussianBlurVertical.isComplete()
-      || !mPostProcess_GaussianBlurHorizontal_First.isComplete()
-      || !mPostProcess_GaussianBlur_Blend.isComplete()) return;
 
-  UINT targetBufferIndex = 0;
+void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* globals) {
+  if (globals->PPDofEnabled < 0.5f) {
+    BlitGBufferToPostprocessBuffers(renderTarget, globals);
+    GenerateBloomTexture(renderTarget, globals);
+    RenderFinalImage(renderTarget, globals, renderTarget->mGBufferA);
+  } else {
+    ApplyDepthOfField(renderTarget, globals);
+    GenerateBloomTexture(renderTarget, globals);
+    RenderFinalImage(renderTarget, globals, renderTarget->mDOFColorTexture);
+  }
+}
+
+
+void EngineShaders::BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget, 
+                                                    Globals* globals) {
+  Vec2 size = renderTarget->GetSize();
+  UINT width = UINT(size.x);
+  UINT height = UINT(size.y);
+
+  /// Blit G-Buffer into postprocess ping-pong buffers 
+  OpenGL->BlitFrameBuffer(renderTarget->mGBufferId,
+                          renderTarget->GetPostprocessTargetFramebufferId(),
+                          0, 0, width, height, 0, 0, width, height);
+  renderTarget->SwapPostprocessBuffers();
+}
+
+
+void EngineShaders::ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals) {
+  mPostProcess_DOF.Update();
+  if (!mPostProcess_DOF.isComplete()) return;
+  
+  Vec2 size = renderTarget->GetSize();
+  UINT width = UINT(size.x);
+  UINT height = UINT(size.y);
+
+  OpenGL->SetFrameBuffer(renderTarget->mDOFBufferId);
+  glViewport(0, 0, width, height);
+  globals->GBufferSourceA = renderTarget->mGBufferA;
+  globals->DepthBufferSource = renderTarget->mDepthBuffer;
+
+  mPostProcess_DOF.Set(globals);
+  mFullScreenQuad->Render(mPostProcess_DOF.GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
+
+  OpenGL->BlitFrameBuffer(renderTarget->mDOFBufferId,
+                          renderTarget->GetPostprocessTargetFramebufferId(),
+                          0, 0, width, height, 0, 0, width, height);
+  renderTarget->SwapPostprocessBuffers();
+}
+
+void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* globals) {
+  mPostProcess_GaussianBlurHorizontal_First.Update();
+  if (!mPostProcess_GaussianBlurHorizontal_First.isComplete()) return;
+  mPostProcess_GaussianBlurHorizontal.Update();
+  if (!mPostProcess_GaussianBlurHorizontal.isComplete()) return;
+  mPostProcess_GaussianBlurVertical.Update();
+  if (!mPostProcess_GaussianBlurVertical.isComplete()) return;
 
   Vec2 size = renderTarget->GetSize();
   UINT width = UINT(size.x);
@@ -36,36 +82,27 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
 
   UINT downsampleCount = UINT(ceilf(log2f(size.x / float(BloomEffectMaxResolution))));
 
-  /// Blit G-Buffer into gaussian ping-pong buffers to decrease resolution
-  FrameBufferId source = renderTarget->mGBufferId;
-  UINT newWidth = width;
-  UINT newHeight = height;
-  for (UINT i = 0; i <= downsampleCount; i++) {
-    FrameBufferId target = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    OpenGL->BlitFrameBuffer(source, target, 
-                            0, 0, width, height, 0, 0, 
-                            newWidth, newHeight);
-    width = newWidth;
-    height = newHeight;
-    newWidth = (width / 2);
-    newHeight = (height / 2);
-    source = target;
-    targetBufferIndex = 1 - targetBufferIndex;
+  /// Decrease resolution
+  for (UINT i = 0; i < downsampleCount; i++) {
+    OpenGL->BlitFrameBuffer(renderTarget->GetPostprocessSourceFramebufferId(),
+                            renderTarget->GetPostprocessTargetFramebufferId(),
+                            0, 0, width, height, 0, 0, width / 2, height / 2);
+    width /= 2;
+    height /= 2;
+    renderTarget->SwapPostprocessBuffers();
   }
 
   /// Blur the image
   size = Vec2(float(width), float(height));
-  globals->GBufferSourceA = renderTarget->mGBufferA;
   globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth),
                                       float(height) / float(originalHeight));
   globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
 
-  UINT gaussIterationCount = 10;
+  UINT gaussIterationCount = 1;
 
   for (UINT i = 0; i < gaussIterationCount * 2; i++) {
-    FrameBufferId targetBuffer = renderTarget->mGaussFramebuffers[targetBufferIndex];
-    OpenGL->SetFrameBuffer(targetBuffer);
-    globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];
+    OpenGL->SetFrameBuffer(renderTarget->GetPostprocessTargetFramebufferId());
+    globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
     Pass* pass = (i % 2 == 0)
       ? &mPostProcess_GaussianBlurHorizontal : &mPostProcess_GaussianBlurVertical;
     if (i == 0) {
@@ -78,20 +115,27 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
     }
     pass->Set(globals);
     mFullScreenQuad->Render(pass->GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
-    targetBufferIndex = 1 - targetBufferIndex;
+    renderTarget->SwapPostprocessBuffers();
   }
+}
 
-  /// Blend to original image and perform HDR multisampling correction
 
+void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* globals,
+                                      Texture* sourceColorMSAA) {
+  mPostProcess_GaussianBlur_Blend_MSAA.Update();
+  if (!mPostProcess_GaussianBlur_Blend_MSAA.isComplete()) return;
+
+  /// Additively blend bloom to Gbuffer, and perform HDR multisampling correction
+  Vec2 size = renderTarget->GetSize();
+  UINT width = UINT(size.x);
+  UINT height = UINT(size.y);
   OpenGL->SetFrameBuffer(renderTarget->mColorBufferId);
-  size = renderTarget->GetSize();
-  glViewport(0, 0, originalWidth, originalHeight);
-  globals->PPGauss = renderTarget->mGaussTextures[1 - targetBufferIndex];
-  mPostProcess_GaussianBlur_Blend.Set(globals);
-  mFullScreenQuad->Render(mPostProcess_GaussianBlur_Blend.GetUsedAttributes(), 1,
+  glViewport(0, 0, width, height);
+  globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
+  globals->GBufferSourceA = sourceColorMSAA;
+  mPostProcess_GaussianBlur_Blend_MSAA.Set(globals);
+  mFullScreenQuad->Render(mPostProcess_GaussianBlur_Blend_MSAA.GetUsedAttributes(), 1,
                           PRIMITIVE_TRIANGLES);
-
-
 }
 
 void EngineShaders::BuildPostProcessPasses() {
@@ -103,18 +147,18 @@ void EngineShaders::BuildPostProcessPasses() {
     TheEngineStubs->GetStub("postprocess/gaussianblur-horizontal");
   StubNode* gaussianVertical =
     TheEngineStubs->GetStub("postprocess/gaussianblur-vertical");
-  StubNode* gaussianBlend =
-    TheEngineStubs->GetStub("postprocess/gaussianblur-blend");
+  StubNode* gaussianBlendMSAA =
+    TheEngineStubs->GetStub("postprocess/gaussianblur-blend-msaa");
+  StubNode* dofFragment =
+    TheEngineStubs->GetStub("postprocess/depth-of-field");
+
 
   mPostProcess_GaussianBlurHorizontal.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurHorizontal.mFragmentStub.Connect(gaussianHorizontal);
   mPostProcess_GaussianBlurHorizontal.mRenderstate.mDepthTest = false;
   mPostProcess_GaussianBlurHorizontal.mBlendModeSlot.SetDefaultValue(1.0f); // normal
   mPostProcess_GaussianBlurHorizontal.mFaceModeSlot.SetDefaultValue(0.5f); // f&b
-  //mPostProcess_GaussianBlurHorizontal.mRenderstate.mBlendMode =
-  //  RenderState::BlendMode::NORMAL;
-  //mPostProcess_GaussianBlurHorizontal.mRenderstate.mFaceMode =
-  //  RenderState::FaceMode::FRONT_AND_BACK;
+  mPostProcess_GaussianBlurHorizontal.Update();
 
   mPostProcess_GaussianBlurHorizontal_First.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurHorizontal_First.mFragmentStub.Connect(
@@ -122,33 +166,28 @@ void EngineShaders::BuildPostProcessPasses() {
   mPostProcess_GaussianBlurHorizontal_First.mRenderstate.mDepthTest = false;
   mPostProcess_GaussianBlurHorizontal_First.mBlendModeSlot.SetDefaultValue(1.0f);
   mPostProcess_GaussianBlurHorizontal_First.mFaceModeSlot.SetDefaultValue(0.5f);
-
-  //mPostProcess_GaussianBlurHorizontal_First.mRenderstate.mBlendMode =
-  //  RenderState::BlendMode::NORMAL;
-  //mPostProcess_GaussianBlurHorizontal_First.mRenderstate.mFaceMode =
-  //  RenderState::FaceMode::FRONT_AND_BACK;
+  mPostProcess_GaussianBlurHorizontal_First.Update();
 
   mPostProcess_GaussianBlurVertical.mVertexStub.Connect(fullscreenVertex);
   mPostProcess_GaussianBlurVertical.mFragmentStub.Connect(gaussianVertical);
   mPostProcess_GaussianBlurVertical.mRenderstate.mDepthTest = false;
   mPostProcess_GaussianBlurVertical.mBlendModeSlot.SetDefaultValue(1.0f);
   mPostProcess_GaussianBlurVertical.mFaceModeSlot.SetDefaultValue(0.5f);
+  mPostProcess_GaussianBlurVertical.Update();
 
-  //mPostProcess_GaussianBlurVertical.mRenderstate.mBlendMode =
-  //  RenderState::BlendMode::NORMAL;
-  //mPostProcess_GaussianBlurVertical.mRenderstate.mFaceMode =
-  //  RenderState::FaceMode::FRONT_AND_BACK;
+  mPostProcess_GaussianBlur_Blend_MSAA.mVertexStub.Connect(fullscreenVertex);
+  mPostProcess_GaussianBlur_Blend_MSAA.mFragmentStub.Connect(gaussianBlendMSAA);
+  mPostProcess_GaussianBlur_Blend_MSAA.mRenderstate.mDepthTest = false;
+  mPostProcess_GaussianBlur_Blend_MSAA.mBlendModeSlot.SetDefaultValue(1.0f);
+  mPostProcess_GaussianBlur_Blend_MSAA.mFaceModeSlot.SetDefaultValue(0.5f);
+  mPostProcess_GaussianBlur_Blend_MSAA.Update();
 
-  mPostProcess_GaussianBlur_Blend.mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlur_Blend.mFragmentStub.Connect(gaussianBlend);
-  mPostProcess_GaussianBlur_Blend.mRenderstate.mDepthTest = false;
-  mPostProcess_GaussianBlur_Blend.mBlendModeSlot.SetDefaultValue(1.0f);
-  mPostProcess_GaussianBlur_Blend.mFaceModeSlot.SetDefaultValue(0.5f);
-
-  //mPostProcess_GaussianBlur_Blend.mRenderstate.mBlendMode =
-  //  RenderState::BlendMode::NORMAL;
-  //mPostProcess_GaussianBlur_Blend.mRenderstate.mFaceMode =
-  //  RenderState::FaceMode::FRONT_AND_BACK;
+  mPostProcess_DOF.mVertexStub.Connect(fullscreenVertex);
+  mPostProcess_DOF.mFragmentStub.Connect(dofFragment);
+  mPostProcess_DOF.mRenderstate.mDepthTest = false;
+  mPostProcess_DOF.mBlendModeSlot.SetDefaultValue(1.0f);
+  mPostProcess_DOF.mFaceModeSlot.SetDefaultValue(0.5f);
+  mPostProcess_DOF.Update();
 
   /// Fullscreen quad
   IndexEntry quadIndices[] = {0, 1, 2, 2, 1, 3};

@@ -19,7 +19,9 @@ MovieNode::~MovieNode() {
 }
 
 void MovieNode::Draw(RenderTarget* renderTarget, float time) {
+  mGlobals.DirectToScreen = 0.0f;
   bool clipFound = false;
+  bool postprocessApplied = false;
   for (vector<ClipNode*>& track : mTracks) {
     int clipIndex = 0;
     int clipCount = int(track.size());
@@ -28,6 +30,13 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
       float startTime = clip->mStartTime.Get();
       float endTime = startTime + clip->mLength.Get();
       if (startTime <= time && endTime > time) {
+        /// Should this be after postprocess?
+        if (clip->mApplyPostprocessBefore.Get() >= 0.5f) {
+          TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+          mGlobals.DirectToScreen = 1.0f;
+          postprocessApplied = true;
+        }
+
         /// Render clip
         clip->Draw(renderTarget, &mGlobals, time - startTime);
         clipFound = true;
@@ -38,8 +47,10 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
   }
   
   if (clipFound) {
-    /// Apply post-process to scene to framebuffer
-    TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+    if (!postprocessApplied) {
+      /// Apply post-process to scene to framebuffer
+      TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+    }
   }
   else {
     renderTarget->SetColorBufferAsTarget(&mGlobals);

@@ -80,7 +80,7 @@ OpenGLAPI::OpenGLAPI() {
     CheckGLError();
   }
 
-  glEnable(GL_MULTISAMPLE);
+  //glEnable(GL_MULTISAMPLE);
   OnContextSwitch();
   CheckGLError();
 }
@@ -122,6 +122,8 @@ void OpenGLAPI::OnContextSwitch() {
 
 static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
                                            const char* source) {
+  ASSERT(!PleaseNoNewResources);
+
   CheckGLError();
   /// Create shader object, set the source, and compile
   GLuint shader = glCreateShader(shaderType);
@@ -153,6 +155,7 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
 
 shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
+  ASSERT(!PleaseNoNewResources);
   CheckGLError();
   GLuint program = glCreateProgram();
   mProgramCompiledHack = true;
@@ -404,6 +407,7 @@ void OpenGLAPI::SetUniform(UniformId id, NodeType type, const void* values) {
 
 
 VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
+  ASSERT(!PleaseNoNewResources);
   VertexBufferHandle handle;
   glGenBuffers(1, &handle);
   CheckGLError();
@@ -421,6 +425,7 @@ void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
 
 
 void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
+  ASSERT(!PleaseNoNewResources);
   BindVertexBuffer(handle);
   void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
   CheckGLError();
@@ -437,6 +442,7 @@ void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
 
 
 IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
+  ASSERT(!PleaseNoNewResources);
   IndexBufferHandle handle;
   glGenBuffers(1, &handle);
   CheckGLError();
@@ -454,6 +460,7 @@ void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
 
 
 void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
+  ASSERT(!PleaseNoNewResources);
   BindIndexBuffer(handle);
   void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
   CheckGLError();
@@ -500,6 +507,7 @@ void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
 AttributeMapper* OpenGLAPI::CreateAttributeMapper(
   const vector<VertexAttribute>& bufferAttribs,
   const vector<ShaderProgram::Attribute>& shaderAttribs, UINT stride) {
+  ASSERT(!PleaseNoNewResources);
   AttributeMapperOpenGL* mapper = new AttributeMapperOpenGL();
   mapper->Stride = stride;
 
@@ -750,6 +758,7 @@ static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format
 
 TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
                                        bool isMultiSample, bool doesRepeat, bool mipmap) {
+  ASSERT(!PleaseNoNewResources);
   CheckGLError();
   GLuint texture;
   glGenTextures(1, &texture);
@@ -793,6 +802,7 @@ TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
 
 void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
                                void* texelData, bool generateMipmap) {
+  ASSERT(!PleaseNoNewResources);
   GLint internalFormat;
   GLenum format;
   GLenum glType;
@@ -806,6 +816,7 @@ void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
 
 void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
                                   TexelType type, void* texelData) {
+  ASSERT(!PleaseNoNewResources);
   GLint internalFormat;
   GLenum format;
   GLenum glType;
@@ -824,6 +835,7 @@ void OpenGLAPI::DeleteTexture(TextureHandle handle) {
 
 void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
                                   TexelType type, void* texelData) {
+  ASSERT(!PleaseNoNewResources);
   BindTexture(handle);
   SetTextureData(width, height, type, texelData, true);
   CheckGLError();
@@ -833,6 +845,7 @@ void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
 void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
                                      int width, int height, TexelType type,
                                      void* texelData) {
+  ASSERT(!PleaseNoNewResources);
   BindTexture(handle);
   SetTextureSubData(width, x, y, height, type, texelData);
   CheckGLError();
@@ -854,6 +867,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
                                            TextureHandle targetBufferA,
                                            TextureHandle targetBufferB,
                                            bool isMultiSample) {
+  ASSERT(!PleaseNoNewResources);
   CheckGLError();
   GLuint bufferId;
   glGenFramebuffers(1, &bufferId);
@@ -916,16 +930,16 @@ void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
                                 int dstX0, int dstY0, int dstX1, int dstY1) {
 
   CheckGLError();
-  //BindReadFramebuffer(source);
-  //BindDrawFramebuffer(target);
-  //glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
-  //                  dstX0, dstY0, dstX1, dstY1,
-  //                  GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  BindReadFramebuffer(source);
+  BindDrawFramebuffer(target);
+  glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
+                    dstX0, dstY0, dstX1, dstY1,
+                    GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-  glBlitNamedFramebuffer(source, target, 
-                         srcX0, srcY0, srcX1, srcY1,
-                         dstX0, dstY0, dstX1, dstY1,
-                         GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  //glBlitNamedFramebuffer(source, target, 
+  //                       srcX0, srcY0, srcX1, srcY1,
+  //                       dstX0, dstY0, dstX1, dstY1,
+  //                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
   CheckGLError();
 }
 

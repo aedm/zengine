@@ -11,3 +11,9 @@ zengine.VC.db
 zengine.VC.VC.opendb
 zengine/x64/
 demoplayer/.msbuild/
+*.iobj
+*.ipdb
+*.csv
+*.cfg
+*.mp3
+*.zen
