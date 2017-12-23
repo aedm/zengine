@@ -2,7 +2,7 @@
 
 #include "valuenodes.h"
 
-class FloatsToVec3Node: public ValueNode<NodeType::VEC3> {
+class FloatsToVec3Node: public ValueNode<ValueType::VEC3> {
 public:
   FloatsToVec3Node();
   virtual ~FloatsToVec3Node();

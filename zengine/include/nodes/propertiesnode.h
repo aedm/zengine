@@ -12,4 +12,4 @@ public:
   FloatSlot mBPM;
 };
 
-typedef TypedSlot<NodeType::PROPERTIES, PropertiesNode> PropertiesSlot;
+typedef TypedSlot<PropertiesNode> PropertiesSlot;

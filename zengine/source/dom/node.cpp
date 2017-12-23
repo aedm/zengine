@@ -6,7 +6,7 @@
 /// Array for variable sizes in bytes
 const int gVariableByteSizes[] = {
 #undef ITEM
-#define ITEM(name, type) sizeof(NodeTypes<NodeType::name>::Type),
+#define ITEM(name, type) sizeof(type),
   VALUETYPE_LIST
 };
 
@@ -59,10 +59,9 @@ bool Message::operator<(const Message& other) const {
   return false;
 }
 
-Slot::Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot,
+Slot::Slot(Node* owner, SharedString name, bool isMultiSlot,
            bool isPublic, bool isSerializable, bool isTraversable)
   : mOwner(owner)
-  , mType(type)
   , mIsMultiSlot(isMultiSlot) {
   ASSERT(mOwner != nullptr);
   mNode = nullptr;
@@ -80,8 +79,8 @@ Slot::~Slot() {
 
 
 bool Slot::Connect(Node* target) {
-  if (target && NodeType::ALLOW_ALL != mType && target->GetType() != mType) {
-    DEBUGBREAK("Slot and operator type mismatch");
+  if (target && !DoesAcceptNode(target)) {
+    DEBUGBREAK("Slot doesn't accept node.");
     return false;
   }
   if (mIsMultiSlot) {
@@ -211,8 +210,8 @@ Node* Slot::operator[](UINT index) {
   return mMultiNodes[index];
 }
 
-bool Slot::DoesAcceptType(NodeType type) const {
-  return mType == NodeType::ALLOW_ALL || type == mType;
+bool Slot::DoesAcceptNode(Node* node) const {
+  return true;
 }
 
 bool Slot::IsDefaulted() {
@@ -221,15 +220,11 @@ bool Slot::IsDefaulted() {
 }
 
 
-Node::Node(NodeType type, bool isForwarderNode)
-  : mType(type) {
+Node::Node(bool isForwarderNode)
+{
   mIsUpToDate = false;
   mIsProperlyConnected = true;
 }
-
-
-Node::Node(const Node& original)
-  : mType(original.mType) {}
 
 
 void Node::ConnectToSlot(Slot* slot) {
@@ -249,17 +244,13 @@ const vector<Slot*>& Node::GetDependants() const {
 }
 
 
-NodeType Node::GetType() const {
-  return mType;
-}
-
-
 void Node::HandleMessage(Message* message) {}
 
 
 Node* Node::GetReferencedNode() {
   return this;
 }
+
 
 void Node::SendMsg(MessageType message) {
   for (Slot* slot : mDependants) {

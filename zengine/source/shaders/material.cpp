@@ -8,8 +8,7 @@ static SharedString SolidPassSlotName = make_shared<string>("Solid Pass");
 static SharedString ShadowPassSlotName = make_shared<string>("Shadow Pass");
 
 Material::Material()
-  : Node(NodeType::MATERIAL)
-  , mSolidPass(this, SolidPassSlotName)
+  : mSolidPass(this, SolidPassSlotName)
   , mShadowPass(this, ShadowPassSlotName) {}
 
 
@@ -40,8 +39,7 @@ REGISTER_NODECLASS(SolidMaterial, "Solid Material");
 
 
 SolidMaterial::SolidMaterial()
-  : Node(NodeType::MATERIAL)
-  , mGhostSlot(NodeType::ALLOW_ALL, this, nullptr, false, false, false, true)
+  : mGhostSlot(this, nullptr, false, false, false, true)
 {
   mMaterial.mShadowPass.Connect(&TheEngineShaders->mSolidShadowPass);
 

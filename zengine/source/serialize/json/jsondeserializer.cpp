@@ -46,31 +46,31 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     node->SetPosition(position);
   }
 
-  if (IsInstanceOf<FloatNode>(node)) {
+  if (IsExactType<FloatNode>(node)) {
     DeserializeFloatNode(value, SafeCast<FloatNode*>(node));
   }
-  else if (IsInstanceOf<Vec2Node>(node)) {
+  else if (IsExactType<Vec2Node>(node)) {
     DeserializeVec2Node(value, SafeCast<Vec2Node*>(node));
   } 
-  else if (IsInstanceOf<Vec3Node>(node)) {
+  else if (IsExactType<Vec3Node>(node)) {
     DeserializeVec3Node(value, SafeCast<Vec3Node*>(node));
   } 
-  else if (IsInstanceOf<Vec4Node>(node)) {
+  else if (IsExactType<Vec4Node>(node)) {
     DeserializeVec4Node(value, SafeCast<Vec4Node*>(node));
   } 
-  else if (IsInstanceOf<FloatSplineNode>(node)) {
+  else if (IsExactType<FloatSplineNode>(node)) {
     DeserializeFloatSplineNode(value, SafeCast<FloatSplineNode*>(node));
   } 
-  else if (IsInstanceOf<TextureNode>(node)) {
+  else if (IsExactType<TextureNode>(node)) {
     DeserializeTextureNode(value, SafeCast<TextureNode*>(node));
   }
-  else if (IsInstanceOf<StaticMeshNode>(node)) {
+  else if (IsExactType<StaticMeshNode>(node)) {
     DeserializeStaticMeshNode(value, SafeCast<StaticMeshNode*>(node));
   } 
-  else if (IsInstanceOf<StubNode>(node)) {
+  else if (IsExactType<StubNode>(node)) {
     DeserializeStubNode(value, SafeCast<StubNode*>(node));
   } 
-  else if (IsInstanceOf<Document>(node)) {
+  else if (IsExactType<Document>(node)) {
     ASSERT(mDocument == nullptr);
     mDocument = SafeCast<Document*>(node);
   }
@@ -120,7 +120,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         continue;;
       }
       ASSERT(slot->mIsMultiSlot == itr->value.IsArray());
-      if (IsInstanceOf<StringSlot>(slot)) {
+      if (IsExactType<StringSlot>(slot)) {
         static_cast<StringSlot*>(slot)->
           SetDefaultValue(itr->value["default"].GetString());
       } 

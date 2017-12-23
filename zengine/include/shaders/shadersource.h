@@ -9,12 +9,12 @@ struct ShaderSource {
 
   /// Metadata for a uniform
   struct Uniform {
-    Uniform(const string& name, Node* node, ShaderGlobalType globalType, NodeType type);
+    Uniform(const string& name, Node* node, ShaderGlobalType globalType, ValueType type);
 
     const string mName;
     Node* const mNode;
     const ShaderGlobalType mGlobalType;
-    const NodeType mType;
+    const ValueType mType;
   };
 
   /// Metadata for a sampler

@@ -12,7 +12,7 @@ ShaderSource::ShaderSource(
 {}
 
 ShaderSource::Uniform::Uniform(const string& name, Node* node,
-                               ShaderGlobalType globalType, NodeType type)
+                               ShaderGlobalType globalType, ValueType type)
   : mName(name)
   , mNode(node)
   , mGlobalType(globalType)

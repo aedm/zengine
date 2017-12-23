@@ -14,7 +14,7 @@ const EnumMapperA GlobalUniformMapper[] = {
 };
 
 /// Array for global uniform types
-const NodeType GlobalUniformTypes[] = {
+const ValueType GlobalUniformTypes[] = {
 #undef ITEM
 #define ITEM(name, type, token) NodeType::type,
   GLOBALUSAGE_LIST
@@ -27,8 +27,7 @@ const int GlobalUniformOffsets[] = {
 };
 
 StubNode::StubNode()
-  : Node(NodeType::SHADER_STUB)
-  , mMetadata(nullptr)
+  : mMetadata(nullptr)
   , mSource(this, SourceSlotName, false, false)
 {}
 
@@ -66,7 +65,7 @@ void StubNode::Operate() {
   /// Create a new list of slots
   for (auto param : mMetadata->parameters) {
     auto it = mParameterNameSlotMap.find(*param->mName);
-    if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptType(param->mType)) {
+    if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptNode(StaticValueNodesList[int(param->mType)])) {
       /// This slot was used before, reuse it.
       /// "isTraversable" is false since it's already in the mTraversableSlots vector.
       AddSlot(it->second, true, true, true);
@@ -77,19 +76,19 @@ void StubNode::Operate() {
       /// Generate new slot.
       Slot* slot = nullptr;
       switch (param->mType) {
-        case NodeType::FLOAT:
-          slot = new ValueStubSlot<NodeType::FLOAT>(this, param->mName);
+        case ValueType::FLOAT:
+          slot = new ValueStubSlot<ValueType::FLOAT>(this, param->mName);
           break;
-        case NodeType::VEC2:
-          slot = new ValueStubSlot<NodeType::VEC2>(this, param->mName);
+        case ValueType::VEC2:
+          slot = new ValueStubSlot<ValueType::VEC2>(this, param->mName);
           break;
-        case NodeType::VEC3:
-          slot = new ValueStubSlot<NodeType::VEC3>(this, param->mName);
+        case ValueType::VEC3:
+          slot = new ValueStubSlot<ValueType::VEC3>(this, param->mName);
           break;
-        case NodeType::VEC4:
-          slot = new ValueStubSlot<NodeType::VEC4>(this, param->mName);
+        case ValueType::VEC4:
+          slot = new ValueStubSlot<ValueType::VEC4>(this, param->mName);
           break;
-        case NodeType::TEXTURE:
+        case ValueType::TEXTURE:
           slot = new TextureSlot(this, param->mName);
           break;
         default:
@@ -135,7 +134,7 @@ void StubNode::HandleMessage(Message* message) {
         mIsUpToDate = false;
         SendMsg(MessageType::VALUE_CHANGED);
       }
-      else if (message->mSlot->GetReferencedNode()->GetType() == NodeType::SHADER_STUB) {
+      else if (dynamic_cast<StubNode*>(message->mSlot->GetReferencedNode())) {
         SendMsg(MessageType::VALUE_CHANGED);
       }
       else {

@@ -12,8 +12,7 @@ static SharedString CopyToSecondaryBufferSlotName = make_shared<string>("Copy to
 static SharedString ApplyPostprocessBeforeSlotName = make_shared<string>("After postprocess");
 
 ClipNode::ClipNode()
-  : Node(NodeType::CLIP)
-  , mSceneSlot(this, SceneSlotName)
+  : mSceneSlot(this, SceneSlotName)
   , mStartTime(this, StartSlotName)
   , mLength(this, LengthSlotName)
   , mTrackNumber(this, TrackNumberSlotName)

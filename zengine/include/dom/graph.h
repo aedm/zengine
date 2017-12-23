@@ -13,4 +13,4 @@ protected:
 
 };
 
-typedef TypedSlot<NodeType::GRAPH, Graph> GraphSlot;
+typedef TypedSlot<Graph> GraphSlot;

@@ -29,4 +29,4 @@ protected:
   virtual void HandleMessage(Message* message) override;
 };
 
-typedef TypedSlot<NodeType::CAMERA, CameraNode> CameraSlot;
+typedef TypedSlot<CameraNode> CameraSlot;

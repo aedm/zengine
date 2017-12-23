@@ -5,7 +5,7 @@
 #include "../shaders/pass.h"
 
 class Drawable;
-typedef TypedSlot<NodeType::DRAWABLE, Drawable> DrawableSlot;
+typedef TypedSlot<Drawable> DrawableSlot;
 
 class Drawable: public Node {
 public:

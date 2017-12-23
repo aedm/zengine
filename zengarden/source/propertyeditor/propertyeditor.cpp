@@ -113,7 +113,7 @@ void DefaultPropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   }
 
   /// Source editor button
-  if (IsInstanceOf<StubNode>(mNode)) {
+  if (IsExactType<StubNode>(mNode)) {
     StubNode* stub = static_cast<StubNode*>(mNode);
     QPushButton* sourceButton = new QPushButton("Edit source", watcherWidget);
     watcherWidget->connect(sourceButton, &QPushButton::pressed, [=]() {

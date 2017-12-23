@@ -3,8 +3,7 @@
 
 REGISTER_NODECLASS(StaticMeshNode, "Static Mesh");
 
-MeshNode::MeshNode()
-  : Node(NodeType::MESH) {}
+MeshNode::MeshNode() {}
 
 
 Mesh* MeshNode::GetMesh() const {

@@ -4,30 +4,37 @@
 #include <memory>
 #include <string>
 
-//class Mesh;
-//class Texture;
+class Texture;
 
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
-	ITEM(FLOAT,			float	    ) \
-	ITEM(VEC2,			Vec2		  ) \
-	ITEM(VEC3,			Vec3		  ) \
-	ITEM(VEC4,			Vec4		  ) \
-	ITEM(UINT,			UINT		  ) \
-	ITEM(MATRIX44,	Matrix		) \
-	//ITEM(TEXTURE,		Texture*	) \
+	ITEM(FLOAT,			float	      ) \
+	ITEM(VEC2,			Vec2		    ) \
+	ITEM(VEC3,			Vec3		    ) \
+	ITEM(VEC4,			Vec4		    ) \
+	ITEM(UINT,			UINT		    ) \
+	ITEM(MATRIX44,	Matrix		  ) \
+	ITEM(STRING,	  std::string	) \
+	ITEM(TEXTURE,	  Texture*	  ) \
+
+/// Value types
+enum class ValueType {
+#undef ITEM
+#define ITEM(name, type) name,
+  VALUETYPE_LIST
+};
 
 
-/// Variable sizes in bytes, indexed by NodeType (only VALUETYPE_LIST names)
+/// Variable sizes in bytes, indexed by ValueType 
 extern const int gVariableByteSizes[];
 
 
 /// Macrolist for attribute types (name, type, token)
 #define VERTEXATTRIBUTE_LIST \
-	ITEM(POSITION,		NodeType::VEC3,		"aPosition"	) \
-	ITEM(TEXCOORD,		NodeType::VEC2,		"aTexCoord"	) \
-	ITEM(NORMAL,		  NodeType::VEC3,		"aNormal"	) \
-	ITEM(TANGENT,		  NodeType::VEC3,		"aTangent"	) \
+	ITEM(POSITION,		ValueType::VEC3,		"aPosition"	) \
+	ITEM(TEXCOORD,		ValueType::VEC2,		"aTexCoord"	) \
+	ITEM(NORMAL,		  ValueType::VEC3,		"aNormal"	) \
+	ITEM(TANGENT,		  ValueType::VEC3,		"aTangent"	) \
 
 
 /// Possible variable types in vertex attributes

@@ -26,4 +26,4 @@ protected:
 
 };
 
-typedef TypedSlot<NodeType::CLIP, ClipNode> ClipSlot;
+typedef TypedSlot<ClipNode> ClipSlot;

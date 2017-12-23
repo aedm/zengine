@@ -16,7 +16,7 @@ private:
   /// How to reference a certain Node dependency within GLSL code? 
   /// Stubs translate to a function call and a variable to store its return value.
   struct StubReference {
-    StubReference(NodeType type);
+    StubReference(ValueType type);
 
     /// The variable name in the main function
     string mVariableName;
@@ -25,7 +25,7 @@ private:
     string mFunctionName;
 
     /// Stub return type
-    const NodeType mType;
+    const ValueType mType;
   };
 
   /// Non-stub Nodes translate to a uniform/sampler value
@@ -34,15 +34,15 @@ private:
     string mName;
 
     /// Value type
-    NodeType mType;
+    ValueType mType;
   };
 
   /// Inputs and output of the shader stage
   struct InOutVariable {
-    InOutVariable(NodeType type, const string& name, int layout = -1);
+    InOutVariable(ValueType type, const string& name, int layout = -1);
 
     /// Variable type
-    NodeType mType;
+    ValueType mType;
 
     /// Variable name
     string mName;
@@ -100,7 +100,7 @@ private:
   void GenerateSourceFunctions(ShaderStage* shaderStage);
   void GenerateSourceMain(ShaderStage* shaderStage);
 
-  static const string& GetTypeString(NodeType type, bool isMultiSampler = false, 
+  static const string& GetTypeString(ValueType type, bool isMultiSampler = false,
                                      bool isShadow = false);
 
   ShaderStage mVertexStage;

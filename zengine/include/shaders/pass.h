@@ -16,7 +16,7 @@ struct PassUniform {
   UniformId handle;
   Node* node;
   ShaderGlobalType globalType;
-  NodeType type;
+  ValueType type;
 };
 
 /// A renderpass is a way to render an object. Materials consist of several
@@ -90,4 +90,4 @@ protected:
   vector<char> mUniformArray;
 };
 
-typedef TypedSlot<NodeType::PASS, Pass> PassSlot;
+typedef TypedSlot<Pass> PassSlot;

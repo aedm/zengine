@@ -15,7 +15,7 @@ protected:
   Mesh*	mMesh = nullptr;
 };
 
-typedef TypedSlot<NodeType::MESH, MeshNode> MeshSlot;
+typedef TypedSlot<MeshNode> MeshSlot;
 
 
 /// A simple static mesh container.

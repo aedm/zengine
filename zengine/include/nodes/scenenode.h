@@ -52,4 +52,4 @@ private:
   void CalculateRenderDependencies();
 };
 
-typedef TypedSlot<NodeType::SCENE, SceneNode> SceneSlot;
+typedef TypedSlot<SceneNode> SceneSlot;

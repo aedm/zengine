@@ -11,8 +11,7 @@ static SharedString ScaleSlotName = make_shared<string>("Scale");
 static SharedString InstancesSlotName = make_shared<string>("Instances");
 
 Drawable::Drawable()
-  : Node(NodeType::DRAWABLE)
-  , mMesh(this, MeshSlotName)
+  : mMesh(this, MeshSlotName)
   , mMaterial(this, MaterialSlotName) 
   , mMove(this, MoveSlotName, false, true, true, -100.0f, 100.0f)
   , mRotate(this, RotateSlotName, false, true, true, -Pi, Pi)

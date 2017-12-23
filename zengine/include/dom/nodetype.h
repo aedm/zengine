@@ -9,68 +9,33 @@ using namespace std;
 class Node;
 class Slot;
 
-/// Possible node types
-enum class NodeType {
-  /// Node types holding a value type
-#undef ITEM
-#define ITEM(name, type) name,
-  VALUETYPE_LIST
-
-  /// Other node types 
-  STRING,
-  TEXTURE,
-  SHADER_STUB,
-  PASS,
-  MATERIAL,
-  MESH,
-  DRAWABLE,
-  WORLD,
-  CAMERA,
-  SCENE,
-  GRAPH,
-  DOCUMENT,
-  MOVIE,
-  CLIP,
-  PROPERTIES,
-  
-  /// Empty stub value type
-  NONE,
-
-  /// Editor nodes
-  UI,
-  WIDGET,
-
-  /// Slot type that allows all node connections
-  ALLOW_ALL,
-
-  /// Undefined behavior
-  UNDEFINED
-};
-
-
 /// Type helpers
-template<NodeType T> struct NodeTypes;
+template<ValueType T> struct ValueTypes;
 #undef ITEM
 #define ITEM(name, type) \
-  template<> struct NodeTypes<NodeType::name> { typedef type Type; };
+  template<> struct ValueTypes<ValueType::name> { typedef type Type; };
 VALUETYPE_LIST
 
 
 /// Array for attribute types, index by VertexAttributeEnum
-extern const NodeType gVertexAttributeType[];
+extern const ValueType gVertexAttributeType[];
 
 
 /// Returns true if the node is an instance of a certain class
 template<class T>
-bool IsInstanceOf(Node* node) {
+bool IsExactType(Node* node) {
   return typeid(T) == typeid(*node);
 }
 
 template<class T>
-bool IsInstanceOf(Slot* slot) {
+bool IsExactType(Slot* slot) {
   return typeid(T) == typeid(*slot);
 }
 
+template<class T, class N>
+bool IsInsanceOf(N* ptr) {
+  return dynamic_cast<T>(ptr) != nullptr;
+}
 
 /// Exact type of the node. Poor man's reflection.
 struct NodeClass {

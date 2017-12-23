@@ -116,6 +116,7 @@
     <ClInclude Include="include\nodes\movienode.h" />
     <ClInclude Include="include\nodes\scenenode.h" />
     <ClInclude Include="include\nodes\splinenode.h" />
+    <ClInclude Include="include\nodes\texturenode.h" />
     <ClInclude Include="include\nodes\timenode.h" />
     <ClInclude Include="include\nodes\valuenodes.h" />
     <ClInclude Include="include\nodes\vectornodes.h" />
@@ -158,6 +159,7 @@
     <ClCompile Include="source\nodes\movienode.cpp" />
     <ClCompile Include="source\nodes\propertiesnode.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
+    <ClCompile Include="source\nodes\texturenode.cpp" />
     <ClCompile Include="source\nodes\timenode.cpp" />
     <ClCompile Include="source\nodes\splinenode.cpp" />
     <ClCompile Include="source\nodes\valuenodes.cpp" />

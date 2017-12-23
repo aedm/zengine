@@ -13,8 +13,7 @@ static SharedString ShakeTimeSlotName = make_shared<string>("ShakeTime");
 static SharedString ShakeSpeedSlotName = make_shared<string>("ShakeSpeed");
 
 CameraNode::CameraNode()
-  : Node(NodeType::CAMERA)
-  , mTarget(this, TargetSlotName, false, true, true, 0.0f, 150.0f)
+  : mTarget(this, TargetSlotName, false, true, true, 0.0f, 150.0f)
   , mDistance(this, DistanceSlotName, false, true, true, 0.0f, 150.0f)
   , mOrientation(this, OrientationSlotName, false, true, true, -Pi, Pi)
   , mFovY(this, FovYSlotName)

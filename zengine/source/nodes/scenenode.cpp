@@ -15,8 +15,7 @@ static SharedString DOFFocusDistanceSlotName = make_shared<string>("DOF focus di
 static SharedString DOFBlurSlotName = make_shared<string>("DOF blur");
 
 SceneNode::SceneNode()
-  : Node(NodeType::SCENE)
-  , mDrawables(this, DrawablesSlotName, true)
+  : mDrawables(this, DrawablesSlotName, true)
   , mCamera(this, CameraSlotName)
   , mShadowMapSize(this, ShadowMapSizeSlotName, false, true, true, 0.0f, 100.0f)
   , mSkyLightDirection(this, SkylightDirectionSlotName)
@@ -24,7 +23,7 @@ SceneNode::SceneNode()
   , mSkyLightAmbient(this, SkylightAmbientSlotName)
   , mSkyLightSpread(this, SkylightSpreadSlotName, false, true, true, 0.0f, 30.0f)
   , mSkyLightSampleSpread(this, SkylightSampleSpreadSlotName, false, true, true, 0.0f, 20.0f)
-  , mSceneTimes(NodeType::FLOAT, this, nullptr, true, false, false, false)
+  , mSceneTimes(this, nullptr, true, false, false, false)
   , mDOFEnabled(this, DOFEnabledSlotName) 
   , mDOFFocusDistance(this, DOFFocusDistanceSlotName, false, true, true, 0.0f, 100.0f)
   , mDOFBlur(this, DOFBlurSlotName, false, true, true, 0.0f, 30.0f)
@@ -135,7 +134,7 @@ void SceneNode::CalculateRenderDependencies() {
   mSceneTimes.DisconnectAll(false);
   GenerateTransitiveClosure(mTransitiveClosure, true);
   for (Node* node : mTransitiveClosure) {
-    if (IsInstanceOf<SceneTimeNode>(node)) {
+    if (IsExactType<SceneTimeNode>(node)) {
       SceneTimeNode* sceneTimeNode = static_cast<SceneTimeNode*>(node);
       ASSERT(sceneTimeNode);
       mSceneTimes.Connect(sceneTimeNode);

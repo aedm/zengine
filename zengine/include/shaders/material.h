@@ -16,7 +16,7 @@ protected:
   virtual void HandleMessage(Message* message) override;
 };
 
-typedef TypedSlot<NodeType::MATERIAL, Material> MaterialSlot;
+typedef TypedSlot<Material> MaterialSlot;
 
 
 class SolidMaterial: public Node {

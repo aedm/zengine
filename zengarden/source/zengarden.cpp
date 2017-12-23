@@ -189,11 +189,11 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
     shared_ptr<WatcherUI> watcher;
-    if (IsInstanceOf<FloatNode>(node)) {
+    if (IsExactType<FloatNode>(node)) {
       watcher = node->Watch<StaticFloatEditor>(static_cast<FloatNode*>(node));
-    } else if (IsInstanceOf<Vec3Node>(node)) {
+    } else if (IsExactType<Vec3Node>(node)) {
       watcher = node->Watch<StaticVec3Editor>(static_cast<Vec3Node*>(node));
-    } else if (IsInstanceOf<Vec4Node>(node)) {
+    } else if (IsExactType<Vec4Node>(node)) {
       watcher = node->Watch<StaticVec4Editor>(static_cast<Vec4Node*>(node));
     } else {
       watcher = node->Watch<DefaultPropertyEditor>(node);

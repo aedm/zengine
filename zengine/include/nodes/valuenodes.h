@@ -6,79 +6,60 @@
 #include <string>
 
 /// Nodes holding primitive values.
-template<NodeType T>
+template<ValueType T>
 class ValueNode: public Node {
 protected:
-  typedef typename NodeTypes<T>::Type ValueType;
+  typedef typename ValueTypes<T>::Type VType;
 
 public:
   ValueNode();
 
-  /// For cloning
-  ValueNode(const ValueNode<T>& original);
-
   /// Returns value of node. Reevaluates if necessary
-  virtual const ValueType& Get() = 0;
+  virtual const VType& Get() = 0;
 };
 
 
-template<NodeType T>
-ValueNode<T>::ValueNode()
-  : Node(T) {}
-
-
-template<NodeType T>
-ValueNode<T>::ValueNode(const ValueNode<T>& original)
-  : Node(original) {}
+template<ValueType T>
+ValueNode<T>::ValueNode() {}
 
 
 /// Simple static value nodes
-template<NodeType T>
+template<ValueType T>
 class StaticValueNode: public ValueNode <T> {
 public:
   StaticValueNode();
 
-  /// For cloning
-  StaticValueNode(const StaticValueNode<T>& original);
-
   /// Returns value of node. Reevaluates if necessary
-  virtual const ValueType& Get() override;
+  virtual const VType& Get() override;
 
   /// Sets value of node.
-  void Set(const ValueType& newValue);
+  void Set(const VType& newValue);
 
 protected:
   /// Output value of the node
-  ValueType mValue;
+  VType mValue;
 };
 
 
-template<> StaticValueNode<NodeType::VEC2>::StaticValueNode();
-template<> StaticValueNode<NodeType::VEC3>::StaticValueNode();
-template<> StaticValueNode<NodeType::VEC4>::StaticValueNode();
+template<> StaticValueNode<ValueType::VEC2>::StaticValueNode();
+template<> StaticValueNode<ValueType::VEC3>::StaticValueNode();
+template<> StaticValueNode<ValueType::VEC4>::StaticValueNode();
 
-template<NodeType T>
+template<ValueType T>
 StaticValueNode<T>::StaticValueNode()
   : ValueNode() {
-  mValue = ValueType();
+  mValue = VType();
 }
 
 
-template<NodeType T>
-StaticValueNode<T>::StaticValueNode(const StaticValueNode<T>& original)
-  : ValueNode(original) {
-  mValue = original.mValue;
-}
-
-
-template<NodeType T>
-const typename StaticValueNode<T>::ValueType& StaticValueNode<T>::Get() {
+template<ValueType T>
+const typename StaticValueNode<T>::VType& StaticValueNode<T>::Get() {
   return mValue;
 }
 
 
-template<NodeType T>
-void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
+template<ValueType T>
+void StaticValueNode<T>::Set(const typename ValueNode<T>::VType& newValue) {
   if (mValue == newValue) return;
   mValue = newValue;
   SendMsg(MessageType::VALUE_CHANGED);
@@ -89,25 +70,25 @@ void StaticValueNode<T>::Set(const typename ValueNode<T>::ValueType& newValue) {
 /// that provides a default value. This way these nodes provide a value
 /// even when there's no external node connected to them. Also, GetNode()
 /// never returns nullptr.
-template<NodeType T>
-class ValueSlot: public Slot {
+template<ValueType T>
+class ValueSlot: public TypedSlot<ValueNode<T>> {
 public:
-  typedef typename NodeTypes<T>::Type ValueType;
+  typedef typename ValueTypes<T>::Type VType;
 
   ValueSlot(Node* owner, SharedString name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true,
             float minimum = 0.0f, float maximum = 1.0f);
 
-  const ValueType& Get() const;
+  const VType& Get() const;
 
   /// Return minimum & maximum
   Vec2 GetRange() const;
 
   /// Sets the value of the built-in Node.
-  void SetDefaultValue(const ValueType& value);
+  void SetDefaultValue(const VType& value);
 
   /// Gets the default value
-  const ValueType& GetDefaultValue();
+  const VType& GetDefaultValue();
 
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
@@ -129,11 +110,11 @@ protected:
 };
 
 
-template<NodeType T>
+template<ValueType T>
 ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
                         bool isPublic, bool isSerializable,
                         float minimum, float maximum)
-  : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable)
+  : TypedSlot<ValueNode<T>>(owner, name, isMultiSlot, isPublic, isSerializable)
   , mMinimum(minimum)
   , mMaximum(maximum)
 {
@@ -141,37 +122,36 @@ ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
 }
 
 
-template<NodeType T>
-const typename ValueSlot<T>::ValueType& ValueSlot<T>::Get() const {
-  ASSERT(GetReferencedNode()->GetType() == T)
-  return static_cast<ValueNode<T>*>(GetReferencedNode())->Get();
+template<ValueType T>
+const typename ValueSlot<T>::VType& ValueSlot<T>::Get() const {
+  return SafeCast<ValueNode<T>*>(GetReferencedNode())->Get();
 }
 
 
-template<NodeType T>
+template<ValueType T>
 Vec2 ValueSlot<T>::GetRange() const {
   return Vec2(mMinimum, mMaximum);
 }
 
 
-template<NodeType T>
-void ValueSlot<T>::SetDefaultValue(const ValueType& value) {
+template<ValueType T>
+void ValueSlot<T>::SetDefaultValue(const VType& value) {
 //  ASSERT(IsDefaulted());
   mDefault.Set(value);
 }
 
 
-template<NodeType T>
-const typename ValueSlot<T>::ValueType& ValueSlot<T>::GetDefaultValue() {
+template<ValueType T>
+const typename ValueSlot<T>::VType& ValueSlot<T>::GetDefaultValue() {
   return mDefault.Get();
 }
 
 
-template<NodeType T>
+template<ValueType T>
 bool ValueSlot<T>::Connect(Node* target) {
   if (mNode == target || (target == nullptr && mNode == &mDefault)) return true;
-  if (target && !DoesAcceptType(target->GetType())) {
-    DEBUGBREAK("Slot and operator type mismatch");
+  if (target && !DoesAcceptNode(target)) {
+    DEBUGBREAK("Slot and node type mismatch");
     return false;
   }
   if (mNode) mNode->DisconnectFromSlot(this);
@@ -182,7 +162,7 @@ bool ValueSlot<T>::Connect(Node* target) {
 }
 
 
-template<NodeType T>
+template<ValueType T>
 void ValueSlot<T>::Disconnect(Node* target) {
   ASSERT(target == mNode);
   ASSERT(target != nullptr);
@@ -198,7 +178,7 @@ void ValueSlot<T>::Disconnect(Node* target) {
 }
 
 
-template<NodeType T>
+template<ValueType T>
 void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   SHOULD_NOT_HAPPEN;
   if (mNode == &mDefault) return;
@@ -209,49 +189,26 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
 }
 
 
-template<NodeType T>
+template<ValueType T>
 bool ValueSlot<T>::IsDefaulted() {
   return GetReferencedNode() == &mDefault;
 }
 
 
-/// Helper cast
-template<NodeType T>
-inline static ValueSlot<T>* ToValueSlot(Slot* slot) {
-  return static_cast<ValueSlot<T>*>(slot);
-}
-
-
 /// Node and slot types
-typedef ValueSlot<NodeType::FLOAT>			FloatSlot;
-typedef ValueSlot<NodeType::VEC2>			  Vec2Slot;
-typedef ValueSlot<NodeType::VEC3>			  Vec3Slot;
-typedef ValueSlot<NodeType::VEC4>			  Vec4Slot;
-//typedef ValueSlot<NodeType::MATRIX44>		Matrix4Slot;
+typedef ValueSlot<ValueType::FLOAT>	FloatSlot;
+typedef ValueSlot<ValueType::VEC2> Vec2Slot;
+typedef ValueSlot<ValueType::VEC3> Vec3Slot;
+typedef ValueSlot<ValueType::VEC4> Vec4Slot;
+typedef ValueSlot<ValueType::STRING> StringSlot;
+typedef ValueSlot<ValueType::TEXTURE> TextureSlot;
 
-typedef StaticValueNode<NodeType::FLOAT>	  FloatNode;
-typedef StaticValueNode<NodeType::VEC2>	    Vec2Node;
-typedef StaticValueNode<NodeType::VEC3>	    Vec3Node;
-typedef StaticValueNode<NodeType::VEC4>		  Vec4Node;
-//typedef StaticValueNode<NodeType::MATRIX44>	Matrix4Node;
+typedef StaticValueNode<ValueType::FLOAT>	  FloatNode;
+typedef StaticValueNode<ValueType::VEC2>	  Vec2Node;
+typedef StaticValueNode<ValueType::VEC3>	  Vec3Node;
+typedef StaticValueNode<ValueType::VEC4>		Vec4Node;
+typedef StaticValueNode<ValueType::STRING>	StringNode;
+typedef StaticValueNode<ValueType::TEXTURE>	TextureNode;
 
-
-///// Explicit template type instantiations
-//template class StaticValueNode < NodeType::FLOAT >;
-//template class StaticValueNode < NodeType::VEC2 >;
-//template class StaticValueNode < NodeType::VEC3 >;
-//template class StaticValueNode < NodeType::VEC4 >;
-//template class StaticValueNode < NodeType::MATRIX44 >;
-
-
-/// Define texture type
-template<> struct NodeTypes<NodeType::TEXTURE> { typedef Texture* Type; };
-typedef StaticValueNode<NodeType::TEXTURE>	TextureNode;
-typedef ValueSlot<NodeType::TEXTURE> TextureSlot;
-
-/// Define text type
-template<> struct NodeTypes<NodeType::STRING> { typedef std::string Type; };
-typedef StaticValueNode<NodeType::STRING>	StringNode;
-typedef ValueSlot<NodeType::STRING> StringSlot;
-
-
+/// An instance of each static value nodes
+extern Node* StaticValueNodesList[];

@@ -84,7 +84,7 @@ private:
 /// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
-  Slot(NodeType type, Node* owner, SharedString name, bool isMultiSlot = false,
+  Slot(Node* owner, SharedString name, bool isMultiSlot = false,
        bool isPublic = true, bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
@@ -126,7 +126,7 @@ public:
   vector<Node*> GetDirectMultiNodes() const;
   
   /// Type of object this slot accepts
-  virtual bool DoesAcceptType(NodeType type) const;
+  virtual bool DoesAcceptNode(Node* node) const;
 
   /// Returns the name of the slot
   SharedString GetName();
@@ -149,24 +149,17 @@ protected:
 
   /// Name of the slot. Can't be changed.
   SharedString mName;
-
-  /// Output type
-  const NodeType mType;
 };
-
 
 /// An operation that takes its slot values as input and computes an output
 class Node {
   friend class Slot;
   friend class Watcher;
   friend class MessageQueue;
-  template<NodeType T> friend class ValueSlot;
-  
+  template<ValueType T> friend class ValueSlot;
+
 public:
   virtual ~Node();
-
-  /// Returns object type.
-  NodeType GetType() const;
 
   /// List of slots this node's output is connected to
   const vector<Slot*>& GetDependants() const;
@@ -185,10 +178,7 @@ public:
   virtual Node* GetReferencedNode();
 
 protected:
-  Node(NodeType type, bool isForwarderNode = false);
-
-  /// For cloning
-  Node(const Node& original);
+  Node(bool isForwarderNode = false);
 
   /// True is all slots are properly connected
   bool mIsProperlyConnected;
@@ -201,9 +191,6 @@ protected:
 
   /// Handle received messages
   virtual void HandleMessage(Message* message);
-
-  /// Output type
-  NodeType mType;
 
   /// Check if all slots are properly connected to an operator
   void CheckConnections();
@@ -299,21 +286,19 @@ private:
 };
 
 
-//template <class ...B>
-//inline void Watch(void (Watcher::*M)(B...), B... args) {
-//  for (Watcher* watcher : mWatchers) watcher->*M(...args);
-//}
-
-
-/// Typed slot macro, syntactic sugar. 
-template<NodeType T, class N>
+/// Typed slot
+template<class N>
 class TypedSlot: public Slot {
 public:
   TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true)
-    : Slot(T, owner, name, isMultiSlot, isPublic, isSerializable) {}
+    : Slot(owner, name, isMultiSlot, isPublic, isSerializable) {}
 
   N* GetNode() {
-    return static_cast<N*>(GetReferencedNode());
+    return SafeCast<N*>(GetReferencedNode());
+  }
+
+  virtual bool DoesAcceptNode(Node* node) const override {
+    return IsInsanceOf<N*>(node);
   }
 };

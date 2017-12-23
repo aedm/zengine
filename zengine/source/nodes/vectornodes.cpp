@@ -7,7 +7,7 @@ static SharedString YSlotName = make_shared<string>("Y");
 static SharedString ZSlotName = make_shared<string>("Z");
 
 FloatsToVec3Node::FloatsToVec3Node() 
-  : ValueNode<NodeType::VEC3>()
+  : ValueNode<ValueType::VEC3>()
   , mValue(0, 0, 0)
   , mX(this, XSlotName)
   , mY(this, YSlotName)

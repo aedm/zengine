@@ -54,20 +54,20 @@ enum class ShaderGlobalType {
 };
 
 extern const EnumMapperA GlobalUniformMapper[];
-extern const NodeType GlobalUniformTypes[];
+extern const ValueType GlobalUniformTypes[];
 extern const int GlobalUniformOffsets[];
 
 /// A struct to store global uniforms
 struct Globals {
 #undef ITEM
-#define ITEM(name, type, token) NodeTypes<NodeType::type>::Type token;
+#define ITEM(name, type, token) ValueTypes<ValueType::type>::Type token;
 	GLOBALUSAGE_LIST
 };
 
 /// Stub parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct StubParameter {
-	NodeType mType;
+	ValueType mType;
 	SharedString mName;
 };
 
@@ -75,13 +75,13 @@ struct StubParameter {
 /// ":output vec4 MyColor" -- creates "outMyColor" output variable.
 /// ":input vec4 MyColor" -- creates "inMyColor" input variable.
 struct StubVariable {
-	NodeType type;
+	ValueType type;
 	string name;
 };
 
 /// --
 struct StubGlobal {
-	NodeType type;
+  ValueType type;
 	string name;
 	ShaderGlobalType usage;
   bool isMultiSampler; // type is "sampler2DMS"
@@ -91,7 +91,7 @@ struct StubGlobal {
 
 /// All metadata collected from a stub source.
 struct StubMetadata {
-	StubMetadata(const string& name, NodeType returnType,
+	StubMetadata(const string& name, ValueType returnType,
 				 const string& strippedSource,
 				 const vector<OWNERSHIP StubParameter*>& parameters,
 				 const vector<StubGlobal*>& globals,
@@ -104,7 +104,7 @@ struct StubMetadata {
 	const string name;
 
 	/// Value of the ":returns" directive.
-	const NodeType returnType;
+	const ValueType returnType;
 
 	/// The source without any directives.
 	const string strippedSource;
@@ -160,5 +160,5 @@ protected:
 };
 
 
-typedef TypedSlot<NodeType::SHADER_STUB, StubNode> StubSlot;
+typedef TypedSlot<StubNode> StubSlot;
 

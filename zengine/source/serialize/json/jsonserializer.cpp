@@ -99,28 +99,28 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   }
 
   /// Save graph position
-  if (!IsInstanceOf<Graph>(node) && !IsInstanceOf<Document>(node)) {
+  if (!IsInsanceOf<Graph>(node) && !IsInsanceOf<Document>(node)) {
     v.AddMember("position", SerializeVec2(node->GetPosition()), *mAllocator);
   }
 
   /// TODO: save size
 
   /// Save node content
-  if (IsInstanceOf<FloatNode>(node)) {
+  if (IsExactType<FloatNode>(node)) {
     SerializeFloatNode(v, static_cast<FloatNode*>(node));
-  } else if (IsInstanceOf<Vec2Node>(node)) {
+  } else if (IsExactType<Vec2Node>(node)) {
     SerializeVec2Node(v, static_cast<Vec2Node*>(node));
-  } else if (IsInstanceOf<Vec3Node>(node)) {
+  } else if (IsExactType<Vec3Node>(node)) {
     SerializeVec3Node(v, static_cast<Vec3Node*>(node));
-  } else if (IsInstanceOf<Vec4Node>(node)) {
+  } else if (IsExactType<Vec4Node>(node)) {
     SerializeVec4Node(v, static_cast<Vec4Node*>(node));
-  } else if (IsInstanceOf<FloatSplineNode>(node)) {
+  } else if (IsExactType<FloatSplineNode>(node)) {
     SerializeFloatSplineNode(v, static_cast<FloatSplineNode*>(node));
-  } else if (IsInstanceOf<TextureNode>(node)) {
+  } else if (IsExactType<TextureNode>(node)) {
     SerializeTextureNode(v, static_cast<TextureNode*>(node));
-  } else if (IsInstanceOf<StaticMeshNode>(node)) {
+  } else if (IsExactType<StaticMeshNode>(node)) {
     SerializeStaticMeshNode(v, static_cast<StaticMeshNode*>(node));
-  } else if (IsInstanceOf<StubNode>(node)) {
+  } else if (IsExactType<StubNode>(node)) {
     SerializeStubNode(v, static_cast<StubNode*>(node));
   }
 

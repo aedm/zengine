@@ -103,7 +103,7 @@ enum class SplineLayer {
 };
 
 
-class FloatSplineNode: public ValueNode<NodeType::FLOAT>
+class FloatSplineNode: public ValueNode<ValueType::FLOAT>
 {
 public:
 	FloatSplineNode();

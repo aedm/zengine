@@ -9,8 +9,7 @@ static SharedString ClipSlotName = make_shared<string>("clips");
 static const int MaxTrackCount = 8;
 
 MovieNode::MovieNode()
-  : Node(NodeType::MOVIE)
-  , mClips(this, ClipSlotName, true) {
+  : mClips(this, ClipSlotName, true) {
   mTracks.resize(MaxTrackCount);
 }
 

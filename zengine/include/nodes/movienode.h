@@ -30,4 +30,4 @@ private:
   Globals mGlobals;
 };
 
-typedef TypedSlot<NodeType::MOVIE, MovieNode> MovieSlot;
+typedef TypedSlot<MovieNode> MovieSlot;
