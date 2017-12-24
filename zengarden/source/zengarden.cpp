@@ -268,20 +268,13 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   shared_ptr<WatcherUI> watcher;
 
   /// Non-3D watchers
-  switch (node->GetType()) {
-    case NodeType::STRING:
-    {
-      auto stringNode = dynamic_cast<StringNode*>(node);
-      watcher = stringNode->Watch<TextWatcher>(stringNode);
-      break;
-    }
-    case NodeType::DOCUMENT:
-    {
-      auto documentNode = dynamic_cast<Document*>(node);
-      watcher = documentNode->Watch<DocumentWatcher>(documentNode);
-      break;
-    }
-    default: break;
+  if (IsInsanceOf<StringNode*>(node)) {
+    auto stringNode = SafeCast<StringNode*>(node);
+    watcher = stringNode->Watch<TextWatcher>(stringNode);
+  }
+  else if (IsInsanceOf<Document*>(node)) {
+    auto documentNode = SafeCast<Document*>(node);
+    watcher = documentNode->Watch<DocumentWatcher>(documentNode);
   }
 
   if (watcher) {
@@ -295,47 +288,33 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   }
 
   /// 3D watchers
+  if (IsInsanceOf<Pass*>(node)) {
+    auto passNode = SafeCast<Pass*>(node);
+    watcher = static_pointer_cast<WatcherUI>(passNode->Watch<PassWatcher>(passNode));
+  }
+  else if (IsInsanceOf<MeshNode*>(node)) {
+    auto meshNode = SafeCast<MeshNode*>(node);
+    watcher = static_pointer_cast<WatcherUI>(meshNode->Watch<MeshWatcher>(meshNode));
+  }
+  else if (IsInsanceOf<Drawable*>(node)) {
+    auto drawableNode = SafeCast<Drawable*>(node);
+    watcher =
+      static_pointer_cast<WatcherUI>(drawableNode->Watch<DrawableWatcher>(drawableNode));
+  }
+  else if (IsInsanceOf<SceneNode*>(node)) {
+    auto sceneNode = dynamic_cast<SceneNode*>(node);
+    watcher = static_pointer_cast<WatcherUI>(sceneNode->Watch<SceneWatcher>(sceneNode));
+  }
+  else if (IsInsanceOf<Graph*>(node)) {
+    auto graphNode = dynamic_cast<Graph*>(node);
+    watcher = static_pointer_cast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
+  }
+  else if (IsInsanceOf<MovieNode*>(node)) {
+    auto movieNode = dynamic_cast<MovieNode*>(node);
+    watcher = static_pointer_cast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
+  }
+
   if (watcherWidget == nullptr) {
-    switch (node->GetType()) {
-      case NodeType::PASS:
-      {
-        auto passNode = dynamic_cast<Pass*>(node);
-        watcher = static_pointer_cast<WatcherUI>(passNode->Watch<PassWatcher>(passNode));
-      }
-      break;
-      case NodeType::MESH:
-      {
-        auto meshNode = dynamic_cast<MeshNode*>(node);
-        watcher = static_pointer_cast<WatcherUI>(meshNode->Watch<MeshWatcher>(meshNode));
-      }
-      break;
-      case NodeType::DRAWABLE:
-      {
-        auto drawableNode = dynamic_cast<Drawable*>(node);
-        watcher =
-          static_pointer_cast<WatcherUI>(drawableNode->Watch<DrawableWatcher>(drawableNode));
-      }
-      break;
-      case NodeType::SCENE:
-      {
-        auto sceneNode = dynamic_cast<SceneNode*>(node);
-        watcher = static_pointer_cast<WatcherUI>(sceneNode->Watch<SceneWatcher>(sceneNode));
-      }
-      break;
-      case NodeType::GRAPH:
-      {
-        auto graphNode = dynamic_cast<Graph*>(node);
-        watcher = static_pointer_cast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
-      }
-      break;
-      case NodeType::MOVIE:
-      {
-        auto movieNode = dynamic_cast<MovieNode*>(node);
-        watcher = static_pointer_cast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
-      }
-      break;
-      default: return;
-    }
     watcherWidget =
       new GLWatcherWidget(tabWidget, watcher, mCommonGLWidget, watcherPosition, tabWidget);
   }

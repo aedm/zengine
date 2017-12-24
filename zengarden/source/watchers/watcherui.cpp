@@ -37,7 +37,7 @@ QString WatcherUI::CreateDisplayedName(Node* node) {
     return QString::fromStdString(node->GetName());
   } 
   
-  if (node->GetType() == NodeType::SHADER_STUB) {
+  if (IsInsanceOf<StubNode*>(node)) {
     StubNode* stub = static_cast<StubNode*>(node);
     StubMetadata* metaData = stub->GetStubMetadata();
     if (metaData != nullptr && !metaData->name.empty()) {

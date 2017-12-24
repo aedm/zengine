@@ -29,8 +29,18 @@ T SafeCast(K object) {
   #endif
 }
 
-/// Logging facility 
+template<typename T, typename K>
+T SafeCastAllowNull(K object) {
+#ifdef _DEBUG
+  T cast = dynamic_cast<T>(object);
+  ASSERT(object == nullptr || cast != nullptr);
+  return cast;
+#else 
+  return static_cast<T>(object);
+#endif
+}
 
+/// Logging facility 
 class Document;
 class Logger;
 extern Logger* TheLogger;

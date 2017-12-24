@@ -173,7 +173,7 @@ void FloatEditor::SetReadOnly(bool readOnly) {
 }
 
 
-FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, FloatSlot* slot, 
+FloatWatcher::FloatWatcher(ValueNode<ValueType::FLOAT>* node, FloatSlot* slot,
                            QString name, bool readOnly)
   : WatcherUI(node) 
   , mName(name)
@@ -183,7 +183,7 @@ FloatWatcher::FloatWatcher(ValueNode<NodeType::FLOAT>* node, FloatSlot* slot,
 
 
 void FloatWatcher::OnRedraw() {
-  float value = static_cast<ValueNode<NodeType::FLOAT>*>(mNode)->Get();
+  float value = static_cast<ValueNode<ValueType::FLOAT>*>(mNode)->Get();
   mEditorX->Set(value);
 }
 
@@ -209,7 +209,7 @@ void FloatWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  auto valueNode = dynamic_cast<ValueNode<NodeType::FLOAT>*>(mNode);
+  auto valueNode = dynamic_cast<ValueNode<ValueType::FLOAT>*>(mNode);
   mEditorX = new FloatEditor(watcherWidget, mName, valueNode->Get());
   mEditorX->onValueChange += Delegate(this, &FloatWatcher::HandleValueChange);
   layout->addWidget(mEditorX);
@@ -226,7 +226,7 @@ void FloatWatcher::HandleValueChange(FloatEditor* editor, float value) {
 }
 
 
-Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, Vec3Slot* slot, QString name, 
+Vec3Watcher::Vec3Watcher(ValueNode<ValueType::VEC3>* node, Vec3Slot* slot, QString name,
                          bool readOnly)
   : WatcherUI(node) 
   , mName(name)
@@ -236,7 +236,7 @@ Vec3Watcher::Vec3Watcher(ValueNode<NodeType::VEC3>* node, Vec3Slot* slot, QStrin
 
 
 void Vec3Watcher::OnRedraw() {
-  Vec3 value = static_cast<ValueNode<NodeType::VEC3>*>(mNode)->Get();
+  Vec3 value = static_cast<ValueNode<ValueType::VEC3>*>(mNode)->Get();
   mEditorX->Set(value.x);
   mEditorY->Set(value.y);
   mEditorZ->Set(value.z);
@@ -267,7 +267,7 @@ void Vec3Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  auto valueNode = dynamic_cast<ValueNode<NodeType::VEC3>*>(mNode);
+  auto valueNode = dynamic_cast<ValueNode<ValueType::VEC3>*>(mNode);
   Vec3 value = valueNode->Get();
 
   mEditorX = new FloatEditor(watcherWidget, mName + ".x", value.x);
@@ -300,7 +300,7 @@ void Vec3Watcher::HandleValueChange(FloatEditor* editor, float value) {
 
 
 
-Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, QString name, bool readOnly)
+Vec4Watcher::Vec4Watcher(ValueNode<ValueType::VEC4>* node, QString name, bool readOnly)
   : WatcherUI(node) 
   , mName(name)
   , mIsReadOnly(readOnly)
@@ -308,7 +308,7 @@ Vec4Watcher::Vec4Watcher(ValueNode<NodeType::VEC4>* node, QString name, bool rea
 
 
 void Vec4Watcher::OnRedraw() {
-  Vec4 value = static_cast<ValueNode<NodeType::VEC4>*>(mNode)->Get();
+  Vec4 value = static_cast<ValueNode<ValueType::VEC4>*>(mNode)->Get();
   mEditorX->Set(value.x);
   mEditorY->Set(value.y);
   mEditorZ->Set(value.z);
@@ -333,7 +333,7 @@ void Vec4Watcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  auto node = dynamic_cast<ValueNode<NodeType::VEC4>*>(mNode);
+  auto node = dynamic_cast<ValueNode<ValueType::VEC4>*>(mNode);
   Vec4 value = node->Get();
 
   mEditorX = new FloatEditor(watcherWidget, mName + ".x", value.x);

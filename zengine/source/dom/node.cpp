@@ -6,14 +6,14 @@
 /// Array for variable sizes in bytes
 const int gVariableByteSizes[] = {
 #undef ITEM
-#define ITEM(name, type) sizeof(type),
+#define ITEM(name, capitalizedName, type) sizeof(type),
   VALUETYPE_LIST
 };
 
 MessageQueue TheMessageQueue;
 
 void MessageQueue::Enqueue(Node* source, Node* target, MessageType type, Slot* slot) {
-  Message message = {source, target, slot, type};
+  Message message = { source, target, slot, type };
   if (mMessageSet.find(message) != mMessageSet.end()) return;
   mMessageQueue.push_back(message);
   mMessageSet.insert(message);
@@ -60,7 +60,7 @@ bool Message::operator<(const Message& other) const {
 }
 
 Slot::Slot(Node* owner, SharedString name, bool isMultiSlot,
-           bool isPublic, bool isSerializable, bool isTraversable)
+  bool isPublic, bool isSerializable, bool isTraversable)
   : mOwner(owner)
   , mIsMultiSlot(isMultiSlot) {
   ASSERT(mOwner != nullptr);
@@ -95,7 +95,8 @@ bool Slot::Connect(Node* target) {
     target->ConnectToSlot(this);
     /// TODO: merge these
     TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
-  } else {
+  }
+  else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
@@ -114,13 +115,14 @@ void Slot::Disconnect(Node* target) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, 
-                                this);
+        TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED,
+          this);
         return;
       }
     }
     ERR("Node was not found.");
-  } else {
+  }
+  else {
     ASSERT(target == mNode);
     ASSERT(target != nullptr);
     DisconnectAll(true);
@@ -135,15 +137,16 @@ void Slot::DisconnectAll(bool notifyOwner) {
     }
     mMultiNodes.clear();
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED, 
-                              this);
+      TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED,
+        this);
     }
-  } else {
+  }
+  else {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED, 
-                              this);
+      TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED,
+        this);
     }
   }
 }
@@ -196,7 +199,8 @@ void Slot::ChangeNodeIndex(Node* node, UINT targetIndex) {
       mMultiNodes[i] = mMultiNodes[i + 1];
     }
     mMultiNodes[targetIndex] = tempNode;
-  } else {
+  }
+  else {
     for (UINT i = index; i > targetIndex; i--) {
       mMultiNodes[i] = mMultiNodes[i - 1];
     }
@@ -214,14 +218,17 @@ bool Slot::DoesAcceptNode(Node* node) const {
   return true;
 }
 
+bool Slot::DoesAcceptValueNode(ValueType type) const {
+  return true;
+}
+
 bool Slot::IsDefaulted() {
   /// Plain slots don't have default values, only ValueSlots
   return false;
 }
 
 
-Node::Node(bool isForwarderNode)
-{
+Node::Node(bool isForwarderNode) {
   mIsUpToDate = false;
   mIsProperlyConnected = true;
 }
@@ -235,7 +242,7 @@ void Node::ConnectToSlot(Slot* slot) {
 
 void Node::DisconnectFromSlot(Slot* slot) {
   mDependants.erase(std::remove(mDependants.begin(), mDependants.end(), slot),
-                    mDependants.end());
+    mDependants.end());
 }
 
 
@@ -252,6 +259,10 @@ Node* Node::GetReferencedNode() {
 }
 
 
+ValueType Node::GetValueType() const {
+  return mValueType;
+}
+
 void Node::SendMsg(MessageType message) {
   for (Slot* slot : mDependants) {
     TheMessageQueue.Enqueue(this, slot->mOwner, message, slot);
@@ -261,27 +272,27 @@ void Node::SendMsg(MessageType message) {
 
 void Node::ReceiveMessage(Message* message) {
   switch (message->mType) {
-    case MessageType::SLOT_CONNECTION_CHANGED:
-      CheckConnections();
-      /// Notifies dependants about transitive closure change
-      TheMessageQueue.Enqueue(message->mSource, this, 
-                              MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot);
-      NotifyWatchers(&Watcher::OnSlotConnectionChanged, message->mSlot);
-      break;
-    case MessageType::TRANSITIVE_CLOSURE_CHANGED:
-      /// Bubbles up transitive closure notifications
-      SendMsg(MessageType::TRANSITIVE_CLOSURE_CHANGED);
-      break;
-    case MessageType::NEEDS_REDRAW:
-      /// Bubbles up redraw command
-      SendMsg(MessageType::NEEDS_REDRAW);
-      NotifyWatchers(&Watcher::OnRedraw);
-      break;
-    case MessageType::NODE_NAME_CHANGED:
-      NotifyWatchers(&Watcher::OnChildNameChange);
-      break;
-    default:
-      break;
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    CheckConnections();
+    /// Notifies dependants about transitive closure change
+    TheMessageQueue.Enqueue(message->mSource, this,
+      MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot);
+    NotifyWatchers(&Watcher::OnSlotConnectionChanged, message->mSlot);
+    break;
+  case MessageType::TRANSITIVE_CLOSURE_CHANGED:
+    /// Bubbles up transitive closure notifications
+    SendMsg(MessageType::TRANSITIVE_CLOSURE_CHANGED);
+    break;
+  case MessageType::NEEDS_REDRAW:
+    /// Bubbles up redraw command
+    SendMsg(MessageType::NEEDS_REDRAW);
+    NotifyWatchers(&Watcher::OnRedraw);
+    break;
+  case MessageType::NODE_NAME_CHANGED:
+    NotifyWatchers(&Watcher::OnChildNameChange);
+    break;
+  default:
+    break;
   }
 
   HandleMessage(message);
@@ -307,7 +318,8 @@ void Node::Update() {
         for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
           slot->GetReferencedMultiNode(i)->Update();
         }
-      } else {
+      }
+      else {
         Node* node = slot->GetReferencedNode();
         if (node) node->Update();
       }
@@ -437,7 +449,8 @@ private:
         for (Node* node : slot->GetDirectMultiNodes()) {
           Traverse(node);
         }
-      } else if (!slot->IsDefaulted()) {
+      }
+      else if (!slot->IsDefaulted()) {
         Node* dependency = slot->GetDirectNode();
         if (dependency != nullptr) Traverse(dependency);
       }

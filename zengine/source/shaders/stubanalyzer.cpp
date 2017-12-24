@@ -18,7 +18,7 @@ OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
 StubAnalyzer::StubAnalyzer(const char* stubSource)
   : mName(nullptr)
   , mCurrentLineNumber(-1)
-  , mReturnType(NodeType::NONE) {
+  , mReturnType(ValueType::NONE) {
   vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
     mCurrentLineNumber = line->LineNumber;
@@ -125,8 +125,8 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  NodeType declaredType = TokenToType(line->SubStrings[2]);
-  NodeType expectedType = GlobalUniformTypes[usage];
+  ValueType declaredType = TokenToType(line->SubStrings[2]);
+  ValueType expectedType = GlobalUniformTypes[usage];
   if (declaredType != expectedType) {
     ERR("line %d: wrong type for global uniform '%s'.", mCurrentLineNumber,
         name.ToString().c_str());
@@ -143,20 +143,19 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
 }
 
 
-NodeType StubAnalyzer::TokenToType(const SubString& subStr) {
+ValueType StubAnalyzer::TokenToType(const SubString& subStr) {
   switch (subStr.Token) {
-    case TOKEN_void:		        return NodeType::NONE;
-    case TOKEN_float:		        return NodeType::FLOAT;
-    case TOKEN_vec2:		        return NodeType::VEC2;
-    case TOKEN_vec3:		        return NodeType::VEC3;
-    case TOKEN_vec4:		        return NodeType::VEC4;
-    case TOKEN_mat4:		        return NodeType::MATRIX44;
-    case TOKEN_sampler2D:	      return NodeType::TEXTURE;
-    case TOKEN_sampler2DMS:	    return NodeType::TEXTURE;
-    case TOKEN_sampler2DShadow:	return NodeType::TEXTURE;
+    case TOKEN_void:		        return ValueType::NONE;
+    case TOKEN_float:		        return ValueType::FLOAT;
+    case TOKEN_vec2:		        return ValueType::VEC2;
+    case TOKEN_vec3:		        return ValueType::VEC3;
+    case TOKEN_vec4:		        return ValueType::VEC4;
+    case TOKEN_mat4:		        return ValueType::MATRIX44;
+    case TOKEN_sampler2D:	      return ValueType::TEXTURE;
+    case TOKEN_sampler2DMS:	    return ValueType::TEXTURE;
+    case TOKEN_sampler2DShadow:	return ValueType::TEXTURE;
     default:
-      ERR("line %d: Wrong type '%s'",
-          mCurrentLineNumber, subStr.ToString().c_str());
-      return NodeType::NONE;
+      ERR("line %d: Wrong type '%s'", mCurrentLineNumber, subStr.ToString().c_str());
+      return ValueType::NONE;
   }
 }

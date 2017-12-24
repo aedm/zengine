@@ -3,7 +3,7 @@
 #include <exception>
 
 shared_ptr<ShaderSource> ShaderBuilder::FromStubs(StubNode* vertexStub,
-                                                  StubNode* fragmentStub) {
+  StubNode* fragmentStub) {
   if (vertexStub == nullptr) {
     ERR("vertex stub is nullptr");
     return nullptr;
@@ -45,7 +45,7 @@ ShaderBuilder::ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub)
 
   /// Collects node dependencies
   INFO("Analyzing stubs, vs: '%s', fs: '%s' ...", vertexStubMeta->name.c_str(),
-       fragmentStubMeta->name.c_str());
+    fragmentStubMeta->name.c_str());
 
   try {
     /// Traverse the dependency tree
@@ -67,7 +67,8 @@ ShaderBuilder::ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub)
 
     INFO("Building fragment shader source for '%s'...", fragmentStubMeta->name.c_str());
     GenerateSource(&mFragmentStage);
-  } catch (...) {
+  }
+  catch (...) {
     ERR("Shader source creation failed");
   }
 }
@@ -77,8 +78,8 @@ ShaderBuilder::~ShaderBuilder() {}
 
 shared_ptr<ShaderSource> ShaderBuilder::MakeShaderSource() {
   return make_shared<ShaderSource>(mUniforms, mSamplers,
-                                   mVertexStage.mSourceStream.str(),
-                                   mFragmentStage.mSourceStream.str());
+    mVertexStage.mSourceStream.str(),
+    mFragmentStage.mSourceStream.str());
 }
 
 void ShaderBuilder::CollectInputsAndOutputs(Node* node, ShaderStage* shaderStage) {
@@ -112,14 +113,14 @@ void ShaderBuilder::CollectInputsAndOutputs(Node* node, ShaderStage* shaderStage
 }
 
 void ShaderBuilder::TraverseDependencies(Node* root, ShaderStage* shaderStage,
-                                         set<Node*>& visitedNodes) {
+  set<Node*>& visitedNodes) {
   visitedNodes.insert(root);
 
   if (IsInsanceOf<StubNode*>(root)) {
     /// Assigns empty stub reference
     StubNode* stubNode = SafeCast<StubNode*>(root);
     stubNode->Update();
-    
+
     ValueType returnType = stubNode->GetStubMetadata()->returnType;
     shaderStage->mStubMap[root] = make_shared<StubReference>(returnType);
 
@@ -140,14 +141,18 @@ void ShaderBuilder::TraverseDependencies(Node* root, ShaderStage* shaderStage,
         TraverseDependencies(node, shaderStage, visitedNodes);
       }
     }
-  } else {
+  }
+  else {
     auto ref = make_shared<ValueReference>();
-    ref->mType = root->GetType();
-    if (root->GetType() == ValueType::TEXTURE) {
+    ValueType type = root->GetValueType();
+    ASSERT(type != ValueType::NONE);
+    ref->mType = type;
+    if (type == ValueType::TEXTURE) {
       if (mSamplerMap.find(root) == mSamplerMap.end()) {
         mSamplerMap[root] = ref;
       }
-    } else {
+    }
+    else {
       if (mUniformMap.find(root) == mUniformMap.end()) {
         mUniformMap[root] = ref;
       }
@@ -169,7 +174,7 @@ void ShaderBuilder::ShaderStage::GenerateStubNames() {
   int stubIndex = 0;
 
   for (Node* node : mDependencies) {
-    if (node->GetType() == ValueType::SHADER_STUB) {
+    if (IsInsanceOf<StubNode*>(node)) {
       shared_ptr<StubReference> stubReference = mStubMap.at(node);
       ++stubIndex;
 
@@ -211,7 +216,7 @@ void ShaderBuilder::GenerateNames() {
 
 void ShaderBuilder::AddGlobalsToDependencies(ShaderStage* shaderStage) {
   for (Node* node : shaderStage->mDependencies) {
-    if (node->GetType() != ValueType::SHADER_STUB) continue;
+    if (!IsInsanceOf<StubNode*>(node)) continue;
 
     StubNode* stub = SafeCast<StubNode*>(node);
     StubMetadata* stubMeta = stub->GetStubMetadata();
@@ -225,11 +230,12 @@ void ShaderBuilder::AddGlobalsToDependencies(ShaderStage* shaderStage) {
       mUsedGlobals.insert(global->usage);
       if (global->type == ValueType::TEXTURE) {
         mSamplers.push_back(ShaderSource::Sampler(global->name, nullptr, global->usage,
-                                                  global->isMultiSampler,
-                                                  global->isShadow));
-      } else {
+          global->isMultiSampler,
+          global->isShadow));
+      }
+      else {
         mUniforms.push_back(ShaderSource::Uniform(global->name, nullptr, global->usage,
-                                                  global->type));
+          global->type));
       }
     }
   }
@@ -238,7 +244,7 @@ void ShaderBuilder::AddGlobalsToDependencies(ShaderStage* shaderStage) {
 void ShaderBuilder::AddLocalsToDependencies() {
   for (auto& it : mUniformMap) {
     mUniforms.push_back(ShaderSource::Uniform(
-      it.second->mName, it.first, ShaderGlobalType::LOCAL, it.first->GetType()));
+      it.second->mName, it.first, ShaderGlobalType::LOCAL, it.first->GetValueType()));
   }
   for (auto& it : mSamplerMap) {
     mSamplers.push_back(ShaderSource::Sampler(
@@ -248,7 +254,7 @@ void ShaderBuilder::AddLocalsToDependencies() {
 
 void ShaderBuilder::GenerateSource(ShaderStage* shaderStage) {
   for (Node* node : shaderStage->mDependencies) {
-    if (node->GetType() == ValueType::SHADER_STUB) {
+    if (IsInsanceOf<StubNode*>(node)) {
       CollectInputsAndOutputs(node, shaderStage);
     }
   }
@@ -303,7 +309,7 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
 
 void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
   for (Node* node : shaderStage->mDependencies) {
-    if (node->GetType() == ValueType::SHADER_STUB) {
+    if (IsInsanceOf<StubNode*>(node)) {
       StubNode* stub = static_cast<StubNode*>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
 
@@ -364,8 +370,7 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
   stream << endl;
   stream << "void main() {" << endl;
   for (Node* node : shaderStage->mDependencies) {
-    if (node->GetType() == ValueType::SHADER_STUB) {
-      //NodeData* data = mDataMap.at(node);
+    if (IsInsanceOf<StubNode*>(node)) {
       StubNode* stub = static_cast<StubNode*>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
       auto stubReference = shaderStage->mStubMap.at(node);
@@ -387,11 +392,12 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
             ERR("Parameter not connected");
             throw exception();
           }
-          if (paramNode->GetType() == ValueType::SHADER_STUB) {
+          if (IsInsanceOf<StubNode*>(paramNode)) {
             /// Call parameter is the result of a former function call
             auto paramStubReference = shaderStage->mStubMap.at(paramNode);
             stream << paramStubReference->mVariableName;
-          } else {
+          }
+          else {
             /// Call parameter is a uniform
             auto valueReference = mUniformMap.at(paramNode);
             stream << valueReference->mName;
@@ -423,17 +429,17 @@ const string& ShaderBuilder::GetTypeString(ValueType type, bool isMultiSampler, 
   if (isShadow) return ssampler2dshadow;
 
   switch (type) {
-    case ValueType::FLOAT:		  return sfloat;
-    case ValueType::VEC2:		  return svec2;
-    case ValueType::VEC3:		  return svec3;
-    case ValueType::VEC4:		  return svec4;
-    case ValueType::UINT:		  return suint;
-    case ValueType::MATRIX44:	return smatrix44;
-    case ValueType::TEXTURE:		return ssampler2d;
-    case ValueType::NONE:		  return svoid;
-    default:
-      ERR("Unhandled type: %d", type);
-      return serror;
+  case ValueType::FLOAT:		  return sfloat;
+  case ValueType::VEC2:		  return svec2;
+  case ValueType::VEC3:		  return svec3;
+  case ValueType::VEC4:		  return svec4;
+  case ValueType::UINT:		  return suint;
+  case ValueType::MATRIX44:	return smatrix44;
+  case ValueType::TEXTURE:		return ssampler2d;
+  case ValueType::NONE:		  return svoid;
+  default:
+    ERR("Unhandled type: %d", type);
+    return serror;
   }
 }
 

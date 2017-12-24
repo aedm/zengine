@@ -6,7 +6,7 @@ Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
 
 GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
   : WatcherUI(node) {
-  if (node->GetType() != NodeType::SCENE) {
+  if (!IsInsanceOf<SceneNode*>(node)) {
     mDefaultScene.mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
     mDefaultScene.mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
     mDefaultScene.mSkyLightAmbient.SetDefaultValue(0.2f);

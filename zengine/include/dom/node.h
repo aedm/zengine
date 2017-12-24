@@ -127,6 +127,7 @@ public:
   
   /// Type of object this slot accepts
   virtual bool DoesAcceptNode(Node* node) const;
+  virtual bool DoesAcceptValueNode(ValueType type) const;
 
   /// Returns the name of the slot
   SharedString GetName();
@@ -177,6 +178,9 @@ public:
   /// - Composite nodes have internal, hidden nodes that do the heavy lifting
   virtual Node* GetReferencedNode();
 
+  /// ValueNodes returns the value type, all others return or ValueType::NONE
+  ValueType GetValueType() const;
+
 protected:
   Node(bool isForwarderNode = false);
 
@@ -197,6 +201,9 @@ protected:
 
   /// True if Operate() needs to be called
   bool mIsUpToDate;
+
+  /// Value type. Only ValueNodes have a non-NONE value.
+  ValueType mValueType = ValueType::NONE;
 
 private:
   /// Slots that this node is connected to (as an input)
@@ -254,7 +261,6 @@ private:
 
   /// Slots that need to be serialized when saving / loading.
   unordered_map<SharedString, Slot*> mSerializableSlotsByName;
-
   
   /// ------------------ Watcher operations ------------------
   /// This section can be disabled without hurting the engine.
@@ -285,6 +291,7 @@ private:
   set<shared_ptr<Watcher>> mWatchers;
 };
 
+template <ValueType T> class ValueNode;
 
 /// Typed slot
 template<class N>
@@ -295,10 +302,14 @@ public:
     : Slot(owner, name, isMultiSlot, isPublic, isSerializable) {}
 
   N* GetNode() {
-    return SafeCast<N*>(GetReferencedNode());
+    return SafeCastAllowNull<N*>(GetReferencedNode());
   }
 
   virtual bool DoesAcceptNode(Node* node) const override {
-    return IsInsanceOf<N*>(node);
+    return IsInsanceOf<N*>(node->GetReferencedNode());
+  }
+
+  virtual bool DoesAcceptValueNode(ValueType type) const override {
+    return false;
   }
 };

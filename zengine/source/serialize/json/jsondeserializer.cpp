@@ -120,7 +120,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         continue;;
       }
       ASSERT(slot->mIsMultiSlot == itr->value.IsArray());
-      if (IsExactType<StringSlot>(slot)) {
+      if (IsExactType<StringSlot*>(slot)) {
         static_cast<StringSlot*>(slot)->
           SetDefaultValue(itr->value["default"].GetString());
       } 

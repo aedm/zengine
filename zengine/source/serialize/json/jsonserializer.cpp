@@ -99,7 +99,7 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   }
 
   /// Save graph position
-  if (!IsInsanceOf<Graph>(node) && !IsInsanceOf<Document>(node)) {
+  if (!IsInsanceOf<Graph*>(node) && !IsInsanceOf<Document*>(node)) {
     v.AddMember("position", SerializeVec2(node->GetPosition()), *mAllocator);
   }
 

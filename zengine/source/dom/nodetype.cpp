@@ -4,10 +4,11 @@
 /// TODO: remove this. It's only here because if I put it in a separate, empty .cpp
 /// file, the symbol won't get pulled in by the linker, and the nodeclass won't
 /// get registered. Fuk C++.
-REGISTER_NODECLASS(StringNode, "String");
-REGISTER_NODECLASS(FloatNode, "Float");
-REGISTER_NODECLASS(Vec4Node, "Vec4");
-REGISTER_NODECLASS(Vec3Node, "Vec3");
+#undef ITEM
+#define ITEM(name, capitalizedName, type) \
+  REGISTER_NODECLASS(capitalizedName##Node, MAGIC(capitalizedName));
+VALUETYPE_LIST
+
 
 /// Array for attribute types
 const ValueType gVertexAttributeType[] = {

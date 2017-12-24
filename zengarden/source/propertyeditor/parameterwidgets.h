@@ -94,7 +94,7 @@ protected:
 /// A parameter panel item for FloatNodes
 class FloatWatcher: public WatcherUI {
 public:
-  FloatWatcher(ValueNode<NodeType::FLOAT>* node, FloatSlot* slot, QString name, 
+  FloatWatcher(ValueNode<ValueType::FLOAT>* node, FloatSlot* slot, QString name, 
                bool readOnly);
   virtual ~FloatWatcher() {}
 
@@ -121,7 +121,7 @@ private:
 /// A parameter panel item for Vec3Nodes
 class Vec3Watcher: public WatcherUI {
 public:
-  Vec3Watcher(ValueNode<NodeType::VEC3>* node, Vec3Slot* slot, QString name, 
+  Vec3Watcher(ValueNode<ValueType::VEC3>* node, Vec3Slot* slot, QString name, 
               bool readOnly);
   virtual ~Vec3Watcher() {}
 
@@ -150,7 +150,7 @@ private:
 /// A parameter panel item for Vec4Nodes
 class Vec4Watcher: public WatcherUI {
 public:
-  Vec4Watcher(ValueNode<NodeType::VEC4>* node, QString name, bool readOnly);
+  Vec4Watcher(ValueNode<ValueType::VEC4>* node, QString name, bool readOnly);
   virtual ~Vec4Watcher() {}
 
   /// Enable/disable editing

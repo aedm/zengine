@@ -15,8 +15,7 @@ static SharedString FaceModeSlotName = make_shared<string>("Face mode");
 static SharedString BlendModeSlotName = make_shared<string>("Blending");
 
 Pass::Pass()
-  : Node(NodeType::PASS)
-  , mVertexStub(this, VertesStubSlotName)
+  : mVertexStub(this, VertesStubSlotName)
   , mFragmentStub(this, FragmentStubSlotName)
   , mFaceModeSlot(this, FaceModeSlotName)
   , mBlendModeSlot(this, BlendModeSlotName)
@@ -68,16 +67,15 @@ void Pass::Operate() {
 
   for (auto& sampler : mShaderSource->mSamplers) {
     if (sampler.mNode) {
-      Slot* slot =
-        new Slot(sampler.mNode->GetType(), this, nullptr, false, false, false, false);
+      Slot* slot = new TextureSlot(this, nullptr, false, false, false, false);
       slot->Connect(sampler.mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
   for (auto uniform : mShaderSource->mUniforms) {
     if (uniform.mNode) {
-      Slot* slot =
-        new Slot(uniform.mNode->GetType(), this, nullptr, false, false, false, false);
+      Slot* slot = CreateValueSlot(uniform.mNode->GetValueType(), 
+        this, nullptr, false, false, false, false);
       slot->Connect(uniform.mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
@@ -149,9 +147,9 @@ void Pass::Set(Globals* globals) {
       ASSERT(source->mNode != nullptr);
       switch (source->mType) {
         #undef ITEM
-        #define ITEM(name, type) \
-				case NodeType::name: { \
-          auto vNode = SafeCast<ValueNode<NodeType::name>*>(source->mNode); \
+        #define ITEM(name, capitalizedName, type) \
+				case ValueType::name: { \
+          auto vNode = SafeCast<ValueNode<ValueType::name>*>(source->mNode); \
           vNode->Update(); \
           *(reinterpret_cast<type*>(&mUniformArray[target->mOffset])) = vNode->Get(); \
 					break; \
@@ -164,8 +162,8 @@ void Pass::Set(Globals* globals) {
       int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
       switch (source->mType) {
         #undef ITEM
-        #define ITEM(name, type) \
-				case NodeType::name: { \
+        #define ITEM(name, capitalizedName, type) \
+				case ValueType::name: { \
           void* valuePointer = reinterpret_cast<char*>(globals)+offset; \
           *(reinterpret_cast<type*>(&mUniformArray[target->mOffset])) = \
             *reinterpret_cast<type*>(valuePointer); \

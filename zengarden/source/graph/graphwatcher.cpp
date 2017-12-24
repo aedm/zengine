@@ -367,8 +367,8 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
       mIsConnectionValid = false;
       UpdateHoveredWidget(mousePos);
       if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
-        if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptType(
-          mHoveredWidget->GetNode()->GetType())) {
+        if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptNode(
+          mHoveredWidget->GetNode())) {
           /// TODO: check for graph cycles
           mIsConnectionValid = true;
         }
@@ -379,8 +379,8 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
       mIsConnectionValid = false;
       UpdateHoveredWidget(mousePos);
       if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
-        if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptType(
-          mClickedWidget->GetNode()->GetType())) {
+        if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptNode(
+          mClickedWidget->GetNode())) {
           /// TODO: check for graph cycles
           mIsConnectionValid = true;
         }

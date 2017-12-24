@@ -16,7 +16,7 @@ const EnumMapperA GlobalUniformMapper[] = {
 /// Array for global uniform types
 const ValueType GlobalUniformTypes[] = {
 #undef ITEM
-#define ITEM(name, type, token) NodeType::type,
+#define ITEM(name, type, token) ValueType::type,
   GLOBALUSAGE_LIST
 };
 
@@ -152,7 +152,7 @@ void StubNode::HandleMessage(Message* message) {
   }
 }
 
-StubMetadata::StubMetadata(const string& _name, NodeType _returnType,
+StubMetadata::StubMetadata(const string& _name, ValueType _returnType,
     const string& _strippedSource, 
     OWNERSHIP const vector<StubParameter*>& _parameters,
     const vector<StubGlobal*>& _globals,

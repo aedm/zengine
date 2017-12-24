@@ -8,20 +8,21 @@ class Texture;
 
 /// Macrolist for operator types with an output variable (name, output type, shader token)
 #define VALUETYPE_LIST \
-	ITEM(FLOAT,			float	      ) \
-	ITEM(VEC2,			Vec2		    ) \
-	ITEM(VEC3,			Vec3		    ) \
-	ITEM(VEC4,			Vec4		    ) \
-	ITEM(UINT,			UINT		    ) \
-	ITEM(MATRIX44,	Matrix		  ) \
-	ITEM(STRING,	  std::string	) \
-	ITEM(TEXTURE,	  Texture*	  ) \
+	ITEM(FLOAT, Float, float) \
+	ITEM(VEC2, Vec2, Vec2) \
+	ITEM(VEC3, Vec3, Vec3) \
+	ITEM(VEC4, Vec4, Vec4) \
+	ITEM(UINT, Uint, UINT) \
+	ITEM(MATRIX44, Matrix, Matrix) \
+	ITEM(STRING, String, std::string) \
+	ITEM(TEXTURE, Texture, Texture*) \
 
 /// Value types
 enum class ValueType {
 #undef ITEM
-#define ITEM(name, type) name,
+#define ITEM(name, capitalizedName, type) name,
   VALUETYPE_LIST
+  NONE
 };
 
 

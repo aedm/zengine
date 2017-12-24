@@ -24,14 +24,14 @@ private:
   void AnalyzeVariable(SourceLine* line,
                        vector<StubVariable*>& storage);
 
-  NodeType TokenToType(const SubString& subStr);
+  ValueType TokenToType(const SubString& subStr);
 
   int mCurrentLineNumber;
 
   /// Builders
   string* mName;
   string mStrippedSource;
-  NodeType mReturnType;
+  ValueType mReturnType;
   vector<StubParameter*> mParameters;
   vector<StubGlobal*> mGlobals;
   vector<StubVariable*> mInputs;

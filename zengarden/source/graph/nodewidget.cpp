@@ -62,7 +62,7 @@ void NodeWidget::CreateWidgetSlots()
   mGraphWatcher->GetGLWidget()->makeCurrent();
   for (Slot* slot : mNode->GetPublicSlots())
 	{
-    if (slot->DoesAcceptType(NodeType::STRING)) continue;
+    if (slot->DoesAcceptNode(StaticValueNodesList[int(ValueType::STRING)])) continue;
 		WidgetSlot* sw = new WidgetSlot();
 		sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->mTitleFont);
 		sw->mSlot = slot;
@@ -196,7 +196,7 @@ void NodeWidget::OnNameChange() {
     /// Just use the type as a name by default
     text = QString::fromStdString(
       NodeRegistry::GetInstance()->GetNodeClass(mNode)->mClassName);
-    if (mNode->GetType() == NodeType::SHADER_STUB) {
+    if (IsInsanceOf<StubNode*>(mNode)) {
       StubNode* stub = static_cast<StubNode*>(mNode);
       StubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {

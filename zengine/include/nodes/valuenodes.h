@@ -20,7 +20,9 @@ public:
 
 
 template<ValueType T>
-ValueNode<T>::ValueNode() {}
+ValueNode<T>::ValueNode() {
+  mValueType = T;
+}
 
 
 /// Simple static value nodes
@@ -90,6 +92,9 @@ public:
   /// Gets the default value
   const VType& GetDefaultValue();
 
+  /// True if NodeValue a can be connected
+  virtual bool DoesAcceptValueNode(ValueType type) const override;
+
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
   virtual bool Connect(Node* node) override;
@@ -148,6 +153,12 @@ const typename ValueSlot<T>::VType& ValueSlot<T>::GetDefaultValue() {
 
 
 template<ValueType T>
+bool ValueSlot<T>::DoesAcceptValueNode(ValueType type) const {
+  return T == type;
+}
+
+
+template<ValueType T>
 bool ValueSlot<T>::Connect(Node* target) {
   if (mNode == target || (target == nullptr && mNode == &mDefault)) return true;
   if (target && !DoesAcceptNode(target)) {
@@ -194,21 +205,16 @@ bool ValueSlot<T>::IsDefaulted() {
   return GetReferencedNode() == &mDefault;
 }
 
-
 /// Node and slot types
-typedef ValueSlot<ValueType::FLOAT>	FloatSlot;
-typedef ValueSlot<ValueType::VEC2> Vec2Slot;
-typedef ValueSlot<ValueType::VEC3> Vec3Slot;
-typedef ValueSlot<ValueType::VEC4> Vec4Slot;
-typedef ValueSlot<ValueType::STRING> StringSlot;
-typedef ValueSlot<ValueType::TEXTURE> TextureSlot;
+#undef ITEM
+#define ITEM(name, capitalizedName, type) \
+typedef ValueSlot<ValueType::name> capitalizedName##Slot; \
+typedef StaticValueNode<ValueType::name> capitalizedName##Node;
+VALUETYPE_LIST
 
-typedef StaticValueNode<ValueType::FLOAT>	  FloatNode;
-typedef StaticValueNode<ValueType::VEC2>	  Vec2Node;
-typedef StaticValueNode<ValueType::VEC3>	  Vec3Node;
-typedef StaticValueNode<ValueType::VEC4>		Vec4Node;
-typedef StaticValueNode<ValueType::STRING>	StringNode;
-typedef StaticValueNode<ValueType::TEXTURE>	TextureNode;
+Slot* CreateValueSlot(ValueType type, Node* owner, SharedString name, bool isMultiSlot = false,
+  bool isPublic = true, bool isSerializable = true,
+  float minimum = 0.0f, float maximum = 1.0f);
 
 /// An instance of each static value nodes
 extern Node* StaticValueNodesList[];

@@ -19,12 +19,29 @@ template<> StaticValueNode<ValueType::VEC4>::StaticValueNode()
 }
 
 #undef ITEM
-#define ITEM(name, type) static StaticValueNode<ValueType::name> name##NodeInstance;
+#define ITEM(name, capitalizedName, type) static StaticValueNode<ValueType::name> name##NodeInstance;
 VALUETYPE_LIST
 
 #undef ITEM
-#define ITEM(name, type) &name##NodeInstance,
+#define ITEM(name, capitalizedName, type) &name##NodeInstance,
 Node* StaticValueNodesList[] = {
   VALUETYPE_LIST
 };
+
+
+/// Slot factory
+Slot* CreateValueSlot(ValueType type, Node* owner, SharedString name, bool isMultiSlot,
+  bool isPublic, bool isSerializable, float minimum, float maximum) {
+  switch (type) {
+#undef ITEM
+#define ITEM(upperName, capitalizedName, type) \
+    case ValueType::upperName: \
+      return new capitalizedName##Slot(owner, name, \
+        isMultiSlot, isPublic, isSerializable, minimum, maximum);
+    VALUETYPE_LIST
+  default:
+    SHOULD_NOT_HAPPEN;
+    return nullptr;
+  }
+}
 

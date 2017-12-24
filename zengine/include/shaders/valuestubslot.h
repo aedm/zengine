@@ -18,5 +18,5 @@ ValueStubSlot<T>::ValueStubSlot(Node* owner, SharedString name)
 
 template <ValueType T>
 bool ValueStubSlot<T>::DoesAcceptNode(Node* node) const {
-  return IsInsanceOf<StubNode*>(node) || IsInsanceOf<ValueNode<N>*>(node);
+  return IsInsanceOf<StubNode*>(node) || IsInsanceOf<ValueNode<T>*>(node);
 }
