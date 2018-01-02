@@ -103,6 +103,7 @@
     <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\document.h" />
+    <ClInclude Include="include\dom\ghost.h" />
     <ClInclude Include="include\dom\graph.h" />
     <ClInclude Include="include\dom\node.h" />
     <ClInclude Include="include\dom\nodetype.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="source\dom\node.cpp" />
     <ClCompile Include="source\dom\nodetype.cpp" />
     <ClCompile Include="source\dom\watcher.cpp" />
+    <ClCompile Include="source\ghost.cpp" />
     <ClCompile Include="source\nodes\cameranode.cpp" />
     <ClCompile Include="source\nodes\clipnode.cpp" />
     <ClCompile Include="source\nodes\drawable.cpp" />

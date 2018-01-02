@@ -32,6 +32,9 @@ enum class NodeType {
   MOVIE,
   CLIP,
   PROPERTIES,
+
+  /// Ghost node
+  GHOST,
   
   /// Empty stub value type
   NONE,

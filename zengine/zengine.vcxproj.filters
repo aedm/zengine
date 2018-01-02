@@ -186,6 +186,7 @@
     <ClInclude Include="include\shaders\shadersource.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
+    <ClInclude Include="include\dom\ghost.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -295,6 +296,7 @@
     <ClCompile Include="source\shaders\shadersource.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="source\ghost.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">
