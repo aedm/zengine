@@ -103,6 +103,7 @@
     <ClInclude Include="include\base\types.h" />
     <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\document.h" />
+    <ClInclude Include="include\dom\ghost.h" />
     <ClInclude Include="include\dom\graph.h" />
     <ClInclude Include="include\dom\node.h" />
     <ClInclude Include="include\dom\nodetype.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\document.cpp" />
+    <ClCompile Include="source\dom\ghost.cpp" />
     <ClCompile Include="source\dom\graph.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
     <ClCompile Include="source\dom\nodetype.cpp" />

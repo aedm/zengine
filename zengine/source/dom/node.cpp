@@ -227,6 +227,11 @@ bool Slot::IsDefaulted() {
   return false;
 }
 
+void Slot::SetGhostSlot(bool isGhostSlot) {
+  mGhostSlot = isGhostSlot;
+  NOT_IMPLEMENTED;
+}
+
 
 Node::Node(bool isForwarderNode) {
   mIsUpToDate = false;

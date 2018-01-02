@@ -141,6 +141,9 @@ public:
   /// Returns true if slot is connected to its own default node (if it has one)
   virtual bool IsDefaulted();
 
+  /// Set ghost bit
+  void SetGhostSlot(bool isGhostSlot);
+
 protected:
   /// The slot is connected to this node (nullptr if multislot)
   Node* mNode;
@@ -150,6 +153,9 @@ protected:
 
   /// Name of the slot. Can't be changed.
   SharedString mName;
+
+  /// Ghost slots will be the slots of ghost nodes. They are free parameters that users can change.
+  bool mGhostSlot = false;
 };
 
 /// An operation that takes its slot values as input and computes an output
