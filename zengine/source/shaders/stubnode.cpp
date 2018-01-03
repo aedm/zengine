@@ -8,7 +8,7 @@ static SharedString SourceSlotName = make_shared<string>("Source");
 
 const EnumMapperA GlobalUniformMapper[] = {
 #undef ITEM
-#define ITEM(name, type, token) { "g" MAGIC(token), (UINT)ShaderGlobalType::name },
+#define ITEM(name, type) { "g" MAGIC(name), (UINT)ShaderGlobalType::name },
   GLOBALUSAGE_LIST
   {"", -1}
 };
@@ -16,13 +16,13 @@ const EnumMapperA GlobalUniformMapper[] = {
 /// Array for global uniform types
 const ValueType GlobalUniformTypes[] = {
 #undef ITEM
-#define ITEM(name, type, token) ValueType::type,
+#define ITEM(name, type) ValueType::type,
   GLOBALUSAGE_LIST
 };
 
 const int GlobalUniformOffsets[] = {
 #undef ITEM
-#define ITEM(name, type, token) offsetof(Globals, token),
+#define ITEM(name, type) offsetof(Globals, name),
   GLOBALUSAGE_LIST
 };
 

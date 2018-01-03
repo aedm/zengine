@@ -280,6 +280,26 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string> PushButton</string>
+         </property>
+         <property name="icon">
+          <iconset resource="zengarden.qrc">
+           <normaloff>:/zengarden/icons/angle-right.svg</normaloff>:/zengarden/icons/angle-right.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>14</width>
+           <height>14</height>
+          </size>
+         </property>
+         <property name="shortcut">
+          <string>Ctrl+S</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QWidget" name="timelineWidget" native="true">
          <property name="minimumSize">
           <size>

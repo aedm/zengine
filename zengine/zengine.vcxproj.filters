@@ -297,7 +297,6 @@
     <ClCompile Include="source\shaders\shadersource.cpp">
       <Filter>source\shaders</Filter>
     </ClCompile>
-    <ClCompile Include="source\nodes\texturenode.cpp" />
     <ClCompile Include="source\dom\ghost.cpp" />
   </ItemGroup>
   <ItemGroup>

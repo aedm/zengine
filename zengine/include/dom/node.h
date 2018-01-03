@@ -29,7 +29,7 @@ enum class MessageType {
   /// Direct slot connection changed.
   SLOT_CONNECTION_CHANGED,
 
-  /// THe transitive closure changed
+  /// The transitive closure changed
   TRANSITIVE_CLOSURE_CHANGED,
 
   /// The value of a connected node changed, reevaluation might be needed
