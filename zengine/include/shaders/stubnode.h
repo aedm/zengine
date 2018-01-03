@@ -9,45 +9,45 @@ using namespace std;
 
 /// Macro list for global uniforms (name, type, variable/token)
 #define GLOBALUSAGE_LIST \
-  ITEM(USAGE_TIME,					                      FLOAT,			  Time)					            \
-  ITEM(USAGE_MATRIX_CAMERA,			                  MATRIX44,		  Camera)					          \
-  ITEM(USAGE_MATRIX_WORLD,			                  MATRIX44,		  World)					          \
-  ITEM(USAGE_MATRIX_VIEW,				                  MATRIX44,		  View)					            \
-  ITEM(USAGE_MATRIX_PROJECTION,		                MATRIX44,		  Projection)				        \
-  ITEM(USAGE_MATRIX_TRANSFORMATION,	              MATRIX44,		  Transformation)			      \
-  ITEM(USAGE_MATRIX_SKYLIGHT_CAMERA,              MATRIX44,		  SkylightCamera)           \
-  ITEM(USAGE_MATRIX_SKYLIGHT_PROJECTION,          MATRIX44,		  SkylightProjection)       \
-  ITEM(USAGE_MATRIX_SKYLIGHT_TRANSFORMATION,      MATRIX44,		  SkylightTransformation)   \
-  ITEM(USAGE_SKYLIGHT_TEXTURE,                    TEXTURE,		  SkylightTexture)          \
-  ITEM(USAGE_SKYLIGHT_TEXTURE_SIZE_RECIP,         FLOAT,        SkylightTextureSizeRecip) \
-  ITEM(USAGE_SKYLIGHT_DIRECTION,                  VEC3,		      SkylightDirection)        \
-  ITEM(USAGE_SKYLIGHT_COLOR,                      VEC3,		      SkylightColor)            \
-  ITEM(USAGE_SKYLIGHT_AMBIENT,                    FLOAT,		    SkylightAmbient)          \
-  ITEM(USAGE_SKYLIGHT_SPREAD,                     FLOAT,		    SkylightSpread)           \
-  ITEM(USAGE_SKYLIGHT_SAMPLE_SPREAD,              FLOAT,		    SkylightSampleSpread)     \
-  ITEM(USAGE_RENDERTARGET_SIZE,		                VEC2,			    RenderTargetSize)		      \
-  ITEM(USAGE_RENDERTARGET_SIZE_RECIP,	            VEC2,			    RenderTargetSizeRecip)	  \
-  ITEM(USAGE_VIEWPORT_SIZE,			                  VEC2,			    ViewportSize)			        \
-  ITEM(USAGE_PIXEL_SIZE,				                  VEC2,			    PixelSize)				        \
-  ITEM(USAGE_DIFFUSE_COLOR,			                  VEC4,			    DiffuseColor)			        \
-  ITEM(USAGE_AMBIENT_COLOR,			                  VEC4,			    AmbientColor)			        \
-  ITEM(USAGE_DEPTH_BIAS,				                  FLOAT,			  DepthBias)				        \
-  ITEM(USAGE_DEPTH_BUFFER,				                TEXTURE,		  DepthBufferSource)		    \
-  ITEM(USAGE_GBUFFER_SOURCE_A,                    TEXTURE,		  GBufferSourceA)	          \
-  ITEM(USAGE_GBUFFER_SAMPLE_COUNT,		            FLOAT,        GBufferSampleCount)       \
-  ITEM(USAGE_SECONDARY_TEXTURE,                   TEXTURE,		  SecondaryTexture)         \
-  ITEM(USAGE_POSTPROCESS_GAUSSTEX,                TEXTURE,      PPGauss)		              \
-  ITEM(USAGE_POSTPROCESS_GAUSSTEX_PIXEL_SIZE,     VEC2,         PPGaussPixelSize)		      \
-  ITEM(USAGE_POSTPROCESS_GAUSSTEX_RELATIVE_SIZE,  VEC2,         PPGaussRelativeSize)		  \
-  ITEM(USAGE_POSTPROCESS_DOF_ENABLED,		          FLOAT,        PPDofEnabled)             \
-  ITEM(USAGE_POSTPROCESS_DOF_FOCUS_DISTANCE,		  FLOAT,        PPDofFocusDistance)       \
-  ITEM(USAGE_POSTPROCESS_DOF_BLUR,		            FLOAT,        PPDofBlur)                \
-  ITEM(USAGE_DIRECT_TO_SCREEN,		                FLOAT,        DirectToScreen)           \
+  ITEM(Time,                          FLOAT) \
+  ITEM(Camera,                        MATRIX44) \
+  ITEM(World,                         MATRIX44) \
+  ITEM(View,                          MATRIX44) \
+  ITEM(Projection,                    MATRIX44) \
+  ITEM(Transformation,                MATRIX44) \
+  ITEM(SkylightCamera,                MATRIX44) \
+  ITEM(SkylightProjection,            MATRIX44) \
+  ITEM(SkylightTransformation,        MATRIX44) \
+  ITEM(SkylightTexture,               TEXTURE) \
+  ITEM(SkylightTextureSizeRecip,      FLOAT) \
+  ITEM(SkylightDirection,             VEC3) \
+  ITEM(SkylightColor,                 VEC3) \
+  ITEM(SkylightAmbient,               FLOAT) \
+  ITEM(SkylightSpread,                FLOAT) \
+  ITEM(SkylightSampleSpread,          FLOAT) \
+  ITEM(RenderTargetSize,              VEC2) \
+  ITEM(RenderTargetSizeRecip,         VEC2) \
+  ITEM(ViewportSize,                  VEC2) \
+  ITEM(PixelSize,                     VEC2) \
+  ITEM(DiffuseColor,                  VEC4) \
+  ITEM(AmbientColor,                  VEC4) \
+  ITEM(DepthBias,                     FLOAT) \
+  ITEM(DepthBufferSource,             TEXTURE) \
+  ITEM(GBufferSourceA,                TEXTURE) \
+  ITEM(GBufferSampleCount,            FLOAT) \
+  ITEM(SecondaryTexture,              TEXTURE) \
+  ITEM(PPGauss,                       TEXTURE) \
+  ITEM(PPGaussPixelSize,              VEC2) \
+  ITEM(PPGaussRelativeSize,           VEC2) \
+  ITEM(PPDofEnabled,                  FLOAT) \
+  ITEM(PPDofFocusDistance,            FLOAT) \
+  ITEM(PPDofBlur,                     FLOAT) \
+  ITEM(DirectToScreen,                FLOAT) \
 
 
 enum class ShaderGlobalType {
 #undef ITEM
-#define ITEM(name, type, variable) name,
+#define ITEM(name, type) name,
 	GLOBALUSAGE_LIST
 
 	LOCAL,	/// For non-global uniforms
@@ -60,7 +60,7 @@ extern const int GlobalUniformOffsets[];
 /// A struct to store global uniforms
 struct Globals {
 #undef ITEM
-#define ITEM(name, type, token) ValueTypes<ValueType::type>::Type token;
+#define ITEM(name, type) ValueTypes<ValueType::type>::Type name;
 	GLOBALUSAGE_LIST
 };
 
