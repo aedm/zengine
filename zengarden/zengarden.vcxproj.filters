@@ -98,9 +98,6 @@
     <ClCompile Include="source\propertyeditor\propertyeditor.cpp">
       <Filter>source\propertyeditor</Filter>
     </ClCompile>
-    <ClCompile Include="source\propertyeditor\parameterwidgets.cpp">
-      <Filter>source\propertyeditor</Filter>
-    </ClCompile>
     <ClCompile Include="source\watchers\passwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
@@ -129,18 +126,6 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_prototypes.cpp">
-      <Filter>Generated Files\Release-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_parameterwidgets.cpp">
-      <Filter>Generated Files\Debug-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_parameterwidgets.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_parameterwidgets.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_parameterwidgets.cpp">
       <Filter>Generated Files\Release-static</Filter>
     </ClCompile>
     <ClCompile Include="source\graph\graphwatcher.cpp">
@@ -176,6 +161,24 @@
     <ClCompile Include="source\util\meshhloader.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\propertyeditor\valuewidgets.cpp">
+      <Filter>source\propertyeditor</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_valuewidgets.cpp">
+      <Filter>Generated Files\Debug-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_valuewidgets.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_valuewidgets.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_valuewidgets.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
+    <ClCompile Include="source\propertyeditor\sloteditor.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -199,9 +202,6 @@
     <CustomBuild Include="source\propertyeditor\propertyeditor.h">
       <Filter>source\propertyeditor</Filter>
     </CustomBuild>
-    <CustomBuild Include="source\propertyeditor\parameterwidgets.h">
-      <Filter>source\propertyeditor</Filter>
-    </CustomBuild>
     <CustomBuild Include="source\graph\graphwatcher.h">
       <Filter>source\graph</Filter>
     </CustomBuild>
@@ -213,6 +213,9 @@
     </CustomBuild>
     <CustomBuild Include="source\forms\movieeditor.ui">
       <Filter>source\forms</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\propertyeditor\valuewidgets.h">
+      <Filter>source\propertyeditor</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +295,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\util\meshloader.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\propertyeditor\sloteditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

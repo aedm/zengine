@@ -356,7 +356,7 @@ Node::~Node() {
 void Node::SetName(const string& name) {
   mName = name;
   NotifyWatchers(&Watcher::OnNameChange);
-  SendMsg(MessageType::NODE_NAME_CHANGED);
+  TheMessageQueue.Enqueue(nullptr, this, MessageType::NODE_NAME_CHANGED);
 }
 
 const string& Node::GetName() const {
@@ -375,7 +375,8 @@ const Vec2 Node::GetPosition() const {
 
 void Node::SetSize(const Vec2 size) {
   mSize = size;
-  TheMessageQueue.Enqueue(nullptr, this, MessageType::NODE_POSITION_CHANGED);
+  TheMessageQueue.Enqueue(nullptr, this, MessageType::NODE_NAME_CHANGED);
+  SendMsg(MessageType::NODE_NAME_CHANGED);
 }
 
 const Vec2 Node::GetSize() const {

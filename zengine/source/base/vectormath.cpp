@@ -54,6 +54,16 @@ Vec2& Vec2::operator-=(const Vec2& op) {
   return *this;
 }
 
+float& Vec2::operator[](int n) {
+  float* a[]{ &x, &y };
+  return *(a[n]);
+}
+
+float Vec2::operator[](int n) const {
+  float a[]{ x, y };
+  return a[n];
+}
+
 float Vec2::Length() const {
   return sqrtf(x*x + y*y);
 }
@@ -96,6 +106,16 @@ Vec3 Vec3::operator/(float f) const {
 
 bool Vec3::operator==(const Vec3& op) const {
   return x == op.x && y == op.y && z == op.z;
+}
+
+float& Vec3::operator[](int n) {
+  float* a[]{ &x, &y, &z };
+  return *(a[n]);
+}
+
+float Vec3::operator[](int n) const {
+  float a[]{ x, y, z };
+  return a[n];
 }
 
 Vec3 Vec3::Cross(const Vec3& op) const {
@@ -168,18 +188,27 @@ bool Vec4::operator == (const Vec4& v) const {
   return x == v.x && y == v.y && z == v.z && w == v.w;
 }
 
+float& Vec4::operator[](int n) {
+  float* a[]{ &x, &y, &z, &w };
+  return *(a[n]);
+}
+
+float Vec4::operator[](int n) const {
+  float a[]{ x, y, z, w };
+  return a[n];
+}
+
 Vec3 Vec4::XYZ() {
   return Vec3(x, y, z);
 }
 
-Vec4 Vec4::operator*(const Matrix& m) const
-{
+Vec4 Vec4::operator*(const Matrix& m) const {
   return Vec4(
-    x*m.m[0]  + y*m.m[1]  + z*m.m[2]  + w*m.m[3],
-    x*m.m[4]  + y*m.m[5]  + z*m.m[6]  + w*m.m[7],
-    x*m.m[8]  + y*m.m[9]  + z*m.m[10] + w*m.m[11],
+    x*m.m[0] + y*m.m[1] + z*m.m[2] + w*m.m[3],
+    x*m.m[4] + y*m.m[5] + z*m.m[6] + w*m.m[7],
+    x*m.m[8] + y*m.m[9] + z*m.m[10] + w*m.m[11],
     x*m.m[12] + y*m.m[13] + z*m.m[14] + w*m.m[15]
-    );
+  );
 }
 
 Matrix::Matrix() {}
@@ -270,7 +299,7 @@ Matrix& Matrix::operator*=(const Matrix& other) {
   Vec4 col[4];
   for (UINT x = 0; x < 4; x++) {
     col[x] = Vec4(other.m[x + 0 * 4], other.m[x + 1 * 4],
-                  other.m[x + 2 * 4], other.m[x + 3 * 4]);
+      other.m[x + 2 * 4], other.m[x + 3 * 4]);
   }
 
   for (UINT y = 0; y < 4; y++) {
@@ -323,14 +352,13 @@ Matrix Matrix::Ortho(float x1, float y1, float x2, float y2, float near, float f
   Matrix m;
   m.m[0] = 2.0f*rx;	m.m[1] = 0;		      m.m[2] = 0;	      m.m[3] = -(x1 + x2) * rx;
   m.m[4] = 0;		    m.m[5] = 2.0f*ry;	  m.m[6] = 0;	      m.m[7] = -(y1 + y2) * ry;
-  m.m[8] = 0;		    m.m[9] = 0;		      m.m[10] = -2*rz;	m.m[11] = -(far + near) * rz;
+  m.m[8] = 0;		    m.m[9] = 0;		      m.m[10] = -2 * rz;	m.m[11] = -(far + near) * rz;
   m.m[12] = 0;		  m.m[13] = 0;		    m.m[14] = 0;	    m.m[15] = 1;
   return m;
 }
 
 
-Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio)
-{
+Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio) {
   /// Create projection matrix
   /// https://unspecified.wordpress.com/2012/06/21/calculating-the-gluperspective-matrix-and-other-opengl-matrix-maths/
 
@@ -340,7 +368,7 @@ Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio
   Matrix m;
   m.m[0] = f / aspectRatio;	m.m[1] = 0;		m.m[2] = 0;	    m.m[3] = 0;
   m.m[4] = 0;		            m.m[5] = f;	  m.m[6] = 0;	    m.m[7] = 0;
-  m.m[8] = 0;		            m.m[9] = 0;		m.m[10] = (zFar + zNear) / a;	  
+  m.m[8] = 0;		            m.m[9] = 0;		m.m[10] = (zFar + zNear) / a;
   m.m[11] = 2.0f * zFar * zNear / a;
   m.m[12] = 0;	            m.m[13] = 0;  m.m[14] = -1;	  m.m[15] = 0;
   return m;
@@ -392,12 +420,14 @@ void Quaternion::ToEuler(float& oRoll, float& oPitch, float& oYaw) {
       oRoll = atan2f(2.0f * (vy * vz + s * vx), 1.0f - 2.0f * (vx * vx + vy * vy));
       oPitch = asinf(a);
       oYaw = atan2f(2.0f * (vx * vy + s * vz), 1.0f - 2.0f * (vy * vy + vz * vz));
-    } else {
+    }
+    else {
       oRoll = -atan2f(2.0f * (vx * vy - s * vz), 1.0f - 2.0f * (vx * vx + vz * vz));
       oPitch = Pi / -2.0f;
       oYaw = 0.0f;
     }
-  } else {
+  }
+  else {
     oRoll = atan2f(2.0f * (vx * vy - s * vz), 1.0f - 2.0f * (vx * vx + vz * vz));
     oPitch = Pi / 2.0f;
     oYaw = 0.0f;
@@ -413,7 +443,8 @@ Quaternion::Quaternion(Quaternion& q1, Quaternion& q2, float ratio) {
     sinom = sinf(omega);
     sclp = sinf((1.0f - ratio) * omega) / sinom;
     sclq = sinf(ratio * omega) / sinom;
-  } else {
+  }
+  else {
     sclp = 1.0f - ratio;
     sclq = ratio;
   }

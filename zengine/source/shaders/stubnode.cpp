@@ -147,6 +147,10 @@ void StubNode::HandleMessage(Message* message) {
       }
       SendMsg(MessageType::VALUE_CHANGED);
       break;
+    case MessageType::NODE_NAME_CHANGED:
+      // TODO: implement and use GetDefaultNode for value slots
+      mSource.GetNode()->SetName(GetName());
+      break;
     default:
       break;
   }

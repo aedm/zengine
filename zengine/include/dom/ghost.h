@@ -16,4 +16,6 @@ protected:
 
   void Regenerate();
 
+private:
+  
 };

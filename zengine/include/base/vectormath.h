@@ -5,98 +5,109 @@
 class Quaternion;
 class Matrix;
 
-class Vec2
-{
+class Vec2 {
 public:
-	Vec2();
-	Vec2(float x, float y);
+  static constexpr int Dimensions = 2;
 
-	Vec2 operator + (const Vec2& op) const;
-	Vec2 operator - (const Vec2& op) const;
-	Vec2 operator / (const Vec2& op) const;
-	Vec2 operator * (const Vec2& op) const;
-	Vec2 operator * (float F) const;
-	Vec2 operator / (float F) const;
+  Vec2();
+  Vec2(float x, float y);
+
+  Vec2 operator + (const Vec2& op) const;
+  Vec2 operator - (const Vec2& op) const;
+  Vec2 operator / (const Vec2& op) const;
+  Vec2 operator * (const Vec2& op) const;
+  Vec2 operator * (float F) const;
+  Vec2 operator / (float F) const;
+
   Vec2& operator *= (float F);
   Vec2& operator += (const Vec2& op);
   Vec2& operator -= (const Vec2& op);
-  bool operator == (const Vec2& op) const;
 
-	float	Length() const;
+  bool operator == (const Vec2& op) const;
+  float& operator[] (int n);
+  float operator[] (int n) const;
+
+  float	Length() const;
   Vec2 Dot(const Vec2& op) const;
 
-	float	x, y;
+  float	x, y;
 };
 
-class Vec3
-{
+class Vec3 {
 public:
-	Vec3();
-	Vec3(float x, float y, float z);
+  static constexpr int Dimensions = 3;
 
-	float x, y, z;
+  Vec3();
+  Vec3(float x, float y, float z);
 
-	Vec3 operator * (float f) const;
-	Vec3 operator - (const Vec3& op) const;
-	Vec3 operator + (const Vec3& op) const;
-	Vec3 operator - () const;
-	Vec3 operator / (float f) const;
+  float x, y, z;
 
-	Vec3& operator /= (float f);
-	Vec3& operator *= (float f);
-	Vec3& operator += (const Vec3& op);
+  Vec3 operator * (float f) const;
+  Vec3 operator - (const Vec3& op) const;
+  Vec3 operator + (const Vec3& op) const;
+  Vec3 operator - () const;
+  Vec3 operator / (float f) const;
+
+  Vec3& operator /= (float f);
+  Vec3& operator *= (float f);
+  Vec3& operator += (const Vec3& op);
 
   bool operator == (const Vec3& op) const;
+  float& operator[] (int n);
+  float operator[] (int n) const;
 
-	Vec3 Cross(const Vec3& op) const;
-	float Dot(const Vec3& op) const;
-	float Length() const;
-	float LengthSquared() const;
-	Vec3 Normal() const;
-  
-	Vec3& Normalize();
+  Vec3 Cross(const Vec3& op) const;
+  float Dot(const Vec3& op) const;
+  float Length() const;
+  float LengthSquared() const;
+  Vec3 Normal() const;
+
+  Vec3& Normalize();
 };
 
 
-class Vec4
-{
+class Vec4 {
 public:
-	Vec4();
-	Vec4(float x, float y, float z, float w);
-	Vec4(Vec3 v, float w);
+  static constexpr int Dimensions = 4;
 
-	float x, y, z, w;
+  Vec4();
+  Vec4(float x, float y, float z, float w);
+  Vec4(Vec3 v, float w);
 
-	float Dot(const Vec4& v) const;
-	Vec4 operator - (const Vec4& v) const;
-	bool operator == (const Vec4& v) const;
+  float x, y, z, w;
+
+  float Dot(const Vec4& v) const;
+  Vec4 operator - (const Vec4& v) const;
   Vec4 operator * (const Matrix& m) const;
 
-	Vec3 XYZ();
+  bool operator == (const Vec4& v) const;
+  float& operator[] (int n);
+  float operator[] (int n) const;
+
+  Vec3 XYZ();
 };
 
-class Matrix
-{
+class Matrix {
 public:
-	Matrix();
+  Matrix();
 
-	float& operator() (UINT y, UINT x);
-	Matrix& operator *= (const Matrix& m);
-	Matrix operator * (const Matrix& m) const;
-	Vec4 operator * (const Vec4& v) const;
+  float& operator() (UINT y, UINT x);
+  Matrix& operator *= (const Matrix& m);
+  Matrix operator * (const Matrix& m) const;
+  Vec4 operator * (const Vec4& v) const;
 
-	void LoadIdentity();
-  
+  void LoadIdentity();
+
   /// Matrix data
   float			m[16];
 
   /// 3D transformation matrices
-	static Matrix	Translate(const Vec3& translateVector);
-	static Matrix	Rotate(float angle, const Vec3& axis);
-	static Matrix	Rotate(const Quaternion& q);
-	static Matrix	Scale(const Vec3& scaleVector);
+  static Matrix	Translate(const Vec3& translateVector);
+  static Matrix	Rotate(float angle, const Vec3& axis);
+  static Matrix	Rotate(const Quaternion& q);
+  static Matrix	Scale(const Vec3& scaleVector);
 
-	/// Ortho matrix where (0,0) is the top left
+  /// Ortho matrix where (0,0) is the top left
   static Matrix	Ortho(float x1, float y1, float x2, float y2);
   static Matrix	Ortho(float x1, float y1, float x2, float y2, float near, float far);
 
@@ -108,23 +119,22 @@ public:
 };
 
 
-class Quaternion
-{
-public:	
-	Quaternion();
+class Quaternion {
+public:
+  Quaternion();
   Quaternion(float s, float vx, float vy, float vz);
 
   /// Spherical interpolation constructor
-	Quaternion(Quaternion& q1, Quaternion& q2, float ratio);
-	
-	float s, vx, vy, vz;							
+  Quaternion(Quaternion& q1, Quaternion& q2, float ratio);
 
-	static Quaternion FromEuler(float roll, float pitch, float yaw);
-	void ToEuler(float& oRoll, float& oPitch, float& oYaw);
+  float s, vx, vy, vz;
 
-	Quaternion Conjugate();
+  static Quaternion FromEuler(float roll, float pitch, float yaw);
+  void ToEuler(float& oRoll, float& oPitch, float& oYaw);
 
-	Quaternion& operator *= (Quaternion& q);				
-	Quaternion operator * (const Quaternion& q);				
-	Quaternion& operator = (const Quaternion& q);					
+  Quaternion Conjugate();
+
+  Quaternion& operator *= (Quaternion& q);
+  Quaternion operator * (const Quaternion& q);
+  Quaternion& operator = (const Quaternion& q);
 };

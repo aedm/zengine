@@ -13,6 +13,7 @@
 #include "watchers/moviewatcher.h"
 #include "watchers/timelineeditor.h"
 #include "propertyeditor/propertyeditor.h"
+#include "propertyeditor/sloteditor.h"
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
@@ -42,8 +43,8 @@ ZenGarden::ZenGarden(QWidget *parent)
   connect(mUI.actionSaveAs, SIGNAL(triggered()), this, SLOT(HandleMenuSaveAs()));
   connect(mUI.actionNew, SIGNAL(triggered()), this, SLOT(HandleMenuNew()));
   connect(mUI.actionOpen, SIGNAL(triggered()), this, SLOT(HandleMenuOpen()));
-  connect(mUI.actionDocumentProperties, SIGNAL(triggered()), this, 
-          SLOT(HandlePropertiesMenu()));
+  connect(mUI.actionDocumentProperties, SIGNAL(triggered()), this,
+    SLOT(HandlePropertiesMenu()));
 
   mUI.timelineWidget->hide();
 
@@ -141,7 +142,7 @@ void ZenGarden::LoadEngineShaders(QDir& dir) {
     std::string b = fileInfo.absoluteFilePath().toStdString();
     if (fileInfo.isDir()) {
       LoadEngineShaders(QDir(fileInfo.absoluteFilePath()));
-    } 
+    }
     else if (fileInfo.completeSuffix() == shaderSuffix) {
       QString filePath = fileInfo.absoluteFilePath();
       LoadEngineShader(filePath);
@@ -153,24 +154,24 @@ void ZenGarden::LoadEngineShaders(QDir& dir) {
 
 void ZenGarden::keyPressEvent(QKeyEvent* event) {
   switch (event->key()) {
-    case Qt::Key_Space:
-      mPlayMovie = !mPlayMovie;
-      RestartMovieTimer();
-      if (!mPlayMovie) StopMusic();
-      return;
-    case Qt::Key_Escape:
-      mMovieCursor = 0.0f;
-      RestartMovieTimer();
-      return;
-    case Qt::Key_5:
-      mUI.timelineWidget->setVisible(!mUI.timelineWidget->isVisible());
-      return;
-    case Qt::Key_F12:
-      mUI.upperRightPanel->setVisible(!mUI.upperRightPanel->isVisible());
-      return;
-    case Qt::Key_F11:
-      mUI.bottomLeftPanel->setVisible(!mUI.bottomLeftPanel->isVisible());
-      return;
+  case Qt::Key_Space:
+    mPlayMovie = !mPlayMovie;
+    RestartMovieTimer();
+    if (!mPlayMovie) StopMusic();
+    return;
+  case Qt::Key_Escape:
+    mMovieCursor = 0.0f;
+    RestartMovieTimer();
+    return;
+  case Qt::Key_5:
+    mUI.timelineWidget->setVisible(!mUI.timelineWidget->isVisible());
+    return;
+  case Qt::Key_F12:
+    mUI.upperRightPanel->setVisible(!mUI.upperRightPanel->isVisible());
+    return;
+  case Qt::Key_F11:
+    mUI.bottomLeftPanel->setVisible(!mUI.bottomLeftPanel->isVisible());
+    return;
   }
   QMainWindow::keyPressEvent(event);
 }
@@ -190,13 +191,23 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
   if (node != nullptr) {
     shared_ptr<WatcherUI> watcher;
     if (IsExactType<FloatNode>(node)) {
-      watcher = node->Watch<StaticFloatEditor>(static_cast<FloatNode*>(node));
-    } else if (IsExactType<Vec3Node>(node)) {
-      watcher = node->Watch<StaticVec3Editor>(static_cast<Vec3Node*>(node));
-    } else if (IsExactType<Vec4Node>(node)) {
-      watcher = node->Watch<StaticVec4Editor>(static_cast<Vec4Node*>(node));
-    } else {
-      watcher = node->Watch<DefaultPropertyEditor>(node);
+      watcher = 
+        node->Watch<StaticValueWatcher<ValueType::FLOAT>>(SafeCast<FloatNode*>(node));
+    }
+    else if (IsExactType<Vec2Node>(node)) {
+      watcher = 
+        node->Watch<StaticValueWatcher<ValueType::VEC2>>(SafeCast<Vec2Node*>(node));
+    }
+    else if (IsExactType<Vec3Node>(node)) {
+      watcher =
+        node->Watch<StaticValueWatcher<ValueType::VEC3>>(SafeCast<Vec3Node*>(node));
+    }
+    else if (IsExactType<Vec4Node>(node)) {
+      watcher =
+        node->Watch<StaticValueWatcher<ValueType::VEC4>>(SafeCast<Vec4Node*>(node));
+    }
+    else {
+      watcher = node->Watch<SlotEditor>(node);
     }
     if (watcher) {
       watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
@@ -237,7 +248,7 @@ float ZenGarden::GetMovieCursor() {
 
 void ZenGarden::SetSceneNodeForClip(SceneNode* sceneNode) {
   if (!mMovieWatcherWidget || !mMovieWatcherWidget->mWatcher) return;
-  shared_ptr<TimelineEditor> editor = 
+  shared_ptr<TimelineEditor> editor =
     dynamic_pointer_cast<TimelineEditor>(mMovieWatcherWidget->mWatcher);
   if (!editor) return;
   editor->SetSceneNodeForSelectedClip(sceneNode);
@@ -252,16 +263,16 @@ PropertiesNode* ZenGarden::GetPropertiesNode() {
 void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
   QTabWidget* tabWidget = nullptr;
   switch (watcherPosition) {
-    case WatcherPosition::UPPER_LEFT_TAB:
-      tabWidget = mUI.upperLeftPanel;
-      break;
-    case WatcherPosition::BOTTOM_LEFT_TAB:
-      tabWidget = mUI.bottomLeftPanel;
-      break;
-    case WatcherPosition::RIGHT_TAB:
-      tabWidget = mUI.upperRightPanel;
-      break;
-    default: SHOULD_NOT_HAPPEN; break;
+  case WatcherPosition::UPPER_LEFT_TAB:
+    tabWidget = mUI.upperLeftPanel;
+    break;
+  case WatcherPosition::BOTTOM_LEFT_TAB:
+    tabWidget = mUI.bottomLeftPanel;
+    break;
+  case WatcherPosition::RIGHT_TAB:
+    tabWidget = mUI.upperRightPanel;
+    break;
+  default: SHOULD_NOT_HAPPEN; break;
   }
 
   WatcherWidget* watcherWidget = nullptr;
@@ -279,7 +290,8 @@ void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
 
   if (watcher) {
     watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
-  } else {
+  }
+  else {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
       watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<FloatSplineNode*>(node));
@@ -477,9 +489,9 @@ void ZenGarden::PlayMusic(float beats) {
   float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
   float seconds = beats / bps;
   if (mBassMusicChannel < 0) return;
-  BASS_ChannelSetPosition(mBassMusicChannel, 
-                          BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds), 
-                          BASS_POS_BYTE);
+  BASS_ChannelSetPosition(mBassMusicChannel,
+    BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds),
+    BASS_POS_BYTE);
   BASS_ChannelPlay(mBassMusicChannel, FALSE);
 }
 
