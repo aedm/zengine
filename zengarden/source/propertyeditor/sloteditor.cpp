@@ -39,53 +39,10 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   /// Slots
   for (Slot* slot : mNode->GetPublicSlots()) {
     if (slot->mIsMultiSlot) continue;
-
     AddSlot<ValueType::FLOAT>(slot);
     AddSlot<ValueType::VEC2>(slot);
     AddSlot<ValueType::VEC3>(slot);
     AddSlot<ValueType::VEC4>(slot);
-
-    //shared_ptr<WatcherUI> watcher;
-
-    //if (IsInsanceOf<ValueNode<ValueType::FLOAT>*>(slot->GetReferencedNode())) {
-    //  /// Float slots
-    //  auto floatSlot = SafeCast<FloatSlot*>(slot);
-    //  auto slotNode = floatSlot->GetNode();
-    //  watcher = slotNode->Watch<FloatWatcher>(slotNode, floatSlot,
-    //    QString::fromStdString(*slot->GetName()),
-    //    !slot->IsDefaulted());
-    //}
-    //else if (IsInsanceOf<ValueNode<ValueType::VEC3>*>(slot->GetReferencedNode())) {
-    //  /// Vec3 slots
-    //  auto vec3Slot = SafeCast<Vec3Slot*>(slot);
-    //  auto slotNode = vec3Slot->GetNode();
-    //  watcher = slotNode->Watch<Vec3Watcher>(slotNode, vec3Slot,
-    //    QString::fromStdString(*slot->GetName()),
-    //    !slot->IsDefaulted());
-    //}
-    //else if (IsInsanceOf<ValueNode<ValueType::VEC4>*>(slot->GetReferencedNode())) {
-    //  /// Vec4 slots
-    //  auto vec4Slot = SafeCast<Vec4Slot*>(slot);
-    //  auto slotNode = vec4Slot->GetNode();
-    //  watcher = slotNode->Watch<Vec4Watcher>(
-    //    slotNode, QString::fromStdString(*slot->GetName()), !slot->IsDefaulted());
-    //}
-
-    //if (watcher) {
-    //  WatcherWidget* widget =
-    //    new WatcherWidget(watcherWidget, watcher, WatcherPosition::PROPERTY_PANEL);
-    //  watcher->deleteWatcherWidgetCallback =
-    //    Delegate(this, &SlotEditor::RemoveWatcherWidget);
-    //  mLayout->addWidget(widget);
-    //  watcher->SetWatcherWidget(widget);
-    //  mSlotWatchers[slot] = watcher;
-    //}
-    //else {
-    //  /// General slots, just add a label
-    //  //QLabel* slotLabel =
-    //  //  new QLabel(QString::fromStdString(*slot->GetName()), mWatcherWidget);
-    //  //mLayout->addWidget(slotLabel);
-    //}
   }
 
   /// Source editor button
