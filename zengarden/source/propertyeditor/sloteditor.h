@@ -1,6 +1,7 @@
 #pragma once
 
 #include "propertyeditor.h"
+#include <QtGui/QIcon>
 
 class SlotWatcher;
 
@@ -19,8 +20,11 @@ private:
 
   void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 
+  /// Adds a slot to the UI. Returns false on type mismatch
   template <ValueType T>
-  void AddSlot(Slot* slot);
+  bool AddSlot(Slot* slot, QWidget* parent, QLayout* layout);
+
+  QIcon mGhostIcon;
 };
 
 

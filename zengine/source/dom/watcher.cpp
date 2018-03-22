@@ -21,6 +21,7 @@ void Watcher::ChangeNode(Node* node) {
 void Watcher::OnDeleteNode() {}
 void Watcher::OnRedraw() {}
 void Watcher::OnNameChange() {}
+void Watcher::OnSlotGhostChange(Slot* slot) {}
 void Watcher::OnSlotConnectionChanged(Slot* slot) {}
 void Watcher::OnSlotStructureChanged() {}
 void Watcher::OnGraphPositionChanged() {}

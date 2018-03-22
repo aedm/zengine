@@ -227,11 +227,15 @@ bool Slot::IsDefaulted() {
   return false;
 }
 
-void Slot::SetGhostSlot(bool isGhostSlot) {
-  mGhostSlot = isGhostSlot;
-  NOT_IMPLEMENTED;
+void Slot::SetGhost(bool isGhost) {
+  mGhostSlot = isGhost;
+  TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_GHOST_FLAG_CHANGED, this);
+  mOwner->SendMsg(MessageType::TRANSITIVE_CLOSURE_CHANGED);
 }
 
+bool Slot::IsGhost() {
+  return mGhostSlot;
+}
 
 Node::Node(bool isForwarderNode) {
   mIsUpToDate = false;
@@ -295,6 +299,14 @@ void Node::ReceiveMessage(Message* message) {
     break;
   case MessageType::NODE_NAME_CHANGED:
     NotifyWatchers(&Watcher::OnChildNameChange);
+    break;
+  case MessageType::SLOT_GHOST_FLAG_CHANGED:
+    TheMessageQueue.Enqueue(message->mSource, this,
+      MessageType::TRANSITIVE_GHOST_CHANGED, message->mSlot);
+    NotifyWatchers(&Watcher::OnSlotGhostChange, message->mSlot);
+    break;
+  case MessageType::TRANSITIVE_GHOST_CHANGED:
+    SendMsg(MessageType::TRANSITIVE_GHOST_CHANGED);
     break;
   default:
     break;

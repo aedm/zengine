@@ -29,8 +29,14 @@ enum class MessageType {
   /// Direct slot connection changed.
   SLOT_CONNECTION_CHANGED,
 
+  /// Slot's ghost flag changed
+  SLOT_GHOST_FLAG_CHANGED,
+
   /// The transitive closure changed
   TRANSITIVE_CLOSURE_CHANGED,
+
+  /// Ghost flag changes somewhere down the line
+  TRANSITIVE_GHOST_CHANGED,
 
   /// The value of a connected node changed, reevaluation might be needed
   VALUE_CHANGED,
@@ -142,7 +148,8 @@ public:
   virtual bool IsDefaulted();
 
   /// Set ghost bit
-  void SetGhostSlot(bool isGhostSlot);
+  void SetGhost(bool isGhostSlot);
+  bool IsGhost();
 
 protected:
   /// The slot is connected to this node (nullptr if multislot)
@@ -154,7 +161,8 @@ protected:
   /// Name of the slot. Can't be changed.
   SharedString mName;
 
-  /// Ghost slots will be the slots of ghost nodes. They are free parameters that users can change.
+  /// Ghost slots will be the slots of ghost nodes. They are free parameters 
+  /// that users can change.
   bool mGhostSlot = false;
 };
 

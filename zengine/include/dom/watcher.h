@@ -21,6 +21,9 @@ public:
   /// Called when the name of the node is changed
   virtual void OnNameChange();
 
+  /// Called when a slot's ghost flag changed
+  virtual void OnSlotGhostChange(Slot* slot);
+
   /// Called when the name of the node is changed
   virtual void OnChildNameChange();
 

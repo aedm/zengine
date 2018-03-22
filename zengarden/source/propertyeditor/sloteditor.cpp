@@ -2,9 +2,14 @@
 #include "../watchers/watcherwidget.h"
 #include "../zengarden.h"
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QLabel>
 
 SlotEditor::SlotEditor(Node* node)
-  : PropertyEditor(node) {}
+  : PropertyEditor(node) 
+{
+  mGhostIcon.addFile(QStringLiteral(":/zengarden/icons/angle-right.svg"), 
+    QSize(), QIcon::Normal, QIcon::On);
+}
 
 
 SlotEditor::~SlotEditor() {
@@ -16,20 +21,21 @@ SlotEditor::~SlotEditor() {
 
 
 template <ValueType T>
-void SlotEditor::AddSlot(Slot* slot) {
-  if (!IsInsanceOf<ValueNode<T>*>(slot->GetReferencedNode())) return;
+bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
+  if (!IsInsanceOf<ValueNode<T>*>(slot->GetReferencedNode())) return false;
 
   auto valueSlot = SafeCast<ValueSlot<T>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
   shared_ptr<SlotWatcher> watcher = slotNode->Watch<TypedSlotWatcher<T>>(valueSlot);
 
   WatcherWidget* widget =
-    new WatcherWidget(mWatcherWidget, watcher, WatcherPosition::PROPERTY_PANEL);
+    new WatcherWidget(parent, watcher, WatcherPosition::PROPERTY_PANEL);
   watcher->deleteWatcherWidgetCallback =
     Delegate(this, &SlotEditor::RemoveWatcherWidget);
-  mLayout->addWidget(widget);
+  layout->addWidget(widget);
   watcher->SetWatcherWidget(widget);
   mSlotWatchers[slot] = watcher;
+  return true;
 }
 
 
@@ -39,10 +45,35 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   /// Slots
   for (Slot* slot : mNode->GetPublicSlots()) {
     if (slot->mIsMultiSlot) continue;
-    AddSlot<ValueType::FLOAT>(slot);
-    AddSlot<ValueType::VEC2>(slot);
-    AddSlot<ValueType::VEC3>(slot);
-    AddSlot<ValueType::VEC4>(slot);
+
+    /// Create horizontal widget to add editor and ghost button
+    QWidget* widget = new QWidget(watcherWidget);
+    mLayout->addWidget(widget);
+    widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    QHBoxLayout* hLayout = new QHBoxLayout(widget);
+    hLayout->setSpacing(4);
+    hLayout->setContentsMargins(0, 0, 0, 0);
+
+    if (!AddSlot<ValueType::FLOAT>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ValueType::VEC2>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ValueType::VEC3>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ValueType::VEC4>(slot, watcherWidget, hLayout)) {
+      QLabel* label = new QLabel(QString::fromStdString(*slot->GetName().get()), widget);
+      hLayout->addWidget(label);
+    }
+
+    QPushButton* ghostButton = new QPushButton("", widget);
+    ghostButton->setCheckable(true);
+    ghostButton->setChecked(slot->IsGhost());
+    ghostButton->setFlat(true);
+    ghostButton->setMaximumWidth(20);
+    ghostButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    ghostButton->setIcon(mGhostIcon);
+    hLayout->addWidget(ghostButton);
+    
+    ghostButton->connect(ghostButton, &QPushButton::toggled, [=]() {
+      slot->SetGhost(!slot->IsGhost());
+    });
   }
 
   /// Source editor button
