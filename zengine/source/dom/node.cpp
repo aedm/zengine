@@ -268,6 +268,10 @@ Node* Node::GetReferencedNode() {
 }
 
 
+bool Node::IsGhostNode() {
+  return false;
+}
+
 ValueType Node::GetValueType() const {
   return mValueType;
 }

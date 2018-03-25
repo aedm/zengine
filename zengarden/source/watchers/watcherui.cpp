@@ -28,17 +28,17 @@ EventForwarderGLWidget* WatcherUI::GetGLWidget() {
 
 
 QString WatcherUI::CreateDisplayedName(Node* node) {
-  if (node == nullptr) {
-    return QString();
-  } 
-  
+  ASSERT(node != nullptr);
+
   if (!node->GetName().empty()) {
     /// Node has a name, use that.
     return QString::fromStdString(node->GetName());
   } 
-  
-  if (IsInsanceOf<StubNode*>(node)) {
-    StubNode* stub = static_cast<StubNode*>(node);
+
+  Node* referencedNode = node->GetReferencedNode();
+
+  if (IsInsanceOf<StubNode*>(referencedNode)) {
+    StubNode* stub = static_cast<StubNode*>(referencedNode);
     StubMetadata* metaData = stub->GetStubMetadata();
     if (metaData != nullptr && !metaData->name.empty()) {
       /// For shader stubs, use the stub name by default
@@ -48,7 +48,7 @@ QString WatcherUI::CreateDisplayedName(Node* node) {
 
   /// Just use the type as a name by default
   return QString::fromStdString(
-    NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName);
+    NodeRegistry::GetInstance()->GetNodeClass(referencedNode)->mClassName);
 }
 
 

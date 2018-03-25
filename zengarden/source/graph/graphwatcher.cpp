@@ -61,7 +61,8 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
             ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
           }
         }
-      } else {
+      }
+      else {
         /// TODO: remove code duplication
         Node* connectedNode = slot->GetDirectNode();
         if (connectedNode) {
@@ -114,7 +115,8 @@ void GraphWatcher::Update() {
 void GraphWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
-  } else if (event->button() == Qt::RightButton) {
+  }
+  else if (event->button() == Qt::RightButton) {
     HandleMouseRightDown(event);
   }
 }
@@ -123,7 +125,8 @@ void GraphWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event)
 void GraphWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftUp(event);
-  } else if (event->button() == Qt::RightButton) {
+  }
+  else if (event->button() == Qt::RightButton) {
     HandleMouseRightUp(event);
   }
 }
@@ -210,50 +213,54 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
   mCurrentMousePos = mousePos;
 
   switch (mCurrentState) {
-    case State::DEFAULT:
-      if (mHoveredWidget) {
-        if ((event->modifiers() & Qt::ShiftModifier) > 0) {
-          if (mHoveredSlotIndex >= 0) {
-            /// Start connecting from slot to node
-            mCurrentState = State::CONNECT_TO_NODE;
-            mClickedWidget = mHoveredWidget;
-            mClickedSlotIndex = mHoveredSlotIndex;
-            mIsConnectionValid = false;
-            DeselectAll();
-          } else {
-            /// Start connecting from node to slot
-            mCurrentState = State::CONNECT_TO_SLOT;
-            mClickedWidget = mHoveredWidget;
-            mClickedSlotIndex = -1;
-            mIsConnectionValid = false;
-            DeselectAll();
-          }
-        } else {
-          if (!mHoveredWidget->mIsSelected) {
-            /// Select node
-            DeselectAll();
-            mHoveredWidget->mIsSelected = true;
-            mSelectedNodeWidgets.insert(mHoveredWidget);
-            ZenGarden::GetInstance()->SetNodeForPropertyEditor(mHoveredWidget->GetNode());
-          }
-          StorePositionOfSelectedNodes();
-          mAreNodesMoved = false;
+  case State::DEFAULT:
+    if (mHoveredWidget) {
+      if ((event->modifiers() & Qt::ShiftModifier) > 0) {
+        if (mHoveredSlotIndex >= 0) {
+          /// Start connecting from slot to node
+          mCurrentState = State::CONNECT_TO_NODE;
           mClickedWidget = mHoveredWidget;
-          mCurrentState = State::MOVE_NODES;
-
-          /// Put node on top
-          GetGraph()->mNodes.ChangeNodeIndex(mHoveredWidget->GetNode(), 0);
+          mClickedSlotIndex = mHoveredSlotIndex;
+          mIsConnectionValid = false;
+          DeselectAll();
         }
-      } else {
-        /// No widget was pressed, start rectangular selection
-        mCurrentState = State::SELECT_RECTANGLE;
-        DeselectAll();
-        ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
+        else {
+          /// Start connecting from node to slot
+          mCurrentState = State::CONNECT_TO_SLOT;
+          mClickedWidget = mHoveredWidget;
+          mClickedSlotIndex = -1;
+          mIsConnectionValid = false;
+          DeselectAll();
+        }
       }
-      break;
-    case State::CONNECT_TO_NODE:
-      break;
-    default: break;
+      else {
+        if (!mHoveredWidget->mIsSelected) {
+          /// Select node
+          DeselectAll();
+          mHoveredWidget->mIsSelected = true;
+          mSelectedNodeWidgets.insert(mHoveredWidget);
+          ZenGarden::GetInstance()->SetNodeForPropertyEditor(mHoveredWidget->GetNode());
+        }
+
+        StorePositionOfSelectedNodes();
+        mAreNodesMoved = false;
+        mClickedWidget = mHoveredWidget;
+        mCurrentState = State::MOVE_NODES;
+
+        /// Put node on top
+        GetGraph()->mNodes.ChangeNodeIndex(mHoveredWidget->GetNode(), 0);
+      }
+    }
+    else {
+      /// No widget was pressed, start rectangular selection
+      mCurrentState = State::SELECT_RECTANGLE;
+      DeselectAll();
+      ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
+    }
+    break;
+  case State::CONNECT_TO_NODE:
+    break;
+  default: break;
   }
   GetGLWidget()->update();
 }
@@ -262,49 +269,50 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
 void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   Vec2 mousePos = MouseToWorld(event);
   switch (mCurrentState) {
-    case State::MOVE_NODES:
-      if (mAreNodesMoved) {
-        for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
-          Vec2 pos = widget->GetNode()->GetPosition();
-          TheCommandStack->Execute(
-            new MoveNodeCommand(widget->GetNode(), pos, widget->mOriginalPosition));
-        }
-      } else {
-        DeselectAll();
-        mClickedWidget->mIsSelected = true;
-        mSelectedNodeWidgets.insert(mClickedWidget);
-        GetGLWidget()->update();
+  case State::MOVE_NODES:
+    if (mAreNodesMoved) {
+      for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
+        Vec2 pos = widget->GetNode()->GetPosition();
+        TheCommandStack->Execute(
+          new MoveNodeCommand(widget->GetNode(), pos, widget->mOriginalPosition));
       }
-      mCurrentState = State::DEFAULT;
-      break;
-    case State::SELECT_RECTANGLE:
-      for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
-        shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
-        if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
-      }
-      mCurrentState = State::DEFAULT;
+    }
+    else {
+      DeselectAll();
+      mClickedWidget->mIsSelected = true;
+      mSelectedNodeWidgets.insert(mClickedWidget);
       GetGLWidget()->update();
-      break;
-    case State::CONNECT_TO_NODE:
-      if (mIsConnectionValid) {
-        Node* node = mHoveredWidget->GetNode();
-        Slot* slot = mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot;
-        TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
-      }
-      GetGLWidget()->update();
-      mCurrentState = State::DEFAULT;
-      break;
-    case State::CONNECT_TO_SLOT:
-      if (mIsConnectionValid) {
-        Node* node = mClickedWidget->GetNode();
-        Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
-        TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
-      }
-      GetGLWidget()->update();
-      mCurrentState = State::DEFAULT;
-      break;
-    case State::DEFAULT:
-      break;
+    }
+    mCurrentState = State::DEFAULT;
+    break;
+  case State::SELECT_RECTANGLE:
+    for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
+      shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
+      if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
+    }
+    mCurrentState = State::DEFAULT;
+    GetGLWidget()->update();
+    break;
+  case State::CONNECT_TO_NODE:
+    if (mIsConnectionValid) {
+      Node* node = mHoveredWidget->GetNode();
+      Slot* slot = mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot;
+      TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
+    }
+    GetGLWidget()->update();
+    mCurrentState = State::DEFAULT;
+    break;
+  case State::CONNECT_TO_SLOT:
+    if (mIsConnectionValid) {
+      Node* node = mClickedWidget->GetNode();
+      Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
+      TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
+    }
+    GetGLWidget()->update();
+    mCurrentState = State::DEFAULT;
+    break;
+  case State::DEFAULT:
+    break;
   }
 }
 
@@ -317,7 +325,8 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
       if (slot->mIsMultiSlot) {
         /// HACK HACK HACK
         slot->DisconnectAll(true);
-      } else if (slot->GetReferencedNode()) {
+      }
+      else if (slot->GetReferencedNode()) {
         TheCommandStack->Execute(new ConnectNodeToSlotCommand(NULL, slot));
       }
     }
@@ -345,59 +354,74 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
   Vec2 mousePos = MouseToWorld(event);
   mCurrentMousePos = mousePos;
   switch (mCurrentState) {
-    case State::MOVE_NODES:
-    {
+  case State::MOVE_NODES:
+  {
+    Vec2 mouseDiff = mousePos - mOriginalMousePos;
+    if ((event->modifiers() & Qt::ControlModifier) > 0 && !mAreNodesMoved) {
+      Node* originalNode = mHoveredWidget->GetNode();
+      Ghost* ghost = new Ghost(originalNode);
+      Vec2 position = mHoveredWidget->mOriginalPosition + mouseDiff;
+      TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
+      TheCommandStack->Execute(new MoveNodeCommand(ghost, position));
+      shared_ptr<NodeWidget> ghostWidget = ghost->Watch<NodeWidget>(ghost, this);
+      mWidgetMap[ghost] = ghostWidget;
+      DeselectAll();
+      mSelectedNodeWidgets.insert(ghostWidget);
+      ghostWidget->mOriginalPosition = ghost->GetPosition();
       mAreNodesMoved = true;
-      Vec2 mouseDiff = mousePos - mOriginalMousePos;
-      for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
-        widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
-      }
-      GetGLWidget()->update();
+      mOriginalMousePos = mousePos;
+      return;
     }
-    break;
-    case State::SELECT_RECTANGLE:
-      for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
-        shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
-        widget->mIsSelected = HasIntersection(mOriginalMousePos,
-          mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
-      }
-      GetGLWidget()->update();
-      break;
-    case State::CONNECT_TO_NODE:
-      mIsConnectionValid = false;
-      UpdateHoveredWidget(mousePos);
-      if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
-        if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptNode(
-          mHoveredWidget->GetNode())) {
-          /// TODO: check for graph cycles
-          mIsConnectionValid = true;
-        }
-      }
-      GetGLWidget()->update();
-      break;
-    case State::CONNECT_TO_SLOT:
-      mIsConnectionValid = false;
-      UpdateHoveredWidget(mousePos);
-      if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
-        if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptNode(
-          mClickedWidget->GetNode())) {
-          /// TODO: check for graph cycles
-          mIsConnectionValid = true;
-        }
-      }
-      GetGLWidget()->update();
-      break;
-    case State::PAN_CANVAS:
-    {
-      Vec2 mousePixelPos(event->x(), event->y());
-      Vec2 diff = mousePixelPos - mOriginalMousePos;
-      mCenter = mOriginalCenter - diff * mZoomFactor;
-      GetGLWidget()->update();
+
+    for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
+      widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
     }
+    GetGLWidget()->update();
+  }
+  break;
+  case State::SELECT_RECTANGLE:
+    for (Node* node : GetGraph()->mNodes.GetDirectMultiNodes()) {
+      shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
+      widget->mIsSelected = HasIntersection(mOriginalMousePos,
+        mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
+    }
+    GetGLWidget()->update();
     break;
-    default:
-      if (UpdateHoveredWidget(mousePos)) GetGLWidget()->update();
-      break;
+  case State::CONNECT_TO_NODE:
+    mIsConnectionValid = false;
+    UpdateHoveredWidget(mousePos);
+    if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
+      if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptNode(
+        mHoveredWidget->GetNode())) {
+        /// TODO: check for graph cycles
+        mIsConnectionValid = true;
+      }
+    }
+    GetGLWidget()->update();
+    break;
+  case State::CONNECT_TO_SLOT:
+    mIsConnectionValid = false;
+    UpdateHoveredWidget(mousePos);
+    if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
+      if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptNode(
+        mClickedWidget->GetNode())) {
+        /// TODO: check for graph cycles
+        mIsConnectionValid = true;
+      }
+    }
+    GetGLWidget()->update();
+    break;
+  case State::PAN_CANVAS:
+  {
+    Vec2 mousePixelPos(event->x(), event->y());
+    Vec2 diff = mousePixelPos - mOriginalMousePos;
+    mCenter = mOriginalCenter - diff * mZoomFactor;
+    GetGLWidget()->update();
+  }
+  break;
+  default:
+    if (UpdateHoveredWidget(mousePos)) GetGLWidget()->update();
+    break;
   }
 }
 
@@ -452,51 +476,51 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
   }
 
   switch (event->key()) {
-    case Qt::Key_Delete:
-      if (mSelectedNodeWidgets.size() > 0) {
-        set<Node*>* selectedNodes = new set<Node*>();
-        for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
-          selectedNodes->insert(nodeWidget->GetNode());
-        }
-        TheCommandStack->Execute(new DeleteNodeCommand(selectedNodes));
-        ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
+  case Qt::Key_Delete:
+    if (mSelectedNodeWidgets.size() > 0) {
+      set<Node*>* selectedNodes = new set<Node*>();
+      for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
+        selectedNodes->insert(nodeWidget->GetNode());
       }
-      break;
+      TheCommandStack->Execute(new DeleteNodeCommand(selectedNodes));
+      ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
+    }
+    break;
 
-      /// 1 opens watcher on upper left panel
-    case Qt::Key_1:
-      if (mSelectedNodeWidgets.size() == 1) {
-        ZenGarden::GetInstance()->Watch(
-          (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::UPPER_LEFT_TAB);
+    /// 1 opens watcher on upper left panel
+  case Qt::Key_1:
+    if (mSelectedNodeWidgets.size() == 1) {
+      ZenGarden::GetInstance()->Watch(
+        (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::UPPER_LEFT_TAB);
 
-      }
-      break;
+    }
+    break;
 
-      /// 2 opens watcher on right panel
-    case Qt::Key_2:
-      if (mSelectedNodeWidgets.size() == 1) {
-        ZenGarden::GetInstance()->Watch(
-          (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::RIGHT_TAB);
-      }
-      break;
+    /// 2 opens watcher on right panel
+  case Qt::Key_2:
+    if (mSelectedNodeWidgets.size() == 1) {
+      ZenGarden::GetInstance()->Watch(
+        (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::RIGHT_TAB);
+    }
+    break;
 
-      /// 3 opens watcher on bottom left panel
-    case Qt::Key_3:
-      if (mSelectedNodeWidgets.size() == 1) {
-        ZenGarden::GetInstance()->Watch(
-          (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::BOTTOM_LEFT_TAB);
+    /// 3 opens watcher on bottom left panel
+  case Qt::Key_3:
+    if (mSelectedNodeWidgets.size() == 1) {
+      ZenGarden::GetInstance()->Watch(
+        (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::BOTTOM_LEFT_TAB);
+    }
+    break;
+  case Qt::Key_Enter:
+    if (mSelectedNodeWidgets.size() == 1) {
+      Node* node = (*mSelectedNodeWidgets.begin())->GetNode();
+      SceneNode* sceneNode = dynamic_cast<SceneNode*>(node);
+      if (sceneNode) {
+        ZenGarden::GetInstance()->SetSceneNodeForClip(sceneNode);
       }
-      break;
-    case Qt::Key_Enter:
-      if (mSelectedNodeWidgets.size() == 1) {
-        Node* node = (*mSelectedNodeWidgets.begin())->GetNode();
-        SceneNode* sceneNode = dynamic_cast<SceneNode*>(node);
-        if (sceneNode) {
-          ZenGarden::GetInstance()->SetSceneNodeForClip(sceneNode);
-        }
-      }
-      break;
-    default: break;
+    }
+    break;
+  default: break;
   }
 }
 
@@ -575,8 +599,8 @@ void GraphWatcher::HandleDragEnterEvent(QDragEnterEvent* event) {
   if (urlList.size() != 1) return;
 
   QString fileName = urlList.at(0).toLocalFile();
-  if (fileName.endsWith(".obj") || fileName.endsWith(".3ds") || 
-      fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
+  if (fileName.endsWith(".obj") || fileName.endsWith(".3ds") ||
+    fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
     event->acceptProposedAction();
   }
 }

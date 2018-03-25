@@ -94,12 +94,15 @@ void NodeWidget::UpdateGraph() {
   if (mGraphWatcher) mGraphWatcher->Update();
 }
 
+static Vec4 LiveHeaderColor = Vec4(0, 0.2, 0.4, Opacity);
+static Vec4 GhostHeaderColor = Vec4(0.4, 0.2, 0, Opacity);
+
 void NodeWidget::Paint()
 {
   Vec2 position = mNode->GetPosition();
   Vec2 size = mNode->GetSize();
 
-  ThePainter->mColor.Set(Vec4(0, 0.2, 0.4, Opacity));
+  ThePainter->mColor.Set(mNode->IsGhostNode() ? GhostHeaderColor : LiveHeaderColor);
 	ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
 
 	ThePainter->mColor.Set(Vec4(0, 0, 0, Opacity));
@@ -194,10 +197,11 @@ void NodeWidget::OnNameChange() {
     text = QString::fromStdString(mNode->GetName());
   } else {
     /// Just use the type as a name by default
+    Node* node = mNode->GetReferencedNode();
     text = QString::fromStdString(
-      NodeRegistry::GetInstance()->GetNodeClass(mNode)->mClassName);
-    if (IsInsanceOf<StubNode*>(mNode)) {
-      StubNode* stub = static_cast<StubNode*>(mNode);
+      NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName);
+    if (IsInsanceOf<StubNode*>(node)) {
+      StubNode* stub = SafeCast<StubNode*>(node);
       StubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {
         /// For shader stubs, use the stub name by default

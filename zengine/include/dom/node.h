@@ -192,6 +192,8 @@ public:
   /// - Composite nodes have internal, hidden nodes that do the heavy lifting
   virtual Node* GetReferencedNode();
 
+  virtual bool IsGhostNode();
+
   /// ValueNodes returns the value type, all others return or ValueType::NONE
   ValueType GetValueType() const;
 

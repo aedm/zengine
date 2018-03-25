@@ -20,7 +20,7 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   /// Node type
-  string& typeString = NodeRegistry::GetInstance()->GetNodeClass(mNode)->mClassName;
+  string& typeString = NodeRegistry::GetInstance()->GetNodeClass(mNode->GetReferencedNode())->mClassName;
   QLabel* typeLabel = new QLabel(QString::fromStdString(typeString), watcherWidget);
   typeLabel->setAlignment(Qt::AlignHCenter);
   QFont font = typeLabel->font();

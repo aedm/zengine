@@ -7,6 +7,7 @@
 
 #include "dom/nodetype.h"
 #include "dom/node.h"
+#include "dom/ghost.h"
 #include "dom/graph.h"
 #include "dom/document.h"
 #include "dom/watcher.h"

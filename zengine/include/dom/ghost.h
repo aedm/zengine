@@ -4,15 +4,18 @@
 
 class Ghost : public Node {
 public:
-  Ghost();
+  Ghost(Node* originalNode);
+  virtual ~Ghost();
 
-  void SetOriginalNode(Node* originalNode);
+  Slot mOriginalNode;
+
+  virtual bool IsGhostNode() override;
 
 protected:
   vector<Node*> mInternalNodes;
-  Node* mMainInternalNode;
+  Node* mMainInternalNode = nullptr;
 
-  Node* mOriginalNode;
+  virtual Node* GetReferencedNode() override;
 
   void Regenerate();
 

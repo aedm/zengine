@@ -1,12 +1,28 @@
 #include <include/dom/ghost.h>
+#include <include/dom/nodetype.h>
 
-Ghost::Ghost() {}
+Ghost::Ghost(Node* originalNode)
+  : Node()
+  , mOriginalNode(this, nullptr, false, false, true, false)
+{
+  mOriginalNode.Connect(originalNode);
+  Regenerate();
+}
 
-void Ghost::SetOriginalNode(Node* originalNode) {
-  mOriginalNode = originalNode;
+Ghost::~Ghost() {
+  SafeDelete(mMainInternalNode);
+}
+
+bool Ghost::IsGhostNode() {
+  return true;
+}
+
+Node* Ghost::GetReferencedNode() {
+  return mMainInternalNode;
 }
 
 void Ghost::Regenerate() {
-  NOT_IMPLEMENTED;
+  Node* original = mOriginalNode.GetReferencedNode();
+  mMainInternalNode = NodeRegistry::GetInstance()->GetNodeClass(original)->Manufacture();
 }
 
