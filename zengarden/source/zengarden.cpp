@@ -357,7 +357,12 @@ void ZenGarden::CreateNewDocument() {
   mDocument->mProperties.Connect(new PropertiesNode());
   mDocument->mMovie.Connect(new MovieNode());
 
+  Graph* graph = new Graph();
+  mDocument->mGraphs.Connect(graph);
+
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
+  Watch(graph, WatcherPosition::RIGHT_TAB);
+
   SetupMovieWatcher();
 }
 

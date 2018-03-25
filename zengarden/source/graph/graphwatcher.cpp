@@ -199,6 +199,13 @@ void GraphWatcher::DeselectAll() {
 }
 
 
+void GraphWatcher::SelectWidget(const shared_ptr<NodeWidget>& nodeWidget) {
+  if (nodeWidget->mIsSelected) return;
+  ASSERT(mSelectedNodeWidgets.find(nodeWidget) == mSelectedNodeWidgets.end());
+  mSelectedNodeWidgets.insert(nodeWidget);
+  nodeWidget->mIsSelected = true;
+}
+
 void GraphWatcher::StorePositionOfSelectedNodes() {
   for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
     nodeWidget->mOriginalPosition = nodeWidget->GetNode()->GetPosition();
@@ -237,8 +244,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
         if (!mHoveredWidget->mIsSelected) {
           /// Select node
           DeselectAll();
-          mHoveredWidget->mIsSelected = true;
-          mSelectedNodeWidgets.insert(mHoveredWidget);
+          SelectWidget(mHoveredWidget);
           ZenGarden::GetInstance()->SetNodeForPropertyEditor(mHoveredWidget->GetNode());
         }
 
@@ -279,8 +285,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
     }
     else {
       DeselectAll();
-      mClickedWidget->mIsSelected = true;
-      mSelectedNodeWidgets.insert(mClickedWidget);
+      SelectWidget(mClickedWidget);
       GetGLWidget()->update();
     }
     mCurrentState = State::DEFAULT;
@@ -361,18 +366,20 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
       Node* originalNode = mHoveredWidget->GetNode();
       Ghost* ghost = new Ghost(originalNode);
       Vec2 position = mHoveredWidget->mOriginalPosition + mouseDiff;
+      ghost->SetPosition(position);
       TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
-      TheCommandStack->Execute(new MoveNodeCommand(ghost, position));
-      shared_ptr<NodeWidget> ghostWidget = ghost->Watch<NodeWidget>(ghost, this);
-      mWidgetMap[ghost] = ghostWidget;
+      /// Adding new nodes to a graph resets watcher state, but we want to move the ghost
+      mCurrentState = State::MOVE_NODES;
+      shared_ptr<NodeWidget> ghostWidget = mWidgetMap.at(ghost);
       DeselectAll();
-      mSelectedNodeWidgets.insert(ghostWidget);
-      ghostWidget->mOriginalPosition = ghost->GetPosition();
+      SelectWidget(ghostWidget);
+      StorePositionOfSelectedNodes();
       mAreNodesMoved = true;
       mOriginalMousePos = mousePos;
       return;
     }
 
+    mAreNodesMoved = true;
     for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
       widget->GetNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
     }
@@ -561,7 +568,7 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
   }
 
   if (changed) {
-    mSelectedNodeWidgets.clear();
+    DeselectAll();
     mHoveredWidget.reset();
     mClickedWidget.reset();
     mCurrentState = State::DEFAULT;

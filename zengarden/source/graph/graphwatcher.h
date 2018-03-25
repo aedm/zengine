@@ -101,6 +101,7 @@ private:
   int mHoveredSlotIndex;
 
   void DeselectAll();
+  void SelectWidget(const shared_ptr<NodeWidget>& nodeWidget);
   void StorePositionOfSelectedNodes();
 
   /// Finds which widget and slot is hovered by the mouse pointer.

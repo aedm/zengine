@@ -1,4 +1,5 @@
 #include <include/dom/node.h>
+#include <include/dom/ghost.h>
 #include <include/dom/watcher.h>
 #include <include/base/helpers.h>
 #include <algorithm>
@@ -365,6 +366,16 @@ Node::~Node() {
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
     Slot* slot = deps.back();
+    Node* owner = slot->mOwner;
+
+    /// If a ghost is made of this node, delete it.
+    if (owner->IsGhostNode()) {
+      Ghost* ghost = SafeCast<Ghost*>(owner);
+      if (ghost->mOriginalNode.GetDirectNode() == this) {
+        delete ghost;
+        continue;
+      }
+    }
     slot->Disconnect(this);
   }
 }
