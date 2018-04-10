@@ -30,8 +30,9 @@ Node* StaticValueNodesList[] = {
 
 
 /// Slot factory
-Slot* CreateValueSlot(ValueType type, Node* owner, SharedString name, bool isMultiSlot,
-  bool isPublic, bool isSerializable, float minimum, float maximum) {
+Slot* CreateValueSlot(ValueType type, Node* owner, SharedString name, 
+  bool isMultiSlot, bool isPublic, bool isSerializable, float minimum, float maximum) 
+{
   switch (type) {
 #undef ITEM
 #define ITEM(upperName, capitalizedName, type) \

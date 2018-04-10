@@ -46,7 +46,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   bool directToScreen = globals->DirectToScreen > 0.5f;
 
   /// Get camera
-  CameraNode* camera = mCamera.GetNode();
+  auto& camera = mCamera.GetNode();
   if (camera == nullptr) return;
 
   /// Pass #1: skylight shadow
@@ -99,7 +99,7 @@ void SceneNode::Operate() {
 
 void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
-    Drawable* drawable = SafeCast<Drawable*>(mDrawables.GetReferencedMultiNode(i));
+    auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->Draw(globals, passType);
   }
 }
@@ -111,15 +111,16 @@ void SceneNode::HandleMessage(Message* message) {
       break;
     case MessageType::VALUE_CHANGED:
     case MessageType::SLOT_CONNECTION_CHANGED:
-      TheMessageQueue.Enqueue(this, this, MessageType::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(
+        this->shared_from_this(), this->shared_from_this(), MessageType::NEEDS_REDRAW);
       break;
     case MessageType::SCENE_TIME_EDITED:
     {
-      auto source = SafeCast<SceneTimeNode*>(message->mSource);
+      auto source = PointerCast<SceneTimeNode>(message->mSource);
       mSceneTime = source->Get();
-      for (Node* node : mSceneTimes.GetDirectMultiNodes()) {
+      for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
         if (node != source) {
-          SafeCast<SceneTimeNode*>(node)->Set(mSceneTime);
+          PointerCast<SceneTimeNode>(node)->Set(mSceneTime);
         }
       }
       SendMsg(MessageType::SCENE_TIME_EDITED);
@@ -133,9 +134,9 @@ void SceneNode::CalculateRenderDependencies() {
   mTransitiveClosure.clear();
   mSceneTimes.DisconnectAll(false);
   GenerateTransitiveClosure(mTransitiveClosure, true);
-  for (Node* node : mTransitiveClosure) {
+  for (auto& node : mTransitiveClosure) {
     if (IsExactType<SceneTimeNode>(node)) {
-      SceneTimeNode* sceneTimeNode = static_cast<SceneTimeNode*>(node);
+      shared_ptr<SceneTimeNode> sceneTimeNode = PointerCast<SceneTimeNode>(node);
       ASSERT(sceneTimeNode);
       mSceneTimes.Connect(sceneTimeNode);
     }
@@ -144,7 +145,7 @@ void SceneNode::CalculateRenderDependencies() {
 
 void SceneNode::SetSceneTime(float time) {
   Update();
-  for (Node* node : mSceneTimes.GetDirectMultiNodes()) {
+  for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
     SafeCast<SceneTimeNode*>(node)->Set(time);
   }
 }
@@ -155,7 +156,7 @@ float SceneNode::GetSceneTime() {
 
 void SceneNode::UpdateDependencies() {
   /// Update dependencies
-  for (Node* node : mTransitiveClosure) {
-    if (this != node) node->Update();
+  for (auto& node : mTransitiveClosure) {
+    if (this != node.get()) node->Update();
   }
 }

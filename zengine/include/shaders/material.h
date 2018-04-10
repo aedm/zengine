@@ -24,7 +24,7 @@ public:
   SolidMaterial();
   virtual ~SolidMaterial();
 
-  virtual Node* GetReferencedNode() override;
+  virtual shared_ptr<Node> GetReferencedNode() override;
 
 protected:
   virtual void HandleMessage(Message* message) override;
@@ -32,10 +32,10 @@ protected:
 private:
   void SetupSlots();
 
-  Material mMaterial;
-  Pass mSolidPass;
-  StubNode mSolidVertexStub;
-  StubNode mSolidFragmentStub;
+  const shared_ptr<Material> mMaterial;
+  const shared_ptr<Pass> mSolidPass;
+  const shared_ptr<StubNode> mSolidVertexStub;
+  const shared_ptr<StubNode> mSolidFragmentStub;
 
   Slot mGhostSlot;
 };

@@ -32,15 +32,25 @@ bool IsExactType(Slot* slot) {
   return typeid(T) == typeid(*slot);
 }
 
+template<class T>
+bool IsExactType(const shared_ptr<Node>& node) {
+  return typeid(T) == typeid(*node.get());
+}
+
 template<class T, class N>
 bool IsInsanceOf(N* ptr) {
   return dynamic_cast<T>(ptr) != nullptr;
 }
 
+template<class T, class N>
+bool IsPointerOf(const shared_ptr<N>& ptr) {
+  return dynamic_pointer_cast<T>(ptr) != nullptr;
+}
+
+
 /// Exact type of the node. Poor man's reflection.
 struct NodeClass {
-  virtual Node* Manufacture() = 0;
-  virtual Node* Manufacture(Node*) = 0;
+  virtual shared_ptr<Node> Manufacture() = 0;
   string mClassName;
 };
 
@@ -49,18 +59,15 @@ struct NodeClass {
 /// Registers a Node type in the engine. This makes the engine know about
 /// all the Node types that can be utilised, and it also enables serialization
 /// and deserialization of objects;
-#define REGISTER_NODECLASS(nodeClass, nodeClassName)          \
-  struct NodeClass_##nodeClass: public NodeClass {            \
-    NodeClass_##nodeClass() {                                 \
-      mClassName = string(nodeClassName);                     \
-      NodeRegistry::GetInstance()->Register<nodeClass>(this); \
-    }                                                         \
-    virtual Node* Manufacture() override {                    \
-      return new nodeClass();                                 \
-    }                                                         \
-    virtual Node* Manufacture(Node* node) override {          \
-      return new nodeClass(*static_cast<nodeClass*>(node));   \
-    }                                                         \
+#define REGISTER_NODECLASS(nodeClass, nodeClassName)                              \
+  struct NodeClass_##nodeClass: public NodeClass {                                \
+    NodeClass_##nodeClass() {                                                     \
+      mClassName = string(nodeClassName);                                         \
+      NodeRegistry::GetInstance()->Register<nodeClass>(this);                     \
+    }                                                                             \
+    virtual shared_ptr<Node> Manufacture() override {                             \
+      return make_shared<nodeClass>();                                            \
+    }                                                                             \
   } NodeClassInstance_##nodeClass;                            \
 
 
@@ -75,7 +82,7 @@ public:
   NodeClass* GetNodeClass(const string& name);
 
   /// Returns NodeClass by node instance. Node must be registered
-  NodeClass* GetNodeClass(Node* node);
+  NodeClass* GetNodeClass(const shared_ptr<Node>& node);
 
   /// Returns NodeClass by node class. Node must be registered
   template<class T> NodeClass* GetNodeClass();

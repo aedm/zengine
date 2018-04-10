@@ -17,14 +17,14 @@ public:
   void SetStubSource(const string& name, const string& source);
 
   /// Get stub source by name
-  StubNode* GetStub(const string& name);
+  shared_ptr<StubNode> GetStub(const string& name);
   string GetSource(const string& name);
 
   /// Engine stutbs loaded, create built-in material passes and shaders
   void OnLoadFinished();
 
 private:
-  map<string, StubNode*> mStubs;
+  map<string, shared_ptr<StubNode>> mStubs;
 };
 
 extern EngineStubs* TheEngineStubs;

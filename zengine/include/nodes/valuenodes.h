@@ -97,11 +97,11 @@ public:
 
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
-  virtual bool Connect(Node* node) override;
+  virtual bool Connect(const shared_ptr<Node>& node) override;
 
   /// Disconnects a node from this slot, and connects it
   /// to the built-in node.
-  virtual void Disconnect(Node* node) override;
+  virtual void Disconnect(const shared_ptr<Node>& node) override;
   virtual void DisconnectAll(bool notifyOwner) override;
 
   /// Returns true if slot is connected to its own default node
@@ -109,7 +109,7 @@ public:
 
 protected:
   /// Default value
-  StaticValueNode<T> mDefault;
+  shared_ptr<StaticValueNode<T>> mDefault;
   float mMinimum;
   float mMaximum;
 };
@@ -120,16 +120,17 @@ ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
                         bool isPublic, bool isSerializable,
                         float minimum, float maximum)
   : TypedSlot<ValueNode<T>>(owner, name, isMultiSlot, isPublic, isSerializable)
+  , mDefault(make_shared<StaticValueNode<T>>())
   , mMinimum(minimum)
   , mMaximum(maximum)
 {
-  Connect(&mDefault);
+  Connect(mDefault);
 }
 
 
 template<ValueType T>
 const typename ValueSlot<T>::VType& ValueSlot<T>::Get() const {
-  return SafeCast<ValueNode<T>*>(GetReferencedNode())->Get();
+  return PointerCast<ValueNode<T>>(GetReferencedNode())->Get();
 }
 
 
@@ -141,14 +142,13 @@ Vec2 ValueSlot<T>::GetRange() const {
 
 template<ValueType T>
 void ValueSlot<T>::SetDefaultValue(const VType& value) {
-//  ASSERT(IsDefaulted());
-  mDefault.Set(value);
+  mDefault->Set(value);
 }
 
 
 template<ValueType T>
 const typename ValueSlot<T>::VType& ValueSlot<T>::GetDefaultValue() {
-  return mDefault.Get();
+  return mDefault->Get();
 }
 
 
@@ -159,50 +159,53 @@ bool ValueSlot<T>::DoesAcceptValueNode(ValueType type) const {
 
 
 template<ValueType T>
-bool ValueSlot<T>::Connect(Node* target) {
-  if (mNode == target || (target == nullptr && mNode == &mDefault)) return true;
+bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
+  if (mNode == target || (target == nullptr && mNode == mDefault)) return true;
   if (target && !DoesAcceptNode(target)) {
     DEBUGBREAK("Slot and node type mismatch");
     return false;
   }
   if (mNode) mNode->DisconnectFromSlot(this);
-  mNode = target ? target : &mDefault;
+  mNode = target ? target : mDefault;
   mNode->ConnectToSlot(this);
-  TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
+  TheMessageQueue.Enqueue(
+    target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
   return true;
 }
 
 
 template<ValueType T>
-void ValueSlot<T>::Disconnect(Node* target) {
+void ValueSlot<T>::Disconnect(const shared_ptr<Node>& target) {
   ASSERT(target == mNode);
   ASSERT(target != nullptr);
   mNode->DisconnectFromSlot(this);
-  if (mNode == &mDefault) {
+  if (mNode == mDefault) {
     /// Avoid infinite loop when called by the default node's destructor.
     mNode = nullptr;
     return;
   }
-  mNode = &mDefault;
-  mDefault.ConnectToSlot(this);
-  TheMessageQueue.Enqueue(target, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
+  mNode = mDefault;
+  mDefault->ConnectToSlot(this);
+  TheMessageQueue.Enqueue(
+    target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
 }
 
 
 template<ValueType T>
 void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   SHOULD_NOT_HAPPEN;
-  if (mNode == &mDefault) return;
-  mDefault.ConnectToSlot(this);
+  if (mNode == mDefault) return;
+  mDefault->ConnectToSlot(this);
   if (notifyOwner) {
-    TheMessageQueue.Enqueue(nullptr, mOwner, MessageType::SLOT_CONNECTION_CHANGED, this);
+    TheMessageQueue.Enqueue(
+      nullptr, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
   }
 }
 
 
 template<ValueType T>
 bool ValueSlot<T>::IsDefaulted() {
-  return GetReferencedNode() == &mDefault;
+  return GetReferencedNode() == mDefault;
 }
 
 /// Node and slot types
@@ -212,7 +215,8 @@ typedef ValueSlot<ValueType::name> capitalizedName##Slot; \
 typedef StaticValueNode<ValueType::name> capitalizedName##Node;
 VALUETYPE_LIST
 
-Slot* CreateValueSlot(ValueType type, Node* owner, SharedString name, bool isMultiSlot = false,
+Slot* CreateValueSlot(ValueType type, Node* owner, 
+  SharedString name, bool isMultiSlot = false,
   bool isPublic = true, bool isSerializable = true,
   float minimum = 0.0f, float maximum = 1.0f);
 

@@ -17,30 +17,33 @@ extern const EnumMapperA SplineLayerMapper[];
 
 class JSONSerializer {
 public:
-  JSONSerializer(Node* root);
+  JSONSerializer(const shared_ptr<Node>& root);
   string GetJSON();
 
 private:
   /// Collect nodes in the transitive close of root
-  void Traverse(Node* root);
+  void Traverse(const shared_ptr<Node>& root);
 
   /// Creates a JSON document from all the nodes
   void DumpNodes();
 
   /// Creates the JSON value for a Node
-  rapidjson::Value Serialize(Node* node);
+  rapidjson::Value Serialize(const shared_ptr<Node>& node);
 
   /// Node serializers
-  void SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node);
-  void SerializeVec2Node(rapidjson::Value& nodeValue, Vec2Node* node);
-  void SerializeVec3Node(rapidjson::Value& nodeValue, Vec3Node* node);
-  void SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* node);
-  void SerializeFloatSplineNode(rapidjson::Value& nodeValue, FloatSplineNode* node);
+  void SerializeFloatNode(rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node);
+  void SerializeVec2Node(rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node);
+  void SerializeVec3Node(rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node);
+  void SerializeVec4Node(rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node);
+  void SerializeFloatSplineNode(
+    rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node);
 
-  void SerializeTextureNode(rapidjson::Value& nodeValue, TextureNode* node);
-  void SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node);
-  void SerializeStaticMeshNode(rapidjson::Value& nodeValue, StaticMeshNode* node);
-  void SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node);
+  void SerializeTextureNode(
+    rapidjson::Value& nodeValue, const shared_ptr<TextureNode>& node);
+  void SerializeStubNode(rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node);
+  void SerializeStaticMeshNode(
+    rapidjson::Value& nodeValue, const shared_ptr<StaticMeshNode>& node);
+  void SerializeGeneralNode(rapidjson::Value& nodeValue, const shared_ptr<Node>& node);
 
   /// Helpers
   rapidjson::Value SerializeVec2(const Vec2& vec);
@@ -54,8 +57,8 @@ private:
   int mNodeCount;
 
   /// All nodes to save
-  unordered_map<Node*, int> mNodes;
-  vector<Node*> mNodesList;
+  unordered_map<shared_ptr<Node>, int> mNodes;
+  vector<shared_ptr<Node>> mNodesList;
 
   rapidjson::Document mJsonDocument;
   rapidjson::Document::AllocatorType* mAllocator;

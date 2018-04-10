@@ -62,8 +62,8 @@ enum class MessageType {
 };
 
 struct Message {
-  Node* mSource;
-  Node* mTarget;
+  shared_ptr<Node> mSource;
+  shared_ptr<Node> mTarget;
   Slot* mSlot;
   MessageType mType;
 
@@ -75,7 +75,8 @@ class MessageQueue {
   friend class Node;
 
 public:
-  void Enqueue(Node* source, Node* target, MessageType type, Slot* slot = nullptr);
+  void Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target, 
+    MessageType type, Slot* slot = nullptr);
 
 private:
   std::set<Message> mMessageSet;
@@ -83,7 +84,7 @@ private:
   bool mIsInProgress = false;
 
   void ProcessAllMessages();
-  void RemoveNode(Node* node);
+  void RemoveNode(shared_ptr<Node> node);
 };
 
 
@@ -95,16 +96,16 @@ public:
   virtual ~Slot();
 
   /// The operator which this slot is a member of
-  Node* const mOwner;
+  const weak_ptr<Node> mOwner;
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
   /// - for multislots, the node will be added to the list of connected nodes. 
   /// Returns false if connection is not possible due to type mismatch.
-  virtual bool Connect(Node* node);
+  virtual bool Connect(const shared_ptr<Node>& node);
 
   /// Disconnects a node from this slot. 
-  virtual void Disconnect(Node* node);
+  virtual void Disconnect(const shared_ptr<Node>& node);
 
   /// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
   /// send a SLOT_CONNECTION_CHANGED message to its owner.
@@ -112,27 +113,27 @@ public:
 
   /// Removes the connected node from connected nodes list, 
   /// and reinserts it at the "TargetIndex" position. Only for multislots.
-  void ChangeNodeIndex(Node* node, UINT targetIndex);
+  void ChangeNodeIndex(const shared_ptr<Node>& node, UINT targetIndex);
 
   /// Returns referenced connected node (single slots only)
   /// Subclasses of Slot have a properly typed GetNode() method.
-  Node* GetReferencedNode() const;
+  shared_ptr<Node> GetReferencedNode() const;
 
   /// Returns directly connected node, no reference following (single slots only)
-  Node* GetDirectNode() const;
+  shared_ptr<Node> GetDirectNode() const;
 
   /// Returns the number of connected nodes (only for multislot)
   UINT GetMultiNodeCount() const;
 
   /// Returns the 'index'th connected node reference (only for multislot)
-  Node* GetReferencedMultiNode(UINT index) const;
+  shared_ptr<Node> GetReferencedMultiNode(UINT index) const;
 
   /// Returns the multinodes *without* forwarding,
   /// ie. not calling Node::GetReferencedNode()
-  vector<Node*> GetDirectMultiNodes() const;
+  const vector<shared_ptr<Node>>& GetDirectMultiNodes() const;
   
   /// Type of object this slot accepts
-  virtual bool DoesAcceptNode(Node* node) const;
+  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const;
   virtual bool DoesAcceptValueNode(ValueType type) const;
 
   /// Returns the name of the slot
@@ -142,7 +143,7 @@ public:
   const bool mIsMultiSlot;
 
   /// Return the Nth connected node from a multislot
-  Node* operator[] (UINT index);
+  shared_ptr<Node>& operator[] (UINT index);
 
   /// Returns true if slot is connected to its own default node (if it has one)
   virtual bool IsDefaulted();
@@ -153,10 +154,10 @@ public:
 
 protected:
   /// The slot is connected to this node (nullptr if multislot)
-  Node* mNode;
+  shared_ptr<Node> mNode;
 
   /// The slot is connected to these nodes (empty if not multislot)
-  vector<Node*> mMultiNodes;
+  vector<shared_ptr<Node>> mMultiNodes;
 
   /// Name of the slot. Can't be changed.
   SharedString mName;
@@ -167,7 +168,7 @@ protected:
 };
 
 /// An operation that takes its slot values as input and computes an output
-class Node {
+class Node: public enable_shared_from_this<Node> {
   friend class Slot;
   friend class Watcher;
   friend class MessageQueue;
@@ -184,18 +185,22 @@ public:
 
   /// Calculates the transitive closure of the node to "oResult" in topological ordering.
   /// Deepest nodes come first. 
-  void GenerateTransitiveClosure(vector<Node*>& oResultm, bool includeHiddenSlots);
+  void GenerateTransitiveClosure(vector<shared_ptr<Node>>& oResultm, 
+    bool includeHiddenSlots);
 
   /// Returns a node which can actually do what it claims to do. Most nodes
   /// return "this", but there are a few exceptions that refer to a different node:
   /// - Ghost nodes are references to other nodes (TODO)
   /// - Composite nodes have internal, hidden nodes that do the heavy lifting
-  virtual Node* GetReferencedNode();
+  virtual shared_ptr<Node> GetReferencedNode();
 
   virtual bool IsGhostNode();
 
   /// ValueNodes returns the value type, all others return or ValueType::NONE
   ValueType GetValueType() const;
+
+  /// Disconnects all outgoing connections
+  void DisconnectAll();
 
 protected:
   Node(bool isForwarderNode = false);
@@ -317,12 +322,12 @@ public:
             bool isPublic = true, bool isSerializable = true)
     : Slot(owner, name, isMultiSlot, isPublic, isSerializable) {}
 
-  N* GetNode() {
-    return SafeCastAllowNull<N*>(GetReferencedNode());
+  shared_ptr<N> GetNode() {
+    return PointerCast<N>(GetReferencedNode());
   }
 
-  virtual bool DoesAcceptNode(Node* node) const override {
-    return IsInsanceOf<N*>(node->GetReferencedNode());
+  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
+    return IsPointerOf<N>(node->GetReferencedNode());
   }
 
   virtual bool DoesAcceptValueNode(ValueType type) const override {

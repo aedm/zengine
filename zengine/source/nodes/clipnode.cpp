@@ -48,7 +48,7 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
     OpenGL->Clear(clearColor, clearDepth);
   }
 
-  SceneNode* scene = mSceneSlot.GetNode();
+  auto& scene = mSceneSlot.GetNode();
   if (!scene) return;
 
   scene->SetSceneTime(clipTime);

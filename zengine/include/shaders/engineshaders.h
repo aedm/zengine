@@ -11,7 +11,7 @@ public:
 
   void ApplyPostProcess(RenderTarget* renderTarget, Globals* globals);
    
-  Pass mSolidShadowPass;
+  const shared_ptr<Pass> mSolidShadowPass;
 
 private:
   void BuildPostProcessPasses();
@@ -38,11 +38,11 @@ private:
   void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
                          Texture* sourceColorMSAA);
 
-  Pass mPostProcess_GaussianBlurHorizontal_First;
-  Pass mPostProcess_GaussianBlurHorizontal;
-  Pass mPostProcess_GaussianBlurVertical;
-  Pass mPostProcess_GaussianBlur_Blend_MSAA;
-  Pass mPostProcess_DOF;
+  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First;
+  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal;
+  shared_ptr<Pass> mPostProcess_GaussianBlurVertical;
+  shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA;
+  shared_ptr<Pass> mPostProcess_DOF;
 
   Mesh* mFullScreenQuad = nullptr;
 };

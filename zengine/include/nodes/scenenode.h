@@ -45,7 +45,7 @@ protected:
   virtual void HandleMessage(Message* message) override;
 
 private:
-  vector<Node*> mTransitiveClosure;
+  vector<shared_ptr<Node>> mTransitiveClosure;
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
 

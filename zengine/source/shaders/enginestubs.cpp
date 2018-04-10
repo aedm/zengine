@@ -6,23 +6,25 @@ EngineStubs::EngineStubs() {
 }
 
 EngineStubs::~EngineStubs() {
-  for (auto &it : mStubs) delete it.second;
-  mStubs.clear();
+  for (auto& stub : mStubs) {
+    stub.second->DisconnectAll();
+  }
 }
 
 void EngineStubs::SetStubSource(const std::string& name, const std::string& source) {
-  StubNode* stub;
-  auto it = mStubs.find(name);
+  shared_ptr<StubNode> stub;
+  auto& it = mStubs.find(name);
   if (it == mStubs.end()) {
-    stub = new StubNode();
+    stub = make_shared<StubNode>();
     mStubs[name] = stub;
-  } else {
+  }
+  else {
     stub = it->second;
   }
   stub->mSource.SetDefaultValue(source);
 }
 
-StubNode* EngineStubs::GetStub(const string& name) {
+shared_ptr<StubNode> EngineStubs::GetStub(const string& name) {
   return mStubs.at(name);
 }
 

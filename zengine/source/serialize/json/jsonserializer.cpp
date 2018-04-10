@@ -26,7 +26,7 @@ const EnumMapperA SplineLayerMapper[] = {
 };
 
 
-JSONSerializer::JSONSerializer(Node* root) {
+JSONSerializer::JSONSerializer(const shared_ptr<Node>& root) {
   mJsonDocument.SetObject();
   mAllocator = &mJsonDocument.GetAllocator();
 
@@ -47,7 +47,7 @@ string JSONSerializer::GetJSON() {
   return buffer.GetString();
 }
 
-void JSONSerializer::Traverse(Node* root) {
+void JSONSerializer::Traverse(const shared_ptr<Node>& root) {
   mNodes[root] = ++mNodeCount;
   mNodesList.push_back(root);
 
@@ -56,14 +56,14 @@ void JSONSerializer::Traverse(Node* root) {
   for (auto slotPair : root->GetSerializableSlots()) {
     Slot* slot = slotPair.second;
     if (slot->mIsMultiSlot) {
-      for (Node* node : slot->GetDirectMultiNodes()) {
+      for (auto& node : slot->GetDirectMultiNodes()) {
         auto it = mNodes.find(node);
         if (it == mNodes.end()) {
           Traverse(node);
         }
       }
     } else {
-      Node* node = slot->GetDirectNode();
+      shared_ptr<Node> node = slot->GetDirectNode();
       if (node == nullptr || slot->IsDefaulted()) continue;
       auto it = mNodes.find(node);
       if (it == mNodes.end()) {
@@ -75,14 +75,14 @@ void JSONSerializer::Traverse(Node* root) {
 
 void JSONSerializer::DumpNodes() {
   rapidjson::Value nodesArray(rapidjson::kArrayType);
-  for (Node* node : mNodesList) {
+  for (auto& node : mNodesList) {
     nodesArray.PushBack(Serialize(node), *mAllocator);
   }
   mJsonDocument.AddMember("nodes", nodesArray, *mAllocator);
 }
 
 
-rapidjson::Value JSONSerializer::Serialize(Node* node) {
+rapidjson::Value JSONSerializer::Serialize(const shared_ptr<Node>& node) {
   rapidjson::Value v(rapidjson::kObjectType);
 
   /// Save class type
@@ -99,7 +99,7 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
   }
 
   /// Save graph position
-  if (!IsInsanceOf<Graph*>(node) && !IsInsanceOf<Document*>(node)) {
+  if (!IsPointerOf<Graph>(node) && !IsPointerOf<Document>(node)) {
     v.AddMember("position", SerializeVec2(node->GetPosition()), *mAllocator);
   }
 
@@ -107,21 +107,21 @@ rapidjson::Value JSONSerializer::Serialize(Node* node) {
 
   /// Save node content
   if (IsExactType<FloatNode>(node)) {
-    SerializeFloatNode(v, static_cast<FloatNode*>(node));
+    SerializeFloatNode(v, PointerCast<FloatNode>(node));
   } else if (IsExactType<Vec2Node>(node)) {
-    SerializeVec2Node(v, static_cast<Vec2Node*>(node));
+    SerializeVec2Node(v, PointerCast<Vec2Node>(node));
   } else if (IsExactType<Vec3Node>(node)) {
-    SerializeVec3Node(v, static_cast<Vec3Node*>(node));
+    SerializeVec3Node(v, PointerCast<Vec3Node>(node));
   } else if (IsExactType<Vec4Node>(node)) {
-    SerializeVec4Node(v, static_cast<Vec4Node*>(node));
+    SerializeVec4Node(v, PointerCast<Vec4Node>(node));
   } else if (IsExactType<FloatSplineNode>(node)) {
-    SerializeFloatSplineNode(v, static_cast<FloatSplineNode*>(node));
+    SerializeFloatSplineNode(v, PointerCast<FloatSplineNode>(node));
   } else if (IsExactType<TextureNode>(node)) {
-    SerializeTextureNode(v, static_cast<TextureNode*>(node));
+    SerializeTextureNode(v, PointerCast<TextureNode>(node));
   } else if (IsExactType<StaticMeshNode>(node)) {
-    SerializeStaticMeshNode(v, static_cast<StaticMeshNode*>(node));
+    SerializeStaticMeshNode(v, PointerCast<StaticMeshNode>(node));
   } else if (IsExactType<StubNode>(node)) {
-    SerializeStubNode(v, static_cast<StubNode*>(node));
+    SerializeStubNode(v, PointerCast<StubNode>(node));
   }
 
   SerializeGeneralNode(v, node);
@@ -153,7 +153,9 @@ rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) {
 }
 
 
-void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* node) {
+void JSONSerializer::SerializeGeneralNode(
+  rapidjson::Value& nodeValue, const shared_ptr<Node>& node) 
+{
   /// Save slots
   if (node->GetSerializableSlots().size() > 0) {
     rapidjson::Value slotsObject(rapidjson::kObjectType);
@@ -164,14 +166,14 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
       /// Save multislot
       if (slot->mIsMultiSlot) {
         rapidjson::Value connections(rapidjson::kArrayType);
-        for (Node* connectedNode : slot->GetDirectMultiNodes()) {
+        for (auto& connectedNode : slot->GetDirectMultiNodes()) {
           int connectedID = mNodes.at(connectedNode);
           connections.PushBack(connectedID, *mAllocator);
         }
         slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
                               connections, *mAllocator);
       } else {
-        Node* connectedNode = slot->GetDirectNode();
+        auto& connectedNode = slot->GetDirectNode();
 
         FloatSlot* floatSlot;
         Vec2Slot* vec2Slot;
@@ -227,23 +229,33 @@ void JSONSerializer::SerializeGeneralNode(rapidjson::Value& nodeValue, Node* nod
 }
 
 
-void JSONSerializer::SerializeFloatNode(rapidjson::Value& nodeValue, FloatNode* node) {
+void JSONSerializer::SerializeFloatNode(
+  rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node) 
+{
   nodeValue.AddMember("value", node->Get(), *mAllocator);
 }
 
-void JSONSerializer::SerializeVec2Node(rapidjson::Value& nodeValue, Vec2Node* node) {
+void JSONSerializer::SerializeVec2Node(
+  rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node) 
+{
   nodeValue.AddMember("value", SerializeVec2(node->Get()), *mAllocator);
 }
 
-void JSONSerializer::SerializeVec3Node(rapidjson::Value& nodeValue, Vec3Node* node) {
+void JSONSerializer::SerializeVec3Node(
+  rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node) 
+{
   nodeValue.AddMember("value", SerializeVec3(node->Get()), *mAllocator);
 }
 
-void JSONSerializer::SerializeVec4Node(rapidjson::Value& nodeValue, Vec4Node* node) {
+void JSONSerializer::SerializeVec4Node(
+  rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node) 
+{
   nodeValue.AddMember("value", SerializeVec4(node->Get()), *mAllocator);
 }
 
-void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, FloatSplineNode* node) {
+void JSONSerializer::SerializeFloatSplineNode(
+  rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node) 
+{
   for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT); layer++) {
     SplineFloatComponent* component = node->GetComponent(SplineLayer(layer));
     auto& points = component->GetPoints();
@@ -265,7 +277,8 @@ void JSONSerializer::SerializeFloatSplineNode(rapidjson::Value& nodeValue, Float
 }
 
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
-                                          TextureNode* node) {
+  const shared_ptr<TextureNode>& node) 
+{
   Texture* texture = node->Get();
   ASSERT(texture->mTexelData);
   string b64 = base64_encode((UCHAR*)texture->mTexelData, texture->mTexelDataByteCount);
@@ -278,7 +291,8 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
 }
 
 void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
-                                             StaticMeshNode* node) {
+  const shared_ptr<StaticMeshNode>& node) 
+{
   Mesh* mesh = node->GetMesh();
   ASSERT(mesh->mRawVertexData != nullptr);
   nodeValue.AddMember("format", mesh->mFormat->mBinaryFormat, *mAllocator);
@@ -302,7 +316,9 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
   }
 }
 
-void JSONSerializer::SerializeStubNode(rapidjson::Value& nodeValue, StubNode* node) {
+void JSONSerializer::SerializeStubNode(
+  rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node) 
+{
   const string& f = node->mSource.Get();
   rapidjson::Value slotValue(rapidjson::kObjectType);
   nodeValue.AddMember("source", f, *mAllocator);
@@ -313,7 +329,7 @@ void JSONSerializer::SerializeValueSlot(rapidjson::Value& slotsObject, Slot* slo
                                         rapidjson::Value& defaultValue) {
   rapidjson::Value slotValue(rapidjson::kObjectType);
   slotValue.AddMember("default", defaultValue, *mAllocator);
-  Node* connectedNode = slot->GetReferencedNode();
+  auto& connectedNode = slot->GetReferencedNode();
   if (!slot->IsDefaulted()) {
     int connectedID = mNodes.at(connectedNode);
     slotValue.AddMember("id", connectedID, *mAllocator);

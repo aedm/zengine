@@ -39,8 +39,9 @@ FloatSplineNode::FloatSplineNode()
   , mBeatSpikeLength(this, BeatSpikeLengthSlotName)
   , mBeatSpikeEasing(this, BeatSpikeEasingSlotName)
   , mBeatQuantizerFrequency(this, BeatQuantizerFrequencySlotName)
+  , mSceneTimeNode(make_shared<SceneTimeNode>())
 {
-  mTimeSlot.Connect(&mSceneTimeNode);
+  mTimeSlot.Connect(mSceneTimeNode);
   mNoiseVelocity.SetDefaultValue(20.0f);
   mBeatSpikeEasing.SetDefaultValue(1.0f);
   mBeatSpikeLength.SetDefaultValue(0.5f);
@@ -48,7 +49,7 @@ FloatSplineNode::FloatSplineNode()
 
 
 FloatSplineNode::~FloatSplineNode() {
-  mTimeSlot.Disconnect(&mSceneTimeNode);
+  mSceneTimeNode->DisconnectAll();
 }
 
 
@@ -56,7 +57,7 @@ void FloatSplineNode::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::VALUE_CHANGED:
       InvalidateCurrentValue();
-      NotifyWatchers(&Watcher::OnTimeEdited, mSceneTimeNode.Get());
+      NotifyWatchers(&Watcher::OnTimeEdited, mSceneTimeNode->Get());
       break;
     default:
       break;

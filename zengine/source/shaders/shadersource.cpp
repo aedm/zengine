@@ -11,7 +11,7 @@ ShaderSource::ShaderSource(
   , mFragmentSource(fragmentSource)
 {}
 
-ShaderSource::Uniform::Uniform(const string& name, Node* node,
+ShaderSource::Uniform::Uniform(const string& name, const shared_ptr<Node>& node,
                                ShaderGlobalType globalType, ValueType type)
   : mName(name)
   , mNode(node)
@@ -19,7 +19,7 @@ ShaderSource::Uniform::Uniform(const string& name, Node* node,
   , mType(type) 
 {}
 
-ShaderSource::Sampler::Sampler(const string& name, Node* node, 
+ShaderSource::Sampler::Sampler(const string& name, const shared_ptr<Node>& node,
                                ShaderGlobalType globalType,
                                bool isMultiSampler, bool isShadow)
   : mName(name)

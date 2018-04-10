@@ -1,21 +1,26 @@
 #pragma once
 
 #include "node.h"
+#include <vector>
+#include <map>
+
+using namespace std;
 
 class Ghost : public Node {
 public:
-  Ghost(Node* originalNode);
-  virtual ~Ghost();
+  Ghost(const shared_ptr<Node>& originalNode);
 
   Slot mOriginalNode;
 
   virtual bool IsGhostNode() override;
 
 protected:
-  vector<Node*> mInternalNodes;
-  Node* mMainInternalNode = nullptr;
+  set<shared_ptr<Node>> mInternalNodes;
+  map<shared_ptr<Node>, shared_ptr<Node>> mNodeMapping;
 
-  virtual Node* GetReferencedNode() override;
+  shared_ptr<Node> mMainInternalNode;
+
+  virtual shared_ptr<Node> GetReferencedNode() override;
 
   void Regenerate();
 

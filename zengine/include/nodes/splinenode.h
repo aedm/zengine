@@ -148,7 +148,7 @@ public:
   SplineFloatComponent* GetComponent(SplineLayer layer);
 
   /// Scene time node
-  SceneTimeNode mSceneTimeNode;
+  shared_ptr<SceneTimeNode> mSceneTimeNode;
 
   /// Time slot, connected to mSceneTimeNode
   FloatSlot mTimeSlot;

@@ -67,7 +67,7 @@ namespace Convert {
   }
 }
 
-string ToJSON(Document* document) {
+string ToJSON(const shared_ptr<Document>& document) {
   JSONSerializer serialzer(document);
   return serialzer.GetJSON();
 }

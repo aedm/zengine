@@ -33,7 +33,7 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   int id = value["id"].GetInt();
   NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(string(nodeClassName));
 
-  Node* node = nodeClass->Manufacture();
+  shared_ptr<Node> node = nodeClass->Manufacture();
   ASSERT(mNodes.find(id) == mNodes.end());
   mNodes[id] = node;
 
@@ -47,19 +47,19 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   }
 
   if (IsExactType<FloatNode>(node)) {
-    DeserializeFloatNode(value, SafeCast<FloatNode*>(node));
+    DeserializeFloatNode(value, PointerCast<FloatNode>(node));
   }
   else if (IsExactType<Vec2Node>(node)) {
-    DeserializeVec2Node(value, SafeCast<Vec2Node*>(node));
+    DeserializeVec2Node(value, PointerCast<Vec2Node>(node));
   } 
   else if (IsExactType<Vec3Node>(node)) {
-    DeserializeVec3Node(value, SafeCast<Vec3Node*>(node));
+    DeserializeVec3Node(value, PointerCast<Vec3Node>(node));
   } 
   else if (IsExactType<Vec4Node>(node)) {
-    DeserializeVec4Node(value, SafeCast<Vec4Node*>(node));
+    DeserializeVec4Node(value, PointerCast<Vec4Node>(node));
   } 
   else if (IsExactType<FloatSplineNode>(node)) {
-    DeserializeFloatSplineNode(value, SafeCast<FloatSplineNode*>(node));
+    DeserializeFloatSplineNode(value, SafeCast<FloatSplineNode>(node));
   } 
   else if (IsExactType<TextureNode>(node)) {
     DeserializeTextureNode(value, SafeCast<TextureNode*>(node));
@@ -101,7 +101,7 @@ Vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
 
 void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
   int id = value["id"].GetInt();
-  Node* node = mNodes.at(id);
+  auto& node = mNodes.at(id);
   
   if (value.HasMember("slots")) {
     rapidjson::Value& jsonSlots = value["slots"];
@@ -147,13 +147,13 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
       else if (itr->value.IsArray()) {
         for (UINT i = 0; i < itr->value.Size(); i++) {
           int connId = itr->value[i].GetInt();
-          Node* connNode = mNodes.at(connId);
+          auto& connNode = mNodes.at(connId);
           slot->Connect(connNode);
         }
       }
       else {
         int connId = itr->value.GetInt();
-        Node* connNode = mNodes.at(connId);
+        auto& connNode = mNodes.at(connId);
         slot->Connect(connNode);
       }
     }
@@ -245,7 +245,7 @@ void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
 void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
   if (value.HasMember("id")) {
     int connId = value["id"].GetDouble();
-    Node* connNode = mNodes.at(connId);
+    auto& connNode = mNodes.at(connId);
     slot->Connect(connNode);
   }
 }

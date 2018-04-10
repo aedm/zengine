@@ -25,8 +25,8 @@ Drawable::Drawable()
 Drawable::~Drawable() {}
 
 void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Primitive) {
-  Material* material = mMaterial.GetNode();
-  MeshNode* meshNode = mMesh.GetNode();
+  auto& material = mMaterial.GetNode();
+  auto& meshNode = mMesh.GetNode();
   Globals globals = *oldGlobals;
 
   if (mChildren.GetMultiNodeCount() == 0 && !(material && meshNode)) return;
@@ -69,7 +69,7 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
   }
 
   for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
-    static_cast<Drawable*>(mChildren.GetReferencedMultiNode(i))->Draw(&globals, passType);
+    PointerCast<Drawable>(mChildren.GetReferencedMultiNode(i))->Draw(&globals, passType);
   }
 }
 
@@ -77,7 +77,8 @@ void Drawable::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::SLOT_CONNECTION_CHANGED:
     case MessageType::VALUE_CHANGED:
-      TheMessageQueue.Enqueue(nullptr, this, MessageType::NEEDS_REDRAW);
+      TheMessageQueue.Enqueue(
+        nullptr, this->shared_from_this(), MessageType::NEEDS_REDRAW);
       break;
     default: break;
   }

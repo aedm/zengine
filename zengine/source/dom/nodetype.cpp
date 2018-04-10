@@ -33,7 +33,7 @@ NodeClass* NodeRegistry::GetNodeClass(const string& name) {
 }
 
 
-NodeClass* NodeRegistry::GetNodeClass(Node* node) {
+NodeClass* NodeRegistry::GetNodeClass(const shared_ptr<Node>& node) {
   /// If this breaks, you forgot to REGISTER_NODECLASS.
   return mNodeIndexMap.at(type_index(typeid(*node)));
 }

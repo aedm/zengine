@@ -21,11 +21,11 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
   mGlobals.DirectToScreen = 0.0f;
   bool clipFound = false;
   bool postprocessApplied = false;
-  for (vector<ClipNode*>& track : mTracks) {
+  for (vector<shared_ptr<ClipNode>>& track : mTracks) {
     int clipIndex = 0;
     int clipCount = int(track.size());
     for (; clipIndex < clipCount; clipIndex++) {
-      ClipNode* clip = track[clipIndex];
+      shared_ptr<ClipNode>& clip = track[clipIndex];
       float startTime = clip->mStartTime.Get();
       float endTime = startTime + clip->mLength.Get();
       if (startTime <= time && endTime > time) {
@@ -61,14 +61,14 @@ int MovieNode::GetTrackCount() {
   return int(mTracks.size());
 }
 
-const std::vector<ClipNode*>& MovieNode::GetTrack(int trackIndex) {
+const std::vector<shared_ptr<ClipNode>>& MovieNode::GetTrack(int trackIndex) {
   return mTracks[trackIndex];
 }
 
 float MovieNode::CalculateMovieLength() {
   float length = 0.0f;
   for (auto& track : mTracks) {
-    for (ClipNode* clipNode : track) {
+    for (auto& clipNode : track) {
       float clipEnd = clipNode->mStartTime.Get() + clipNode->mLength.Get();
       if (clipEnd > length) length = clipEnd;
     }
@@ -87,8 +87,8 @@ void MovieNode::HandleMessage(Message* message) {
       break;
     case MessageType::SCENE_TIME_EDITED:
     {
-      ClipNode* clipNode = SafeCast<ClipNode*>(message->mSource);
-      SceneNode* scene = clipNode->mSceneSlot.GetNode();
+      auto& clipNode = PointerCast<ClipNode>(message->mSource);
+      auto& scene = clipNode->mSceneSlot.GetNode();
       if (!scene) return;
       float time = clipNode->mStartTime.Get() + scene->GetSceneTime();
       NotifyWatchers(&Watcher::OnTimeEdited, time);
@@ -101,7 +101,7 @@ void MovieNode::HandleMessage(Message* message) {
 void MovieNode::SortClips() {
   for (auto& track : mTracks) track.clear();
   for (UINT i = 0; i < mClips.GetMultiNodeCount(); i++) {
-    ClipNode* clipNode = static_cast<ClipNode*>(mClips.GetReferencedMultiNode(i));
+    auto& clipNode = PointerCast<ClipNode>(mClips.GetReferencedMultiNode(i));
     int trackNumber = int(clipNode->mTrackNumber.Get());
     if (trackNumber < 0) trackNumber = 0;
     if (trackNumber >= mTracks.size()) trackNumber = int(mTracks.size() - 1);

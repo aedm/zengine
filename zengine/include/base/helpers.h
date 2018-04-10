@@ -1,6 +1,9 @@
 #pragma once
 #include "system.h"
 #include <assert.h>
+#include <memory>
+
+using namespace std;
 
 #if 1
 #	ifdef _DEBUG
@@ -27,6 +30,17 @@ T SafeCast(K object) {
   #else 
   return static_cast<T>(object);
   #endif
+}
+
+template<typename T, typename K>
+shared_ptr<T> PointerCast(const shared_ptr<K>& object) {
+#ifdef _DEBUG
+  shared_ptr<T> cast = dynamic_pointer_cast<T>(object);
+  ASSERT(object == nullptr || cast != nullptr);
+  return cast;
+#else 
+  return static_pointer_cast<T>(object);
+#endif
 }
 
 template<typename T, typename K>
@@ -146,5 +160,5 @@ namespace Convert {
   bool StringToFloat(const char* s, float& f);
 }
 
-string ToJSON(Document* document);
+string ToJSON(const shared_ptr<Document>& document);
 Document* FromJSON(string& json);
