@@ -150,7 +150,7 @@ void Pass::Set(Globals* globals) {
         #undef ITEM
         #define ITEM(name, capitalizedName, type) \
 				case ValueType::name: { \
-          auto vNode = SafeCast<ValueNode<ValueType::name>*>(source->mNode); \
+          auto vNode = PointerCast<ValueNode<ValueType::name>>(source->mNode); \
           vNode->Update(); \
           *(reinterpret_cast<type*>(&mUniformArray[target->mOffset])) = vNode->Get(); \
 					break; \
@@ -187,7 +187,7 @@ void Pass::Set(Globals* globals) {
     Texture* tex = nullptr;
     if (samplerMapper.mSource->mGlobalType == ShaderGlobalType::LOCAL) {
       ASSERT(samplerMapper.mSource->mNode != nullptr);
-      tex = static_cast<TextureNode*>(samplerMapper.mSource->mNode)->Get();
+      tex = PointerCast<TextureNode>(samplerMapper.mSource->mNode)->Get();
     } else {
       /// Global uniform, takes value from the Globals object
       int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];

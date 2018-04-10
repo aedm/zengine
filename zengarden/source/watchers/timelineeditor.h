@@ -7,13 +7,13 @@
 
 class TimelineEditor: public WatcherUI {
 public:
-  TimelineEditor(MovieNode* movieNode);
+  TimelineEditor(const shared_ptr<MovieNode>& movieNode);
   virtual ~TimelineEditor();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   virtual void OnRedraw() override;
   virtual void OnChildNameChange();
-  void SetSceneNodeForSelectedClip(SceneNode* sceneNode);
+  void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode);
 
 private:
   Ui::MovieEditor mUI;
@@ -36,8 +36,8 @@ private:
   float mOriginalClipStart;
   float mOriginalClipLength;
   QPoint mOriginalMousePos;
-  ClipNode* mHoveredClip = nullptr;
-  ClipNode* mSelectedClip = nullptr;
+  shared_ptr<ClipNode> mHoveredClip;
+  shared_ptr<ClipNode> mSelectedClip;
 
   void HandleMovieCursorChange(float seconds);
   void HandleMouseDown(QMouseEvent* event);

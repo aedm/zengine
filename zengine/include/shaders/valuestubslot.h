@@ -6,7 +6,7 @@ template <ValueType T>
 class ValueStubSlot: public ValueSlot<T> {
 public:
   ValueStubSlot(Node* owner, SharedString name);
-  virtual bool DoesAcceptNode(Node* node) const override;
+  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override;
 };
 
 
@@ -17,6 +17,6 @@ ValueStubSlot<T>::ValueStubSlot(Node* owner, SharedString name)
 
 
 template <ValueType T>
-bool ValueStubSlot<T>::DoesAcceptNode(Node* node) const {
-  return IsInsanceOf<StubNode*>(node) || IsInsanceOf<ValueNode<T>*>(node);
+bool ValueStubSlot<T>::DoesAcceptNode(const shared_ptr<Node>& node) const {
+  return IsPointerOf<StubNode>(node) || IsPointerOf<ValueNode<T>>(node);
 }

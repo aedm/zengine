@@ -58,7 +58,7 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
     const Mesh* mesh = meshNode->GetMesh();
 
     /// Set pass (pipeline state)
-    Pass* pass = material->GetPass(passType);
+    auto& pass = material->GetPass(passType);
     if (!pass) return;
     pass->Update();
 

@@ -12,8 +12,8 @@ public:
   virtual bool Undo() override;
 
 private:
-  Node* mNode;
-  Graph* mGraph;
+  shared_ptr<Node> mNode;
+  shared_ptr<Graph> mGraph;
 };
 
 
@@ -26,7 +26,7 @@ public:
   virtual bool Undo() override;
 
 private:
-  Node* mNode;
+  shared_ptr<Node> mNode;
   Vec2 mNewPosition;
   Vec2 mOldPosition;
 };
@@ -40,20 +40,20 @@ public:
   virtual bool Undo() override;
 
 private:
-  Node* mNewNode;
-  Node* mOldNode;
+  shared_ptr<Node> mNewNode;
+  shared_ptr<Node> mOldNode;
   Slot* mSlot;
 };
 
 
 class DeleteNodeCommand: public Command {
 public:
-  DeleteNodeCommand(OWNERSHIP set<Node*>* nodes);
+  DeleteNodeCommand(set<shared_ptr<Node>>& nodes);
   virtual ~DeleteNodeCommand();
 
   virtual bool Do() override;
   virtual bool Undo() override;
 
 private:
-  set<Node*>* mNodes;
+  set<shared_ptr<Node>> mNodes;
 };

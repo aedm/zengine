@@ -143,7 +143,7 @@ public:
   const bool mIsMultiSlot;
 
   /// Return the Nth connected node from a multislot
-  shared_ptr<Node>& operator[] (UINT index);
+  const shared_ptr<Node> operator[] (UINT index);
 
   /// Returns true if slot is connected to its own default node (if it has one)
   virtual bool IsDefaulted();

@@ -23,11 +23,11 @@ public:
   static ZenGarden* GetInstance();
 
   /// Open a watcher
-  void Watch(Node* node, WatcherPosition watcherPosition);
+  void Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition);
 
   /// Property editor related
-  void SetNodeForPropertyEditor(Node* node);
-  Node* GetNodeInPropertyEditor();
+  void SetNodeForPropertyEditor(shared_ptr<Node> node);
+  shared_ptr<Node> GetNodeInPropertyEditor();
 
   /// Sets the cursor relative to the beginning of the timeline
   void SetMovieCursor(float seconds);
@@ -41,7 +41,7 @@ public:
   /// Returns the movie cursor position in seconds
   float GetMovieCursor();
 
-  void SetSceneNodeForClip(SceneNode* sceneNode);
+  void SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode);
 
   /// Event that fires when the movie cursor changes
   Event<float> mOnMovieCursorChange;
@@ -68,7 +68,7 @@ private:
   QGLWidget* mCommonGLWidget = nullptr;
 
   /// The currently open document
-  Document*	mDocument = nullptr;
+  shared_ptr<Document>	mDocument = nullptr;
   DocumentWatcher* mDocumentWatcher = nullptr;
   QString mDocumentFileName;
   

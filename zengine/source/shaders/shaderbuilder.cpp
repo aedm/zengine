@@ -2,8 +2,9 @@
 #include <include/shaders/enginestubs.h>
 #include <exception>
 
-shared_ptr<ShaderSource> ShaderBuilder::FromStubs(StubNode* vertexStub,
-  StubNode* fragmentStub) {
+shared_ptr<ShaderSource> ShaderBuilder::FromStubs(const shared_ptr<StubNode>& vertexStub,
+  const shared_ptr<StubNode>& fragmentStub)
+{
   if (vertexStub == nullptr) {
     ERR("vertex stub is nullptr");
     return nullptr;
@@ -29,9 +30,11 @@ ShaderBuilder::ShaderStage::ShaderStage(bool isVertexShader)
   : mIsVertexShader(isVertexShader) {}
 
 
-ShaderBuilder::ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub)
+ShaderBuilder::ShaderBuilder(const shared_ptr<StubNode>& vertexStub, 
+  const shared_ptr<StubNode>& fragmentStub)
   : mVertexStage(true)
-  , mFragmentStage(false) {
+  , mFragmentStage(false) 
+{
   StubMetadata* vertexStubMeta = vertexStub->GetStubMetadata();
   if (vertexStubMeta == nullptr) {
     ERR("Vertex stub has no metadata.");
@@ -82,8 +85,10 @@ shared_ptr<ShaderSource> ShaderBuilder::MakeShaderSource() {
     mFragmentStage.mSourceStream.str());
 }
 
-void ShaderBuilder::CollectInputsAndOutputs(Node* node, ShaderStage* shaderStage) {
-  StubNode* stub = SafeCast<StubNode*>(node);
+void ShaderBuilder::CollectInputsAndOutputs(
+  const shared_ptr<Node>& node, ShaderStage* shaderStage) 
+{
+  shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
 
   StubMetadata* stubMeta = stub->GetStubMetadata();
   if (stubMeta == nullptr) {
@@ -112,26 +117,27 @@ void ShaderBuilder::CollectInputsAndOutputs(Node* node, ShaderStage* shaderStage
   }
 }
 
-void ShaderBuilder::TraverseDependencies(Node* root, ShaderStage* shaderStage,
-  set<Node*>& visitedNodes) {
+void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root, 
+  ShaderStage* shaderStage, set<shared_ptr<Node>>& visitedNodes) 
+{
   visitedNodes.insert(root);
 
-  if (IsInsanceOf<StubNode*>(root)) {
+  if (IsPointerOf<StubNode>(root)) {
     /// Assigns empty stub reference
-    StubNode* stubNode = SafeCast<StubNode*>(root);
+    auto stubNode = PointerCast<StubNode>(root);
     stubNode->Update();
 
     ValueType returnType = stubNode->GetStubMetadata()->returnType;
     shaderStage->mStubMap[root] = make_shared<StubReference>(returnType);
 
     for (auto slotPair : stubNode->mParameterSlotMap) {
-      Node* node = slotPair.second->GetDirectNode();
+      shared_ptr<Node> node = slotPair.second->GetDirectNode();
       if (node == nullptr) {
         WARN("Incomplete shader graph.");
         throw exception();
       }
       if (slotPair.first->mType == ValueType::TEXTURE) {
-        TextureNode* textureNode = dynamic_cast<TextureNode*>(node);
+        auto& textureNode = PointerCast<TextureNode>(node);
         ASSERT(textureNode);
         if (textureNode->Get() != nullptr) {
           shaderStage->mDefines.push_back(*slotPair.first->mName + "_CONNECTED");
@@ -163,18 +169,20 @@ void ShaderBuilder::TraverseDependencies(Node* root, ShaderStage* shaderStage,
 }
 
 
-void ShaderBuilder::CollectDependencies(Node* root, ShaderStage* shaderStage) {
-  StubNode* uberShader = TheEngineStubs->GetStub("uber");
-  TraverseDependencies(uberShader, shaderStage, set<Node*>());
-  TraverseDependencies(root, shaderStage, set<Node*>());
+void ShaderBuilder::CollectDependencies(const shared_ptr<Node>& root, 
+  ShaderStage* shaderStage) 
+{
+  shared_ptr<StubNode> uberShader = TheEngineStubs->GetStub("uber");
+  TraverseDependencies(uberShader, shaderStage, set<shared_ptr<Node>>());
+  TraverseDependencies(root, shaderStage, set<shared_ptr<Node>>());
 }
 
 
 void ShaderBuilder::ShaderStage::GenerateStubNames() {
   int stubIndex = 0;
 
-  for (Node* node : mDependencies) {
-    if (IsInsanceOf<StubNode*>(node)) {
+  for (const auto& node : mDependencies) {
+    if (IsPointerOf<StubNode>(node)) {
       shared_ptr<StubReference> stubReference = mStubMap.at(node);
       ++stubIndex;
 
@@ -215,10 +223,10 @@ void ShaderBuilder::GenerateNames() {
 
 
 void ShaderBuilder::AddGlobalsToDependencies(ShaderStage* shaderStage) {
-  for (Node* node : shaderStage->mDependencies) {
-    if (!IsInsanceOf<StubNode*>(node)) continue;
+  for (const auto& node : shaderStage->mDependencies) {
+    if (!IsPointerOf<StubNode>(node)) continue;
 
-    StubNode* stub = SafeCast<StubNode*>(node);
+    auto stub = PointerCast<StubNode>(node);
     StubMetadata* stubMeta = stub->GetStubMetadata();
     if (stubMeta == nullptr) {
       ERR("Can't build shader source.");
@@ -253,8 +261,8 @@ void ShaderBuilder::AddLocalsToDependencies() {
 }
 
 void ShaderBuilder::GenerateSource(ShaderStage* shaderStage) {
-  for (Node* node : shaderStage->mDependencies) {
-    if (IsInsanceOf<StubNode*>(node)) {
+  for (const auto& node : shaderStage->mDependencies) {
+    if (IsPointerOf<StubNode>(node)) {
       CollectInputsAndOutputs(node, shaderStage);
     }
   }
@@ -308,9 +316,9 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
 }
 
 void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
-  for (Node* node : shaderStage->mDependencies) {
-    if (IsInsanceOf<StubNode*>(node)) {
-      StubNode* stub = static_cast<StubNode*>(node);
+  for (const auto& node : shaderStage->mDependencies) {
+    if (IsPointerOf<StubNode>(node)) {
+      shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
 
       /// Define samplers
@@ -319,7 +327,7 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
         StubParameter* param = stubMeta->parameters[i];
         if (param->mType == ValueType::TEXTURE) {
           Slot* slot = stub->GetSlotByParameter(param);
-          Node* paramNode = slot->GetReferencedNode();
+          auto paramNode = slot->GetReferencedNode();
           if (paramNode == nullptr) {
             /// Node not connected to param
             ERR("Sampler not connected");
@@ -369,9 +377,9 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
 
   stream << endl;
   stream << "void main() {" << endl;
-  for (Node* node : shaderStage->mDependencies) {
-    if (IsInsanceOf<StubNode*>(node)) {
-      StubNode* stub = static_cast<StubNode*>(node);
+  for (const auto& node : shaderStage->mDependencies) {
+    if (IsPointerOf<StubNode>(node)) {
+      shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
       auto stubReference = shaderStage->mStubMap.at(node);
 
@@ -386,13 +394,13 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
         if (param->mType != ValueType::TEXTURE) {
           if (!isFirstParameter) stream << ", ";
           Slot* slot = stub->GetSlotByParameter(param);
-          Node* paramNode = slot->GetReferencedNode();
+          auto paramNode = slot->GetReferencedNode();
           if (paramNode == nullptr) {
             /// Node not connected to param
             ERR("Parameter not connected");
             throw exception();
           }
-          if (IsInsanceOf<StubNode*>(paramNode)) {
+          if (IsPointerOf<StubNode>(paramNode)) {
             /// Call parameter is the result of a former function call
             auto paramStubReference = shaderStage->mStubMap.at(paramNode);
             stream << paramStubReference->mVariableName;

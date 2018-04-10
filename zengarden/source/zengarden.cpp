@@ -186,7 +186,7 @@ void ZenGarden::LoadEngineShader(const QString& path) {
     string(stubSource.get()));
 }
 
-void ZenGarden::SetNodeForPropertyEditor(Node* node) {
+void ZenGarden::SetNodeForPropertyEditor(shared_ptr<Node>& node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
     shared_ptr<WatcherUI> watcher;
@@ -220,7 +220,7 @@ void ZenGarden::SetNodeForPropertyEditor(Node* node) {
 }
 
 
-Node* ZenGarden::GetNodeInPropertyEditor() {
+shared_ptr<Node> ZenGarden::GetNodeInPropertyEditor() {
   if (!mPropertyEditor) return nullptr;
   return mPropertyEditor->mWatcher->GetNode();
 }
@@ -246,7 +246,7 @@ float ZenGarden::GetMovieCursor() {
   return mMovieCursor;
 }
 
-void ZenGarden::SetSceneNodeForClip(SceneNode* sceneNode) {
+void ZenGarden::SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode) {
   if (!mMovieWatcherWidget || !mMovieWatcherWidget->mWatcher) return;
   shared_ptr<TimelineEditor> editor =
     dynamic_pointer_cast<TimelineEditor>(mMovieWatcherWidget->mWatcher);
@@ -260,7 +260,7 @@ PropertiesNode* ZenGarden::GetPropertiesNode() {
 }
 
 
-void ZenGarden::Watch(Node* node, WatcherPosition watcherPosition) {
+void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition) {
   QTabWidget* tabWidget = nullptr;
   switch (watcherPosition) {
   case WatcherPosition::UPPER_LEFT_TAB:

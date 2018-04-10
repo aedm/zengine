@@ -1,7 +1,7 @@
 #include <include/dom/watcher.h>
 #include <include/dom/node.h>
 
-Watcher::Watcher(Node* node)
+Watcher::Watcher(const shared_ptr<Node>& node)
   : mNode(node)
 {}
 
@@ -9,7 +9,7 @@ Watcher::~Watcher() {
   ASSERT(mNode == nullptr);
 }
 
-Node* Watcher::GetNode() {
+shared_ptr<Node> Watcher::GetNode() {
   return mNode;
 }
 

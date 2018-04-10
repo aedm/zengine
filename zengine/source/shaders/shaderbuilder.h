@@ -5,10 +5,12 @@
 
 class ShaderBuilder {
 public:
-  static shared_ptr<ShaderSource> FromStubs(StubNode* vertexStub, StubNode* fragmentStub);
+  static shared_ptr<ShaderSource> FromStubs(
+    const shared_ptr<StubNode>& vertexStub, const shared_ptr<StubNode>& fragmentStub);
 
 private:
-  ShaderBuilder(StubNode* vertexStub, StubNode* fragmentStub);
+  ShaderBuilder(const shared_ptr<StubNode>& vertexStub, 
+    const shared_ptr<StubNode>& fragmentStub);
   ~ShaderBuilder();
 
   shared_ptr<ShaderSource> MakeShaderSource();
@@ -59,10 +61,10 @@ private:
     void GenerateStubNames();
 
     /// Topologic order of dependencies
-    vector<Node*> mDependencies;
+    vector<shared_ptr<Node>> mDependencies;
 
     /// References of stub nodes
-    map<Node*, shared_ptr<StubReference>> mStubMap;
+    map<shared_ptr<Node>, shared_ptr<StubReference>> mStubMap;
 
     /// Stader stage type
     const bool mIsVertexShader;
@@ -80,18 +82,18 @@ private:
   };
 
   /// Creates topological order of dependency tree
-  void CollectDependencies(Node* root, ShaderStage* shaderStage);
+  void CollectDependencies(const shared_ptr<Node>& root, ShaderStage* shaderStage);
 
   /// Traverses stub graph for a shader stage, called only by CollectDependencies
-  void TraverseDependencies(Node* root, ShaderBuilder::ShaderStage* shaderStage,
-                            set<Node*>& visitedNodes);
+  void TraverseDependencies(const shared_ptr<Node>& root, 
+    ShaderBuilder::ShaderStage* shaderStage, set<shared_ptr<Node>>& visitedNodes);
 
   /// Generates function and variable names
   void GenerateNames();
 
   /// Generate metadata
   void AddGlobalsToDependencies(ShaderStage* shaderStage);
-  void CollectInputsAndOutputs(Node* node, ShaderStage* shaderStage);
+  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage);
   void AddLocalsToDependencies();
 
   /// Generate source
@@ -107,8 +109,8 @@ private:
   ShaderStage mFragmentStage;
 
   /// References of uniform/smapler nodes
-  map<Node*, shared_ptr<ValueReference>> mUniformMap;
-  map<Node*, shared_ptr<ValueReference>> mSamplerMap;
+  map<shared_ptr<Node>, shared_ptr<ValueReference>> mUniformMap;
+  map<shared_ptr<Node>, shared_ptr<ValueReference>> mSamplerMap;
   set<ShaderGlobalType> mUsedGlobals;
 
   /// Metadata

@@ -213,7 +213,7 @@ void Slot::ChangeNodeIndex(const shared_ptr<Node>& node, UINT targetIndex) {
   }
 }
 
-shared_ptr<Node>& Slot::operator[](UINT index) {
+const shared_ptr<Node> Slot::operator[](UINT index) {
   ASSERT(mIsMultiSlot);
   ASSERT(index < mMultiNodes.size());
   return mMultiNodes[index];

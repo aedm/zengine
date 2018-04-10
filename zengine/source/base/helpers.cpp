@@ -72,7 +72,7 @@ string ToJSON(const shared_ptr<Document>& document) {
   return serialzer.GetJSON();
 }
 
-Document* FromJSON(string& json) {
+shared_ptr<Document> FromJSON(string& json) {
   JSONDeserializer deserialzer(json);
   return deserialzer.GetDocument();
 }

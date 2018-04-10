@@ -18,13 +18,14 @@ template<> StaticValueNode<ValueType::VEC4>::StaticValueNode()
   mValue = Vec4(0, 0, 0, 0);
 }
 
-#undef ITEM
-#define ITEM(name, capitalizedName, type) static StaticValueNode<ValueType::name> name##NodeInstance;
-VALUETYPE_LIST
+//#undef ITEM
+//#define ITEM(name, capitalizedName, type) \
+//  static StaticValueNode<ValueType::name> name##NodeInstance;
+//VALUETYPE_LIST
 
 #undef ITEM
-#define ITEM(name, capitalizedName, type) &name##NodeInstance,
-Node* StaticValueNodesList[] = {
+#define ITEM(name, capitalizedName, type) make_shared<StaticValueNode<ValueType::name>>(),
+shared_ptr<Node> StaticValueNodesList[] = {
   VALUETYPE_LIST
 };
 

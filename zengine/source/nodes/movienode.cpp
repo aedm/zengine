@@ -109,7 +109,8 @@ void MovieNode::SortClips() {
   }
 
   for (auto& track : mTracks) {
-    std::sort(track.begin(), track.end(), [](ClipNode* a, ClipNode* b) {
+    std::sort(track.begin(), track.end(), 
+      [](const shared_ptr<ClipNode>& a, const shared_ptr<ClipNode>& b) {
       return a->mStartTime.Get() < b->mStartTime.Get();
     });
   }

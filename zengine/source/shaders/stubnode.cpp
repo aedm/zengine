@@ -65,7 +65,8 @@ void StubNode::Operate() {
   /// Create a new list of slots
   for (auto param : mMetadata->parameters) {
     auto it = mParameterNameSlotMap.find(*param->mName);
-    if (it != mParameterNameSlotMap.end() && it->second->DoesAcceptNode(StaticValueNodesList[int(param->mType)])) {
+    if (it != mParameterNameSlotMap.end() && 
+      it->second->DoesAcceptNode(StaticValueNodesList[int(param->mType)])) {
       /// This slot was used before, reuse it.
       /// "isTraversable" is false since it's already in the mTraversableSlots vector.
       AddSlot(it->second, true, true, true);
@@ -134,7 +135,7 @@ void StubNode::HandleMessage(Message* message) {
         mIsUpToDate = false;
         SendMsg(MessageType::VALUE_CHANGED);
       }
-      else if (dynamic_cast<StubNode*>(message->mSlot->GetReferencedNode())) {
+      else if (PointerCast<StubNode>(message->mSlot->GetReferencedNode())) {
         SendMsg(MessageType::VALUE_CHANGED);
       }
       else {

@@ -157,7 +157,7 @@ int CALLBACK WinMain(
 
   /// Load precalc project file
   char* json = System::ReadFile(L"loading.zen");
-  Document* loading = FromJSON(string(json));
+  shared_ptr<Document> loading = FromJSON(string(json));
   ASSERT(loading);
   delete json;
 
@@ -173,20 +173,20 @@ int CALLBACK WinMain(
 
   /// Load demo file
   json = System::ReadFile(L"demo.zen");
-  Document* doc = FromJSON(string(json));
+  shared_ptr<Document> doc = FromJSON(string(json));
   ASSERT(doc);
   delete json;
 
   /// Compile shaders, upload resources
-  vector<Node*> nodes;
+  vector<shared_ptr<Node>> nodes;
   doc->GenerateTransitiveClosure(nodes, false);
-  for (Node* node : nodes) node->Update();
+  for (const auto& node : nodes) node->Update();
 
   /// No more OpenGL resources should be allocated after this point
   PleaseNoNewResources = true;
 
   /// Calculate demo length
-  MovieNode* movieNode = doc->mMovie.GetNode();
+  shared_ptr<MovieNode> movieNode = doc->mMovie.GetNode();
   float movieLength = movieNode->CalculateMovieLength();
   float beatsPerSecond = doc->mProperties.GetNode()->mBPM.Get() / 60.0f;;
 

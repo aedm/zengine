@@ -221,4 +221,4 @@ Slot* CreateValueSlot(ValueType type, Node* owner,
   float minimum = 0.0f, float maximum = 1.0f);
 
 /// An instance of each static value nodes
-extern Node* StaticValueNodesList[];
+extern shared_ptr<Node> StaticValueNodesList[];

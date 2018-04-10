@@ -5,11 +5,7 @@ CreateNodeCommand::CreateNodeCommand(Node* node, Graph* graph)
   : mNode(node)
   , mGraph(graph) {}
 
-CreateNodeCommand::~CreateNodeCommand() {
-  if (!mIsActive) {
-    SafeDelete(mNode);
-  }
-}
+CreateNodeCommand::~CreateNodeCommand() {}
 
 bool CreateNodeCommand::Do() {
   mGraph->mNodes.Connect(mNode);
@@ -60,23 +56,16 @@ bool ConnectNodeToSlotCommand::Undo() {
   return mSlot->Connect(mOldNode);
 }
 
-DeleteNodeCommand::DeleteNodeCommand(OWNERSHIP set<Node*>* nodes)
+DeleteNodeCommand::DeleteNodeCommand(set<shared_ptr<Node>>& nodes)
   : mNodes(nodes) {}
 
-DeleteNodeCommand::~DeleteNodeCommand() {
-  //if (mIsActive) {
-  //  for (Node* node : *mNodes) {
-  //    delete node;
-  //  }
-  //}
-}
+DeleteNodeCommand::~DeleteNodeCommand() {}
 
 bool DeleteNodeCommand::Do() {
-  for (Node* node : *mNodes) {
-    /// TODO: don't delete them, just remove them from the graph.
-    delete node;
+  for (shared_ptr<Node> node : mNodes) {
+    node->DisconnectAll();
   }
-  SafeDelete(mNodes);
+  mNodes.clear();
   return true;
 }
 

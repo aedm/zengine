@@ -23,7 +23,7 @@ JSONDeserializer::JSONDeserializer(const string& json) {
   INFO("Loading done.");
 }
 
-Document* JSONDeserializer::GetDocument() {
+shared_ptr<Document> JSONDeserializer::GetDocument() {
   ASSERT(mDocument);
   return mDocument;
 }
@@ -59,20 +59,20 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     DeserializeVec4Node(value, PointerCast<Vec4Node>(node));
   } 
   else if (IsExactType<FloatSplineNode>(node)) {
-    DeserializeFloatSplineNode(value, SafeCast<FloatSplineNode>(node));
+    DeserializeFloatSplineNode(value, PointerCast<FloatSplineNode>(node));
   } 
   else if (IsExactType<TextureNode>(node)) {
-    DeserializeTextureNode(value, SafeCast<TextureNode*>(node));
+    DeserializeTextureNode(value, PointerCast<TextureNode>(node));
   }
   else if (IsExactType<StaticMeshNode>(node)) {
-    DeserializeStaticMeshNode(value, SafeCast<StaticMeshNode*>(node));
+    DeserializeStaticMeshNode(value, PointerCast<StaticMeshNode>(node));
   } 
   else if (IsExactType<StubNode>(node)) {
-    DeserializeStubNode(value, SafeCast<StubNode*>(node));
+    DeserializeStubNode(value, PointerCast<StubNode>(node));
   } 
   else if (IsExactType<Document>(node)) {
     ASSERT(mDocument == nullptr);
-    mDocument = SafeCast<Document*>(node);
+    mDocument = PointerCast<Document>(node);
   }
 }
 
@@ -161,7 +161,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
 }
 
 void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value, 
-                                              TextureNode* node) 
+  const shared_ptr<TextureNode>& node)
 {
   int width = value["width"].GetInt();
   int height = value["height"].GetInt();
@@ -185,7 +185,7 @@ void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
 
 
 void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value, 
-                                                 StaticMeshNode* node) {
+  const shared_ptr<StaticMeshNode>& node) {
   int binaryFormat = value["format"].GetInt();
   UINT vertexCount = value["vertexcount"].GetInt();
   VertexFormat* format = TheResourceManager->GetVertexFormat(binaryFormat);
@@ -214,7 +214,9 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
 }
 
 
-void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, FloatSplineNode* node) {
+void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, 
+  const shared_ptr<FloatSplineNode>& node) 
+{
   for (UINT l = UINT(SplineLayer::BASE); l < UINT(SplineLayer::COUNT); l++) {
     const char* fieldName = EnumMapperA::GetStringFromEnum(SplineLayerMapper, l);
     if (!value.HasMember(fieldName)) continue;
@@ -235,7 +237,8 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
 
 
 void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value, 
-                                           StubNode* node) {
+  const shared_ptr<StubNode>& node) 
+{
   string source = value["source"].GetString();
   node->mSource.SetDefaultValue(source);
   node->Update();
@@ -251,22 +254,22 @@ void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot*
 }
 
 void JSONDeserializer::DeserializeFloatNode(const rapidjson::Value& value, 
-                                            FloatNode* node) {
+  const shared_ptr<FloatNode>& node) {
   node->Set(value["value"].GetDouble());
 }
 
 void JSONDeserializer::DeserializeVec2Node(const rapidjson::Value& value, 
-                                           Vec2Node* node) {
+  const shared_ptr<Vec2Node>& node) {
   node->Set(DeserializeVec2(value["value"]));
 }
 
 void JSONDeserializer::DeserializeVec3Node(const rapidjson::Value& value,
-                                           Vec3Node* node) {
+  const shared_ptr<Vec3Node>& node) {
   node->Set(DeserializeVec3(value["value"]));
 }
 
 void JSONDeserializer::DeserializeVec4Node(const rapidjson::Value& value,
-                                           Vec4Node* node) {
+  const shared_ptr<Vec4Node>& node) {
   node->Set(DeserializeVec4(value["value"]));
 }
 

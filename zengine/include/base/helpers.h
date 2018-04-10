@@ -33,7 +33,7 @@ T SafeCast(K object) {
 }
 
 template<typename T, typename K>
-shared_ptr<T> PointerCast(const shared_ptr<K>& object) {
+const shared_ptr<T> PointerCast(const shared_ptr<K>& object) {
 #ifdef _DEBUG
   shared_ptr<T> cast = dynamic_pointer_cast<T>(object);
   ASSERT(object == nullptr || cast != nullptr);
@@ -161,4 +161,4 @@ namespace Convert {
 }
 
 string ToJSON(const shared_ptr<Document>& document);
-Document* FromJSON(string& json);
+shared_ptr<Document> FromJSON(string& json);

@@ -27,7 +27,7 @@ void Material::HandleMessage(Message* message) {
 }
 
 
-Pass* Material::GetPass(PassType passType) {
+const shared_ptr<Pass> Material::GetPass(PassType passType) {
   switch (passType) {
     case PassType::SHADOW: return mShadowPass.GetNode();
     case PassType::SOLID: return mSolidPass.GetNode();

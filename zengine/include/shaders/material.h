@@ -10,7 +10,7 @@ public:
   PassSlot mSolidPass;
   PassSlot mShadowPass;
 
-  Pass* GetPass(PassType passType);
+  const shared_ptr<Pass> GetPass(PassType passType);
 
 protected:
   virtual void HandleMessage(Message* message) override;

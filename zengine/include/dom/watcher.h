@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+using namespace std;
+
 class Node;
 class Slot;
 
@@ -10,7 +13,7 @@ public:
   virtual ~Watcher();
 
   /// Returns the node being watched
-  Node*	GetNode();
+  shared_ptr<Node> GetNode();
 
   /// Destroys the watcher and its UI elements
   virtual void OnDeleteNode();
@@ -43,9 +46,9 @@ public:
   virtual void OnTimeEdited(float time);
 
 protected:
-  Watcher(Node* node);
+  Watcher(const shared_ptr<Node>& node);
 
-  Node* mNode = nullptr;
+  shared_ptr<Node> mNode;
 
 private:
   /// Changes the node being watched. Only a Node should call this.

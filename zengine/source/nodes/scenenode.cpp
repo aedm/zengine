@@ -146,7 +146,7 @@ void SceneNode::CalculateRenderDependencies() {
 void SceneNode::SetSceneTime(float time) {
   Update();
   for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
-    SafeCast<SceneTimeNode*>(node)->Set(time);
+    PointerCast<SceneTimeNode>(node)->Set(time);
   }
 }
 

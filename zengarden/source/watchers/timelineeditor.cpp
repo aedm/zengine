@@ -4,7 +4,7 @@
 static const float DefaultPixelsPerSecond = 100.0f;
 static const int TrackHeightPixels = 20;
 
-TimelineEditor::TimelineEditor(MovieNode* movieNode)
+TimelineEditor::TimelineEditor(const shared_ptr<MovieNode>& movieNode)
   : WatcherUI(movieNode) 
 {
   ZenGarden::GetInstance()->mOnMovieCursorChange += 
@@ -37,7 +37,7 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mTimelineCanvas->OnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
 
   watcherWidget->connect(mUI.newClipButton, &QPushButton::pressed, [=]() {
-    ClipNode* clipNode = new ClipNode();
+    auto clipNode = make_shared<ClipNode>();
     clipNode->mStartTime.SetDefaultValue(ZenGarden::GetInstance()->GetMovieCursor());
     clipNode->mLength.SetDefaultValue(5.0f);
     MovieNode* movieNode = dynamic_cast<MovieNode*>(this->mNode);
