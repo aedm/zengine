@@ -47,22 +47,24 @@ SolidMaterial::SolidMaterial()
   , mSolidVertexStub(make_shared<StubNode>())
   , mSolidFragmentStub(make_shared<StubNode>())
 {
-  mMaterial->mShadowPass.Connect(TheEngineShaders->mSolidShadowPass);
+  mMaterial->mShadowPass.Connect(TheEngineShaders->mSolidShadowPass, true);
 
   mSolidVertexStub->mSource.Connect(
-    TheEngineStubs->GetStub("material/solid/solidPass-vertex")->mSource.GetDirectNode());
+    TheEngineStubs->GetStub("material/solid/solidPass-vertex")->mSource.GetDirectNode(), 
+    true);
   mSolidFragmentStub->mSource.Connect(
-    TheEngineStubs->GetStub("material/solid/solidPass-fragment")->mSource.GetDirectNode());
+    TheEngineStubs->GetStub("material/solid/solidPass-fragment")->mSource.GetDirectNode(), 
+    true);
 
-  mSolidPass->mVertexStub.Connect(mSolidVertexStub);
-  mSolidPass->mFragmentStub.Connect(mSolidFragmentStub);
+  mSolidPass->mVertexStub.Connect(mSolidVertexStub, true);
+  mSolidPass->mFragmentStub.Connect(mSolidFragmentStub, true);
 
   mSolidPass->mRenderstate.mDepthTest = true;
-  mSolidPass->mBlendModeSlot.SetDefaultValue(1.0f); // normal
-  mSolidPass->mFaceModeSlot.SetDefaultValue(0.0f); // front
-  mMaterial->mSolidPass.Connect(mSolidPass);
+  mSolidPass->mBlendModeSlot.SetDefaultValue(1.0f, true); // normal
+  mSolidPass->mFaceModeSlot.SetDefaultValue(0.0f, true); // front
+  mMaterial->mSolidPass.Connect(mSolidPass, true);
 
-  mGhostSlot.Connect(mMaterial);
+  mGhostSlot.Connect(mMaterial, true);
   SetupSlots();
 }
 

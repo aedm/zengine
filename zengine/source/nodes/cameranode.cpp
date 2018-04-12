@@ -22,12 +22,12 @@ CameraNode::CameraNode()
   , mShake(this, ShakeSlotName)
   , mShakeTime(this, ShakeTimeSlotName)
   , mShakeSpeed(this, ShakeSpeedSlotName) {
-  mFovY.SetDefaultValue(60.0f * (Pi / 180.0f));
-  mZNear.SetDefaultValue(1.0f);
-  mZFar.SetDefaultValue(1000.0f);
-  mTarget.SetDefaultValue(Vec3(0, 0, 0));
-  mDistance.SetDefaultValue(50.0f);
-  mOrientation.SetDefaultValue(Vec3(0, 0, 0));
+  mFovY.SetDefaultValue(60.0f * (Pi / 180.0f), true);
+  mZNear.SetDefaultValue(1.0f, true);
+  mZFar.SetDefaultValue(1000.0f, true);
+  mTarget.SetDefaultValue(Vec3(0, 0, 0), true);
+  mDistance.SetDefaultValue(50.0f, true);
+  mOrientation.SetDefaultValue(Vec3(0, 0, 0), true);
 }
 
 void CameraNode::SetupGlobals(Globals* globals) {

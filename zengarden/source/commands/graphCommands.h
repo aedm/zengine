@@ -47,14 +47,14 @@ private:
 };
 
 
-class DeleteNodeCommand: public Command {
+class DisposeNodesCommand: public Command {
 public:
-  DeleteNodeCommand(set<shared_ptr<Node>>& nodes);
-  virtual ~DeleteNodeCommand();
+  DisposeNodesCommand(set<shared_ptr<Node>>& nodes);
 
   virtual bool Do() override;
   virtual bool Undo() override;
 
 private:
   set<shared_ptr<Node>> mNodes;
+  shared_ptr<Graph> mGraph;
 };

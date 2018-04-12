@@ -325,6 +325,11 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
     watcher = PointerCast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
   }
 
+  if (!watcher) {
+    INFO("Naaananana... can't watch this.");
+    return;
+  }
+
   if (watcherWidget == nullptr) {
     watcherWidget =
       new GLWatcherWidget(tabWidget, watcher, mCommonGLWidget, watcherPosition, tabWidget);

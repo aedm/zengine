@@ -201,7 +201,7 @@ void Slot::ChangeNodeIndex(const shared_ptr<Node>& node, UINT targetIndex) {
   ASSERT(it != mMultiNodes.end());
   UINT index = UINT(it - mMultiNodes.begin());
 
-  shared_ptr<Node>& tempNode = mMultiNodes[index];
+  shared_ptr<Node> tempNode = mMultiNodes[index];
   if (index < targetIndex) {
     for (UINT i = index; i < targetIndex; i++) {
       mMultiNodes[i] = mMultiNodes[i + 1];
@@ -285,9 +285,9 @@ ValueType Node::GetValueType() const {
   return mValueType;
 }
 
-void Node::Dispose() {
+void Node::Dispose(bool silent) {
   while (mDependants.size() > 0) {
-    mDependants.at(0)->Disconnect(this->shared_from_this(), true);
+    mDependants.at(0)->Disconnect(this->shared_from_this(), silent);
   }
 }
 

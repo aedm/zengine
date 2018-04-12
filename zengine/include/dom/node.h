@@ -205,7 +205,7 @@ public:
   ValueType GetValueType() const;
 
   /// Disconnects all outgoing connections
-  void Dispose();
+  void Dispose(bool silent = true);
 
   /// Copies content from other node of the same type.
   /// This is useful for creating new nodes with predefined content, eg shader stubs.

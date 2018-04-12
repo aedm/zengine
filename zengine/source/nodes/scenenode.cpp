@@ -28,15 +28,15 @@ SceneNode::SceneNode()
   , mDOFFocusDistance(this, DOFFocusDistanceSlotName, false, true, true, 0.0f, 100.0f)
   , mDOFBlur(this, DOFBlurSlotName, false, true, true, 0.0f, 30.0f)
 {
-  mSkyLightSpread.SetDefaultValue(10.0f);
-  mSkyLightSampleSpread.SetDefaultValue(5.0f);
-  mShadowMapSize.SetDefaultValue(Vec3(30, 30, 50));
-  mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 0.5f, 0.5f));
-  mSkyLightColor.SetDefaultValue(Vec3(1, 1, 1));
-  mSkyLightAmbient.SetDefaultValue(0.2f);
-  mDOFEnabled.SetDefaultValue(0.0f);
-  mDOFFocusDistance.SetDefaultValue(50.0f);
-  mDOFBlur.SetDefaultValue(10.0f);
+  mSkyLightSpread.SetDefaultValue(10.0f, true);
+  mSkyLightSampleSpread.SetDefaultValue(5.0f, true);
+  mShadowMapSize.SetDefaultValue(Vec3(30, 30, 50), true);
+  mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 0.5f, 0.5f), true);
+  mSkyLightColor.SetDefaultValue(Vec3(1, 1, 1), true);
+  mSkyLightAmbient.SetDefaultValue(0.2f, true);
+  mDOFEnabled.SetDefaultValue(0.0f, true);
+  mDOFFocusDistance.SetDefaultValue(50.0f, true);
+  mDOFBlur.SetDefaultValue(10.0f, true);
 }
 
 SceneNode::~SceneNode() {

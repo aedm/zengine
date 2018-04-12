@@ -59,20 +59,19 @@ bool ConnectNodeToSlotCommand::Undo() {
   return mSlot->Connect(mOldNode);
 }
 
-DeleteNodeCommand::DeleteNodeCommand(set<shared_ptr<Node>>& nodes)
-  : mNodes(nodes) {}
+DisposeNodesCommand::DisposeNodesCommand(set<shared_ptr<Node>>& nodes)
+  : mNodes(nodes)
+{}
 
-DeleteNodeCommand::~DeleteNodeCommand() {}
-
-bool DeleteNodeCommand::Do() {
+bool DisposeNodesCommand::Do() {
   for (shared_ptr<Node> node : mNodes) {
-    node->Dispose();
+    node->Dispose(false);
   }
   mNodes.clear();
   return true;
 }
 
-bool DeleteNodeCommand::Undo() {
+bool DisposeNodesCommand::Undo() {
   NOT_IMPLEMENTED;
   return false;
 }
