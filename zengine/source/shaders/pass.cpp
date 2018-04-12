@@ -38,8 +38,7 @@ void Pass::HandleMessage(Message* message) {
           message->mSlot == &mUberShader) {
         mIsUpToDate = false;
       }
-      TheMessageQueue.Enqueue(
-        nullptr, this->shared_from_this(), MessageType::NEEDS_REDRAW);
+      EnqueueMessage(MessageType::NEEDS_REDRAW);
       break;
     default: break;
   }

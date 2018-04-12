@@ -77,8 +77,7 @@ void Drawable::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::SLOT_CONNECTION_CHANGED:
     case MessageType::VALUE_CHANGED:
-      TheMessageQueue.Enqueue(
-        nullptr, this->shared_from_this(), MessageType::NEEDS_REDRAW);
+      EnqueueMessage(MessageType::NEEDS_REDRAW);
       break;
     default: break;
   }

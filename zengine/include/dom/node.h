@@ -235,6 +235,10 @@ protected:
   /// Value type. Only ValueNodes have a non-NONE value.
   ValueType mValueType = ValueType::NONE;
 
+  /// Enqueues message
+  void EnqueueMessage(MessageType message, Slot* slot = nullptr, 
+    const shared_ptr<Node>& sender = nullptr);
+
 private:
   /// Slots that this node is connected to (as an input)
   vector<Slot*> mDependants;

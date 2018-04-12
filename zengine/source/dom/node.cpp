@@ -97,8 +97,7 @@ bool Slot::Connect(const shared_ptr<Node>& target, bool silent) {
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
     if (!silent) {
-      TheMessageQueue.Enqueue(
-        target, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
+      mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
     }
   }
   else {
@@ -107,8 +106,7 @@ bool Slot::Connect(const shared_ptr<Node>& target, bool silent) {
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
       if (!silent) {
-        TheMessageQueue.Enqueue(
-          target, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
+        mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
       }
     }
   }
@@ -123,8 +121,7 @@ void Slot::Disconnect(const shared_ptr<Node>& target, bool silent) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
         if (!silent) {
-          TheMessageQueue.Enqueue(target, GetOwner(), 
-            MessageType::SLOT_CONNECTION_CHANGED, this);
+          mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
         }
         return;
       }
@@ -145,16 +142,14 @@ void Slot::DisconnectAll(bool notifyOwner) {
     }
     mMultiNodes.clear();
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(nullptr, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED,
-        this);
+      mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this);
     }
   }
   else {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(nullptr, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED,
-        this);
+      mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this);
     }
   }
 }
@@ -237,9 +232,7 @@ bool Slot::IsDefaulted() {
 
 void Slot::SetGhost(bool isGhost) {
   mGhostSlot = isGhost;
-  shared_ptr<Node> owner = GetOwner();
-  TheMessageQueue.Enqueue(nullptr, owner, MessageType::SLOT_GHOST_FLAG_CHANGED, this);
-  owner->SendMsg(MessageType::TRANSITIVE_CLOSURE_CHANGED);
+  mOwner->EnqueueMessage(MessageType::SLOT_GHOST_FLAG_CHANGED, this);
 }
 
 bool Slot::IsGhost() {
@@ -295,7 +288,7 @@ void Node::CopyFrom(const shared_ptr<Node>& node) {}
 
 void Node::SendMsg(MessageType message) {
   for (Slot* slot : mDependants) {
-    TheMessageQueue.Enqueue(this->shared_from_this(), slot->GetOwner(), message, slot);
+    slot->GetOwner()->EnqueueMessage(message, slot, this->shared_from_this());
   }
 }
 
@@ -305,8 +298,8 @@ void Node::ReceiveMessage(Message* message) {
   case MessageType::SLOT_CONNECTION_CHANGED:
     CheckConnections();
     /// Notifies dependants about transitive closure change
-    TheMessageQueue.Enqueue(message->mSource, this->shared_from_this(),
-      MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot);
+    EnqueueMessage(MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot, 
+      message->mSource);
     NotifyWatchers(&Watcher::OnSlotConnectionChanged, message->mSlot);
     break;
   case MessageType::TRANSITIVE_CLOSURE_CHANGED:
@@ -322,8 +315,8 @@ void Node::ReceiveMessage(Message* message) {
     NotifyWatchers(&Watcher::OnChildNameChange);
     break;
   case MessageType::SLOT_GHOST_FLAG_CHANGED:
-    TheMessageQueue.Enqueue(message->mSource, this->shared_from_this(),
-      MessageType::TRANSITIVE_GHOST_CHANGED, message->mSlot);
+    EnqueueMessage(MessageType::TRANSITIVE_GHOST_CHANGED, message->mSlot, 
+      message->mSource);
     NotifyWatchers(&Watcher::OnSlotGhostChange, message->mSlot);
     break;
   case MessageType::TRANSITIVE_GHOST_CHANGED:
@@ -348,6 +341,14 @@ void Node::CheckConnections() {
   mIsProperlyConnected = true;
 }
 
+
+void Node::EnqueueMessage(MessageType message, Slot* slot /*= nullptr*/, 
+  const shared_ptr<Node>& sender /*= nullptr*/)
+{
+  /// Glory to C++17
+  if (this->weak_from_this().expired()) return;
+  TheMessageQueue.Enqueue(sender, this->shared_from_this(), message, slot);
+}
 
 void Node::Update() {
   if (!mIsUpToDate && mIsProperlyConnected) {
@@ -402,6 +403,7 @@ void Node::SetName(const string& name) {
   NotifyWatchers(&Watcher::OnNameChange);
   TheMessageQueue.Enqueue(
     nullptr, this->shared_from_this(), MessageType::NODE_NAME_CHANGED);
+  
 }
 
 const string& Node::GetName() const {
@@ -420,8 +422,7 @@ const Vec2 Node::GetPosition() const {
 
 void Node::SetSize(const Vec2 size) {
   mSize = size;
-  TheMessageQueue.Enqueue(nullptr, 
-    this->shared_from_this(), MessageType::NODE_NAME_CHANGED);
+  EnqueueMessage(MessageType::NODE_NAME_CHANGED);
   SendMsg(MessageType::NODE_NAME_CHANGED);
 }
 

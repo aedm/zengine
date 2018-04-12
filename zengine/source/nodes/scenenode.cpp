@@ -111,8 +111,7 @@ void SceneNode::HandleMessage(Message* message) {
       break;
     case MessageType::VALUE_CHANGED:
     case MessageType::SLOT_CONNECTION_CHANGED:
-      TheMessageQueue.Enqueue(
-        this->shared_from_this(), this->shared_from_this(), MessageType::NEEDS_REDRAW);
+      EnqueueMessage(MessageType::NEEDS_REDRAW);
       break;
     case MessageType::SCENE_TIME_EDITED:
     {
