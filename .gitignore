@@ -17,3 +17,4 @@ demoplayer/.msbuild/
 *.cfg
 *.mp3
 *.zen
+.vs/
