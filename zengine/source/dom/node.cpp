@@ -81,7 +81,11 @@ std::shared_ptr<Node> Slot::GetOwner() {
   return mOwner->shared_from_this();
 }
 
-bool Slot::Connect(const shared_ptr<Node>& target, bool silent) {
+bool Slot::IsOwnerExpired() {
+  return mOwner->weak_from_this().expired();
+}
+
+bool Slot::Connect(const shared_ptr<Node>& target) {
   if (target && !DoesAcceptNode(target)) {
     DEBUGBREAK("Slot doesn't accept node.");
     return false;
@@ -96,33 +100,27 @@ bool Slot::Connect(const shared_ptr<Node>& target, bool silent) {
     }
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
-    if (!silent) {
-      mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
-    }
+    mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
   }
   else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
-      if (!silent) {
-        mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
-      }
+      mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
     }
   }
   return true;
 }
 
 
-void Slot::Disconnect(const shared_ptr<Node>& target, bool silent) {
+void Slot::Disconnect(const shared_ptr<Node>& target) {
   if (mIsMultiSlot) {
     for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        if (!silent) {
-          mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
-        }
+        mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this, target);
         return;
       }
     }
@@ -130,7 +128,7 @@ void Slot::Disconnect(const shared_ptr<Node>& target, bool silent) {
   }
   else {
     ASSERT(target == mNode);
-    DisconnectAll(!silent);
+    DisconnectAll(true);
   }
 }
 
@@ -278,9 +276,9 @@ ValueType Node::GetValueType() const {
   return mValueType;
 }
 
-void Node::Dispose(bool silent) {
+void Node::Dispose() {
   while (mDependants.size() > 0) {
-    mDependants.at(0)->Disconnect(this->shared_from_this(), silent);
+    mDependants.at(0)->Disconnect(this->shared_from_this());
   }
 }
 
@@ -288,7 +286,9 @@ void Node::CopyFrom(const shared_ptr<Node>& node) {}
 
 void Node::SendMsg(MessageType message) {
   for (Slot* slot : mDependants) {
-    slot->GetOwner()->EnqueueMessage(message, slot, this->shared_from_this());
+    if (!slot->IsOwnerExpired()) {
+      slot->GetOwner()->EnqueueMessage(message, slot, this->shared_from_this());
+    }
   }
 }
 

@@ -23,7 +23,7 @@ Pass::Pass()
   mRenderstate.mDepthTest = true;
   mRenderstate.mFaceMode = RenderState::FaceMode::FRONT;
   mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
-  mUberShader.Connect(TheEngineStubs->GetStub("uber"), true);
+  mUberShader.Connect(TheEngineStubs->GetStub("uber"));
 }
 
 Pass::~Pass() {

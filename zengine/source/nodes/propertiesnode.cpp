@@ -7,5 +7,5 @@ static SharedString BPMSlotName = make_shared<string>("BPM");
 PropertiesNode::PropertiesNode() 
   : mBPM(this, BPMSlotName, false, true, true, 60, 160) 
 {
-  mBPM.SetDefaultValue(135, true);
+  mBPM.SetDefaultValue(135);
 }

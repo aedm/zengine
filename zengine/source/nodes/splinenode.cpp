@@ -41,10 +41,10 @@ FloatSplineNode::FloatSplineNode()
   , mBeatQuantizerFrequency(this, BeatQuantizerFrequencySlotName)
   , mSceneTimeNode(make_shared<SceneTimeNode>())
 {
-  mTimeSlot.Connect(mSceneTimeNode, true);
-  mNoiseVelocity.SetDefaultValue(20.0f, true);
-  mBeatSpikeEasing.SetDefaultValue(1.0f, true);
-  mBeatSpikeLength.SetDefaultValue(0.5f, true);
+  mTimeSlot.Connect(mSceneTimeNode);
+  mNoiseVelocity.SetDefaultValue(20.0f);
+  mBeatSpikeEasing.SetDefaultValue(1.0f);
+  mBeatSpikeLength.SetDefaultValue(0.5f);
 }
 
 

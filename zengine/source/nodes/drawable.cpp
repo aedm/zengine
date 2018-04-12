@@ -19,7 +19,7 @@ Drawable::Drawable()
   , mScale(this, ScaleSlotName)
   , mInstances(this, InstancesSlotName)
 {
-  mInstances.SetDefaultValue(1, true);
+  mInstances.SetDefaultValue(1);
 }
 
 Drawable::~Drawable() {}

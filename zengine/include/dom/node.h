@@ -96,18 +96,16 @@ public:
   virtual ~Slot();
 
   shared_ptr<Node> GetOwner();
+  bool IsOwnerExpired();
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
   /// - for multislots, the node will be added to the list of connected nodes. 
   /// Returns false if connection is not possible due to type mismatch.
-  /// If the "silent" flag is set, no message will be sent.
-  /// TODO: use C++17's weak_from_this to autosilence
-  virtual bool Connect(const shared_ptr<Node>& node, bool silent = false);
+  virtual bool Connect(const shared_ptr<Node>& node);
 
   /// Disconnects a node from this slot. 
-  /// TODO: use C++17's weak_from_this to autosilence
-  virtual void Disconnect(const shared_ptr<Node>&, bool silent = false);
+  virtual void Disconnect(const shared_ptr<Node>&);
 
   /// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
   /// send a SLOT_CONNECTION_CHANGED message to its owner.
@@ -205,7 +203,7 @@ public:
   ValueType GetValueType() const;
 
   /// Disconnects all outgoing connections
-  void Dispose(bool silent = true);
+  void Dispose();
 
   /// Copies content from other node of the same type.
   /// This is useful for creating new nodes with predefined content, eg shader stubs.

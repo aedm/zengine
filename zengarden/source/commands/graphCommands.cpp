@@ -65,7 +65,7 @@ DisposeNodesCommand::DisposeNodesCommand(set<shared_ptr<Node>>& nodes)
 
 bool DisposeNodesCommand::Do() {
   for (shared_ptr<Node> node : mNodes) {
-    node->Dispose(false);
+    node->Dispose();
   }
   mNodes.clear();
   return true;
