@@ -10,7 +10,7 @@ class SplineWidget;
 
 class FloatSplineWatcher: public WatcherUI {
 public:
-  FloatSplineWatcher(Node* node);
+  FloatSplineWatcher(const shared_ptr<Node>& node);
   virtual ~FloatSplineWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
@@ -63,7 +63,7 @@ protected:
 
   void SelectPoint(SplineLayer layer, int index);
 
-  FloatSplineNode* GetSpline();
+  shared_ptr<FloatSplineNode> GetSpline();
 
 private slots:
   void DrawSpline(QPaintEvent* ev);

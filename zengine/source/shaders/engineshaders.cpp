@@ -15,11 +15,11 @@ EngineShaders::EngineShaders()
 }
 
 EngineShaders::~EngineShaders() {
-  mPostProcess_GaussianBlurHorizontal_First->DisconnectAll();
-  mPostProcess_GaussianBlurHorizontal->DisconnectAll();
-  mPostProcess_GaussianBlurVertical->DisconnectAll();
-  mPostProcess_GaussianBlur_Blend_MSAA->DisconnectAll();
-  mPostProcess_DOF->DisconnectAll();
+  mPostProcess_GaussianBlurHorizontal_First->Dispose();
+  mPostProcess_GaussianBlurHorizontal->Dispose();
+  mPostProcess_GaussianBlurVertical->Dispose();
+  mPostProcess_GaussianBlur_Blend_MSAA->Dispose();
+  mPostProcess_DOF->Dispose();
   TheResourceManager->DiscardMesh(mFullScreenQuad);
 }
 

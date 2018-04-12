@@ -84,7 +84,7 @@ private:
   bool mIsInProgress = false;
 
   void ProcessAllMessages();
-  void RemoveNode(shared_ptr<Node> node);
+  void RemoveNode(Node* node);
 };
 
 
@@ -95,17 +95,19 @@ public:
        bool isPublic = true, bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
-  /// The operator which this slot is a member of
-  const weak_ptr<Node> mOwner;
+  shared_ptr<Node> GetOwner();
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
   /// - for multislots, the node will be added to the list of connected nodes. 
   /// Returns false if connection is not possible due to type mismatch.
-  virtual bool Connect(const shared_ptr<Node>& node);
+  /// If the "silent" flag is set, no message will be sent.
+  /// TODO: use C++17's weak_from_this to autosilence
+  virtual bool Connect(const shared_ptr<Node>& node, bool silent = false);
 
   /// Disconnects a node from this slot. 
-  virtual void Disconnect(const shared_ptr<Node>& node);
+  /// TODO: use C++17's weak_from_this to autosilence
+  virtual void Disconnect(const shared_ptr<Node>&, bool silent = false);
 
   /// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
   /// send a SLOT_CONNECTION_CHANGED message to its owner.
@@ -153,6 +155,9 @@ public:
   bool IsGhost();
 
 protected:
+  /// The operator which this slot is a member of
+  Node* const mOwner;
+
   /// The slot is connected to this node (nullptr if multislot)
   shared_ptr<Node> mNode;
 
@@ -200,7 +205,11 @@ public:
   ValueType GetValueType() const;
 
   /// Disconnects all outgoing connections
-  void DisconnectAll();
+  void Dispose();
+
+  /// Copies content from other node of the same type.
+  /// This is useful for creating new nodes with predefined content, eg shader stubs.
+  virtual void CopyFrom(const shared_ptr<Node>& node);
 
 protected:
   Node(bool isForwarderNode = false);
@@ -334,3 +343,4 @@ public:
     return false;
   }
 };
+

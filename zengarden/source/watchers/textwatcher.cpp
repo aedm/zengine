@@ -1,16 +1,15 @@
 #include "textwatcher.h"
 #include <QtWidgets/QPushButton>
 
-TextWatcher::TextWatcher(StringNode* node)
+TextWatcher::TextWatcher(const shared_ptr<StringNode>& node)
   : WatcherUI(node)
-{
-}
+{}
 
 TextWatcher::~TextWatcher() {}
 
 void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
-  StringNode* stringNode = static_cast<StringNode*>(mNode);
+  shared_ptr<StringNode> stringNode = PointerCast<StringNode>(mNode);
 
   /// Vertical layout
   mLayout = new QVBoxLayout(watcherWidget);

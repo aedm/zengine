@@ -1,7 +1,8 @@
 #include "graphCommands.h"
 #include "../graph/nodewidget.h"
 
-CreateNodeCommand::CreateNodeCommand(Node* node, Graph* graph)
+CreateNodeCommand::CreateNodeCommand(
+  const shared_ptr<Node>& node, const shared_ptr<Graph>& graph)
   : mNode(node)
   , mGraph(graph) {}
 
@@ -17,13 +18,13 @@ bool CreateNodeCommand::Undo() {
   return true;
 }
 
-MoveNodeCommand::MoveNodeCommand(Node* node, const Vec2& position)
+MoveNodeCommand::MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position)
   : mNode(node)
   , mNewPosition(position) {
   mOldPosition = mNode->GetPosition();
 }
 
-MoveNodeCommand::MoveNodeCommand(Node* node, const Vec2& position, 
+MoveNodeCommand::MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position,
                                  const Vec2& oldPosition) 
   : mNode(node)
   , mNewPosition(position)
@@ -41,9 +42,11 @@ bool MoveNodeCommand::Undo() {
 }
 
 
-ConnectNodeToSlotCommand::ConnectNodeToSlotCommand(Node* fromNode, Slot* slot)
+ConnectNodeToSlotCommand::ConnectNodeToSlotCommand(
+  const shared_ptr<Node>& fromNode, Slot* slot)
   : mNewNode(fromNode)
-  , mSlot(slot) {
+  , mSlot(slot) 
+{
   /// TODO: keep old, connected nodes (multinodes)
   //mOldNode = mSlot->GetAbstractNode();
 }
@@ -63,7 +66,7 @@ DeleteNodeCommand::~DeleteNodeCommand() {}
 
 bool DeleteNodeCommand::Do() {
   for (shared_ptr<Node> node : mNodes) {
-    node->DisconnectAll();
+    node->Dispose();
   }
   mNodes.clear();
   return true;

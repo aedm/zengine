@@ -4,8 +4,8 @@
 
 class MeshWatcher : public GeneralSceneWatcher {
 public:
-  MeshWatcher(MeshNode* meshNode);
+  MeshWatcher(const shared_ptr<MeshNode>& meshNode);
 
 private:
-  Drawable mDrawable;
+  shared_ptr<Drawable> mDrawable = make_shared<Drawable>();
 };

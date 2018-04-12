@@ -38,7 +38,7 @@ static const Vec4 ConnectionColorValid(0, 1, 0, 1);
 static const Vec4 ConnectionColorInvalid(1, 0, 0, 1);
 
 
-NodeWidget::NodeWidget(Node* node, GraphWatcher* graphWatcher)
+NodeWidget::NodeWidget(const shared_ptr<Node>& node, GraphWatcher* graphWatcher)
 	: WatcherUI(node)
 	, mTitleTexture(nullptr)
   , mGraphWatcher(graphWatcher)
@@ -102,17 +102,17 @@ void NodeWidget::Paint()
   Vec2 position = mNode->GetPosition();
   Vec2 size = mNode->GetSize();
 
-  ThePainter->mColor.Set(mNode->IsGhostNode() ? GhostHeaderColor : LiveHeaderColor);
+  ThePainter->mColor->Set(mNode->IsGhostNode() ? GhostHeaderColor : LiveHeaderColor);
 	ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
 
-	ThePainter->mColor.Set(Vec4(0, 0, 0, Opacity));
+	ThePainter->mColor->Set(Vec4(0, 0, 0, Opacity));
 	ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
 	
-	ThePainter->mColor.Set(Vec4(0.2, 0.7, 0.9, 1));
+	ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
 	ThePainter->DrawBox(position + mOutputPosition - ConnectionSpotSize * 0.5f, 
                       ConnectionSpotSize);
 	
-	ThePainter->mColor.Set(Vec4(0.9, 0.9, 0.9, 1));
+	ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
 	float centerX = floor((size.x - float(mTitleTexture->TextSize.width())) * 0.5f);
 	ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
 
@@ -134,13 +134,13 @@ void NodeWidget::Paint()
 		}
 
 		WidgetSlot* sw = mWidgetSlots[i];
-		ThePainter->mColor.Set(slotFrameColor);
+		ThePainter->mColor->Set(slotFrameColor);
 		ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
 
-		ThePainter->mColor.Set(Vec4(0.9, 0.9, 0.9, 1));
+		ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
 		ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
 
-		ThePainter->mColor.Set(Vec4(0.2, 0.7, 0.9, 1));
+		ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
 		ThePainter->DrawBox(position + sw->mSpotPos - ConnectionSpotSize * 0.5f, 
                         ConnectionSpotSize);
 	}
@@ -160,7 +160,7 @@ void NodeWidget::Paint()
 			}
 		} else frameColor = Vec4(1, 1, 1, 0.3);
 	} 
-	ThePainter->mColor.Set(frameColor);
+	ThePainter->mColor->Set(frameColor);
 	ThePainter->DrawRect(position, size);
 }
 
@@ -181,7 +181,7 @@ Vec2 NodeWidget::GetInputPosition( int SlotIndex )
 void NodeWidget::OnSlotStructureChanged() {
   CreateWidgetSlots();
   UpdateGraph();
-  Node* node = ZenGarden::GetInstance()->GetNodeInPropertyEditor();
+  shared_ptr<Node> node = ZenGarden::GetInstance()->GetNodeInPropertyEditor();
   if (node == mNode) {
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(node);;
   }
@@ -197,11 +197,11 @@ void NodeWidget::OnNameChange() {
     text = QString::fromStdString(mNode->GetName());
   } else {
     /// Just use the type as a name by default
-    Node* node = mNode->GetReferencedNode();
+    shared_ptr<Node> node = mNode->GetReferencedNode();
     text = QString::fromStdString(
       NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName);
-    if (IsInsanceOf<StubNode*>(node)) {
-      StubNode* stub = SafeCast<StubNode*>(node);
+    if (IsPointerOf<StubNode>(node)) {
+      shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
       StubMetadata* metaData = stub->GetStubMetadata();
       if (metaData != nullptr && !metaData->name.empty()) {
         /// For shader stubs, use the stub name by default

@@ -8,7 +8,7 @@ class SceneNode;
 
 class RenderForwarder: public Watcher {
 public:
-  RenderForwarder(SceneNode* node);
+  RenderForwarder(const shared_ptr<SceneNode>& node);
   virtual ~RenderForwarder() {}
   virtual void OnRedraw();
   FastDelegate<void()> mOnRedraw;
@@ -16,7 +16,7 @@ public:
 
 class GeneralSceneWatcher: public WatcherUI {
 public:
-  GeneralSceneWatcher(Node* node);
+  GeneralSceneWatcher(const shared_ptr<Node>& node);
   virtual ~GeneralSceneWatcher();
 
   /// Initializes resources needed for scene watchers
@@ -33,13 +33,13 @@ protected:
   RenderTarget* mRenderTarget = nullptr;
 
   /// Scene node to be drawn.
-  SceneNode* mScene = nullptr;
+  shared_ptr<SceneNode> mScene;
   
   /// Default scene node, might be unused
-  SceneNode mDefaultScene;
+  shared_ptr<SceneNode> mDefaultScene = make_shared<SceneNode>();
 
   /// Default camera
-  CameraNode mCamera;
+  shared_ptr<CameraNode> mCamera = make_shared<CameraNode>();
 
   /// Forwarder that catches render events for the default scene
   shared_ptr<RenderForwarder> mRenderForwarder;
@@ -61,11 +61,11 @@ protected:
   float mOriginalDistance;
 
   /// Static resources initializes by Init()
-  static Material* mDefaultMaterial;
+  static shared_ptr<Material> mDefaultMaterial;
 
 private:
   /// The Drawable supplied by an implementation
-  Drawable* mDrawable = nullptr;
+  shared_ptr<Drawable> mDrawable;
 
   Globals mGlobals;
 };

@@ -52,5 +52,5 @@ protected:
 
 private:
   /// Changes the node being watched. Only a Node should call this.
-  void ChangeNode(Node* node);
+  void ChangeNode(const shared_ptr<Node>& node);
 };

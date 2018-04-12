@@ -26,5 +26,5 @@ public:
 
   void Set(OWNERSHIP Mesh* mesh);
 
-  static StaticMeshNode* Create(OWNERSHIP Mesh* mesh);
+  static shared_ptr<StaticMeshNode> Create(OWNERSHIP Mesh* mesh);
 };

@@ -131,7 +131,6 @@ class StubNode: public Node {
 
 public:
 	StubNode();
-	StubNode(const StubNode& original);
 	virtual ~StubNode();
 
 	/// Returns the metadata containing information about the stub source.
@@ -144,6 +143,9 @@ public:
 	/// Source of the stub
 	StringSlot mSource;
 
+  /// Copies shader source from another StubNode
+  virtual void CopyFrom(const shared_ptr<Node>& node) override;
+  
 protected:
 	/// Performs metadata analysis on the new stub source.
 	virtual void Operate() override;

@@ -36,11 +36,11 @@ void MessageQueue::ProcessAllMessages() {
   }
 }
 
-void MessageQueue::RemoveNode(shared_ptr<Node> node) {
+void MessageQueue::RemoveNode(Node* node) {
 start:
   for (auto it = mMessageQueue.begin(); it != mMessageQueue.end(); it++) {
     Message message = *it;
-    if (message.mTarget != node) continue;
+    if (message.mTarget == nullptr || message.mTarget.get() != node) continue;
     mMessageQueue.erase(it);
     mMessageSet.erase(message);
     goto start;
@@ -63,16 +63,12 @@ bool Message::operator<(const Message& other) const {
 
 Slot::Slot(Node* owner, SharedString name, bool isMultiSlot,
   bool isPublic, bool isSerializable, bool isTraversable)
-  : mOwner(owner->shared_from_this())
+  : mOwner(owner)
   , mIsMultiSlot(isMultiSlot) {
   ASSERT(owner != nullptr);
   mNode = nullptr;
   mName = name;
   owner->AddSlot(this, isPublic, isSerializable, isTraversable);
-  if (isPublic) {
-    TheMessageQueue.Enqueue(
-      nullptr, mOwner.lock(), MessageType::SLOT_STRUCTURE_CHANGED, this);
-  }
 }
 
 
@@ -81,7 +77,11 @@ Slot::~Slot() {
 }
 
 
-bool Slot::Connect(const shared_ptr<Node>& target) {
+std::shared_ptr<Node> Slot::GetOwner() {
+  return mOwner->shared_from_this();
+}
+
+bool Slot::Connect(const shared_ptr<Node>& target, bool silent) {
   if (target && !DoesAcceptNode(target)) {
     DEBUGBREAK("Slot doesn't accept node.");
     return false;
@@ -96,32 +96,36 @@ bool Slot::Connect(const shared_ptr<Node>& target) {
     }
     mMultiNodes.push_back(target);
     target->ConnectToSlot(this);
-    /// TODO: merge these
-    TheMessageQueue.Enqueue(
-      target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
+    if (!silent) {
+      TheMessageQueue.Enqueue(
+        target, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
+    }
   }
   else {
     if (mNode != target) {
       if (mNode) mNode->DisconnectFromSlot(this);
       mNode = target;
       if (mNode) mNode->ConnectToSlot(this);
-      /// TODO: merge these
-      TheMessageQueue.Enqueue(
-        target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
+      if (!silent) {
+        TheMessageQueue.Enqueue(
+          target, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
+      }
     }
   }
   return true;
 }
 
 
-void Slot::Disconnect(const shared_ptr<Node>& target) {
+void Slot::Disconnect(const shared_ptr<Node>& target, bool silent) {
   if (mIsMultiSlot) {
     for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
-        TheMessageQueue.Enqueue(target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED,
-          this);
+        if (!silent) {
+          TheMessageQueue.Enqueue(target, GetOwner(), 
+            MessageType::SLOT_CONNECTION_CHANGED, this);
+        }
         return;
       }
     }
@@ -129,8 +133,7 @@ void Slot::Disconnect(const shared_ptr<Node>& target) {
   }
   else {
     ASSERT(target == mNode);
-    ASSERT(target != nullptr);
-    DisconnectAll(true);
+    DisconnectAll(!silent);
   }
 }
 
@@ -142,7 +145,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
     }
     mMultiNodes.clear();
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(nullptr, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED,
+      TheMessageQueue.Enqueue(nullptr, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED,
         this);
     }
   }
@@ -150,7 +153,7 @@ void Slot::DisconnectAll(bool notifyOwner) {
     if (mNode) mNode->DisconnectFromSlot(this);
     mNode = nullptr;
     if (notifyOwner) {
-      TheMessageQueue.Enqueue(nullptr, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED,
+      TheMessageQueue.Enqueue(nullptr, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED,
         this);
     }
   }
@@ -234,7 +237,7 @@ bool Slot::IsDefaulted() {
 
 void Slot::SetGhost(bool isGhost) {
   mGhostSlot = isGhost;
-  shared_ptr<Node> owner = mOwner.lock();
+  shared_ptr<Node> owner = GetOwner();
   TheMessageQueue.Enqueue(nullptr, owner, MessageType::SLOT_GHOST_FLAG_CHANGED, this);
   owner->SendMsg(MessageType::TRANSITIVE_CLOSURE_CHANGED);
 }
@@ -282,15 +285,17 @@ ValueType Node::GetValueType() const {
   return mValueType;
 }
 
-void Node::DisconnectAll() {
+void Node::Dispose() {
   while (mDependants.size() > 0) {
-    mDependants.at(0)->Disconnect(this->shared_from_this());
+    mDependants.at(0)->Disconnect(this->shared_from_this(), true);
   }
 }
 
+void Node::CopyFrom(const shared_ptr<Node>& node) {}
+
 void Node::SendMsg(MessageType message) {
   for (Slot* slot : mDependants) {
-    TheMessageQueue.Enqueue(this->shared_from_this(), slot->mOwner.lock(), message, slot);
+    TheMessageQueue.Enqueue(this->shared_from_this(), slot->GetOwner(), message, slot);
   }
 }
 
@@ -365,7 +370,7 @@ void Node::Update() {
 
 Node::~Node() {
   /// Don't send any more messages to this node.
-  TheMessageQueue.RemoveNode(this->shared_from_this());
+  TheMessageQueue.RemoveNode(this);
 
   while (!mWatchers.empty()) {
     auto it = mWatchers.begin();
@@ -377,7 +382,7 @@ Node::~Node() {
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
     Slot* slot = deps.back();
-    shared_ptr<Node> owner = slot->mOwner.lock();
+    shared_ptr<Node> owner = slot->GetOwner();
 
     /// If a ghost is made of this node, delete it.
     if (owner->IsGhostNode()) {
@@ -462,7 +467,7 @@ const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
 void Node::RemoveWatcher(Watcher* watcher) {
   for (auto it = mWatchers.begin(); it != mWatchers.end(); it++) {
     if (it->get() == watcher) {
-      ASSERT(watcher->mNode == this);
+      ASSERT(watcher->mNode.get() == this);
       watcher->mNode = nullptr;
       mWatchers.erase(it);
       return;
@@ -472,7 +477,7 @@ void Node::RemoveWatcher(Watcher* watcher) {
 
 void Node::AssignWatcher(shared_ptr<Watcher> watcher) {
   mWatchers.insert(watcher);
-  watcher->ChangeNode(this);
+  watcher->ChangeNode(this->shared_from_this());
 }
 
 class TransitiveClosure {

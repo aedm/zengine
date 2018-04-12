@@ -1,9 +1,9 @@
 #include "passwatcher.h"
 
-PassWatcher::PassWatcher(Pass* pass)
+PassWatcher::PassWatcher(const shared_ptr<Pass>& pass)
   : GeneralSceneWatcher(pass) 
 {
-  mMaterial.mSolidPass.Connect(pass);
+  mMaterial->mSolidPass.Connect(pass);
 
   /// Mesh
   Vec2 Position(3.5f, 3.5f);
@@ -21,14 +21,10 @@ PassWatcher::PassWatcher(Pass* pass)
   boxMesh->SetVertices(vertices);
   mMesh = StaticMeshNode::Create(boxMesh);
 
-  mDrawable.mMaterial.Connect(&mMaterial);
-  mDrawable.mMesh.Connect(mMesh);
+  mDrawable->mMaterial.Connect(mMaterial);
+  mDrawable->mMesh.Connect(mMesh);
 
-  mDefaultScene.mDrawables.Connect(&mDrawable);
+  mDefaultScene->mDrawables.Connect(mDrawable);
 
-  mCamera.mOrthonormal = true;
-}
-
-PassWatcher::~PassWatcher() {
-  SafeDelete(mMesh);
+  mCamera->mOrthonormal = true;
 }

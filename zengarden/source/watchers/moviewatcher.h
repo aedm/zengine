@@ -6,7 +6,7 @@
 
 class MovieWatcher: public WatcherUI {
 public:
-  MovieWatcher(Node* node);
+  MovieWatcher(const shared_ptr<Node>& node);
   virtual ~MovieWatcher();
 
   virtual void OnRedraw() override;

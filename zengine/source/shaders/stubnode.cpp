@@ -31,13 +31,6 @@ StubNode::StubNode()
   , mSource(this, SourceSlotName, false, false)
 {}
 
-StubNode::StubNode(const StubNode& original)
-  : Node(original)
-  , mMetadata(nullptr)
-  , mSource(this, SourceSlotName, false, false)
-{
-  mSource.SetDefaultValue(original.mSource.Get());
-}
 
 StubNode::~StubNode() {
   for (auto slotPair : mParameterSlotMap) delete(slotPair.second);
@@ -127,6 +120,12 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
+void StubNode::CopyFrom(const shared_ptr<Node>& node)
+{
+  shared_ptr<StubNode> original = PointerCast<StubNode>(node);
+  mSource.SetDefaultValue(original->mSource.Get());
+}
+
 void StubNode::HandleMessage(Message* message) {
   /// Stubs send a VALUE_CHANGED message if the shader needs to be rebuilt
   switch (message->mType) {
@@ -135,7 +134,7 @@ void StubNode::HandleMessage(Message* message) {
         mIsUpToDate = false;
         SendMsg(MessageType::VALUE_CHANGED);
       }
-      else if (PointerCast<StubNode>(message->mSlot->GetReferencedNode())) {
+      else if (IsPointerOf<StubNode>(message->mSlot->GetReferencedNode())) {
         SendMsg(MessageType::VALUE_CHANGED);
       }
       else {

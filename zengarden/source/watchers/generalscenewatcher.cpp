@@ -2,25 +2,22 @@
 #include "../util/util.h"
 #include "../zengarden.h"
 
-Material* GeneralSceneWatcher::mDefaultMaterial = nullptr;
+shared_ptr<Material> GeneralSceneWatcher::mDefaultMaterial;
 
-GeneralSceneWatcher::GeneralSceneWatcher(Node* node)
+GeneralSceneWatcher::GeneralSceneWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node) {
-  if (!IsInsanceOf<SceneNode*>(node)) {
-    mDefaultScene.mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
-    mDefaultScene.mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
-    mDefaultScene.mSkyLightAmbient.SetDefaultValue(0.2f);
-    mDefaultScene.mCamera.Connect(&mCamera);
-    mScene = &mDefaultScene;
-    mRenderForwarder = mDefaultScene.Watch<RenderForwarder>(&mDefaultScene);
+  if (!IsPointerOf<SceneNode>(node)) {
+    mDefaultScene->mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
+    mDefaultScene->mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
+    mDefaultScene->mSkyLightAmbient.SetDefaultValue(0.2f);
+    mDefaultScene->mCamera.Connect(mCamera);
+    mScene = mDefaultScene;
+    mRenderForwarder = mDefaultScene->Watch<RenderForwarder>(mDefaultScene);
     mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
   }
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
-  mRenderForwarder = nullptr;
-  SafeDelete(mDrawable);
-  SafeDelete(mRenderTarget);
 }
 
 void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
@@ -70,26 +67,26 @@ void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 void GeneralSceneWatcher::Init() {
-  StubNode* defaultVertex = 
+  shared_ptr<StubNode> defaultVertex = 
     Util::LoadStub("engine/scenewatcher/defaultvertex.shader");
-  StubNode* defaultFragment = 
+  shared_ptr<StubNode> defaultFragment =
     Util::LoadStub("engine/scenewatcher/defaultfragment.shader");
 
-  Pass* defaultPass = new Pass();
+  shared_ptr<Pass> defaultPass = make_shared<Pass>();
   defaultPass->mFragmentStub.Connect(defaultFragment);
   defaultPass->mVertexStub.Connect(defaultVertex);
   defaultPass->mRenderstate.mDepthTest = true;
   defaultPass->mFaceModeSlot.SetDefaultValue(0);
   defaultPass->mBlendModeSlot.SetDefaultValue(0);
 
-  mDefaultMaterial = new Material();
+  mDefaultMaterial = make_shared<Material>();
   mDefaultMaterial->mSolidPass.Connect(defaultPass);
 }
 
 void GeneralSceneWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event) {
   mOriginalPosition = event->pos();
-  mOriginalOrientation = mCamera.mOrientation.Get();
-  mOriginalDistance = mCamera.mDistance.Get();
+  mOriginalOrientation = mCamera->mOrientation.Get();
+  mOriginalDistance = mCamera->mDistance.Get();
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   } else if (event->button() == Qt::RightButton) {
@@ -108,15 +105,15 @@ void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEven
 void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) {
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
-    Vec3 orientation = mCamera.mOrientation.Get();
+    Vec3 orientation = mCamera->mOrientation.Get();
     orientation.y = mOriginalOrientation.y + float(diff.x()) / 300.0f;
     orientation.x = mOriginalOrientation.x + float(diff.y()) / 300.0f;
-    mCamera.mOrientation.SetDefaultValue(orientation);
+    mCamera->mOrientation.SetDefaultValue(orientation);
   } else if (event->buttons() & Qt::RightButton) {
     auto diff = event->pos() - mOriginalPosition;
-    float distance = mCamera.mDistance.Get();
+    float distance = mCamera->mDistance.Get();
     distance = mOriginalDistance - float(diff.y()) / 2.0f;
-    mCamera.mDistance.SetDefaultValue(distance);
+    mCamera->mDistance.SetDefaultValue(distance);
   }
 }
 
@@ -144,7 +141,7 @@ void GeneralSceneWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* eve
 
 }
 
-RenderForwarder::RenderForwarder(SceneNode* node)
+RenderForwarder::RenderForwarder(const shared_ptr<SceneNode>& node)
   : Watcher(node) {}
 
 void RenderForwarder::OnRedraw() {

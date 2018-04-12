@@ -7,7 +7,7 @@
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QPushButton>
 
-PropertyEditor::PropertyEditor(Node* node)
+PropertyEditor::PropertyEditor(const shared_ptr<Node>& node)
   : WatcherUI(node) {}
 
 
@@ -53,7 +53,7 @@ void PropertyEditor::HandleNameTexBoxChanged() {
 
 
 template<ValueType T>
-StaticValueWatcher<T>::StaticValueWatcher(StaticValueNode<T>* node)
+StaticValueWatcher<T>::StaticValueWatcher(const shared_ptr<StaticValueNode<T>>& node)
   : PropertyEditor(node) {}
 
 
@@ -61,7 +61,7 @@ template<ValueType T>
 void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
-  StaticValueNode<T>* vectorNode = SafeCast<StaticValueNode<T>*>(mNode);
+  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(mNode);
   mVectorEditor = new ValueEditor<T>(watcherWidget, "", vectorNode->Get());
   mVectorEditor->onValueChange +=
     Delegate(this, &StaticValueWatcher<T>::HandleEditorValueChange);
@@ -73,7 +73,7 @@ template<ValueType T>
 void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
   const VectorType& value) 
 {
-  StaticValueNode<T>* vectorNode = SafeCast<StaticValueNode<T>*>(mNode);
+  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(mNode);
   vectorNode->Set(value);
 }
 

@@ -20,8 +20,8 @@ StaticMeshNode::~StaticMeshNode() {
 }
 
 
-StaticMeshNode* StaticMeshNode::Create(OWNERSHIP Mesh* mesh) {
-  StaticMeshNode* meshNode = new StaticMeshNode();
+shared_ptr<StaticMeshNode> StaticMeshNode::Create(OWNERSHIP Mesh* mesh) {
+  shared_ptr<StaticMeshNode> meshNode = make_shared<StaticMeshNode>();
   meshNode->mMesh = mesh;
   return meshNode;
 }

@@ -13,7 +13,7 @@ shared_ptr<Node> Watcher::GetNode() {
   return mNode;
 }
 
-void Watcher::ChangeNode(Node* node) {
+void Watcher::ChangeNode(const shared_ptr<Node>& node) {
   mNode = node;
   OnRedraw();
 }

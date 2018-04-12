@@ -1,6 +1,6 @@
 #include "stubwatcher.h"
 
-StubWatcher::StubWatcher(StubNode* Stub)
+StubWatcher::StubWatcher(const shared_ptr<StubNode>& Stub)
   : WatcherUI(Stub) 
 {}
 

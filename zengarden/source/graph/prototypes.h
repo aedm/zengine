@@ -22,7 +22,7 @@ public:
   static void Init();
   static void	Dispose();
 
-  Node* AskUser(QWidget* parent, QPoint position);
+  shared_ptr<Node> AskUser(QWidget* parent, QPoint position);
 
   void AddPrototype(NodeClass* nodeClass);
   //void AddStub(OWNERSHIP StubNode* stub);
@@ -33,9 +33,8 @@ public:
 private:
   /// A single prototype node
   struct Prototype {
-    ~Prototype();
     NodeClass* mNodeClass;
-    Node* mNode;
+    shared_ptr<Node> mNode;
     QString mName;
   };
 

@@ -35,7 +35,7 @@ public:
   virtual const VType& Get() override;
 
   /// Sets value of node.
-  void Set(const VType& newValue);
+  void Set(const VType& newValue, bool silent = false);
 
 protected:
   /// Output value of the node
@@ -61,10 +61,12 @@ const typename StaticValueNode<T>::VType& StaticValueNode<T>::Get() {
 
 
 template<ValueType T>
-void StaticValueNode<T>::Set(const typename ValueNode<T>::VType& newValue) {
+void StaticValueNode<T>::Set(const typename ValueNode<T>::VType& newValue, bool silent) {
   if (mValue == newValue) return;
   mValue = newValue;
-  SendMsg(MessageType::VALUE_CHANGED);
+  if (!silent) {
+    SendMsg(MessageType::VALUE_CHANGED);
+  }
 }
 
 
@@ -87,7 +89,7 @@ public:
   Vec2 GetRange() const;
 
   /// Sets the value of the built-in Node.
-  void SetDefaultValue(const VType& value);
+  void SetDefaultValue(const VType& value, bool silent = false);
 
   /// Gets the default value
   const VType& GetDefaultValue();
@@ -97,11 +99,12 @@ public:
 
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
-  virtual bool Connect(const shared_ptr<Node>& node) override;
+  /// If the "silent" flag is set, no message will be sent.
+  virtual bool Connect(const shared_ptr<Node>& node, bool silent = false) override;
 
   /// Disconnects a node from this slot, and connects it
   /// to the built-in node.
-  virtual void Disconnect(const shared_ptr<Node>& node) override;
+  virtual void Disconnect(const shared_ptr<Node>&, bool silent = false) override;
   virtual void DisconnectAll(bool notifyOwner) override;
 
   /// Returns true if slot is connected to its own default node
@@ -124,7 +127,7 @@ ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
   , mMinimum(minimum)
   , mMaximum(maximum)
 {
-  Connect(mDefault);
+  Connect(mDefault, true);
 }
 
 
@@ -141,8 +144,8 @@ Vec2 ValueSlot<T>::GetRange() const {
 
 
 template<ValueType T>
-void ValueSlot<T>::SetDefaultValue(const VType& value) {
-  mDefault->Set(value);
+void ValueSlot<T>::SetDefaultValue(const VType& value, bool silent) {
+  mDefault->Set(value, silent);
 }
 
 
@@ -159,7 +162,7 @@ bool ValueSlot<T>::DoesAcceptValueNode(ValueType type) const {
 
 
 template<ValueType T>
-bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
+bool ValueSlot<T>::Connect(const shared_ptr<Node>& target, bool silent) {
   if (mNode == target || (target == nullptr && mNode == mDefault)) return true;
   if (target && !DoesAcceptNode(target)) {
     DEBUGBREAK("Slot and node type mismatch");
@@ -168,14 +171,16 @@ bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
   if (mNode) mNode->DisconnectFromSlot(this);
   mNode = target ? target : mDefault;
   mNode->ConnectToSlot(this);
-  TheMessageQueue.Enqueue(
-    target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
+  if (!silent) {
+    TheMessageQueue.Enqueue(
+      target, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
+  }
   return true;
 }
 
 
 template<ValueType T>
-void ValueSlot<T>::Disconnect(const shared_ptr<Node>& target) {
+void ValueSlot<T>::Disconnect(const shared_ptr<Node>& target, bool silent) {
   ASSERT(target == mNode);
   ASSERT(target != nullptr);
   mNode->DisconnectFromSlot(this);
@@ -186,8 +191,10 @@ void ValueSlot<T>::Disconnect(const shared_ptr<Node>& target) {
   }
   mNode = mDefault;
   mDefault->ConnectToSlot(this);
-  TheMessageQueue.Enqueue(
-    target, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
+  if (!silent) {
+    TheMessageQueue.Enqueue(
+      target, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
+  }
 }
 
 
@@ -198,7 +205,7 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   mDefault->ConnectToSlot(this);
   if (notifyOwner) {
     TheMessageQueue.Enqueue(
-      nullptr, mOwner.lock(), MessageType::SLOT_CONNECTION_CHANGED, this);
+      nullptr, GetOwner(), MessageType::SLOT_CONNECTION_CHANGED, this);
   }
 }
 

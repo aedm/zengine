@@ -26,7 +26,7 @@ public:
   void Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition);
 
   /// Property editor related
-  void SetNodeForPropertyEditor(shared_ptr<Node> node);
+  void SetNodeForPropertyEditor(const shared_ptr<Node>& node);
   shared_ptr<Node> GetNodeInPropertyEditor();
 
   /// Sets the cursor relative to the beginning of the timeline
@@ -47,7 +47,7 @@ public:
   Event<float> mOnMovieCursorChange;
 
   /// Returns the PropertiesNode associated with the current document
-  PropertiesNode* GetPropertiesNode();
+  shared_ptr<PropertiesNode> GetPropertiesNode();
 
 private:
   /// Closes a watcher tab
@@ -68,7 +68,7 @@ private:
   QGLWidget* mCommonGLWidget = nullptr;
 
   /// The currently open document
-  shared_ptr<Document>	mDocument = nullptr;
+  shared_ptr<Document> mDocument;
   DocumentWatcher* mDocumentWatcher = nullptr;
   QString mDocumentFileName;
   

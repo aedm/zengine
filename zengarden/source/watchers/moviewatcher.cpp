@@ -1,14 +1,16 @@
 #include "moviewatcher.h"
 #include "../zengarden.h"
 
-MovieWatcher::MovieWatcher(Node* node)
+MovieWatcher::MovieWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node)
 {
-  ZenGarden::GetInstance()->mOnMovieCursorChange += Delegate(this, &MovieWatcher::HandleMovieCursorChange);
+  ZenGarden::GetInstance()->mOnMovieCursorChange += 
+    Delegate(this, &MovieWatcher::HandleMovieCursorChange);
 }
 
 MovieWatcher::~MovieWatcher() {
-  ZenGarden::GetInstance()->mOnMovieCursorChange -= Delegate(this, &MovieWatcher::HandleMovieCursorChange);
+  ZenGarden::GetInstance()->mOnMovieCursorChange -= 
+    Delegate(this, &MovieWatcher::HandleMovieCursorChange);
 }
 
 void MovieWatcher::OnRedraw() {
@@ -22,18 +24,12 @@ void MovieWatcher::OnTimeEdited(float time) {
 void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
   GetGLWidget()->OnPaint += Delegate(this, &MovieWatcher::Paint);
-  //GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
-  //GetGLWidget()->OnMouseRelease += Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
-  //GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
-  //GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
-  //GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
-
 }
 
 void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
 
-  MovieNode* movieNode = dynamic_cast<MovieNode*>(mNode);
+  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(mNode);
   if (!movieNode) return;
 
   if (!mRenderTarget) {

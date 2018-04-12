@@ -16,14 +16,14 @@ void DisposePainter() {
   SafeDelete(ThePainter);
 }
 
-void ConnectToStubParameter(Pass* pass, bool vertexShader, 
-                            const char* parameterName, Node* target) {
+void ConnectToStubParameter(const shared_ptr<Pass>& pass, bool vertexShader,
+                            const char* parameterName, const shared_ptr<Node>& target) {
   if (pass == nullptr) {
     ERR("Missing pass.");
     return;
   }
   StubSlot* slot = vertexShader ? &pass->mVertexStub : &pass->mFragmentStub;
-  StubNode* stub = slot->GetNode();
+  shared_ptr<StubNode> stub = slot->GetNode();
   if (!stub) {
     ERR("ShaderStub not connected to pass.");
     return;
@@ -42,21 +42,21 @@ UiPainter::UiPainter() {
   mTitleFont.setPixelSize(ADJUST(11));
 
   /// Shaders
-  Pass* pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
-  ConnectToStubParameter(pass, false, "uColor", &mColor);
+  shared_ptr<Pass> pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
+  ConnectToStubParameter(pass, false, "uColor", mColor);
   pass->mRenderstate.mDepthTest = false;
-  mSolidColorMaterial.mSolidPass.Connect(pass);
+  mSolidColorMaterial->mSolidPass.Connect(pass);
   
   pass = Util::LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
-  ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
+  ConnectToStubParameter(pass, false, "uTexture", mTextureNode);
   pass->mRenderstate.mDepthTest = false;
-  mSolidTextureMaterial.mSolidPass.Connect(pass);
+  mSolidTextureMaterial->mSolidPass.Connect(pass);
 
   pass = Util::LoadShader(":/transformPosUV.vs", ":/textTexture.fs");
-  ConnectToStubParameter(pass, false, "uColor", &mColor);
-  ConnectToStubParameter(pass, false, "uTexture", &mTextureNode);
+  ConnectToStubParameter(pass, false, "uColor", mColor);
+  ConnectToStubParameter(pass, false, "uTexture", mTextureNode);
   pass->mRenderstate.mDepthTest = false;
-  mTextTextureMaterial.mSolidPass.Connect(pass);
+  mTextTextureMaterial->mSolidPass.Connect(pass);
 
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
 
@@ -73,35 +73,23 @@ UiPainter::UiPainter() {
   mTexturedBoxMeshNode = StaticMeshNode::Create(textureMesh);
 
   /// Models
-  //SolidLineModel = RenderableNode::Create(SolidColorOp, LineMeshOp);
-  mSolidLine = new Drawable();
-  mSolidLine->mMaterial.Connect(&mSolidColorMaterial);
+  mSolidLine->mMaterial.Connect(mSolidColorMaterial);
   mSolidLine->mMesh.Connect(mLineMeshNode);
 
-  //SolidRectModel = RenderableNode::Create(SolidColorOp, RectMeshOp);
-  mSolidRect = new Drawable();
-  mSolidRect->mMaterial.Connect(&mSolidColorMaterial);
+  mSolidRect->mMaterial.Connect(mSolidColorMaterial);
   mSolidRect->mMesh.Connect(mRectMeshNode);
 
-  //SolidBoxModel = RenderableNode::Create(SolidColorOp, BoxMeshOp);
-  mSolidBox = new Drawable();
-  mSolidBox->mMaterial.Connect(&mSolidColorMaterial);
+  mSolidBox->mMaterial.Connect(mSolidColorMaterial);
   mSolidBox->mMesh.Connect(mBoxMeshNode);
 
-  //TexturedBoxModel = RenderableNode::Create(SolidTextureOp, TexturedBoxMeshOp);
-  mTexturedBox = new Drawable();
-  mTexturedBox->mMaterial.Connect(&mSolidColorMaterial);
+  mTexturedBox->mMaterial.Connect(mSolidColorMaterial);
   mTexturedBox->mMesh.Connect(mTexturedBoxMeshNode);
 
-  //TextBoxModel = RenderableNode::Create(TextTextureOp, TexturedBoxMeshOp);
-  mTextBox = new Drawable();
-  mTextBox->mMaterial.Connect(&mTextTextureMaterial);
+  mTextBox->mMaterial.Connect(mTextTextureMaterial);
   mTextBox->mMesh.Connect(mTexturedBoxMeshNode);
 }
 
 UiPainter::~UiPainter() {
-  SafeDelete(mLineMeshNode);
-  SafeDelete(mSolidLine);
 }
 
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
@@ -153,7 +141,7 @@ void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
     {Vec3(x + w, y + h, 0), Vec2(1, 1)},
   };
 
-  mTextureNode.Set(Tex);
+  mTextureNode->Set(Tex);
   mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
   mTexturedBox->Draw(&mGlobals, PassType::SOLID);
 }
@@ -171,7 +159,7 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
     {Vec3(Position.x + w, Position.y + h, 0), Vec2(u, v)},
   };
 
-  mTextureNode.Set(Tex->TheTexture);
+  mTextureNode->Set(Tex->TheTexture);
   mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
   mTextBox->Draw(&mGlobals, PassType::SOLID);
 }
@@ -180,7 +168,7 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
 void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, 
                               Vec2 size) {
   OpenGL->SetViewport(0, 0, canvasWidth, canvasHeight);
-  mColor.Set(Vec4(1, 1, 1, 1));
+  mColor->Set(Vec4(1, 1, 1, 1));
 
   mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);
   mGlobals.RenderTargetSizeRecip = 

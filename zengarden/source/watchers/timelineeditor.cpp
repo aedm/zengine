@@ -40,13 +40,13 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     auto clipNode = make_shared<ClipNode>();
     clipNode->mStartTime.SetDefaultValue(ZenGarden::GetInstance()->GetMovieCursor());
     clipNode->mLength.SetDefaultValue(5.0f);
-    MovieNode* movieNode = dynamic_cast<MovieNode*>(this->mNode);
+    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
     movieNode->mClips.Connect(clipNode);
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(clipNode);
   });
 
   watcherWidget->connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
-    MovieNode* movieNode = dynamic_cast<MovieNode*>(this->mNode);
+    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
   });
 
@@ -60,7 +60,7 @@ void TimelineEditor::OnChildNameChange() {
   mTimelineCanvas->update();
 }
 
-void TimelineEditor::SetSceneNodeForSelectedClip(SceneNode* sceneNode) {
+void TimelineEditor::SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) {
   if (!mSelectedClip) return;
   mSelectedClip->mSceneSlot.Connect(sceneNode);
 }
@@ -69,7 +69,7 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
   QPainter painter(mTimelineCanvas);
   painter.fillRect(mTimelineCanvas->rect(), QBrush(QColor(23, 23, 23)));
 
-  MovieNode* movieNode = dynamic_cast<MovieNode*>(GetNode());
+  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
   if (!movieNode) return;
 
   //painter.setRenderHint(QPainter::Antialiasing);
@@ -97,12 +97,11 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
     painter.drawText(x + 5, TrackHeightPixels - 5, QString::number(time, 'f', 3));
   }
 
-
   // Draw tracks
   for (int i = 0; i < movieNode->GetTrackCount(); i++) {
     int yTop = (i + 1) * TrackHeightPixels;
-    const vector<ClipNode*>& track = movieNode->GetTrack(i);
-    for (ClipNode* clipNode : track) {
+    const vector<shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
+    for (const auto& clipNode : track) {
       int left = TimeToScreen(clipNode->mStartTime.Get());
       int length = TimeRangeToPixels(clipNode->mLength.Get());
       if (length < 0) length = 0;
@@ -182,13 +181,13 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
   switch (mState) {
     case State::DEFAULT:
     {
-      MovieNode* movieNode = dynamic_cast<MovieNode*>(GetNode());
+      shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
       if (!movieNode) break;
       QPoint pos = event->pos();
       for (int i = 0; i < movieNode->GetTrackCount(); i++) {
         int yTop = (i + 1) * TrackHeightPixels;
-        const vector<ClipNode*>& track = movieNode->GetTrack(i);
-        for (ClipNode* clipNode : track) {
+        const vector<shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
+        for (const  auto& clipNode : track) {
           int left = TimeToScreen(clipNode->mStartTime.Get());
           int length = TimeRangeToPixels(clipNode->mLength.Get());
           if (length < 0) length = 0;

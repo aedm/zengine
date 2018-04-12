@@ -15,10 +15,10 @@ class GraphWatcher: public WatcherUI {
   friend class Node; 
 
 public:
-  GraphWatcher(Graph* graph);
+  GraphWatcher(const shared_ptr<Graph>& graph);
   virtual ~GraphWatcher();
 
-  shared_ptr<NodeWidget> GetNodeWidget(Node* node);
+  shared_ptr<NodeWidget> GetNodeWidget(const shared_ptr<Node>& node);
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
@@ -44,14 +44,14 @@ private:
   void Paint(EventForwarderGLWidget*);
 
   /// All wigdets on the graph
-  Graph* GetGraph();
+  shared_ptr<Graph> GetGraph();
 
   /// Handle drag events
   virtual void HandleDragEnterEvent(QDragEnterEvent* event) override;
   virtual void HandleDropEvent(QDropEvent* event) override;
 
   /// Mapping from node to widget
-  map<Node*, shared_ptr<NodeWidget>> mWidgetMap;
+  map<shared_ptr<Node>, shared_ptr<NodeWidget>> mWidgetMap;
 
   /// Operators currectly selected
   set<shared_ptr<NodeWidget>> mSelectedNodeWidgets;

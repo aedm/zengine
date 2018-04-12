@@ -7,7 +7,7 @@ EngineStubs::EngineStubs() {
 
 EngineStubs::~EngineStubs() {
   for (auto& stub : mStubs) {
-    stub.second->DisconnectAll();
+    stub.second->Dispose();
   }
 }
 

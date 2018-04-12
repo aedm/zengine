@@ -4,6 +4,5 @@
 
 class SceneWatcher: public GeneralSceneWatcher {
 public:
-  SceneWatcher(SceneNode* scene);
-  virtual ~SceneWatcher();
+  SceneWatcher(const shared_ptr<SceneNode>& scene);
 };

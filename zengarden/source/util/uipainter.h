@@ -27,26 +27,26 @@ public:
   void DrawTexture(Texture* texture, float x, float y);
   void DrawTextTexture(TextTexture* texture, const Vec2& position);
 
-  Vec4Node mColor;
-  TextureNode	mTextureNode;
+  shared_ptr<Vec4Node> mColor = make_shared<Vec4Node>();
+  shared_ptr<TextureNode> mTextureNode = make_shared<TextureNode>();
 
   QFont mTitleFont;
 
 private:
-  Material mSolidColorMaterial;
-  Material mSolidTextureMaterial;
-  Material mTextTextureMaterial;
+  const shared_ptr<Material> mSolidColorMaterial = make_shared<Material>();
+  const shared_ptr<Material> mSolidTextureMaterial = make_shared<Material>();
+  const shared_ptr<Material> mTextTextureMaterial = make_shared<Material>();
 
-  StaticMeshNode* mLineMeshNode;
-  StaticMeshNode* mRectMeshNode;
-  StaticMeshNode* mBoxMeshNode;
-  StaticMeshNode* mTexturedBoxMeshNode;
+  shared_ptr<StaticMeshNode> mLineMeshNode;
+  shared_ptr<StaticMeshNode> mRectMeshNode;
+  shared_ptr<StaticMeshNode> mBoxMeshNode;
+  shared_ptr<StaticMeshNode> mTexturedBoxMeshNode;
 
-  Drawable* mSolidLine;
-  Drawable* mSolidRect;
-  Drawable* mSolidBox;
-  Drawable* mTexturedBox;
-  Drawable* mTextBox;
+  const shared_ptr<Drawable> mSolidLine = make_shared<Drawable>();
+  const shared_ptr<Drawable> mSolidRect = make_shared<Drawable>();
+  const shared_ptr<Drawable> mSolidBox = make_shared<Drawable>();
+  const shared_ptr<Drawable> mTexturedBox = make_shared<Drawable>();
+  const shared_ptr<Drawable> mTextBox = make_shared<Drawable>();
 
   Globals mGlobals;
 };

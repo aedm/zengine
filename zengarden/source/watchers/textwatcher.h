@@ -7,7 +7,7 @@
 
 class TextWatcher: public WatcherUI {
 public:
-  TextWatcher(StringNode* node);
+  TextWatcher(const shared_ptr<StringNode>& node);
   virtual ~TextWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;

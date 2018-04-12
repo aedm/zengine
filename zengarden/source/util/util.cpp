@@ -28,7 +28,7 @@ namespace Util {
   }
 
 
-  Pass* LoadShader(const char* VertexFile, const char* FragmentFile) {
+  shared_ptr<Pass> LoadShader(const char* VertexFile, const char* FragmentFile) {
     unique_ptr<char> vertexContent(ReadFileQt(VertexFile));
     unique_ptr<char> fragmentContent(ReadFileQt(FragmentFile));
 
@@ -38,12 +38,12 @@ namespace Util {
     }
 
     /// TODO: use LoadStub instead
-    StubNode* vertexStub = new StubNode();
+    shared_ptr<StubNode> vertexStub = make_shared<StubNode>();
     vertexStub->mSource.SetDefaultValue(string(vertexContent.get()));
-    StubNode* fragmentStub = new StubNode();
+    shared_ptr<StubNode> fragmentStub = make_shared<StubNode>();
     fragmentStub->mSource.SetDefaultValue(string(fragmentContent.get()));
 
-    Pass* pass = new Pass();
+    shared_ptr<Pass> pass = make_shared<Pass>();
     pass->mVertexStub.Connect(vertexStub);
     pass->mFragmentStub.Connect(fragmentStub);
 
@@ -182,10 +182,10 @@ namespace Util {
     return zenmesh;
   }
 
-  StubNode* LoadStub(const QString& fileName) {
+  shared_ptr<StubNode> LoadStub(const QString& fileName) {
     unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
     /// TODO: register this as an engine node
-    StubNode* stub = new StubNode();
+    shared_ptr<StubNode> stub = make_shared<StubNode>();
     stub->mSource.SetDefaultValue(stubSource.get());
     return stub;
   }

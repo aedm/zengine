@@ -1,14 +1,14 @@
 #include "documentwatcher.h"
 #include "../zengarden.h"
 
-Q_DECLARE_METATYPE(Graph*)
+Q_DECLARE_METATYPE(shared_ptr<Graph>)
 
 enum MyRoles {
   GraphNodeRole = Qt::UserRole + 1
 };
 
 
-DocumentWatcher::DocumentWatcher(Document* document)
+DocumentWatcher::DocumentWatcher(const shared_ptr<Document>& document)
   : WatcherUI(document)
 {
 }
@@ -31,30 +31,28 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mModel = new QStandardItemModel();
   mUI.graphList->setModel(mModel);
 
-  watcherWidget->connect(mUI.graphList, &QListView::clicked, [=](const QModelIndex &index) {
+  watcherWidget->connect(mUI.graphList, &QListView::clicked, 
+    [=](const QModelIndex &index) {
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    Graph* graph = item->data().value<Graph*>();
+    shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(graph);
   });
 
   RefreshGraphList();
 
-  watcherWidget->connect(mUI.openButton, &QPushButton::pressed, [=]() { 
+  watcherWidget->connect(mUI.openButton, &QPushButton::pressed, [=]() {
     QModelIndex index = mUI.graphList->currentIndex();
     if (!index.isValid()) return;
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    Graph* graph = item->data().value<Graph*>();
+    shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
     ZenGarden::GetInstance()->Watch(graph, WatcherPosition::RIGHT_TAB);
   });
 
   watcherWidget->connect(mUI.newGraphButton, &QPushButton::pressed, [=]() {
-    Graph* graph = new Graph();
-    Document* document = dynamic_cast<Document*>(this->mNode);
+    shared_ptr<Graph> graph = make_shared<Graph>();
+    shared_ptr<Document> document = PointerCast<Document>(this->mNode);
     document->mGraphs.Connect(graph);
   });
-
-  //watcherWidget->connect(mUI.removePointButton, &QPushButton::pressed, [=]() { RemovePoint(); });
-  //watcherWidget->connect(mUI.linearCheckBox, &QPushButton::pressed, [=]() { ToggleLinear(); });
 }
 
 void DocumentWatcher::OnSlotConnectionChanged(Slot* slot) {
@@ -66,14 +64,13 @@ void DocumentWatcher::OnChildNameChange() {
 }
 
 void DocumentWatcher::RefreshGraphList() {
-  Document* doc = static_cast<Document*>(mNode);
+  shared_ptr<Document> doc = PointerCast<Document>(mNode);
   mModel->clear();
-  for (Node* node : doc->mGraphs.GetDirectMultiNodes()) {
-    Graph* graph = static_cast<Graph*>(node);
+  for (const auto& node : doc->mGraphs.GetDirectMultiNodes()) {
+    shared_ptr<Graph> graph = PointerCast<Graph>(node);
     QStandardItem* item = new QStandardItem(CreateDisplayedName(graph));
     item->setData(QVariant::fromValue(graph), GraphNodeRole);
     mModel->appendRow(item);
-    //GraphNode* p = index.data(GraphNodeRole).value<GraphNode*>();
   }
 }
 

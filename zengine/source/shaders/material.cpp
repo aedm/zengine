@@ -68,10 +68,10 @@ SolidMaterial::SolidMaterial()
 
 
 SolidMaterial::~SolidMaterial() {
-  mMaterial->DisconnectAll();
-  mSolidPass->DisconnectAll();
-  mSolidVertexStub->DisconnectAll();
-  mSolidFragmentStub->DisconnectAll();
+  mMaterial->Dispose();
+  mSolidPass->Dispose();
+  mSolidVertexStub->Dispose();
+  mSolidFragmentStub->Dispose();
 }
 
 

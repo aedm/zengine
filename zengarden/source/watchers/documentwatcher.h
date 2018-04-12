@@ -9,7 +9,7 @@
 class DocumentWatcher : public WatcherUI
 {
 public:
-	DocumentWatcher(Document* documentNode);
+	DocumentWatcher(const shared_ptr<Document>& documentNode);
 	virtual ~DocumentWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;

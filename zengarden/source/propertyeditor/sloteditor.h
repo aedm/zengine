@@ -8,7 +8,7 @@ class SlotWatcher;
 /// Widget that displays editable node slots
 class SlotEditor : public PropertyEditor {
 public:
-  SlotEditor(Node* node);
+  SlotEditor(const shared_ptr<Node>& node);
   virtual ~SlotEditor();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
@@ -35,7 +35,7 @@ public:
   virtual void UpdateReadOnly() = 0;
 
 protected:
-  SlotWatcher(Node* node);
+  SlotWatcher(const shared_ptr<Node>& node);
 };
 
 

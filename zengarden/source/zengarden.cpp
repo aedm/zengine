@@ -186,25 +186,25 @@ void ZenGarden::LoadEngineShader(const QString& path) {
     string(stubSource.get()));
 }
 
-void ZenGarden::SetNodeForPropertyEditor(shared_ptr<Node>& node) {
+void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
     shared_ptr<WatcherUI> watcher;
     if (IsExactType<FloatNode>(node)) {
-      watcher = 
-        node->Watch<StaticValueWatcher<ValueType::FLOAT>>(SafeCast<FloatNode*>(node));
+      watcher =
+        node->Watch<StaticValueWatcher<ValueType::FLOAT>>(PointerCast<FloatNode>(node));
     }
     else if (IsExactType<Vec2Node>(node)) {
-      watcher = 
-        node->Watch<StaticValueWatcher<ValueType::VEC2>>(SafeCast<Vec2Node*>(node));
+      watcher =
+        node->Watch<StaticValueWatcher<ValueType::VEC2>>(PointerCast<Vec2Node>(node));
     }
     else if (IsExactType<Vec3Node>(node)) {
       watcher =
-        node->Watch<StaticValueWatcher<ValueType::VEC3>>(SafeCast<Vec3Node*>(node));
+        node->Watch<StaticValueWatcher<ValueType::VEC3>>(PointerCast<Vec3Node>(node));
     }
     else if (IsExactType<Vec4Node>(node)) {
       watcher =
-        node->Watch<StaticValueWatcher<ValueType::VEC4>>(SafeCast<Vec4Node*>(node));
+        node->Watch<StaticValueWatcher<ValueType::VEC4>>(PointerCast<Vec4Node>(node));
     }
     else {
       watcher = node->Watch<SlotEditor>(node);
@@ -255,8 +255,8 @@ void ZenGarden::SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode) {
 }
 
 
-PropertiesNode* ZenGarden::GetPropertiesNode() {
-  return SafeCast<PropertiesNode*>(mDocument->mProperties.GetDirectNode());
+shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() {
+  return PointerCast<PropertiesNode>(mDocument->mProperties.GetDirectNode());
 }
 
 
@@ -279,12 +279,12 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
   shared_ptr<WatcherUI> watcher;
 
   /// Non-3D watchers
-  if (IsInsanceOf<StringNode*>(node)) {
-    auto stringNode = SafeCast<StringNode*>(node);
+  if (IsPointerOf<StringNode>(node)) {
+    shared_ptr<StringNode> stringNode = PointerCast<StringNode>(node);
     watcher = stringNode->Watch<TextWatcher>(stringNode);
   }
-  else if (IsInsanceOf<Document*>(node)) {
-    auto documentNode = SafeCast<Document*>(node);
+  else if (IsPointerOf<Document>(node)) {
+    shared_ptr<Document> documentNode = PointerCast<Document>(node);
     watcher = documentNode->Watch<DocumentWatcher>(documentNode);
   }
 
@@ -294,36 +294,35 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
   else {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
     if (nodeClass->mClassName == "Float Spline") {
-      watcher = node->Watch<FloatSplineWatcher>(dynamic_cast<FloatSplineNode*>(node));
+      watcher = node->Watch<FloatSplineWatcher>(PointerCast<FloatSplineNode>(node));
       watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
     }
   }
 
   /// 3D watchers
-  if (IsInsanceOf<Pass*>(node)) {
-    auto passNode = SafeCast<Pass*>(node);
-    watcher = static_pointer_cast<WatcherUI>(passNode->Watch<PassWatcher>(passNode));
+  if (IsPointerOf<Pass>(node)) {
+    auto passNode = PointerCast<Pass>(node);
+    watcher = PointerCast<WatcherUI>(passNode->Watch<PassWatcher>(passNode));
   }
-  else if (IsInsanceOf<MeshNode*>(node)) {
-    auto meshNode = SafeCast<MeshNode*>(node);
-    watcher = static_pointer_cast<WatcherUI>(meshNode->Watch<MeshWatcher>(meshNode));
+  else if (IsPointerOf<MeshNode>(node)) {
+    auto meshNode = PointerCast<MeshNode>(node);
+    watcher = PointerCast<WatcherUI>(meshNode->Watch<MeshWatcher>(meshNode));
   }
-  else if (IsInsanceOf<Drawable*>(node)) {
-    auto drawableNode = SafeCast<Drawable*>(node);
-    watcher =
-      static_pointer_cast<WatcherUI>(drawableNode->Watch<DrawableWatcher>(drawableNode));
+  else if (IsPointerOf<Drawable>(node)) {
+    auto drawableNode = PointerCast<Drawable>(node);
+    watcher = PointerCast<WatcherUI>(drawableNode->Watch<DrawableWatcher>(drawableNode));
   }
-  else if (IsInsanceOf<SceneNode*>(node)) {
-    auto sceneNode = dynamic_cast<SceneNode*>(node);
-    watcher = static_pointer_cast<WatcherUI>(sceneNode->Watch<SceneWatcher>(sceneNode));
+  else if (IsPointerOf<SceneNode>(node)) {
+    auto sceneNode = PointerCast<SceneNode>(node);
+    watcher = PointerCast<WatcherUI>(sceneNode->Watch<SceneWatcher>(sceneNode));
   }
-  else if (IsInsanceOf<Graph*>(node)) {
-    auto graphNode = dynamic_cast<Graph*>(node);
-    watcher = static_pointer_cast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
+  else if (IsPointerOf<Graph>(node)) {
+    auto graphNode = PointerCast<Graph>(node);
+    watcher = PointerCast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
   }
-  else if (IsInsanceOf<MovieNode*>(node)) {
-    auto movieNode = dynamic_cast<MovieNode*>(node);
-    watcher = static_pointer_cast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
+  else if (IsPointerOf<MovieNode>(node)) {
+    auto movieNode = PointerCast<MovieNode>(node);
+    watcher = PointerCast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
   }
 
   if (watcherWidget == nullptr) {
@@ -353,11 +352,11 @@ void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
 
 void ZenGarden::CreateNewDocument() {
   DeleteDocument();
-  mDocument = new Document();
-  mDocument->mProperties.Connect(new PropertiesNode());
-  mDocument->mMovie.Connect(new MovieNode());
+  mDocument = make_shared<Document>();
+  mDocument->mProperties.Connect(make_shared<PropertiesNode>());
+  mDocument->mMovie.Connect(make_shared<MovieNode>());
 
-  Graph* graph = new Graph();
+  shared_ptr<Graph> graph = make_shared<Graph>();
   mDocument->mGraphs.Connect(graph);
 
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
@@ -368,7 +367,7 @@ void ZenGarden::CreateNewDocument() {
 
 void ZenGarden::SetupMovieWatcher() {
   SafeDelete(mMovieWatcherWidget);
-  MovieNode* movieNode = mDocument->mMovie.GetNode();
+  shared_ptr<MovieNode> movieNode = mDocument->mMovie.GetNode();
   shared_ptr<WatcherUI> watcher = movieNode->Watch<TimelineEditor>(movieNode);
   mMovieWatcherWidget =
     new WatcherWidget(mUI.timelineWidget, watcher, WatcherPosition::TIMELINE_PANEL);
@@ -422,7 +421,7 @@ void ZenGarden::HandleMenuOpen() {
 
   /// Parse file into a Document
   mCommonGLWidget->makeCurrent();
-  Document* document = FromJSON(string(json.get()));
+  shared_ptr<Document> document = FromJSON(string(json.get()));
   if (document == nullptr) return;
 
   /// Load succeeded, remove old document
@@ -432,20 +431,20 @@ void ZenGarden::HandleMenuOpen() {
 
   /// Make sure a MovieNode exists in the document.
   if (!mDocument->mMovie.GetNode()) {
-    MovieNode* movieNode = new MovieNode();
+    shared_ptr<MovieNode> movieNode = make_shared<MovieNode>();
     mDocument->mMovie.Connect(movieNode);
   }
 
   /// Make sure a PropertiesNode exists in the document.
   if (!mDocument->mProperties.GetNode()) {
-    mDocument->mProperties.Connect(new PropertiesNode());
+    mDocument->mProperties.Connect(make_shared<PropertiesNode>());
   }
 
   /// Open "debug" node first -- nvidia Nsight workaround, it can only debug the
   /// first OpenGL window
-  vector<Node*> nodes;
+  vector<shared_ptr<Node>> nodes;
   mDocument->GenerateTransitiveClosure(nodes, false);
-  for (Node* node : nodes) {
+  for (const auto& node : nodes) {
     if (node->GetName() == "debug") {
       Watch(node, WatcherPosition::UPPER_LEFT_TAB);
       break;
@@ -467,10 +466,10 @@ void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
   mCommonGLWidget->makeCurrent();
 
-  vector<Node*> nodes;
+  vector<shared_ptr<Node>> nodes;
   mDocument->GenerateTransitiveClosure(nodes, false);
   for (UINT i = nodes.size(); i > 0; i--) {
-    delete nodes[i - 1];
+    if (nodes[i - 1].use_count()) nodes[i - 1]->Dispose();
   }
   mDocument = nullptr;
   mDocumentWatcher = nullptr;

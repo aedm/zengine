@@ -6,8 +6,8 @@
 namespace Util {
 
   /// Creates a shader pass
-  Pass*	LoadShader(const char* VertexFile, const char* FragmentFile);
-  StubNode* LoadStub(const QString& fileName);
+  shared_ptr<Pass> LoadShader(const char* VertexFile, const char* FragmentFile);
+  shared_ptr<StubNode> LoadStub(const QString& fileName);
 
   /// Reads in a file using Qt
   OWNERSHIP char*	ReadFileQt(const char* FileName);

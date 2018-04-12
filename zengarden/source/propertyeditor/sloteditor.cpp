@@ -4,7 +4,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLabel>
 
-SlotEditor::SlotEditor(Node* node)
+SlotEditor::SlotEditor(const shared_ptr<Node>& node)
   : PropertyEditor(node) 
 {
   mGhostIcon.addFile(QStringLiteral(":/zengarden/icons/angle-right.svg"), 
@@ -22,7 +22,7 @@ SlotEditor::~SlotEditor() {
 
 template <ValueType T>
 bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
-  if (!IsInsanceOf<ValueNode<T>*>(slot->GetReferencedNode())) return false;
+  if (!IsPointerOf<ValueNode<T>>(slot->GetReferencedNode())) return false;
 
   auto valueSlot = SafeCast<ValueSlot<T>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
@@ -78,7 +78,7 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   /// Source editor button
   if (IsExactType<StubNode>(mNode)) {
-    StubNode* stub = static_cast<StubNode*>(mNode);
+    auto stub = PointerCast<StubNode>(mNode);
     QPushButton* sourceButton = new QPushButton("Edit source", watcherWidget);
     watcherWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
       ZenGarden::GetInstance()->Watch(
@@ -92,8 +92,8 @@ void SlotEditor::OnSlotConnectionChanged(Slot* slot) {
   auto it = mSlotWatchers.find(slot);
   if (it != mSlotWatchers.end()) {
     shared_ptr<SlotWatcher> watcher = it->second;
-    Node* node = slot->GetReferencedNode();
-    if (IsInsanceOf<StubNode*>(node)) {
+    shared_ptr<Node> node = slot->GetReferencedNode();
+    if (IsPointerOf<StubNode>(node)) {
       node->RemoveWatcher(watcher.get());
     }
     else {
@@ -110,7 +110,7 @@ void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-SlotWatcher::SlotWatcher(Node* node)
+SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node) {}
 
 
@@ -129,7 +129,7 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  auto valueNode = SafeCast<ValueNode<T>*>(mNode);
+  shared_ptr<ValueNode<T>> valueNode = PointerCast<ValueNode<T>>(mNode);
   auto value = valueNode->Get();
 
   mEditor = new ValueEditor<T>(watcherWidget, 

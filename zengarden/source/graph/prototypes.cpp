@@ -5,10 +5,10 @@
 
 Prototypes* ThePrototypes = NULL;
 
-Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label, 
-                                       int prototypeIndex)
+Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label,
+  int prototypeIndex)
   : QTreeWidgetItem(Parent)
-  , mPrototypeIndex(prototypeIndex) 
+  , mPrototypeIndex(prototypeIndex)
 {
   setText(0, Label);
 }
@@ -29,17 +29,16 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<CameraNode>());
   AddPrototype(registry->GetNodeClass<SceneNode>());
   AddPrototype(registry->GetNodeClass<FloatSplineNode>());
-  
-  AddPrototype(registry->GetNodeClass<CubeMeshNode>());
 
-  FloatSplineNode x;
-  x.Get();
+  AddPrototype(registry->GetNodeClass<CubeMeshNode>());
 
   LoadStubs();
 
   /// Hack to force linking
-  FloatsToVec3Node tmp;
-  CubeMeshNode cubeTmp;
+  /// TODO: remove
+  make_shared<FloatSplineNode>()->Get();
+  make_shared<FloatsToVec3Node>();
+  make_shared<CubeMeshNode>();
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {
@@ -53,7 +52,7 @@ void Prototypes::AddPrototype(NodeClass* nodeClass) {
 Prototypes::~Prototypes() {
 }
 
-Node* Prototypes::AskUser(QWidget* Parent, QPoint Position) {
+shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   QDialog dialog(Parent, Qt::FramelessWindowHint);
   mDialog = &dialog;
   Ui::OperatorSelector selector;
@@ -66,7 +65,7 @@ Node* Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   dialog.resize(200, 400);
   dialog.move(Position);
   connect(selector.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-          this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
+    this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
   //dialog.connect(SIGNAL(itemClicked()), this, SLOT(OnItemSelected()));
 
   int ret = dialog.exec();
@@ -74,10 +73,11 @@ Node* Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   const Prototype* prototype = allPrototypes[ret - 1];
 
   /// Create new node, possibly based on original
+  shared_ptr<Node> node = prototype->mNodeClass->Manufacture();
   if (prototype->mNode == nullptr) {
-    return prototype->mNodeClass->Manufacture();
+    node->CopyFrom(prototype->mNode);
   }
-  return prototype->mNodeClass->Manufacture(prototype->mNode);
+  return node;
 }
 
 
@@ -112,26 +112,26 @@ void Prototypes::LoadStubFolder(QString folder, Category* category) {
     }
     else if (fileInfo.completeSuffix() == shaderSuffix) {
       INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
-      StubNode* stub = Util::LoadStub(fileInfo.absoluteFilePath());
+      shared_ptr<StubNode> stub = Util::LoadStub(fileInfo.absoluteFilePath());
       stub->Update();
       NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass<StubNode>();
       Prototype* prototype = new Prototype();
       prototype->mNodeClass = nodeClass;
       prototype->mNode = stub;
-      prototype->mName = QString::fromStdString(stub->GetStubMetadata() == nullptr 
+      prototype->mName = QString::fromStdString(stub->GetStubMetadata() == nullptr
         ? nodeClass->mClassName : stub->GetStubMetadata()->name);
       category->mPrototypes.push_back(prototype);
     }
   }
 }
 
-void Prototypes::AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget, 
-                                         QTreeWidgetItem* parentItem, 
-                                         vector<const Prototype*>& allPrototypes) 
+void Prototypes::AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget,
+  QTreeWidgetItem* parentItem,
+  vector<const Prototype*>& allPrototypes)
 {
   for (const Prototype* prototype : category->mPrototypes) {
     allPrototypes.push_back(prototype);
-    SelectorItem* item = 
+    SelectorItem* item =
       new SelectorItem(nullptr, prototype->mName, allPrototypes.size());
     if (parentItem == nullptr) treeWidget->addTopLevelItem(item);
     else parentItem->addChild(item);
@@ -153,8 +153,4 @@ Prototypes::Category::~Category() {
   for (Prototype* prototype : mPrototypes) {
     delete prototype;
   }
-}
-
-Prototypes::Prototype::~Prototype() {
-  SafeDelete(mNode);
 }

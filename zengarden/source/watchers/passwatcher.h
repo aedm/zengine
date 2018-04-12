@@ -5,11 +5,10 @@
 class PassWatcher : public GeneralSceneWatcher
 {
 public:
-  PassWatcher(Pass* pass);
-	virtual ~PassWatcher();
+  PassWatcher(const shared_ptr<Pass>& pass);
 
 protected:
-	Material mMaterial;
-	MeshNode* mMesh;
-  Drawable mDrawable;
+  shared_ptr<Material> mMaterial = make_shared<Material>();
+  shared_ptr<Drawable> mDrawable = make_shared<Drawable>();
+  shared_ptr<MeshNode> mMesh;
 };

@@ -3,7 +3,7 @@
 #include "../graph/prototypes.h"
 #include "../zengarden.h"
 
-WatcherUI::WatcherUI(Node* node)
+WatcherUI::WatcherUI(const shared_ptr<Node>& node)
     : Watcher(node)
 {
   mDisplayedName = CreateDisplayedName(mNode);
@@ -27,7 +27,7 @@ EventForwarderGLWidget* WatcherUI::GetGLWidget() {
 }
 
 
-QString WatcherUI::CreateDisplayedName(Node* node) {
+QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
   ASSERT(node != nullptr);
 
   if (!node->GetName().empty()) {
@@ -35,10 +35,10 @@ QString WatcherUI::CreateDisplayedName(Node* node) {
     return QString::fromStdString(node->GetName());
   } 
 
-  Node* referencedNode = node->GetReferencedNode();
+  shared_ptr<Node> referencedNode = node->GetReferencedNode();
 
-  if (IsInsanceOf<StubNode*>(referencedNode)) {
-    StubNode* stub = static_cast<StubNode*>(referencedNode);
+  if (IsPointerOf<StubNode>(referencedNode)) {
+    shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);
     StubMetadata* metaData = stub->GetStubMetadata();
     if (metaData != nullptr && !metaData->name.empty()) {
       /// For shader stubs, use the stub name by default

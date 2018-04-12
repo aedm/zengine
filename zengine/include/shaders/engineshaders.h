@@ -38,11 +38,11 @@ private:
   void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
                          Texture* sourceColorMSAA);
 
-  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First;
-  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal;
-  shared_ptr<Pass> mPostProcess_GaussianBlurVertical;
-  shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA;
-  shared_ptr<Pass> mPostProcess_DOF;
+  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First = make_shared<Pass>();
+  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal = make_shared<Pass>();
+  shared_ptr<Pass> mPostProcess_GaussianBlurVertical = make_shared<Pass>();
+  shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA = make_shared<Pass>();
+  shared_ptr<Pass> mPostProcess_DOF = make_shared<Pass>();
 
   Mesh* mFullScreenQuad = nullptr;
 };

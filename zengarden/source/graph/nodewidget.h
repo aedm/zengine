@@ -13,7 +13,7 @@ class NodeWidget: public WatcherUI {
   friend class GraphWatcher;
 
 public:
-  NodeWidget(Node* node, GraphWatcher* graphWatcher);
+  NodeWidget(const shared_ptr<Node>& node, GraphWatcher* graphWatcher);
   virtual ~NodeWidget();
 
   void Paint();

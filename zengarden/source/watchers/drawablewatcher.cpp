@@ -1,8 +1,8 @@
 #include "drawablewatcher.h"
 
-DrawableWatcher::DrawableWatcher(Drawable* drawable)
+DrawableWatcher::DrawableWatcher(const shared_ptr<Drawable>& drawable)
   : GeneralSceneWatcher(drawable)
 {
-  mDefaultScene.mDrawables.Connect(drawable);
+  mDefaultScene->mDrawables.Connect(drawable);
 }
 
