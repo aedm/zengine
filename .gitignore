@@ -18,3 +18,11 @@ demoplayer/.msbuild/
 *.mp3
 *.zen
 .vs/
+*.pdb
+*.ilk
+zengine/lib/zengine-debug64.lib
+app/bass.dll
+app/assimp-vc140-mt.dll
+app/zengarden-debug64.exe
+*.user
+demoplayer/app/demo-debug64.exe

@@ -48,9 +48,9 @@ using namespace std;
 enum class ShaderGlobalType {
 #undef ITEM
 #define ITEM(name, type) name,
-	GLOBALUSAGE_LIST
+  GLOBALUSAGE_LIST
 
-	LOCAL,	/// For non-global uniforms
+  LOCAL,	/// For non-global uniforms
 };
 
 extern const EnumMapperA GlobalUniformMapper[];
@@ -61,29 +61,29 @@ extern const int GlobalUniformOffsets[];
 struct Globals {
 #undef ITEM
 #define ITEM(name, type) ValueTypes<ValueType::type>::Type name;
-	GLOBALUSAGE_LIST
+  GLOBALUSAGE_LIST
 };
 
 /// Stub parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct StubParameter {
-	ValueType mType;
-	SharedString mName;
+  ValueType mType;
+  SharedString mName;
 };
 
 /// Stub variables are outputs of a shader stage and inputs of the next shader stage.
 /// ":output vec4 MyColor" -- creates "outMyColor" output variable.
 /// ":input vec4 MyColor" -- creates "inMyColor" input variable.
 struct StubVariable {
-	ValueType type;
-	string name;
+  ValueType type;
+  string name;
 };
 
 /// --
 struct StubGlobal {
   ValueType type;
-	string name;
-	ShaderGlobalType usage;
+  string name;
+  ShaderGlobalType usage;
   bool isMultiSampler; // type is "sampler2DMS"
   bool isShadow; // type is "sampler2DShadow"
 };
@@ -91,74 +91,74 @@ struct StubGlobal {
 
 /// All metadata collected from a stub source.
 struct StubMetadata {
-	StubMetadata(const string& name, ValueType returnType,
-				 const string& strippedSource,
-				 const vector<OWNERSHIP StubParameter*>& parameters,
-				 const vector<StubGlobal*>& globals,
-				 const vector<StubVariable*>& inputs,
-				 const vector<StubVariable*>& outputs);
+  StubMetadata(const string& name, ValueType returnType,
+    const string& strippedSource,
+    const vector<OWNERSHIP StubParameter*>& parameters,
+    const vector<StubGlobal*>& globals,
+    const vector<StubVariable*>& inputs,
+    const vector<StubVariable*>& outputs);
 
-	~StubMetadata();
+  ~StubMetadata();
 
-	/// Value of the ":name" directive.
-	const string name;
+  /// Value of the ":name" directive.
+  const string name;
 
-	/// Value of the ":returns" directive.
-	const ValueType returnType;
+  /// Value of the ":returns" directive.
+  const ValueType returnType;
 
-	/// The source without any directives.
-	const string strippedSource;
+  /// The source without any directives.
+  const string strippedSource;
 
-	/// Parameters of the stub. These become slots. (":param")
-	const vector<StubParameter*> parameters;
+  /// Parameters of the stub. These become slots. (":param")
+  const vector<StubParameter*> parameters;
 
-	/// List of globals. (":global")
-	const vector<StubGlobal*> globals;
+  /// List of globals. (":global")
+  const vector<StubGlobal*> globals;
 
-	/// List of stage inputs. (":input")
-	const vector<StubVariable*>	inputs;
+  /// List of stage inputs. (":input")
+  const vector<StubVariable*> inputs;
 
-	/// List of stage outputs. (":output")
-	const vector<StubVariable*>	outputs;
+  /// List of stage outputs. (":output")
+  const vector<StubVariable*> outputs;
 };
 
 
 /// A stub is a part of a shader. It contains shader source code annotated
 /// by directives. Using these annotations, stubs can depend on each other and
 /// on other nodes likes textures and floats. 
-class StubNode: public Node {
-	friend class ShaderBuilder;
+class StubNode : public Node {
+  friend class ShaderBuilder;
 
 public:
-	StubNode();
-	virtual ~StubNode();
+  StubNode();
+  virtual ~StubNode();
 
-	/// Returns the metadata containing information about the stub source.
-	StubMetadata* GetStubMetadata() const;
+  /// Returns the metadata containing information about the stub source.
+  StubMetadata* GetStubMetadata() const;
 
-	/// Get slot by shader parameter name
-	Slot* GetSlotByParameter(StubParameter*);
-	Slot* GetSlotByParameterName(const string& name);
+  /// Get slot by shader parameter name
+  Slot* GetSlotByParameter(StubParameter*);
+  Slot* GetSlotByParameterName(const string& name);
 
-	/// Source of the stub
-	StringSlot mSource;
+  /// Source of the stub
+  StringSlot mSource;
 
   /// Copies shader source from another StubNode
   virtual void CopyFrom(const shared_ptr<Node>& node) override;
-  
-protected:
-	/// Performs metadata analysis on the new stub source.
-	virtual void Operate() override;
 
-	/// Handle received messages
+protected:
+  /// Performs metadata analysis on the new stub source.
+  virtual void Operate() override;
+
+  /// Handle received messages
   virtual void HandleMessage(Message* message) override;
 
-	/// Metadata
-	StubMetadata* mMetadata;
+  /// Metadata
+  StubMetadata* mMetadata;
 
-	/// Maps stub parameters to stub slots
-	map<StubParameter*, Slot*> mParameterSlotMap;
-	map<string, Slot*> mParameterNameSlotMap;
+  /// Maps stub parameters to stub slots
+  map<StubParameter*, Slot*> mParameterSlotMap;
+  map<string, Slot*> mParameterNameSlotMap;
 };
 
 

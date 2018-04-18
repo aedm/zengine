@@ -68,6 +68,7 @@ void Ghost::Regenerate() {
 
   set<shared_ptr<Node>> newInternalNodes;
   map<shared_ptr<Node>, shared_ptr<Node>> newNodeMapping;
+  ClearSlots();
 
   if (topologicalOrder.size() == 0) {
     /// No ghost slots, just reference the original node
@@ -85,15 +86,50 @@ void Ghost::Regenerate() {
       else {
         internalNode = it->second;
       }
+      internalNode->CopyFrom(node);
       newInternalNodes.insert(internalNode);
       newNodeMapping[node] = internalNode;
+
+
+	  /// Connect slots
+      const auto& originalSlots = node->GetPublicSlots();
+      const auto& internalNodeSlots = internalNode->GetPublicSlots();
+      UINT slotCount = originalSlots.size();
+      ASSERT(slotCount == internalNode->GetPublicSlots().size());
+      for (UINT i = 0; i < slotCount; i++) {
+        Slot* originalSlot = originalSlots[i];
+        Slot* internalSlot = internalNodeSlots[i];
+        if (originalSlot->IsGhost()) {
+          /// TODO: initialize value
+          AddSlot(internalSlot, true, true, true);
+        }
+        else {
+          if (!originalSlot->IsDefaulted()) {
+            if (originalSlot->mIsMultiSlot) {
+              for (const auto& connectedNode : originalSlot->GetDirectMultiNodes()) {
+                auto it = newNodeMapping.find(connectedNode);
+                shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
+                  ? connectedNode : it->second;
+                internalSlot->Connect(nodeToConnect);
+              }
+            }
+            else {
+              shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
+              auto it = newNodeMapping.find(connectedNode);
+              shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
+                ? connectedNode : it->second;
+              internalSlot->Connect(originalSlot->GetDirectNode());
+            }
+          }
+        }
+      }
     }
     mMainInternalNode = newNodeMapping.at(root);
-
   }
 
   mInternalNodes = newInternalNodes;
   mNodeMapping = newNodeMapping;
+
 }
 
 

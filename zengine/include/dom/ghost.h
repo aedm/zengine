@@ -19,6 +19,7 @@ protected:
   map<shared_ptr<Node>, shared_ptr<Node>> mNodeMapping;
 
   shared_ptr<Node> mMainInternalNode;
+  
 
   virtual shared_ptr<Node> GetReferencedNode() override;
 
