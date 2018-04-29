@@ -94,7 +94,7 @@ void Ghost::Regenerate() {
 	  /// Connect slots
       const auto& originalSlots = node->GetPublicSlots();
       const auto& internalNodeSlots = internalNode->GetPublicSlots();
-      UINT slotCount = originalSlots.size();
+      size_t slotCount = originalSlots.size();
       ASSERT(slotCount == internalNode->GetPublicSlots().size());
       for (UINT i = 0; i < slotCount; i++) {
         Slot* originalSlot = originalSlots[i];
