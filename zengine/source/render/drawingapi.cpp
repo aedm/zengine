@@ -419,6 +419,7 @@ VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
 
 
 void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
+  CheckGLError();
   glDeleteBuffers(1, &handle);
   CheckGLError();
 }

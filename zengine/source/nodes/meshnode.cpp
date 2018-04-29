@@ -16,7 +16,10 @@ StaticMeshNode::StaticMeshNode()
 
 
 StaticMeshNode::~StaticMeshNode() {
-  if (mMesh) TheResourceManager->DiscardMesh(mMesh);
+  if (mMesh) {
+    TheResourceManager->DiscardMesh(mMesh);
+    mMesh = nullptr;
+  }
 }
 
 

@@ -20,7 +20,13 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   /// Node type
-  string& typeString = NodeRegistry::GetInstance()->GetNodeClass(mNode->GetReferencedNode())->mClassName;
+  shared_ptr<Node> referencedNode = mNode->GetReferencedNode();
+  string typeString;
+  if (referencedNode.use_count() > 0) {
+    typeString =
+      NodeRegistry::GetInstance()->GetNodeClass(mNode->GetReferencedNode())->mClassName;
+  }
+  else typeString = "Ghost";
   QLabel* typeLabel = new QLabel(QString::fromStdString(typeString), watcherWidget);
   typeLabel->setAlignment(Qt::AlignHCenter);
   QFont font = typeLabel->font();
@@ -71,7 +77,7 @@ void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
 template<ValueType T>
 void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
-  const VectorType& value) 
+  const VectorType& value)
 {
   shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(mNode);
   vectorNode->Set(value);

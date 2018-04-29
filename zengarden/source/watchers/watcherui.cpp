@@ -36,6 +36,7 @@ QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
   } 
 
   shared_ptr<Node> referencedNode = node->GetReferencedNode();
+  if (referencedNode.use_count() == 0) return "Empty ghost";
 
   if (IsPointerOf<StubNode>(referencedNode)) {
     shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);

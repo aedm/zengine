@@ -48,6 +48,7 @@ private:
 Ghost::Ghost(const shared_ptr<Node>& originalNode)
   : Node()
   , mOriginalNode(this, nullptr, false, false, true, true)
+  , mMainInternalNode(this, nullptr, false, false, false, false)
 {
   mOriginalNode.Connect(originalNode);
   Regenerate();
@@ -72,7 +73,7 @@ void Ghost::HandleMessage(Message* message)
 }
 
 shared_ptr<Node> Ghost::GetReferencedNode() {
-  return mMainInternalNode ? mMainInternalNode : mOriginalNode.GetReferencedNode();
+  return mMainInternalNode.GetReferencedNode();
 }
 
 void Ghost::Regenerate() {
@@ -86,7 +87,7 @@ void Ghost::Regenerate() {
 
   if (topologicalOrder.size() == 0) {
     /// No ghost slots, just reference the original node
-    mMainInternalNode.reset();
+    mMainInternalNode.Connect(mOriginalNode.GetReferencedNode());
   }
   else {
     for (shared_ptr<Node>& node : topologicalOrder) {
@@ -105,7 +106,7 @@ void Ghost::Regenerate() {
       newNodeMapping[node] = internalNode;
 
 
-	  /// Connect slots
+      /// Connect slots
       const auto& originalSlots = node->GetPublicSlots();
       const auto& internalNodeSlots = internalNode->GetPublicSlots();
       size_t slotCount = originalSlots.size();
@@ -118,32 +119,33 @@ void Ghost::Regenerate() {
           AddSlot(internalSlot, true, true, true);
         }
         else {
-          if (!originalSlot->IsDefaulted()) {
-            if (originalSlot->mIsMultiSlot) {
-              for (const auto& connectedNode : originalSlot->GetDirectMultiNodes()) {
-                auto it = newNodeMapping.find(connectedNode);
-                shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
-                  ? connectedNode : it->second;
-                internalSlot->Connect(nodeToConnect);
-              }
-            }
-            else {
-              shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
+          if (originalSlot->mIsMultiSlot) {
+            for (const auto& connectedNode : originalSlot->GetDirectMultiNodes()) {
               auto it = newNodeMapping.find(connectedNode);
               shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
                 ? connectedNode : it->second;
-              internalSlot->Connect(originalSlot->GetDirectNode());
+              internalSlot->Connect(nodeToConnect);
             }
+          }
+          else {
+            shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
+            auto it = newNodeMapping.find(connectedNode);
+            shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
+              ? connectedNode : it->second;
+            internalSlot->Connect(originalSlot->GetDirectNode());
           }
         }
       }
     }
-    mMainInternalNode = newNodeMapping.at(root);
+    mMainInternalNode.Connect(newNodeMapping.at(root));
   }
 
   mInternalNodes = newInternalNodes;
   mNodeMapping = newNodeMapping;
+
+  /// TODO: detect when there was no actual change
   NotifyWatchers(&Watcher::OnSlotStructureChanged);
+  SendMsg(MessageType::TRANSITIVE_GHOST_CHANGED);
 }
 
 

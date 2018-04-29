@@ -18,7 +18,7 @@ protected:
   set<shared_ptr<Node>> mInternalNodes;
   map<shared_ptr<Node>, shared_ptr<Node>> mNodeMapping;
 
-  shared_ptr<Node> mMainInternalNode;
+  Slot mMainInternalNode;
   
   virtual void HandleMessage(Message* message) override;
 

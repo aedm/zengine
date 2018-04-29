@@ -62,8 +62,11 @@ Mesh::Mesh() {
 
 Mesh::~Mesh() {
   if (mVertexHandle) OpenGL->DestroyVertexBuffer(mVertexHandle);
+  mVertexHandle = 0;
   if (mIndexHandle) OpenGL->DestroyIndexBuffer(mIndexHandle);
+  mIndexHandle = 0;
   if (mWireframeIndexHandle) OpenGL->DestroyIndexBuffer(mWireframeIndexHandle);
+  mWireframeIndexHandle = 0;
   SafeDelete(mRawVertexData);
 }
 

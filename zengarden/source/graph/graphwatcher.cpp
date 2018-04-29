@@ -499,7 +499,6 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
     if (mSelectedNodeWidgets.size() == 1) {
       ZenGarden::GetInstance()->Watch(
         (*mSelectedNodeWidgets.begin())->GetNode(), WatcherPosition::UPPER_LEFT_TAB);
-
     }
     break;
 
