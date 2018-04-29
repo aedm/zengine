@@ -57,6 +57,20 @@ bool Ghost::IsGhostNode() {
   return true;
 }
 
+void Ghost::HandleMessage(Message* message)
+{
+  switch (message->mType) {
+  case MessageType::TRANSITIVE_GHOST_CHANGED:
+  case MessageType::TRANSITIVE_CLOSURE_CHANGED:
+    if (message->mSource == mOriginalNode.GetDirectNode()) {
+      Regenerate();
+    }
+    break;
+  default:
+    break;
+  }
+}
+
 shared_ptr<Node> Ghost::GetReferencedNode() {
   return mMainInternalNode ? mMainInternalNode : mOriginalNode.GetReferencedNode();
 }
@@ -64,7 +78,7 @@ shared_ptr<Node> Ghost::GetReferencedNode() {
 void Ghost::Regenerate() {
   shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
   vector<shared_ptr<Node>> topologicalOrder;
-  GhostTransitiveClosure(root, topologicalOrder);
+  if (root != nullptr) GhostTransitiveClosure(root, topologicalOrder);
 
   set<shared_ptr<Node>> newInternalNodes;
   map<shared_ptr<Node>, shared_ptr<Node>> newNodeMapping;
@@ -129,7 +143,7 @@ void Ghost::Regenerate() {
 
   mInternalNodes = newInternalNodes;
   mNodeMapping = newNodeMapping;
-
+  NotifyWatchers(&Watcher::OnSlotStructureChanged);
 }
 
 

@@ -20,6 +20,7 @@ protected:
 
   shared_ptr<Node> mMainInternalNode;
   
+  virtual void HandleMessage(Message* message) override;
 
   virtual shared_ptr<Node> GetReferencedNode() override;
 
