@@ -14,7 +14,7 @@ WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, Wat
 WatcherWidget::~WatcherWidget() {
   if (mWatcher) {
     // Make the node release the watcher
-    shared_ptr<Node> node = mWatcher->mNode;
+    shared_ptr<Node> node = mWatcher->GetDirectNode();
     if (node) node->RemoveWatcher(mWatcher.get());
     
     // Release the watcher, thereby killing its last reference

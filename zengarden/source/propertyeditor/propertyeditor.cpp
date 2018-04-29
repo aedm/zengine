@@ -13,6 +13,7 @@ PropertyEditor::PropertyEditor(const shared_ptr<Node>& node)
 
 void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
+  shared_ptr<Node> node = GetDirectNode();
 
   /// Vertical layout
   mLayout = new QVBoxLayout(watcherWidget);
@@ -20,11 +21,11 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   /// Node type
-  shared_ptr<Node> referencedNode = mNode->GetReferencedNode();
+  shared_ptr<Node> referencedNode = node->GetReferencedNode();
   string typeString;
   if (referencedNode.use_count() > 0) {
     typeString =
-      NodeRegistry::GetInstance()->GetNodeClass(mNode->GetReferencedNode())->mClassName;
+      NodeRegistry::GetInstance()->GetNodeClass(node->GetReferencedNode())->mClassName;
   }
   else typeString = "Ghost";
   QLabel* typeLabel = new QLabel(QString::fromStdString(typeString), watcherWidget);
@@ -41,8 +42,8 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   nameEditorLayout->setContentsMargins(0, 0, 0, 0);
   mNameTextBox = new TextBox(nameEditor);
   mNameTextBox->setPlaceholderText(QString("noname"));
-  if (!mNode->GetName().empty()) {
-    mNameTextBox->setText(QString::fromStdString(mNode->GetName()));
+  if (!node->GetName().empty()) {
+    mNameTextBox->setText(QString::fromStdString(node->GetName()));
   }
   mNameTextBox->onEditingFinished +=
     Delegate(this, &PropertyEditor::HandleNameTexBoxChanged);
@@ -52,8 +53,9 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
 
 void PropertyEditor::HandleNameTexBoxChanged() {
-  if (mNode) {
-    mNode->SetName(mNameTextBox->text().toStdString());
+  shared_ptr<Node> node = GetDirectNode();
+  if (node) {
+    node->SetName(mNameTextBox->text().toStdString());
   }
 }
 
@@ -67,7 +69,7 @@ template<ValueType T>
 void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
-  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(mNode);
+  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(GetNode());
   mVectorEditor = new ValueEditor<T>(watcherWidget, "", vectorNode->Get());
   mVectorEditor->onValueChange +=
     Delegate(this, &StaticValueWatcher<T>::HandleEditorValueChange);
@@ -79,7 +81,7 @@ template<ValueType T>
 void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
   const VectorType& value)
 {
-  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(mNode);
+  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(GetNode());
   vectorNode->Set(value);
 }
 

@@ -6,19 +6,19 @@
 WatcherUI::WatcherUI(const shared_ptr<Node>& node)
     : Watcher(node)
 {
-  mDisplayedName = CreateDisplayedName(mNode);
+  mDisplayedName = CreateDisplayedName(GetDirectNode());
 }
 
 
 void WatcherUI::OnNameChange() {
-  mDisplayedName = CreateDisplayedName(mNode);
+  mDisplayedName = CreateDisplayedName(GetDirectNode());
   if (mWatcherWidget) mWatcherWidget->SetTabLabel(mDisplayedName);
 }
 
 
 WatcherUI::~WatcherUI() {
   ASSERT(mWatcherWidget == nullptr);
-  ASSERT(mNode == nullptr);
+  ASSERT(GetDirectNode() == nullptr);
 }
 
 

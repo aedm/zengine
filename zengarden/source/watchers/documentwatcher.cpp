@@ -8,10 +8,9 @@ enum MyRoles {
 };
 
 
-DocumentWatcher::DocumentWatcher(const shared_ptr<Document>& document)
+DocumentWatcher::DocumentWatcher(const shared_ptr<Node>& document)
   : WatcherUI(document)
-{
-}
+{}
 
 
 DocumentWatcher::~DocumentWatcher() {
@@ -31,7 +30,7 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mModel = new QStandardItemModel();
   mUI.graphList->setModel(mModel);
 
-  watcherWidget->connect(mUI.graphList, &QListView::clicked, 
+  watcherWidget->connect(mUI.graphList, &QListView::clicked,
     [=](const QModelIndex &index) {
     QStandardItem* item = this->mModel->itemFromIndex(index);
     shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
@@ -50,7 +49,7 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   watcherWidget->connect(mUI.newGraphButton, &QPushButton::pressed, [=]() {
     shared_ptr<Graph> graph = make_shared<Graph>();
-    shared_ptr<Document> document = PointerCast<Document>(this->mNode);
+    shared_ptr<Document> document = PointerCast<Document>(GetNode());
     document->mGraphs.Connect(graph);
   });
 }
@@ -64,7 +63,7 @@ void DocumentWatcher::OnChildNameChange() {
 }
 
 void DocumentWatcher::RefreshGraphList() {
-  shared_ptr<Document> doc = PointerCast<Document>(mNode);
+  shared_ptr<Document> doc = PointerCast<Document>(GetNode());
   mModel->clear();
   for (const auto& node : doc->mGraphs.GetDirectMultiNodes()) {
     shared_ptr<Graph> graph = PointerCast<Graph>(node);

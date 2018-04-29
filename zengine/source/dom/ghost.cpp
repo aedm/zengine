@@ -117,6 +117,10 @@ void Ghost::Regenerate() {
         if (originalSlot->IsGhost()) {
           /// TODO: initialize value
           AddSlot(internalSlot, true, true, true);
+          if (originalSlot->IsDefaulted() &&
+            internalSlot->GetDirectNode() == originalSlot->GetDirectNode()) {
+            internalSlot->DisconnectAll(true);
+          }
         }
         else {
           if (originalSlot->mIsMultiSlot) {

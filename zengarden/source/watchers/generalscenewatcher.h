@@ -33,7 +33,7 @@ protected:
   RenderTarget* mRenderTarget = nullptr;
 
   /// Scene node to be drawn.
-  shared_ptr<SceneNode> mScene;
+  shared_ptr<Node> mScene;
   
   /// Default scene node, might be unused
   shared_ptr<SceneNode> mDefaultScene = make_shared<SceneNode>();

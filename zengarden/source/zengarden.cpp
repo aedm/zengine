@@ -223,7 +223,7 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
 
 shared_ptr<Node> ZenGarden::GetNodeInPropertyEditor() {
   if (!mPropertyEditor) return nullptr;
-  return mPropertyEditor->mWatcher->GetNode();
+  return mPropertyEditor->mWatcher->GetDirectNode();
 }
 
 
@@ -282,49 +282,38 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
 
   /// Non-3D watchers
   if (IsPointerOf<StringNode>(refNode)) {
-    shared_ptr<StringNode> stringNode = PointerCast<StringNode>(refNode);
-    watcher = stringNode->Watch<TextWatcher>(stringNode);
+    watcher = node->Watch<TextWatcher>(node);
   }
   else if (IsPointerOf<Document>(refNode)) {
-    shared_ptr<Document> documentNode = PointerCast<Document>(refNode);
-    watcher = documentNode->Watch<DocumentWatcher>(documentNode);
+    watcher = node->Watch<DocumentWatcher>(node);
+  }
+  else if (IsPointerOf<FloatSplineNode>(refNode)) {
+    watcher = node->Watch<FloatSplineWatcher>(node);
   }
 
   if (watcher) {
+    /// Create non-3D watcher widget
     watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
-  }
-  else {
-    NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(refNode);
-    if (nodeClass->mClassName == "Float Spline") {
-      watcher = refNode->Watch<FloatSplineWatcher>(PointerCast<FloatSplineNode>(refNode));
-      watcherWidget = new WatcherWidget(tabWidget, watcher, watcherPosition, tabWidget);
-    }
   }
 
   /// 3D watchers
   if (IsPointerOf<Pass>(refNode)) {
-    auto passNode = PointerCast<Pass>(refNode);
-    watcher = PointerCast<WatcherUI>(passNode->Watch<PassWatcher>(passNode));
+    watcher = node->Watch<PassWatcher>(node);
   }
   else if (IsPointerOf<MeshNode>(refNode)) {
-    auto meshNode = PointerCast<MeshNode>(refNode);
-    watcher = PointerCast<WatcherUI>(meshNode->Watch<MeshWatcher>(meshNode));
+    watcher = node->Watch<MeshWatcher>(node);
   }
   else if (IsPointerOf<Drawable>(refNode)) {
-    auto drawableNode = PointerCast<Drawable>(refNode);
-    watcher = PointerCast<WatcherUI>(drawableNode->Watch<DrawableWatcher>(drawableNode));
+    watcher = node->Watch<DrawableWatcher>(node);
   }
   else if (IsPointerOf<SceneNode>(refNode)) {
-    auto sceneNode = PointerCast<SceneNode>(refNode);
-    watcher = PointerCast<WatcherUI>(sceneNode->Watch<SceneWatcher>(sceneNode));
+    watcher = node->Watch<SceneWatcher>(node);
   }
   else if (IsPointerOf<Graph>(refNode)) {
-    auto graphNode = PointerCast<Graph>(refNode);
-    watcher = PointerCast<WatcherUI>(graphNode->Watch<GraphWatcher>(graphNode));
+    watcher = node->Watch<GraphWatcher>(node);
   }
   else if (IsPointerOf<MovieNode>(refNode)) {
-    auto movieNode = PointerCast<MovieNode>(refNode);
-    watcher = PointerCast<WatcherUI>(movieNode->Watch<MovieWatcher>(movieNode));
+    watcher = node->Watch<MovieWatcher>(node);
   }
 
   if (!watcher) {

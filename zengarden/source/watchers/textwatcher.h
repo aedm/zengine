@@ -7,12 +7,12 @@
 
 class TextWatcher: public WatcherUI {
 public:
-  TextWatcher(const shared_ptr<StringNode>& node);
+  TextWatcher(const shared_ptr<Node>& node);
   virtual ~TextWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  QBoxLayout*	mLayout;
+  QBoxLayout* mLayout;
   QTextEdit* mTextEdit;
 };

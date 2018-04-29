@@ -5,7 +5,7 @@
 class PassWatcher : public GeneralSceneWatcher
 {
 public:
-  PassWatcher(const shared_ptr<Pass>& pass);
+  PassWatcher(const shared_ptr<Node>& pass);
 
 protected:
   shared_ptr<Material> mMaterial = make_shared<Material>();

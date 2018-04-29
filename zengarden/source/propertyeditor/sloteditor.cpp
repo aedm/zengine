@@ -14,7 +14,9 @@ SlotEditor::SlotEditor(const shared_ptr<Node>& node)
 
 SlotEditor::~SlotEditor() {
   for (auto it : mSlotWatchers) {
-    if (it.second->GetNode()) it.second->GetNode()->RemoveWatcher(it.second.get());
+    if (it.second->GetDirectNode()) {
+      it.second->GetDirectNode()->RemoveWatcher(it.second.get());
+    }
     SafeDelete(it.second->mWatcherWidget);
   }
 }
@@ -41,9 +43,10 @@ bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
 
 void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
+  shared_ptr<Node> directNode = GetDirectNode();
 
   /// Slots
-  for (Slot* slot : mNode->GetPublicSlots()) {
+  for (Slot* slot : directNode->GetPublicSlots()) {
     if (slot->mIsMultiSlot) continue;
 
     /// Create horizontal widget to add editor and ghost button
@@ -77,8 +80,8 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   }
 
   /// Source editor button
-  if (IsExactType<StubNode>(mNode)) {
-    auto stub = PointerCast<StubNode>(mNode);
+  if (IsExactType<StubNode>(directNode)) {
+    auto stub = PointerCast<StubNode>(directNode);
     QPushButton* sourceButton = new QPushButton("Edit source", watcherWidget);
     watcherWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
       ZenGarden::GetInstance()->Watch(
@@ -129,7 +132,7 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  shared_ptr<ValueNode<T>> valueNode = PointerCast<ValueNode<T>>(mNode);
+  shared_ptr<ValueNode<T>> valueNode = PointerCast<ValueNode<T>>(GetNode());
   auto value = valueNode->Get();
 
   mEditor = new ValueEditor<T>(watcherWidget, 

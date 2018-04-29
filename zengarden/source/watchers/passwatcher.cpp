@@ -1,6 +1,6 @@
 #include "passwatcher.h"
 
-PassWatcher::PassWatcher(const shared_ptr<Pass>& pass)
+PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
   : GeneralSceneWatcher(pass) 
 {
   mMaterial->mSolidPass.Connect(pass);

@@ -15,7 +15,7 @@ class GraphWatcher: public WatcherUI {
   friend class Node; 
 
 public:
-  GraphWatcher(const shared_ptr<Graph>& graph);
+  GraphWatcher(const shared_ptr<Node>& graph);
   virtual ~GraphWatcher();
 
   shared_ptr<NodeWidget> GetNodeWidget(const shared_ptr<Node>& node);

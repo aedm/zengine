@@ -6,11 +6,10 @@
 #include <zengine.h>
 #include <QtGui/QStandardItemModel>
 
-class DocumentWatcher : public WatcherUI
-{
+class DocumentWatcher : public WatcherUI {
 public:
-	DocumentWatcher(const shared_ptr<Document>& documentNode);
-	virtual ~DocumentWatcher();
+  DocumentWatcher(const shared_ptr<Node>& documentNode);
+  virtual ~DocumentWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
@@ -22,5 +21,5 @@ protected:
 
   void RefreshGraphList();
 
-	QStandardItemModel* mModel = nullptr;
+  QStandardItemModel* mModel = nullptr;
 };

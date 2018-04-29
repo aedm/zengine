@@ -40,13 +40,13 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     auto clipNode = make_shared<ClipNode>();
     clipNode->mStartTime.SetDefaultValue(ZenGarden::GetInstance()->GetMovieCursor());
     clipNode->mLength.SetDefaultValue(5.0f);
-    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
+    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
     movieNode->mClips.Connect(clipNode);
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(clipNode);
   });
 
   watcherWidget->connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
-    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
+    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
   });
 
@@ -69,7 +69,7 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
   QPainter painter(mTimelineCanvas);
   painter.fillRect(mTimelineCanvas->rect(), QBrush(QColor(23, 23, 23)));
 
-  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
+  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
   //painter.setRenderHint(QPainter::Antialiasing);
@@ -181,7 +181,7 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
   switch (mState) {
     case State::DEFAULT:
     {
-      shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(this->mNode);
+      shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
       if (!movieNode) break;
       QPoint pos = event->pos();
       for (int i = 0; i < movieNode->GetTrackCount(); i++) {

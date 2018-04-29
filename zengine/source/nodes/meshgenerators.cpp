@@ -87,9 +87,10 @@ void CubeMeshNode::Operate() {
 void CubeMeshNode::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::VALUE_CHANGED:
+    case MessageType::SLOT_CONNECTION_CHANGED:
       if (mIsUpToDate) {
         mIsUpToDate = false;
-        SendMsg(MessageType::VALUE_CHANGED);
+        SendMsg(MessageType::NEEDS_REDRAW);
       }
       break;
     default: break;

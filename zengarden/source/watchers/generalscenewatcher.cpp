@@ -18,12 +18,14 @@ GeneralSceneWatcher::GeneralSceneWatcher(const shared_ptr<Node>& node)
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
+  mRenderForwarder->mOnRedraw.clear();
 }
 
 void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
-  mScene->Update();
-  mScene->UpdateDependencies();
+  shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(mScene->GetReferencedNode());
+  sceneNode->Update();
+  sceneNode->UpdateDependencies();
 
   /// Nvidia driver will fail to bind framebuffers after shader compilation.
   /// Just skip the frame if a shader was edited/updated.
@@ -44,7 +46,7 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   mRenderTarget->SetGBufferAsTarget(&mGlobals);
   OpenGL->Clear(true, true, 0x303030);
 
-  mScene->Draw(mRenderTarget, &mGlobals);
+  sceneNode->Draw(mRenderTarget, &mGlobals);
 
   /// Apply post-process to scene to framebuffer
   TheEngineShaders->ApplyPostProcess(mRenderTarget, &mGlobals);
@@ -145,6 +147,6 @@ RenderForwarder::RenderForwarder(const shared_ptr<SceneNode>& node)
   : Watcher(node) {}
 
 void RenderForwarder::OnRedraw() {
-  mOnRedraw();
+  if (!mOnRedraw.empty()) mOnRedraw();
 }
 

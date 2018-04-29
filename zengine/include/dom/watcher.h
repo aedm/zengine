@@ -12,8 +12,11 @@ class Watcher {
 public:
   virtual ~Watcher();
 
-  /// Returns the node being watched
+  /// Returns the live node being watched
   shared_ptr<Node> GetNode();
+
+  /// Returns the direct node being watched
+  shared_ptr<Node> GetDirectNode();
 
   /// Destroys the watcher and its UI elements
   virtual void OnDeleteNode();
@@ -48,9 +51,9 @@ public:
 protected:
   Watcher(const shared_ptr<Node>& node);
 
-  shared_ptr<Node> mNode;
-
 private:
   /// Changes the node being watched. Only a Node should call this.
   void ChangeNode(const shared_ptr<Node>& node);
+
+  shared_ptr<Node> mNode;
 };

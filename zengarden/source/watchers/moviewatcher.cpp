@@ -29,7 +29,7 @@ void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
 
-  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(mNode);
+  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
   if (!mRenderTarget) {

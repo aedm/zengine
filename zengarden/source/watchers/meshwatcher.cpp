@@ -1,6 +1,6 @@
 #include "meshwatcher.h"
 
-MeshWatcher::MeshWatcher(const shared_ptr<MeshNode>& meshNode)
+MeshWatcher::MeshWatcher(const shared_ptr<Node>& meshNode)
   : GeneralSceneWatcher(meshNode)
 {
   mDrawable->mMaterial.Connect(mDefaultMaterial);

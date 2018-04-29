@@ -277,6 +277,9 @@ ValueType Node::GetValueType() const {
 }
 
 void Node::Dispose() {
+  while (mWatchers.size() > 0) {
+    RemoveWatcher(mWatchers.begin()->get());
+  }
   while (mDependants.size() > 0) {
     mDependants.at(0)->Disconnect(this->shared_from_this());
   }

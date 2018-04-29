@@ -191,9 +191,10 @@ void ValueSlot<T>::Disconnect(const shared_ptr<Node>& target) {
 
 template<ValueType T>
 void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
-  SHOULD_NOT_HAPPEN;
   if (mNode == mDefault) return;
+  mNode->DisconnectFromSlot(this);
   mDefault->ConnectToSlot(this);
+  mNode = mDefault;
   if (notifyOwner) {
     mOwner->EnqueueMessage(MessageType::SLOT_CONNECTION_CHANGED, this);
   }

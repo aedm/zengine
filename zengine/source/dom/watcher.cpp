@@ -10,6 +10,11 @@ Watcher::~Watcher() {
 }
 
 shared_ptr<Node> Watcher::GetNode() {
+  return mNode->GetReferencedNode();
+}
+
+std::shared_ptr<Node> Watcher::GetDirectNode()
+{
   return mNode;
 }
 
