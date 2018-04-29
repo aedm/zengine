@@ -1,9 +1,11 @@
 #include "util.h"
 #include <QtCore/QDir>
+#include <QMessageBox>
 #include <memory>
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
+#include "../commands/graphcommands.h"
 
 using namespace std;
 
@@ -188,6 +190,28 @@ namespace Util {
     shared_ptr<StubNode> stub = make_shared<StubNode>();
     stub->mSource.SetDefaultValue(stubSource.get());
     return stub;
+  }
+
+  void DisposeNodes(const set<shared_ptr<Node>>& nodes)
+  {
+    vector<shared_ptr<Node>> nodeList(nodes.begin(), nodes.end());
+    for (UINT i = 0; i < nodeList.size(); i++) {
+      shared_ptr<Node> node = nodeList[i];
+      for (Slot* slot : node->GetDependants()) {
+        shared_ptr<Node> refNode = slot->GetOwner();
+        if (!refNode->IsGhostNode()) continue;
+        if (std::find(nodeList.begin(), nodeList.end(), refNode) == nodeList.end()) {
+          /// Ghost node wasn't in the list, add it
+          nodeList.push_back(refNode);
+        }
+      }
+    }
+    if (nodeList.size() > nodes.size()) {
+      auto button = QMessageBox::question(nullptr, "Delete nodes",
+        "Ghost nodes found. Do you really want to delete?");
+      if (button == QMessageBox::NoButton) return;
+    }
+    TheCommandStack->Execute(new DisposeNodesCommand(nodeList));
   }
 
 } // namespace Util

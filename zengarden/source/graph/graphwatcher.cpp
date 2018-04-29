@@ -489,7 +489,7 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
       for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
         selectedNodes.insert(nodeWidget->GetNode());
       }
-      TheCommandStack->Execute(new DisposeNodesCommand(selectedNodes));
+      Util::DisposeNodes(selectedNodes);
       ZenGarden::GetInstance()->SetNodeForPropertyEditor(nullptr);
     }
     break;

@@ -49,12 +49,12 @@ private:
 
 class DisposeNodesCommand: public Command {
 public:
-  DisposeNodesCommand(set<shared_ptr<Node>>& nodes);
+  DisposeNodesCommand(vector<shared_ptr<Node>>& nodes);
 
   virtual bool Do() override;
   virtual bool Undo() override;
 
 private:
-  set<shared_ptr<Node>> mNodes;
+  vector<shared_ptr<Node>> mNodes;
   shared_ptr<Graph> mGraph;
 };

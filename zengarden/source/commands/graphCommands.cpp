@@ -59,12 +59,12 @@ bool ConnectNodeToSlotCommand::Undo() {
   return mSlot->Connect(mOldNode);
 }
 
-DisposeNodesCommand::DisposeNodesCommand(set<shared_ptr<Node>>& nodes)
+DisposeNodesCommand::DisposeNodesCommand(vector<shared_ptr<Node>>& nodes)
   : mNodes(nodes)
 {}
 
 bool DisposeNodesCommand::Do() {
-  for (shared_ptr<Node> node : mNodes) {
+  for (const auto& node : mNodes) {
     node->Dispose();
   }
   mNodes.clear();
