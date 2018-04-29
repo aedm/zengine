@@ -124,6 +124,7 @@ void StubNode::CopyFrom(const shared_ptr<Node>& node)
 {
   shared_ptr<StubNode> original = PointerCast<StubNode>(node);
   mSource.SetDefaultValue(original->mSource.Get());
+  Update();
 }
 
 void StubNode::HandleMessage(Message* message) {
