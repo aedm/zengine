@@ -220,6 +220,7 @@ void NodeWidget::OnNameChange() {
       }
     }
   }
+  ZenGarden::OpenGLMakeCurrent();
   mTitleTexture = new TextTexture();
   mTitleTexture->SetText(text, ThePainter->mTitleFont);
   UpdateGraph();

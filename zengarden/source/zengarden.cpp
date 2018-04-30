@@ -60,6 +60,11 @@ ZenGarden* ZenGarden::GetInstance() {
   return gZengarden;
 }
 
+void ZenGarden::OpenGLMakeCurrent()
+{
+  GetInstance()->mCommonGLWidget->makeCurrent();
+}
+
 void ZenGarden::InitModules() {
   mLogWatcher = new LogWatcher(this);
   mUI.bottomLeftPanel->addTab(mLogWatcher, "Log");

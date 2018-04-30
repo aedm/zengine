@@ -21,6 +21,7 @@ public:
   ~ZenGarden();
 
   static ZenGarden* GetInstance();
+  static void OpenGLMakeCurrent();
 
   /// Open a watcher
   void Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition);
