@@ -8,7 +8,7 @@ using namespace std;
 
 class Ghost : public Node {
 public:
-  Ghost(const shared_ptr<Node>& originalNode);
+  Ghost();
 
   Slot mOriginalNode;
 

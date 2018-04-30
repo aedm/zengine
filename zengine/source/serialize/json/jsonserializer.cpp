@@ -86,8 +86,13 @@ rapidjson::Value JSONSerializer::Serialize(const shared_ptr<Node>& node) {
   rapidjson::Value v(rapidjson::kObjectType);
 
   /// Save class type
-  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
-  v.AddMember("node", nodeClass->mClassName, *mAllocator);
+  if (node->IsGhostNode()) {
+    v.AddMember("node", "ghost", *mAllocator);
+  }
+  else {
+    NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(node);
+    v.AddMember("node", nodeClass->mClassName, *mAllocator);
+  }
 
   /// Save node ID
   int nodeID = mNodes.at(node);
@@ -323,7 +328,6 @@ void JSONSerializer::SerializeStubNode(
   rapidjson::Value slotValue(rapidjson::kObjectType);
   nodeValue.AddMember("source", f, *mAllocator);
 }
-
 
 void JSONSerializer::SerializeValueSlot(rapidjson::Value& slotsObject, Slot* slot,
                                         rapidjson::Value& defaultValue) {

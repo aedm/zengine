@@ -44,13 +44,13 @@ private:
   set<shared_ptr<Node>> mVisited;
 };
 
+static SharedString OriginalSlotName = make_shared<string>("Original");
 
-Ghost::Ghost(const shared_ptr<Node>& originalNode)
+Ghost::Ghost()
   : Node()
-  , mOriginalNode(this, nullptr, false, false, true, true)
+  , mOriginalNode(this, OriginalSlotName, false, false, true, true)
   , mMainInternalNode(this, nullptr, false, false, false, false)
 {
-  mOriginalNode.Connect(originalNode);
   Regenerate();
 }
 
@@ -67,6 +67,10 @@ void Ghost::HandleMessage(Message* message)
       Regenerate();
     }
     break;
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    if (message->mSlot == &mOriginalNode) {
+      Regenerate();
+    }
   default:
     break;
   }
@@ -84,6 +88,7 @@ void Ghost::Regenerate() {
   set<shared_ptr<Node>> newInternalNodes;
   map<shared_ptr<Node>, shared_ptr<Node>> newNodeMapping;
   ClearSlots();
+  AddSlot(&mOriginalNode, false, true, true);
 
   if (topologicalOrder.size() == 0) {
     /// No ghost slots, just reference the original node

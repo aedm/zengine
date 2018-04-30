@@ -2,6 +2,7 @@
 #include "jsonserializer.h"
 #include <include/resources/resourcemanager.h>
 #include "base64/base64.h"
+#include <include/dom/ghost.h>
 
 JSONDeserializer::JSONDeserializer(const string& json) {
   rapidjson::Document d;
@@ -29,12 +30,18 @@ shared_ptr<Document> JSONDeserializer::GetDocument() {
 }
 
 void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
-  const char* nodeClassName = value["node"].GetString();
+  string nodeClassName = value["node"].GetString();
   int id = value["id"].GetInt();
-  NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(string(nodeClassName));
-
-  shared_ptr<Node> node = nodeClass->Manufacture();
   ASSERT(mNodes.find(id) == mNodes.end());
+
+  shared_ptr<Node> node;
+  if (nodeClassName == "ghost") {
+    node = make_shared<Ghost>();
+  }
+  else {
+    NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(nodeClassName);
+    node = nodeClass->Manufacture();
+  }
   mNodes[id] = node;
 
   if (value.HasMember("name")) {
@@ -46,31 +53,31 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     node->SetPosition(position);
   }
 
-  if (IsExactType<FloatNode>(node)) {
+  if (IsPointerOf<FloatNode>(node)) {
     DeserializeFloatNode(value, PointerCast<FloatNode>(node));
   }
-  else if (IsExactType<Vec2Node>(node)) {
+  else if (IsPointerOf<Vec2Node>(node)) {
     DeserializeVec2Node(value, PointerCast<Vec2Node>(node));
   } 
-  else if (IsExactType<Vec3Node>(node)) {
+  else if (IsPointerOf<Vec3Node>(node)) {
     DeserializeVec3Node(value, PointerCast<Vec3Node>(node));
   } 
-  else if (IsExactType<Vec4Node>(node)) {
+  else if (IsPointerOf<Vec4Node>(node)) {
     DeserializeVec4Node(value, PointerCast<Vec4Node>(node));
   } 
-  else if (IsExactType<FloatSplineNode>(node)) {
+  else if (IsPointerOf<FloatSplineNode>(node)) {
     DeserializeFloatSplineNode(value, PointerCast<FloatSplineNode>(node));
   } 
-  else if (IsExactType<TextureNode>(node)) {
+  else if (IsPointerOf<TextureNode>(node)) {
     DeserializeTextureNode(value, PointerCast<TextureNode>(node));
   }
-  else if (IsExactType<StaticMeshNode>(node)) {
+  else if (IsPointerOf<StaticMeshNode>(node)) {
     DeserializeStaticMeshNode(value, PointerCast<StaticMeshNode>(node));
   } 
-  else if (IsExactType<StubNode>(node)) {
+  else if (IsPointerOf<StubNode>(node)) {
     DeserializeStubNode(value, PointerCast<StubNode>(node));
   } 
-  else if (IsExactType<Document>(node)) {
+  else if (IsPointerOf<Document>(node)) {
     ASSERT(mDocument == nullptr);
     mDocument = PointerCast<Document>(node);
   }

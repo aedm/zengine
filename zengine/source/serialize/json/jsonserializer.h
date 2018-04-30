@@ -1,6 +1,7 @@
 #pragma once
 
 #include <include/dom/document.h>
+#include <include/dom/ghost.h>
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/meshnode.h>
 #include <include/nodes/splinenode.h>
@@ -31,19 +32,24 @@ private:
   rapidjson::Value Serialize(const shared_ptr<Node>& node);
 
   /// Node serializers
-  void SerializeFloatNode(rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node);
-  void SerializeVec2Node(rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node);
-  void SerializeVec3Node(rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node);
-  void SerializeVec4Node(rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node);
+  void SerializeFloatNode(
+    rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node);
+  void SerializeVec2Node(
+    rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node);
+  void SerializeVec3Node(
+    rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node);
+  void SerializeVec4Node(
+    rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node);
   void SerializeFloatSplineNode(
     rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node);
-
   void SerializeTextureNode(
     rapidjson::Value& nodeValue, const shared_ptr<TextureNode>& node);
-  void SerializeStubNode(rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node);
+  void SerializeStubNode(
+    rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node);
   void SerializeStaticMeshNode(
     rapidjson::Value& nodeValue, const shared_ptr<StaticMeshNode>& node);
-  void SerializeGeneralNode(rapidjson::Value& nodeValue, const shared_ptr<Node>& node);
+  void SerializeGeneralNode(
+    rapidjson::Value& nodeValue, const shared_ptr<Node>& node);
 
   /// Helpers
   rapidjson::Value SerializeVec2(const Vec2& vec);

@@ -365,7 +365,8 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
     Vec2 mouseDiff = mousePos - mOriginalMousePos;
     if ((event->modifiers() & Qt::ControlModifier) > 0 && !mAreNodesMoved) {
       shared_ptr<Node> originalNode = mHoveredWidget->GetDirectNode();
-      shared_ptr<Ghost> ghost = make_shared<Ghost>(originalNode);
+      shared_ptr<Ghost> ghost = make_shared<Ghost>();
+      ghost->mOriginalNode.Connect(originalNode);
       Vec2 position = mHoveredWidget->mOriginalPosition + mouseDiff;
       ghost->SetPosition(position);
       TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
