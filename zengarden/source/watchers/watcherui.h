@@ -31,10 +31,8 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Destorys the watcher and its UI elements
-  virtual void OnDeleteNode() override;
+  virtual void OnRemoveWatcher() override;
 
-  /// Triggered when the Watcher isn't attached to a Node anymore. 
-  /// Should deletes the WatcherWidget.
   FastDelegate<void(WatcherWidget*)> deleteWatcherWidgetCallback;
 
   /// Generate a name displayed for a node. If the node has no name, it shows

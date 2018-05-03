@@ -28,7 +28,7 @@ GraphWatcher::GraphWatcher(const shared_ptr<Node>& graph)
 GraphWatcher::~GraphWatcher() {
   for (auto& it : mWidgetMap) {
     shared_ptr<NodeWidget> watcher = it.second;
-    if (watcher->GetDirectNode()) watcher->GetDirectNode()->RemoveWatcher(watcher.get());
+    if (watcher->GetDirectNode()) watcher->GetDirectNode()->RemoveWatcher(watcher);
     watcher->mGraphWatcher = nullptr;
   }
 }

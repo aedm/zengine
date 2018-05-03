@@ -307,7 +307,8 @@ public:
   }
 
   /// Removes a Watcher from the watchers list
-  void RemoveWatcher(Watcher* watcher);
+  void RemoveWatcher(shared_ptr<Watcher> watcher);
+  void RemoveAllWatchers();
 
   /// Adds a new Watcher to the watchers list
   void AssignWatcher(shared_ptr<Watcher> watcher);

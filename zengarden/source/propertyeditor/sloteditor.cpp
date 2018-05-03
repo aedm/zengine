@@ -15,7 +15,7 @@ SlotEditor::SlotEditor(const shared_ptr<Node>& node)
 SlotEditor::~SlotEditor() {
   for (auto it : mSlotWatchers) {
     if (it.second->GetDirectNode()) {
-      it.second->GetDirectNode()->RemoveWatcher(it.second.get());
+      it.second->GetDirectNode()->RemoveWatcher(it.second);
     }
     SafeDelete(it.second->mWatcherWidget);
   }
@@ -97,7 +97,7 @@ void SlotEditor::OnSlotConnectionChanged(Slot* slot) {
     shared_ptr<SlotWatcher> watcher = it->second;
     shared_ptr<Node> node = slot->GetReferencedNode();
     if (IsPointerOf<StubNode>(node)) {
-      node->RemoveWatcher(watcher.get());
+      node->RemoveWatcher(watcher);
     }
     else {
       slot->GetReferencedNode()->AssignWatcher(watcher);

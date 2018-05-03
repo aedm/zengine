@@ -19,7 +19,7 @@ public:
   shared_ptr<Node> GetDirectNode();
 
   /// Destroys the watcher and its UI elements
-  virtual void OnDeleteNode();
+  virtual void OnRemoveWatcher();
 
   /// Called when the watcher needs to be rerendered
   virtual void OnRedraw();

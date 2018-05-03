@@ -23,7 +23,10 @@ void Watcher::ChangeNode(const shared_ptr<Node>& node) {
   OnRedraw();
 }
 
-void Watcher::OnDeleteNode() {}
+void Watcher::OnRemoveWatcher() {
+  mNode.reset();
+}
+
 void Watcher::OnRedraw() {}
 void Watcher::OnNameChange() {}
 void Watcher::OnSlotGhostChange(Slot* slot) {}

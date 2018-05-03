@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "jsondeserializer.h"
 #include "jsonserializer.h"
 #include <include/resources/resourcemanager.h>
@@ -47,7 +48,7 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   if (value.HasMember("name")) {
     node->SetName(value["name"].GetString());
   }
-  
+
   if (value.HasMember("position")) {
     Vec2 position = DeserializeVec2(value["position"]);
     node->SetPosition(position);
@@ -58,25 +59,25 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   }
   else if (IsPointerOf<Vec2Node>(node)) {
     DeserializeVec2Node(value, PointerCast<Vec2Node>(node));
-  } 
+  }
   else if (IsPointerOf<Vec3Node>(node)) {
     DeserializeVec3Node(value, PointerCast<Vec3Node>(node));
-  } 
+  }
   else if (IsPointerOf<Vec4Node>(node)) {
     DeserializeVec4Node(value, PointerCast<Vec4Node>(node));
-  } 
+  }
   else if (IsPointerOf<FloatSplineNode>(node)) {
     DeserializeFloatSplineNode(value, PointerCast<FloatSplineNode>(node));
-  } 
+  }
   else if (IsPointerOf<TextureNode>(node)) {
     DeserializeTextureNode(value, PointerCast<TextureNode>(node));
   }
   else if (IsPointerOf<StaticMeshNode>(node)) {
     DeserializeStaticMeshNode(value, PointerCast<StaticMeshNode>(node));
-  } 
+  }
   else if (IsPointerOf<StubNode>(node)) {
     DeserializeStubNode(value, PointerCast<StubNode>(node));
-  } 
+  }
   else if (IsPointerOf<Document>(node)) {
     ASSERT(mDocument == nullptr);
     mDocument = PointerCast<Document>(node);
@@ -109,65 +110,74 @@ Vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
 void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
   int id = value["id"].GetInt();
   auto& node = mNodes.at(id);
-  
+  const auto& slots = node->GetSerializableSlots();
+
   if (value.HasMember("slots")) {
     rapidjson::Value& jsonSlots = value["slots"];
     for (rapidjson::Value::ConstMemberIterator itr = jsonSlots.MemberBegin();
-         itr != jsonSlots.MemberEnd(); ++itr) {
+      itr != jsonSlots.MemberEnd(); ++itr) {
+      const rapidjson::Value& jsonSlot = itr->value;
+
+      /// Find slot
       string slotName(itr->name.GetString());
-      Slot* slot = nullptr;
-      for (Slot* s : node->GetPublicSlots()) {
-        if (*s->GetName() == slotName) {
-          slot = s;
-          break;
-        }
-      }
-      if (slot == nullptr) {
+      auto& it = std::find_if(slots.begin(), slots.end(),
+        [&](const auto& m) -> bool { return slotName == *m.first; });
+      if (it == slots.end()) {
         ERR("No such slot: %s", slotName.c_str());
         continue;;
       }
-      ASSERT(slot->mIsMultiSlot == itr->value.IsArray());
-      if (IsExactType<StringSlot*>(slot)) {
-        static_cast<StringSlot*>(slot)->
-          SetDefaultValue(itr->value["default"].GetString());
-      } 
-      else if (dynamic_cast<FloatSlot*>(slot) != nullptr) {
-        static_cast<FloatSlot*>(slot)->
-          SetDefaultValue(itr->value["default"].GetDouble());
-        ConnectValueSlotById(itr->value, slot);
+      Slot* slot = it->second;
+
+      /// Set ghost flag
+      if (jsonSlot.HasMember("ghost")) {
+        slot->SetGhost(jsonSlot["ghost"].GetBool());
       }
-      else if (dynamic_cast<Vec2Slot*>(slot) != nullptr) {
-        static_cast<Vec2Slot*>(slot)->
-          SetDefaultValue(DeserializeVec2(itr->value["default"]));
-        ConnectValueSlotById(itr->value, slot);
-      } 
-      else if (dynamic_cast<Vec3Slot*>(slot) != nullptr) {
-        static_cast<Vec3Slot*>(slot)->
-          SetDefaultValue(DeserializeVec3(itr->value["default"]));
-        ConnectValueSlotById(itr->value, slot);
-      } 
-      else if (dynamic_cast<Vec4Slot*>(slot) != nullptr) {
-        static_cast<Vec4Slot*>(slot)->
-          SetDefaultValue(DeserializeVec4(itr->value["default"]));
-        ConnectValueSlotById(itr->value, slot);
-      } 
-      else if (itr->value.IsArray()) {
-        for (UINT i = 0; i < itr->value.Size(); i++) {
-          int connId = itr->value[i].GetInt();
+
+      /// Connect to nodes
+      if (jsonSlot.HasMember("connect")) {
+        const rapidjson::Value& jsonConnect = jsonSlot["connect"];
+        if (slot->mIsMultiSlot != jsonConnect.IsArray()) {
+          ERR("Multi/single slot mismatch: %s", slotName.c_str());
+          continue;
+        }
+        if (jsonConnect.IsArray()) {
+          for (UINT i = 0; i < jsonConnect.Size(); i++) {
+            int connId = jsonConnect[i].GetInt();
+            auto& connNode = mNodes.at(connId);
+            slot->Connect(connNode);
+          }
+        }
+        else {
+          int connId = jsonConnect.GetInt();
           auto& connNode = mNodes.at(connId);
           slot->Connect(connNode);
         }
       }
-      else {
-        int connId = itr->value.GetInt();
-        auto& connNode = mNodes.at(connId);
-        slot->Connect(connNode);
+
+      /// Set default values
+      if (dynamic_cast<StringSlot*>(slot)) {
+        SafeCast<StringSlot*>(slot)->SetDefaultValue(jsonSlot["default"].GetString());
+      }
+      else if (dynamic_cast<FloatSlot*>(slot)) {
+        SafeCast<FloatSlot*>(slot)->SetDefaultValue(jsonSlot["default"].GetDouble());
+      }
+      else if (dynamic_cast<Vec2Slot*>(slot)) {
+        SafeCast<Vec2Slot*>(slot)->
+          SetDefaultValue(DeserializeVec2(itr->value["default"]));
+      }
+      else if (dynamic_cast<Vec3Slot*>(slot)) {
+        SafeCast<Vec3Slot*>(slot)->
+          SetDefaultValue(DeserializeVec3(itr->value["default"]));
+      }
+      else if (dynamic_cast<Vec4Slot*>(slot)) {
+        SafeCast<Vec4Slot*>(slot)->
+          SetDefaultValue(DeserializeVec4(itr->value["default"]));
       }
     }
   }
 }
 
-void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value, 
+void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
   const shared_ptr<TextureNode>& node)
 {
   int width = value["width"].GetInt();
@@ -191,7 +201,7 @@ void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
 }
 
 
-void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value, 
+void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   const shared_ptr<StaticMeshNode>& node) {
   int binaryFormat = value["format"].GetInt();
   UINT vertexCount = value["vertexcount"].GetInt();
@@ -221,8 +231,8 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
 }
 
 
-void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value, 
-  const shared_ptr<FloatSplineNode>& node) 
+void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
+  const shared_ptr<FloatSplineNode>& node)
 {
   for (UINT l = UINT(SplineLayer::BASE); l < UINT(SplineLayer::COUNT); l++) {
     const char* fieldName = EnumMapperA::GetStringFromEnum(SplineLayerMapper, l);
@@ -243,8 +253,8 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
 }
 
 
-void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value, 
-  const shared_ptr<StubNode>& node) 
+void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
+  const shared_ptr<StubNode>& node)
 {
   string source = value["source"].GetString();
   node->mSource.SetDefaultValue(source);
@@ -260,12 +270,12 @@ void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot*
   }
 }
 
-void JSONDeserializer::DeserializeFloatNode(const rapidjson::Value& value, 
+void JSONDeserializer::DeserializeFloatNode(const rapidjson::Value& value,
   const shared_ptr<FloatNode>& node) {
   node->Set(value["value"].GetDouble());
 }
 
-void JSONDeserializer::DeserializeVec2Node(const rapidjson::Value& value, 
+void JSONDeserializer::DeserializeVec2Node(const rapidjson::Value& value,
   const shared_ptr<Vec2Node>& node) {
   node->Set(DeserializeVec2(value["value"]));
 }

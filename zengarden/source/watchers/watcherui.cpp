@@ -63,13 +63,16 @@ void WatcherUI::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mWatcherWidget = watcherWidget;
 }
 
-void WatcherUI::OnDeleteNode() {
-  if (mWatcherWidget) {
-    WatcherWidget* widget = mWatcherWidget;
-    mWatcherWidget = nullptr;
-    widget->mWatcher = nullptr;
+void WatcherUI::OnRemoveWatcher() {
+  Watcher::OnRemoveWatcher();
 
-    /// Call the function that deletes the watcher widget
-    if (deleteWatcherWidgetCallback) deleteWatcherWidgetCallback(widget);
-  }
+  if (mWatcherWidget == nullptr) return;
+
+  /// Call the Qt widget remover callback. A simple delete wouldn't do, because
+  /// Qt handles tab widgets differently.
+  WatcherWidget* tmp = mWatcherWidget;
+  mWatcherWidget = nullptr;
+  if (!deleteWatcherWidgetCallback.empty()) deleteWatcherWidgetCallback(tmp);
+
+  /// point-of-no-return: the watcher widget destorys the last reference to this watcher
 }

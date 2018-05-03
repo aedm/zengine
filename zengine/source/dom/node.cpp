@@ -13,7 +13,7 @@ const int gVariableByteSizes[] = {
 
 MessageQueue TheMessageQueue;
 
-void MessageQueue::Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target, 
+void MessageQueue::Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target,
   MessageType type, Slot* slot) {
   Message message = { source, target, slot, type };
   if (mMessageSet.find(message) != mMessageSet.end()) return;
@@ -277,9 +277,7 @@ ValueType Node::GetValueType() const {
 }
 
 void Node::Dispose() {
-  while (mWatchers.size() > 0) {
-    RemoveWatcher(mWatchers.begin()->get());
-  }
+  RemoveAllWatchers();
   while (mDependants.size() > 0) {
     mDependants.at(0)->Disconnect(this->shared_from_this());
   }
@@ -301,7 +299,7 @@ void Node::ReceiveMessage(Message* message) {
   case MessageType::SLOT_CONNECTION_CHANGED:
     CheckConnections();
     /// Notifies dependants about transitive closure change
-    EnqueueMessage(MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot, 
+    EnqueueMessage(MessageType::TRANSITIVE_CLOSURE_CHANGED, message->mSlot,
       message->mSource);
     NotifyWatchers(&Watcher::OnSlotConnectionChanged, message->mSlot);
     break;
@@ -318,7 +316,7 @@ void Node::ReceiveMessage(Message* message) {
     NotifyWatchers(&Watcher::OnChildNameChange);
     break;
   case MessageType::SLOT_GHOST_FLAG_CHANGED:
-    EnqueueMessage(MessageType::TRANSITIVE_GHOST_CHANGED, message->mSlot, 
+    EnqueueMessage(MessageType::TRANSITIVE_GHOST_CHANGED, message->mSlot,
       message->mSource);
     NotifyWatchers(&Watcher::OnSlotGhostChange, message->mSlot);
     break;
@@ -345,7 +343,7 @@ void Node::CheckConnections() {
 }
 
 
-void Node::EnqueueMessage(MessageType message, Slot* slot /*= nullptr*/, 
+void Node::EnqueueMessage(MessageType message, Slot* slot /*= nullptr*/,
   const shared_ptr<Node>& sender /*= nullptr*/)
 {
   /// Glory to C++17
@@ -375,13 +373,7 @@ void Node::Update() {
 Node::~Node() {
   /// Don't send any more messages to this node.
   TheMessageQueue.RemoveNode(this);
-
-  while (!mWatchers.empty()) {
-    auto it = mWatchers.begin();
-    (*it)->mNode = nullptr;
-    (*it)->OnDeleteNode();
-    mWatchers.erase(it);
-  }
+  RemoveAllWatchers();
 
   const vector<Slot*>& deps = GetDependants();
   while (deps.size()) {
@@ -406,7 +398,7 @@ void Node::SetName(const string& name) {
   NotifyWatchers(&Watcher::OnNameChange);
   TheMessageQueue.Enqueue(
     nullptr, this->shared_from_this(), MessageType::NODE_NAME_CHANGED);
-  
+
 }
 
 const string& Node::GetName() const {
@@ -468,14 +460,18 @@ const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
   return mSerializableSlotsByName;
 }
 
-void Node::RemoveWatcher(Watcher* watcher) {
-  for (auto it = mWatchers.begin(); it != mWatchers.end(); it++) {
-    if (it->get() == watcher) {
-      ASSERT(watcher->mNode.get() == this);
-      watcher->mNode = nullptr;
-      mWatchers.erase(it);
-      return;
-    }
+void Node::RemoveWatcher(shared_ptr<Watcher> watcher) {
+  auto it = std::find(mWatchers.begin(), mWatchers.end(), watcher);
+  if (it == mWatchers.end()) return;
+  ASSERT(watcher->mNode.get() == this);
+  watcher->OnRemoveWatcher();
+  mWatchers.erase(it);
+}
+
+void Node::RemoveAllWatchers()
+{
+  while (mWatchers.size() > 0) {
+    RemoveWatcher(*mWatchers.begin());
   }
 }
 
@@ -521,7 +517,7 @@ private:
   set<shared_ptr<Node>> mVisited;
 };
 
-void Node::GenerateTransitiveClosure(vector<shared_ptr<Node>>& oResult, 
+void Node::GenerateTransitiveClosure(vector<shared_ptr<Node>>& oResult,
   bool includeHiddenSlots) {
   TransitiveClosure tmp(this->shared_from_this(), includeHiddenSlots, oResult);
 }

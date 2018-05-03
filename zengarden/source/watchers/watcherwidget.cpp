@@ -3,8 +3,8 @@
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTabWidget>
 
-WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, WatcherPosition position,
-                             QTabWidget* tabWidget)
+WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, 
+  WatcherPosition position, QTabWidget* tabWidget)
   : QWidget(parent)
   , mPosition(position)
   , mTabWidget(tabWidget)
@@ -12,16 +12,15 @@ WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, Wat
 {}
 
 WatcherWidget::~WatcherWidget() {
-  if (mWatcher) {
-    // Make the node release the watcher
-    shared_ptr<Node> node = mWatcher->GetDirectNode();
-    if (node) node->RemoveWatcher(mWatcher.get());
-    
-    // Release the watcher, thereby killing its last reference
-    mWatcher->mWatcherWidget = nullptr;
-    mWatcher = nullptr;
-
-    ASSERT(mWatcher.use_count() == 0);
+  /// There are two cases: 
+  /// 1. The node is killed, and it detaches the WatcherUI. The WatcherUI calls this
+  ///    destructor, thereby ultimately commiting suicide.  
+  /// 2. The user kills the watcher by closing it on the UI. This descturctor is called
+  ///    first, and the WatcherUI is freed because this object holds the last reference
+  ///    to it.
+  mWatcher->mWatcherWidget = nullptr;
+  if (mWatcher->GetDirectNode()) {
+    mWatcher->GetDirectNode()->RemoveWatcher(mWatcher);
   }
 }
 
@@ -45,11 +44,11 @@ void WatcherWidget::dropEvent(QDropEvent *event) {
   mWatcher->HandleDropEvent(event);
 }
 
-GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, 
-                                 QGLWidget* shareWidget, WatcherPosition position, 
-                                 QTabWidget* tabWidget)
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher,
+  QGLWidget* shareWidget, WatcherPosition position,
+  QTabWidget* tabWidget)
   : WatcherWidget(parent, watcher, position, tabWidget)
-  , mShareWidget(shareWidget) 
+  , mShareWidget(shareWidget)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);

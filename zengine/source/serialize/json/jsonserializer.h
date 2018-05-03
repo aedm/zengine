@@ -56,9 +56,6 @@ private:
   rapidjson::Value SerializeVec3(const Vec3& vec);
   rapidjson::Value SerializeVec4(const Vec4& vec);
 
-  void SerializeValueSlot(rapidjson::Value& slotsObject, Slot* slot,
-                          rapidjson::Value& defaultValue);
-
   /// Number of nodes to save
   int mNodeCount;
 
