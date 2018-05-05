@@ -63,8 +63,8 @@ void WatcherUI::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mWatcherWidget = watcherWidget;
 }
 
-void WatcherUI::OnRemoveWatcher() {
-  Watcher::OnRemoveWatcher();
+void WatcherUI::RemoveFromNode() {
+  Watcher::RemoveFromNode();
 
   if (mWatcherWidget == nullptr) return;
 
