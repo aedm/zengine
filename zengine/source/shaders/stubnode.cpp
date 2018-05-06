@@ -33,6 +33,7 @@ StubNode::StubNode()
 
 
 StubNode::~StubNode() {
+  mSource.GetNode()->RemoveAllWatchers();
   for (auto slotPair : mParameterSlotMap) delete(slotPair.second);
   mParameterSlotMap.clear();
   mParameterNameSlotMap.clear();
@@ -124,6 +125,9 @@ void StubNode::CopyFrom(const shared_ptr<Node>& node)
 {
   shared_ptr<StubNode> original = PointerCast<StubNode>(node);
   mSource.SetDefaultValue(original->mSource.Get());
+  if (original->mMetadata) {
+    SetName(original->mMetadata->name);
+  }
   Update();
 }
 
@@ -154,7 +158,9 @@ void StubNode::HandleMessage(Message* message) {
     break;
   case MessageType::NODE_NAME_CHANGED:
     // TODO: implement and use GetDefaultNode for value slots
-    mSource.GetNode()->SetName(GetName());
+    if (message->mSource == nullptr) {
+      mSource.GetNode()->SetName(GetName());
+    }
     break;
   default:
     break;

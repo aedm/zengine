@@ -199,11 +199,12 @@ void GraphWatcher::DeselectAll() {
 }
 
 
-void GraphWatcher::SelectWidget(const shared_ptr<NodeWidget>& nodeWidget) {
-  if (nodeWidget->mIsSelected) return;
+void GraphWatcher::SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget) {
+  DeselectAll();
   ASSERT(mSelectedNodeWidgets.find(nodeWidget) == mSelectedNodeWidgets.end());
   mSelectedNodeWidgets.insert(nodeWidget);
   nodeWidget->mIsSelected = true;
+  ZenGarden::GetInstance()->SetNodeForPropertyEditor(nodeWidget->GetDirectNode());
 }
 
 void GraphWatcher::StorePositionOfSelectedNodes() {
@@ -243,10 +244,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
       else {
         if (!mHoveredWidget->mIsSelected) {
           /// Select node
-          DeselectAll();
-          SelectWidget(mHoveredWidget);
-          ZenGarden::GetInstance()->SetNodeForPropertyEditor(
-            mHoveredWidget->GetDirectNode());
+          SelectSingleWidget(mHoveredWidget);
         }
 
         StorePositionOfSelectedNodes();
@@ -285,8 +283,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
       }
     }
     else {
-      DeselectAll();
-      SelectWidget(mClickedWidget);
+      SelectSingleWidget(mClickedWidget);
       GetGLWidget()->update();
     }
     mCurrentState = State::DEFAULT;
@@ -373,8 +370,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
       /// Adding new nodes to a graph resets watcher state, but we want to move the ghost
       mCurrentState = State::MOVE_NODES;
       shared_ptr<NodeWidget> ghostWidget = mWidgetMap.at(ghost);
-      DeselectAll();
-      SelectWidget(ghostWidget);
+      SelectSingleWidget(ghostWidget);
       StorePositionOfSelectedNodes();
       mAreNodesMoved = true;
       mOriginalMousePos = mousePos;
@@ -499,7 +495,7 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
     /// 1 opens watcher on upper left panel
   case Qt::Key_1:
     if (mSelectedNodeWidgets.size() == 1) {
-      ZenGarden::GetInstance()->Watch((*mSelectedNodeWidgets.begin())->GetDirectNode(), 
+      ZenGarden::GetInstance()->Watch((*mSelectedNodeWidgets.begin())->GetDirectNode(),
         WatcherPosition::UPPER_LEFT_TAB);
     }
     break;
@@ -515,7 +511,7 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
     /// 3 opens watcher on bottom left panel
   case Qt::Key_3:
     if (mSelectedNodeWidgets.size() == 1) {
-      ZenGarden::GetInstance()->Watch((*mSelectedNodeWidgets.begin())->GetDirectNode(), 
+      ZenGarden::GetInstance()->Watch((*mSelectedNodeWidgets.begin())->GetDirectNode(),
         WatcherPosition::BOTTOM_LEFT_TAB);
     }
     break;
@@ -528,6 +524,22 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
       }
     }
     break;
+  case Qt::Key_G:
+  {
+    if (mCurrentState != State::DEFAULT) return;
+    shared_ptr<Node> originalNode = ZenGarden::GetInstance()->GetNodeInPropertyEditor();
+    if (!originalNode) return;
+    if (IsPointerOf<Graph>(originalNode)) return;
+    shared_ptr<Ghost> ghost = make_shared<Ghost>();
+    ghost->mOriginalNode.Connect(originalNode);
+    ghost->SetPosition(mCurrentMousePos);
+    TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
+    /// Adding new nodes to a graph resets watcher state, but we want to move the ghost
+    shared_ptr<NodeWidget> ghostWidget = mWidgetMap.at(ghost);
+    SelectSingleWidget(ghostWidget);
+    StorePositionOfSelectedNodes();
+    break;
+  }
   default: break;
   }
 }

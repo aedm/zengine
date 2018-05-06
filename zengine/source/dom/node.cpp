@@ -313,7 +313,9 @@ void Node::ReceiveMessage(Message* message) {
     NotifyWatchers(&Watcher::OnRedraw);
     break;
   case MessageType::NODE_NAME_CHANGED:
-    NotifyWatchers(&Watcher::OnChildNameChange);
+    if (message->mSource.get() != nullptr) {
+      NotifyWatchers(&Watcher::OnChildNameChange);
+    }
     break;
   case MessageType::SLOT_GHOST_FLAG_CHANGED:
     EnqueueMessage(MessageType::TRANSITIVE_GHOST_CHANGED, message->mSlot,
@@ -395,10 +397,8 @@ Node::~Node() {
 
 void Node::SetName(const string& name) {
   mName = name;
+  EnqueueMessage(MessageType::NODE_NAME_CHANGED);
   NotifyWatchers(&Watcher::OnNameChange);
-  TheMessageQueue.Enqueue(
-    nullptr, this->shared_from_this(), MessageType::NODE_NAME_CHANGED);
-
 }
 
 const string& Node::GetName() const {
