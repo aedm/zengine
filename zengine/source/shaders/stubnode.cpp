@@ -58,7 +58,7 @@ void StubNode::Operate() {
   /// Create a new list of slots
   for (auto param : mMetadata->parameters) {
     auto it = mParameterNameSlotMap.find(*param->mName);
-    if (it != mParameterNameSlotMap.end() && 
+    if (it != mParameterNameSlotMap.end() &&
       it->second->DoesAcceptNode(StaticValueNodesList[int(param->mType)])) {
       /// This slot was used before, reuse it.
       /// "isTraversable" is false since it's already in the mTraversableSlots vector.
@@ -70,24 +70,24 @@ void StubNode::Operate() {
       /// Generate new slot.
       Slot* slot = nullptr;
       switch (param->mType) {
-        case ValueType::FLOAT:
-          slot = new ValueStubSlot<ValueType::FLOAT>(this, param->mName);
-          break;
-        case ValueType::VEC2:
-          slot = new ValueStubSlot<ValueType::VEC2>(this, param->mName);
-          break;
-        case ValueType::VEC3:
-          slot = new ValueStubSlot<ValueType::VEC3>(this, param->mName);
-          break;
-        case ValueType::VEC4:
-          slot = new ValueStubSlot<ValueType::VEC4>(this, param->mName);
-          break;
-        case ValueType::TEXTURE:
-          slot = new TextureSlot(this, param->mName);
-          break;
-        default:
-          SHOULD_NOT_HAPPEN;
-          break;
+      case ValueType::FLOAT:
+        slot = new ValueStubSlot<ValueType::FLOAT>(this, param->mName);
+        break;
+      case ValueType::VEC2:
+        slot = new ValueStubSlot<ValueType::VEC2>(this, param->mName);
+        break;
+      case ValueType::VEC3:
+        slot = new ValueStubSlot<ValueType::VEC3>(this, param->mName);
+        break;
+      case ValueType::VEC4:
+        slot = new ValueStubSlot<ValueType::VEC4>(this, param->mName);
+        break;
+      case ValueType::TEXTURE:
+        slot = new TextureSlot(this, param->mName);
+        break;
+      default:
+        SHOULD_NOT_HAPPEN;
+        break;
       }
       mParameterSlotMap[param] = slot;
     }
@@ -130,39 +130,43 @@ void StubNode::CopyFrom(const shared_ptr<Node>& node)
 void StubNode::HandleMessage(Message* message) {
   /// Stubs send a VALUE_CHANGED message if the shader needs to be rebuilt
   switch (message->mType) {
-    case MessageType::VALUE_CHANGED:
-      if (message->mSlot == &mSource) {
-        mIsUpToDate = false;
-        SendMsg(MessageType::VALUE_CHANGED);
-      }
-      else if (IsPointerOf<StubNode>(message->mSlot->GetReferencedNode())) {
-        SendMsg(MessageType::VALUE_CHANGED);
-      }
-      else {
-        SendMsg(MessageType::NEEDS_REDRAW);
-      }
-      break;
-    case MessageType::SLOT_CONNECTION_CHANGED:
-      if (message->mSlot == &mSource) {
-        mIsUpToDate = false;
-      }
+  case MessageType::VALUE_CHANGED:
+    if (message->mSlot == &mSource) {
+      mIsUpToDate = false;
+      /// TODO: make sure slots are updated outside the Update() mechanism
+      Update();
       SendMsg(MessageType::VALUE_CHANGED);
-      break;
-    case MessageType::NODE_NAME_CHANGED:
-      // TODO: implement and use GetDefaultNode for value slots
-      mSource.GetNode()->SetName(GetName());
-      break;
-    default:
-      break;
+    }
+    else if (IsPointerOf<StubNode>(message->mSlot->GetReferencedNode())) {
+      SendMsg(MessageType::VALUE_CHANGED);
+    }
+    else {
+      SendMsg(MessageType::NEEDS_REDRAW);
+    }
+    break;
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    if (message->mSlot == &mSource) {
+      mIsUpToDate = false;
+      /// TODO: make sure slots are updated outside the Update() mechanism
+      Update();
+    }
+    SendMsg(MessageType::VALUE_CHANGED);
+    break;
+  case MessageType::NODE_NAME_CHANGED:
+    // TODO: implement and use GetDefaultNode for value slots
+    mSource.GetNode()->SetName(GetName());
+    break;
+  default:
+    break;
   }
 }
 
 StubMetadata::StubMetadata(const string& _name, ValueType _returnType,
-    const string& _strippedSource, 
-    OWNERSHIP const vector<StubParameter*>& _parameters,
-    const vector<StubGlobal*>& _globals,
-    const vector<StubVariable*>& _inputs,
-    const vector<StubVariable*>& _outputs)
+  const string& _strippedSource,
+  OWNERSHIP const vector<StubParameter*>& _parameters,
+  const vector<StubGlobal*>& _globals,
+  const vector<StubVariable*>& _inputs,
+  const vector<StubVariable*>& _outputs)
   : name(_name)
   , returnType(_returnType)
   , parameters(_parameters)

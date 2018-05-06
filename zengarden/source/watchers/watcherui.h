@@ -31,7 +31,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Destorys the watcher and its UI elements
-  virtual void RemoveFromNode() override;
+  virtual void OnRemovedFromNode() override;
 
   FastDelegate<void(WatcherWidget*)> deleteWatcherWidgetCallback;
 

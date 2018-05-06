@@ -464,7 +464,7 @@ void Node::RemoveWatcher(shared_ptr<Watcher> watcher) {
   auto it = std::find(mWatchers.begin(), mWatchers.end(), watcher);
   if (it == mWatchers.end()) return;
   ASSERT(watcher->mNode.get() == this);
-  watcher->OnRemoveWatcher();
+  watcher->OnRemovedFromNode();
   mWatchers.erase(it);
 }
 

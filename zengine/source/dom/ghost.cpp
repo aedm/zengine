@@ -100,8 +100,7 @@ void Ghost::Regenerate() {
       auto it = mNodeMapping.find(node);
       if (it == mNodeMapping.end()) {
         /// Node was not copied before
-        internalNode = shared_ptr<Node>(
-          NodeRegistry::GetInstance()->GetNodeClass(node)->Manufacture());
+        internalNode = NodeRegistry::GetInstance()->GetNodeClass(node)->Manufacture();
       }
       else {
         internalNode = it->second;
@@ -109,7 +108,6 @@ void Ghost::Regenerate() {
       internalNode->CopyFrom(node);
       newInternalNodes.insert(internalNode);
       newNodeMapping[node] = internalNode;
-
 
       /// Connect slots
       const auto& originalSlots = node->GetPublicSlots();
@@ -141,7 +139,7 @@ void Ghost::Regenerate() {
             auto it = newNodeMapping.find(connectedNode);
             shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
               ? connectedNode : it->second;
-            internalSlot->Connect(originalSlot->GetDirectNode());
+            internalSlot->Connect(nodeToConnect);
           }
         }
       }

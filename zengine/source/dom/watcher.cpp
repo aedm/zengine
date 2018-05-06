@@ -23,7 +23,7 @@ void Watcher::ChangeNode(const shared_ptr<Node>& node) {
   OnRedraw();
 }
 
-void Watcher::RemoveFromNode() {
+void Watcher::OnRemovedFromNode() {
   mNode.reset();
 }
 

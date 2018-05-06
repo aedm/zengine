@@ -26,17 +26,13 @@ Pass::Pass()
   mUberShader.Connect(TheEngineStubs->GetStub("uber"));
 }
 
-Pass::~Pass() {
-  RemoveUniformSlots();
-}
-
 void Pass::HandleMessage(Message* message) {
   switch (message->mType) {
     case MessageType::SLOT_CONNECTION_CHANGED:
     case MessageType::VALUE_CHANGED:
       if (message->mSlot == &mVertexStub || message->mSlot == &mFragmentStub ||
           message->mSlot == &mUberShader) {
-        mIsUpToDate = false;
+        BuildShaderSource();
       }
       EnqueueMessage(MessageType::NEEDS_REDRAW);
       break;
@@ -46,40 +42,10 @@ void Pass::HandleMessage(Message* message) {
 
 void Pass::Operate() {
   /// Clean up from previous state
-  mUsedUniforms.clear();
-  mUsedSamplers.clear();
+  if (!mShaderSource) return;
   mShaderProgram.reset();
-  mShaderSource.reset();
-  RemoveUniformSlots();
-
-  /// Generate shader source
-  if (!mShaderSource) {
-    mShaderSource = ShaderBuilder::FromStubs(mVertexStub.GetNode(),
-                                             mFragmentStub.GetNode());
-    if (!mShaderSource) return;
-  }
-  //INFO("--------------- VERTEX SHADER ----------------");
-  //INFO(mShaderSource->mVertexSource.c_str());
-  //INFO("--------------- FRAGMENT SHADER ----------------");
-  //INFO(mShaderSource->mFragmentSource.c_str());
-
-  INFO("Building render pipeline...");
-
-  for (auto& sampler : mShaderSource->mSamplers) {
-    if (sampler.mNode) {
-      Slot* slot = new TextureSlot(this, nullptr, false, false, false, false);
-      slot->Connect(sampler.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
-  for (auto uniform : mShaderSource->mUniforms) {
-    if (uniform.mNode) {
-      Slot* slot = CreateValueSlot(uniform.mNode->GetValueType(), 
-        this, nullptr, false, false, false, false);
-      slot->Connect(uniform.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
+  mUsedSamplers.clear();
+  mUsedUniforms.clear();
 
   const string& vertexSource = mShaderSource->mVertexSource;
   const string& fragmentSource = mShaderSource->mFragmentSource;
@@ -116,6 +82,44 @@ void Pass::Operate() {
 
   /// Allocate space for uniform array
   mUniformArray.resize(mShaderProgram->mUniformBlockSize);
+}
+
+void Pass::BuildShaderSource()
+{
+  mShaderSource.reset();
+  mUniformAndSamplerSlots.clear();
+  ClearSlots();
+  AddSlot(&mVertexStub, true, true, true);
+  AddSlot(&mFragmentStub, true, true, true);
+  AddSlot(&mFaceModeSlot, true, true, true);
+  AddSlot(&mBlendModeSlot, true, true, true);
+  mIsUpToDate = false;
+
+  /// Generate shader source
+  if (!mShaderSource) {
+    mShaderSource = ShaderBuilder::FromStubs(mVertexStub.GetNode(),
+      mFragmentStub.GetNode());
+    if (!mShaderSource) return;
+  }
+
+  INFO("Building render pipeline...");
+
+  for (auto& sampler : mShaderSource->mSamplers) {
+    if (sampler.mNode) {
+      shared_ptr<Slot> slot = 
+        make_shared<TextureSlot>(this, nullptr, false, false, false, false);
+      slot->Connect(sampler.mNode);
+      mUniformAndSamplerSlots.push_back(slot);
+    }
+  }
+  for (auto uniform : mShaderSource->mUniforms) {
+    if (uniform.mNode) {
+      shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
+        uniform.mNode->GetValueType(), this, nullptr, false, false, false, false));
+      slot->Connect(uniform.mNode);
+      mUniformAndSamplerSlots.push_back(slot);
+    }
+  }
 }
 
 void Pass::Set(Globals* globals) {
@@ -204,11 +208,6 @@ const vector<ShaderProgram::Attribute>& Pass::GetUsedAttributes() {
 
 bool Pass::isComplete() {
   return (mShaderProgram != nullptr);
-}
-
-void Pass::RemoveUniformSlots() {
-  for (Slot* slot : mUniformAndSamplerSlots) delete slot;
-  mUniformAndSamplerSlots.clear();
 }
 
 Pass::UniformMapper::UniformMapper(const ShaderProgram::Uniform* target,

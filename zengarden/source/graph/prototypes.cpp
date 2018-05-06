@@ -74,7 +74,7 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
 
   /// Create new node, possibly based on original
   shared_ptr<Node> node = prototype->mNodeClass->Manufacture();
-  if (prototype->mNode == nullptr) {
+  if (prototype->mNode != nullptr) {
     node->CopyFrom(prototype->mNode);
   }
   return node;

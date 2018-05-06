@@ -43,7 +43,6 @@ class Pass: public Node {
 
 public:
   Pass();
-  virtual ~Pass();
 
   /// Shader stages and sources
   StubSlot mFragmentStub;
@@ -69,14 +68,13 @@ protected:
   /// Creates the shader program
   virtual void Operate() override;
 
-  /// Removes all hidden uniform slots
-  void RemoveUniformSlots();
+  void BuildShaderSource();
 
   /// Generated shader source
   shared_ptr<ShaderSource> mShaderSource;
 
   /// Generated slots
-  vector<Slot*> mUniformAndSamplerSlots;
+  vector<shared_ptr<Slot>> mUniformAndSamplerSlots;
   
   /// Compiled and linked shader program
   shared_ptr<ShaderProgram> mShaderProgram;
