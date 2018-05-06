@@ -117,6 +117,7 @@ void Ghost::Regenerate() {
       for (UINT i = 0; i < slotCount; i++) {
         Slot* originalSlot = originalSlots[i];
         Slot* internalSlot = internalNodeSlots[i];
+        ASSERT(*originalSlot->GetName() == *internalSlot->GetName());
         if (originalSlot->IsGhost()) {
           /// TODO: initialize value
           AddSlot(internalSlot, true, true, true);
@@ -151,6 +152,7 @@ void Ghost::Regenerate() {
   mNodeMapping = newNodeMapping;
 
   /// TODO: detect when there was no actual change
+  NotifyWatchers(&Watcher::OnRedraw);
   NotifyWatchers(&Watcher::OnSlotStructureChanged);
   SendMsg(MessageType::TRANSITIVE_GHOST_CHANGED);
 }

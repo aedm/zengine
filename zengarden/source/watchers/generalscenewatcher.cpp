@@ -18,7 +18,7 @@ GeneralSceneWatcher::GeneralSceneWatcher(const shared_ptr<Node>& node)
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
-  mRenderForwarder->mOnRedraw.clear();
+  if (mRenderForwarder) mRenderForwarder->mOnRedraw.clear();
 }
 
 void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {

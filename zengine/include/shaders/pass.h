@@ -45,8 +45,8 @@ public:
   Pass();
 
   /// Shader stages and sources
-  StubSlot mFragmentStub;
   StubSlot mVertexStub;
+  StubSlot mFragmentStub;
   StubSlot mUberShader;
 
   /// Pipeline state
