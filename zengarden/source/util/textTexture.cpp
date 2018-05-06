@@ -1,12 +1,10 @@
 #include "textTexture.h"
 #include <QFontMetrics>
 #include <QPixmap>
-#include <QImage>
 #include <QPainter>
 #include <QGLWidget>
 
 TextTexture::TextTexture()
-  : TheTexture(NULL)
 {}
 
 TextTexture::~TextTexture()
@@ -26,38 +24,48 @@ void TextTexture::SetText(const QString& Text, const QFont& Font)
   /// Calculate image size for the text
   QFontMetrics fm(Font);
   QRect rect = fm.boundingRect(Text);
-  TextSize = rect.size() + QSize(1, 1);
-  int tw = NextDivisibleBy<16>(TextSize.width());
-  int th = NextDivisibleBy<16>(TextSize.height());
+  mTextSize = rect.size() + QSize(1, 1);
+  mWidth = NextDivisibleBy<16>(mTextSize.width());
+  mHeight = NextDivisibleBy<16>(mTextSize.height());
 
   /// Let Qt draw the text
-  QPixmap pixmap(tw, th);
+  QPixmap pixmap(mWidth, mHeight);
   pixmap.fill(QColor(0, 0, 0, 0));
   QPainter painter;
   painter.begin(&pixmap);
   painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing);
   painter.setFont(Font);
   painter.setPen(Qt::white);
-  painter.drawText(0, 0, tw, th, Qt::AlignTop | Qt::AlignLeft, Text);
+  painter.drawText(0, 0, mWidth, mHeight, Qt::AlignTop | Qt::AlignLeft, Text);
   painter.end();
-  QImage image = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
-
-  /// Upload to texture
-  if (TheTexture == NULL || TheTexture->mWidth < tw || TheTexture->mHeight < th) {
-    DestroyTexture();
-    TheTexture = TheResourceManager->CreateGPUTexture(
-      tw, th, TexelType::ARGB8, image.bits(), false, false);
-  }
-  else {
-    OpenGL->UploadTextureSubData(TheTexture->mHandle, 0, 0, tw, th, TexelType::ARGB8, image.bits());
-  }
+  mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
+  mUptodate = false;
 }
 
-void TextTexture::DestroyTexture()
-{
-  if (TheTexture) {
-    TheResourceManager->DiscardTexture(TheTexture);
-    TheTexture = NULL;
+
+Texture* TextTexture::GetTexture() {
+  if (!mUptodate) {
+    /// Upload to texture
+    if (mTexture == nullptr || mTexture->mWidth < mWidth || mTexture->mHeight < mHeight) {
+      DestroyTexture();
+      mTexture = TheResourceManager->CreateGPUTexture(
+        mWidth, mHeight, TexelType::ARGB8, mImage.bits(), false, false);
+    }
+    else {
+      OpenGL->UploadTextureSubData(
+        mTexture->mHandle, 0, 0, mWidth, mHeight, TexelType::ARGB8, mImage.bits());
+    }
+    mUptodate = true;
+  }
+
+  return mTexture;
+}
+
+void TextTexture::DestroyTexture() {
+  if (mTexture) {
+    TheResourceManager->DiscardTexture(mTexture);
+    /// This is awful, use shared_ptr
+    mTexture = nullptr;
   }
 }
 

@@ -73,12 +73,12 @@ void NodeWidget::CreateWidgetSlots()
 
 void NodeWidget::CalculateLayout()
 {
-  mTitleHeight = mTitleTexture->TextSize.height() + TitlePadding * 2.0f + 1.0f;
+  mTitleHeight = mTitleTexture->mTextSize.height() + TitlePadding * 2.0f + 1.0f;
   float slotY = mTitleHeight + SlotSpacing;
   for (WidgetSlot* sw : mWidgetSlots) {
     sw->mPosition = Vec2(SlotLeftMargin, slotY);
     sw->mSize =
-      Vec2(SlotWidth, float(sw->mTexture.TextSize.height()) + SlotPadding.y * 2.0f);
+      Vec2(SlotWidth, float(sw->mTexture.mTextSize.height()) + SlotPadding.y * 2.0f);
     sw->mSpotPos = Vec2(ConnectionSpotPadding, slotY + sw->mSize.y / 2.0f);
     slotY += sw->mSize.y + SlotSpacing;
   }
@@ -112,7 +112,7 @@ void NodeWidget::Paint()
     ConnectionSpotSize);
 
   ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
-  float centerX = floor((size.x - float(mTitleTexture->TextSize.width())) * 0.5f);
+  float centerX = floor((size.x - float(mTitleTexture->mTextSize.width())) * 0.5f);
   ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
 
   /// Paint slots

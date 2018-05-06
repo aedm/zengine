@@ -4,17 +4,25 @@
 #include <QString>
 #include <QFont>
 #include <QSize>
+#include <QImage>
 
-class TextTexture
-{
+class TextTexture {
 public:
-	TextTexture();
-	~TextTexture();
+ TextTexture();
+ ~TextTexture();
 
-	void				SetText(const QString& Text, const QFont& Font);
-	Texture*			TheTexture;
-	QSize				TextSize;
+ void SetText(const QString& Text, const QFont& Font);
+ QSize mTextSize;
+ Texture* GetTexture();
 
 private:
-	void				DestroyTexture();
+ void DestroyTexture();
+ 
+ Texture* mTexture = nullptr;
+ QImage mImage;
+
+ int mWidth = 0;
+ int mHeight = 0;
+
+ bool mUptodate = false;
 };

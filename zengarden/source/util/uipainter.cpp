@@ -148,10 +148,11 @@ void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
 
 
 void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
-  float w = Tex->TextSize.width();
-  float h = Tex->TextSize.height();
-  float u = w / float(Tex->TheTexture->mWidth);
-  float v = h / float(Tex->TheTexture->mHeight);
+  float w = Tex->mTextSize.width();
+  float h = Tex->mTextSize.height();
+  Texture* texture = Tex->GetTexture();
+  float u = w / float(texture->mWidth);
+  float v = h / float(texture->mHeight);
   VertexPosUV vertices[] = {
     {Vec3(Position.x, Position.y, 0), Vec2(0, 0)},
     {Vec3(Position.x + w, Position.y, 0), Vec2(u, 0)},
@@ -159,7 +160,7 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
     {Vec3(Position.x + w, Position.y + h, 0), Vec2(u, v)},
   };
 
-  mTextureNode->Set(Tex->TheTexture);
+  mTextureNode->Set(texture);
   mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
   mTextBox->Draw(&mGlobals, PassType::SOLID);
 }

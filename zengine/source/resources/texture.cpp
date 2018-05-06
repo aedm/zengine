@@ -13,7 +13,8 @@ Texture::Texture( int width, int height, TexelType type, TextureHandle handle,
 {}
 
 Texture::~Texture() {
-  delete mTexelData;
+  /// TODO: delete OpenGL textures
+  SafeDelete(mTexelData); 
 }
 
 UINT Texture::GetTexelByteCount(TexelType type) {
