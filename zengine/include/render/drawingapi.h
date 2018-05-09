@@ -10,7 +10,7 @@ using namespace std;
 class OpenGLAPI;
 extern OpenGLAPI* OpenGL;
 
-const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 1;
+const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 8;
 
 /// TODO: query OpenGL for this value
 static const int MAX_COMBINED_TEXTURE_SLOTS = 48;

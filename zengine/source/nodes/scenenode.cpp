@@ -72,6 +72,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightAmbient = mSkyLightAmbient.Get();
   globals->SkylightSpread = mSkyLightSpread.Get();
   globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
+  globals->Time = mGlobalTimeNode->Get();
   RenderDrawables(globals, PassType::SHADOW);
 
   /// Pass #2: draw to G-Buffer / screen

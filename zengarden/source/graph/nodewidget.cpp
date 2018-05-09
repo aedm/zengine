@@ -94,6 +94,7 @@ void NodeWidget::UpdateGraph() {
 
 static Vec4 LiveHeaderColor = Vec4(0, 0.2, 0.4, Opacity);
 static Vec4 GhostHeaderColor = Vec4(0.4, 0.2, 0, Opacity);
+static Vec4 ReferenceHeaderColor = Vec4(0.4, 0.0, 0.2, Opacity);
 
 void NodeWidget::Paint()
 {
@@ -101,7 +102,12 @@ void NodeWidget::Paint()
   Vec2 position = node->GetPosition();
   Vec2 size = node->GetSize();
 
-  ThePainter->mColor->Set(node->IsGhostNode() ? GhostHeaderColor : LiveHeaderColor);
+  Vec4 headerColor = LiveHeaderColor;
+  if (node->IsGhostNode()) {
+    headerColor = PointerCast<Ghost>(node)->IsDirectReference()
+      ? ReferenceHeaderColor : GhostHeaderColor;
+  }
+  ThePainter->mColor->Set(headerColor);
   ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
 
   ThePainter->mColor->Set(Vec4(0, 0, 0, Opacity));

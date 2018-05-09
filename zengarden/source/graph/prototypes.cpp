@@ -21,6 +21,8 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Vec3Node>());
   AddPrototype(registry->GetNodeClass<Vec4Node>());
   AddPrototype(registry->GetNodeClass<FloatsToVec3Node>());
+  AddPrototype(registry->GetNodeClass<FloatToFloatNode>());
+  AddPrototype(registry->GetNodeClass<MaddNode>());
   AddPrototype(registry->GetNodeClass<Pass>());
   AddPrototype(registry->GetNodeClass<GlobalTimeNode>());
   AddPrototype(registry->GetNodeClass<Material>());
@@ -31,6 +33,7 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<FloatSplineNode>());
 
   AddPrototype(registry->GetNodeClass<CubeMeshNode>());
+  AddPrototype(registry->GetNodeClass<HalfCubeMeshNode>());
 
   LoadStubs();
 

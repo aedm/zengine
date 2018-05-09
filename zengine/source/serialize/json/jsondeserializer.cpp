@@ -54,31 +54,31 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     node->SetPosition(position);
   }
 
-  if (IsPointerOf<FloatNode>(node)) {
+  if (IsExactType<FloatNode>(node)) {
     DeserializeFloatNode(value, PointerCast<FloatNode>(node));
   }
-  else if (IsPointerOf<Vec2Node>(node)) {
+  else if (IsExactType<Vec2Node>(node)) {
     DeserializeVec2Node(value, PointerCast<Vec2Node>(node));
   }
-  else if (IsPointerOf<Vec3Node>(node)) {
+  else if (IsExactType<Vec3Node>(node)) {
     DeserializeVec3Node(value, PointerCast<Vec3Node>(node));
   }
-  else if (IsPointerOf<Vec4Node>(node)) {
+  else if (IsExactType<Vec4Node>(node)) {
     DeserializeVec4Node(value, PointerCast<Vec4Node>(node));
   }
-  else if (IsPointerOf<FloatSplineNode>(node)) {
+  else if (IsExactType<FloatSplineNode>(node)) {
     DeserializeFloatSplineNode(value, PointerCast<FloatSplineNode>(node));
   }
-  else if (IsPointerOf<TextureNode>(node)) {
+  else if (IsExactType<TextureNode>(node)) {
     DeserializeTextureNode(value, PointerCast<TextureNode>(node));
   }
-  else if (IsPointerOf<StaticMeshNode>(node)) {
+  else if (IsExactType<StaticMeshNode>(node)) {
     DeserializeStaticMeshNode(value, PointerCast<StaticMeshNode>(node));
   }
-  else if (IsPointerOf<StubNode>(node)) {
+  else if (IsExactType<StubNode>(node)) {
     DeserializeStubNode(value, PointerCast<StubNode>(node));
   }
-  else if (IsPointerOf<Document>(node)) {
+  else if (IsExactType<Document>(node)) {
     ASSERT(mDocument == nullptr);
     mDocument = PointerCast<Document>(node);
   }

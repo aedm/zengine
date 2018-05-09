@@ -13,6 +13,10 @@ public:
   Slot mOriginalNode;
 
   virtual bool IsGhostNode() override;
+  
+  /// Returns true if ghost node is simply a reference without any
+  /// internal nodes.
+  bool IsDirectReference();
 
 protected:
   set<shared_ptr<Node>> mInternalNodes;

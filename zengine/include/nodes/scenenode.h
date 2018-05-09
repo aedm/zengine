@@ -49,6 +49,8 @@ private:
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
 
+  shared_ptr<GlobalTimeNode> mGlobalTimeNode = make_shared<GlobalTimeNode>();
+
   void CalculateRenderDependencies();
 };
 

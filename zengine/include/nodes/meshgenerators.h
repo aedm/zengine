@@ -16,3 +16,15 @@ protected:
   /// Handle received messages
   virtual void HandleMessage(Message* message) override;
 };
+
+
+class HalfCubeMeshNode : public MeshNode {
+public:
+  HalfCubeMeshNode();
+
+protected:
+  virtual void Operate() override;
+
+  /// Handle received messages
+  virtual void HandleMessage(Message* message) override;
+};

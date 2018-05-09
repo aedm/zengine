@@ -58,6 +58,10 @@ bool Ghost::IsGhostNode() {
   return true;
 }
 
+bool Ghost::IsDirectReference() {
+  return mMainInternalNode.GetDirectNode() == mOriginalNode.GetDirectNode();
+}
+
 void Ghost::HandleMessage(Message* message)
 {
   switch (message->mType) {

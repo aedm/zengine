@@ -2,12 +2,13 @@
 #include <include/resources/resourcemanager.h>
 
 REGISTER_NODECLASS(CubeMeshNode, "Cube");
+REGISTER_NODECLASS(HalfCubeMeshNode, "HalfCube");
 
 static SharedString CubeSizeXSlotName = make_shared<string>("SizeX");
 static SharedString CubeSizeYSlotName = make_shared<string>("SizeY");
 static SharedString CubeSizeZSlotName = make_shared<string>("SizeZ");
 
-CubeMeshNode::CubeMeshNode() 
+CubeMeshNode::CubeMeshNode()
   : MeshNode()
   , mSizeX(this, CubeSizeXSlotName)
   , mSizeY(this, CubeSizeYSlotName)
@@ -86,13 +87,70 @@ void CubeMeshNode::Operate() {
 
 void CubeMeshNode::HandleMessage(Message* message) {
   switch (message->mType) {
-    case MessageType::VALUE_CHANGED:
-    case MessageType::SLOT_CONNECTION_CHANGED:
-      if (mIsUpToDate) {
-        mIsUpToDate = false;
-        SendMsg(MessageType::NEEDS_REDRAW);
-      }
-      break;
-    default: break;
+  case MessageType::VALUE_CHANGED:
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    if (mIsUpToDate) {
+      mIsUpToDate = false;
+      SendMsg(MessageType::NEEDS_REDRAW);
+    }
+    break;
+  default: break;
   }
 }
+
+HalfCubeMeshNode::HalfCubeMeshNode()
+  : MeshNode()
+{}
+
+void HalfCubeMeshNode::Operate() {
+  if (!mMesh) mMesh = TheResourceManager->CreateMesh();
+
+  VertexPosNorm vertices[] = {
+    /// Top
+    { Vec3(0.5f, 1, 0.5f), Vec3(0, 1, 0) },
+    { Vec3(-0.5f, 1, 0.5f), Vec3(0, 1, 0) },
+    { Vec3(0.5f, 1, -0.5f), Vec3(0, 1, 0) },
+    { Vec3(-0.5f, 1, -0.5f), Vec3(0, 1, 0) },
+
+    /// Side
+    { Vec3(0.5f, 1, 0.5f), Vec3(1, 0, 0) },
+    { Vec3(0.5f, 1, -0.5f), Vec3(1, 0, 0) },
+    { Vec3(0.5f, 0, 0.5f), Vec3(1, 0, 0) },
+    { Vec3(0.5f, 0, -0.5f), Vec3(1, 0, 0) },
+
+    /// Front
+    { Vec3(0.5f, 0, 0.5f), Vec3(0, 0, 1) },
+    { Vec3(-0.5f, 0, 0.5f), Vec3(0, 0, 1) },
+    { Vec3(0.5f, 1, 0.5f), Vec3(0, 0, 1) },
+    { Vec3(-0.5f, 1, 0.5f), Vec3(0, 0, 1) },
+  };
+
+  IndexEntry indexes[3 * 2 * 3];
+  int a = 0;
+  for (int i = 0; i < 3; i++) {
+    int base = i * 4;
+    indexes[a++] = 0 + base;
+    indexes[a++] = 1 + base;
+    indexes[a++] = 2 + base;
+    indexes[a++] = 2 + base;
+    indexes[a++] = 1 + base;
+    indexes[a++] = 3 + base;
+  }
+
+  mMesh->SetVertices(vertices);
+  mMesh->SetIndices(indexes);
+}
+
+void HalfCubeMeshNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+  case MessageType::VALUE_CHANGED:
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    if (mIsUpToDate) {
+      mIsUpToDate = false;
+      SendMsg(MessageType::NEEDS_REDRAW);
+    }
+    break;
+  default: break;
+  }
+}
+
