@@ -11,7 +11,10 @@ public:
 private:
   /// Returns true if a ghost slots was found in the subtree
   bool Traverse(const shared_ptr<Node>& node) {
-    if (mVisited.find(node) != mVisited.end()) return false;
+    if (mVisited.find(node) != mVisited.end()) {
+      bool hadGhostSlot = mHadGhostSlot.find(node) != mHadGhostSlot.end();
+      return hadGhostSlot;
+    }
     mVisited.insert(node);
 
     const vector<Slot*>& slots = node->GetPublicSlots();
@@ -36,12 +39,16 @@ private:
       }
     }
 
-    if (foundGhostSlot) mResult->push_back(node);
+    if (foundGhostSlot) {
+      mResult->push_back(node);
+      mHadGhostSlot.insert(node);
+    }
     return foundGhostSlot;
   }
 
   vector<shared_ptr<Node>>* mResult;
   set<shared_ptr<Node>> mVisited;
+  set<shared_ptr<Node>> mHadGhostSlot;
 };
 
 static SharedString OriginalSlotName = make_shared<string>("Original");

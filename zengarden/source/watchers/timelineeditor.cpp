@@ -1,5 +1,6 @@
 #include "timelineeditor.h"
 #include "../zengarden.h"
+#include "../util/util.h"
 
 static const float DefaultPixelsPerSecond = 100.0f;
 static const int TrackHeightPixels = 20;
@@ -50,6 +51,12 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
   });
 
+  watcherWidget->connect(mUI.deleteClipButton, &QPushButton::pressed, [=]() {
+    if (!mSelectedClip) return;
+    set<shared_ptr<Node>> selectedNodes;
+    selectedNodes.insert(mSelectedClip);
+    Util::DisposeNodes(selectedNodes);
+  });
 }
 
 void TimelineEditor::OnRedraw() {

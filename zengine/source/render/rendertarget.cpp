@@ -4,6 +4,7 @@
 
 
 static const int ShadowMapSize = 2048;
+static const int SquareBufferSize = 1024;
 
 RenderTarget::RenderTarget(Vec2 size)
   : mSize(0, 0) {
@@ -20,6 +21,8 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = 0;
   globals->GBufferSourceA = 0;
+  globals->SquareTexture1 = mSquareTexture1;
+  globals->SquareTexture2 = mSquareTexture2;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
   globals->SecondaryTexture = mSecondaryTexture;
   globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
@@ -32,6 +35,8 @@ void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = mDepthBuffer;
   globals->GBufferSourceA = mGBufferA;
+  globals->SquareTexture1 = mSquareTexture1;
+  globals->SquareTexture2 = mSquareTexture2;
   OpenGL->SetFrameBuffer(mColorBufferId);
   OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
@@ -45,8 +50,20 @@ void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
   globals->GBufferSampleCount = 1;
   globals->SecondaryTexture = 0;
   globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
+  globals->SquareTexture1 = mSquareTexture1;
+  globals->SquareTexture2 = mSquareTexture2;
   OpenGL->SetFrameBuffer(mShadowBufferId);
   OpenGL->SetViewport(0, 0, ShadowMapSize, ShadowMapSize);
+}
+
+void RenderTarget::SetSquareBufferAsTarget(Globals* globals) {
+  globals->RenderTargetSize = Vec2(float(SquareBufferSize), float(SquareBufferSize));
+  globals->RenderTargetSizeRecip = 
+    Vec2(1.0f / float(SquareBufferSize), 1.0f / float(SquareBufferSize));
+  globals->DepthBufferSource = nullptr;
+  globals->GBufferSourceA = nullptr;
+  OpenGL->SetFrameBuffer(mSquareFramebuffer);
+  OpenGL->SetViewport(0, 0, SquareBufferSize, SquareBufferSize);
 }
 
 void RenderTarget::Resize(Vec2 size) {
@@ -76,6 +93,16 @@ void RenderTarget::Resize(Vec2 size) {
     width, height, TexelType::ARGB16F, nullptr, false, false);
   mSecondaryFramebuffer = 
     OpenGL->CreateFrameBuffer(0, mSecondaryTexture->mHandle, 0, false);
+
+  /// Create square framebuffer, no MSAA
+  mSquareDepthTexture = TheResourceManager->CreateGPUTexture(
+    SquareBufferSize, SquareBufferSize, TexelType::DEPTH32F, nullptr, false, false);
+  mSquareTexture1 = TheResourceManager->CreateGPUTexture(
+    SquareBufferSize, SquareBufferSize, TexelType::ARGB16F, nullptr, false, false);
+  mSquareTexture2 = TheResourceManager->CreateGPUTexture(
+    SquareBufferSize, SquareBufferSize, TexelType::ARGB16F, nullptr, false, false);
+  mSquareFramebuffer = OpenGL->CreateFrameBuffer(mSquareDepthTexture->mHandle, 
+    mSquareTexture1->mHandle, mSquareTexture2->mHandle, false);
 
   /// Create shadow map
   if (mShadowBufferId == 0) {

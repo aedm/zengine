@@ -43,6 +43,9 @@ using namespace std;
   ITEM(PPDofFocusDistance,            FLOAT) \
   ITEM(PPDofBlur,                     FLOAT) \
   ITEM(DirectToScreen,                FLOAT) \
+  ITEM(DirectToSquare,                FLOAT) \
+  ITEM(SquareTexture1,                TEXTURE) \
+  ITEM(SquareTexture2,                TEXTURE) \
 
 
 enum class ShaderGlobalType {

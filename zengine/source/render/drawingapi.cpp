@@ -867,7 +867,8 @@ void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle 
 FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
                                            TextureHandle targetBufferA,
                                            TextureHandle targetBufferB,
-                                           bool isMultiSample) {
+                                           bool isMultiSample) 
+{
   ASSERT(!PleaseNoNewResources);
   CheckGLError();
   GLuint bufferId;
@@ -892,8 +893,13 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
     glDrawBuffers(1, attachments);
     CheckGLError();
   } else {
-    SHOULD_NOT_HAPPEN;
-    GLuint attachments[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    CheckGLError();
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
+      targetBufferA, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, target,
+      targetBufferB, 0);
+    GLuint attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    CheckGLError();
     glDrawBuffers(2, attachments);
     CheckGLError();
   }
@@ -901,7 +907,6 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
 
   if (targetBufferA) {
     NamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
-    NamedFramebufferDrawBuffer(bufferId, GL_COLOR_ATTACHMENT0);
   }
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

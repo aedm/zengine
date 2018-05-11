@@ -131,7 +131,7 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
     shaderStage->mStubMap[root] = make_shared<StubReference>(returnType);
 
     for (auto slotPair : stubNode->mParameterSlotMap) {
-      shared_ptr<Node> node = slotPair.second->GetDirectNode();
+      shared_ptr<Node> node = slotPair.second->GetReferencedNode();
       if (node == nullptr) {
         WARN("Incomplete shader graph.");
         throw exception();

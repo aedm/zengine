@@ -12,122 +12,53 @@
 
 :output vec4 FragColor
 
-#define DOF_LEVELS 8
-
-//float 
-
 SHADER
 { 
-  // Sum of color and number of samples for each level
-  vec3 backColors[DOF_LEVELS], frontColors[DOF_LEVELS];
-  float backSampleCount[DOF_LEVELS], frontSampleCount[DOF_LEVELS];
-  float backSampleTotal[DOF_LEVELS], frontSampleTotal[DOF_LEVELS];
-  for (int i=0; i<DOF_LEVELS; i++) {
-	backColors[i] = vec3(0, 0, 0);
-	frontColors[i] = vec3(0, 0, 0);
-	backSampleCount[i] = 0;
-	frontSampleCount[i] = 0;
-	backSampleTotal[i] = 0;
-	frontSampleTotal[i] = 0;
-  }
-  
   vec2 gbufferSize = textureSize(gGBufferSourceA);           
   int gbufferSampleCount = int(gGBufferSampleCount);
   
-  // Random rotation
-  float rand = Noise(gl_FragCoord.xy + vec2(10.2341234, 0.934367) * gl_FragCoord.z) * 10 + gTime * 1.0;
+  float rand = Noise(gl_FragCoord.xy + vec2(10.2341234, 0.934367) * gl_FragCoord.z * gl_SampleID) * 100 + gTime;
   float sinrand = sin(rand);
   float cosrand = cos(rand);
   mat2 rotrand = mat2(cosrand, sinrand, sinrand, -cosrand);
 
+
+  float fragmentDepth = texelFetch(gDepthBufferSource, ivec2(gbufferSize * vTexCoord), gl_SampleID).z;
+  
   vec4 zProject = (vec4(0, 0, -gPPDofFocusDistance, 1) * gProjection);
   float focusDepth = zProject.z / zProject.w;
 
-  //float blurFactor = abs(focusDepth - fragmentDepth) * gPPDofBlur * 10;
-  vec2 blurUVCorrect = vec2(gPPDofBlur) / gbufferSize;
+  //FragColor = vec4(1.0 - abs(focusDepth - fragmentDepth)* 400, 0, 0, 1); return;
   
-  const float K = 1000.02 * gPPDofBlur;
-  const float J = 200.1;
-  const float d0 = 0.5 / J;
-  bool hasInFocus = false;
-  vec3 focusColor; 
-
   vec3 color = vec3(0, 0, 0);
-  vec3 backColor = vec3(0, 0, 0);
-  int bcCount = 0;
+  float sampleCount = 0;
 
-  int pointCount = min(100, poissonCount);
+  float blurFactor = abs(focusDepth - fragmentDepth) * gPPDofBlur * 10;
+  vec2 blurUVCorrect = vec2(blurFactor) / gbufferSize;
+  
+  int pointCount = min(10, poissonCount);
   for (int poissonIndex = 0; poissonIndex < pointCount; poissonIndex++) {
     vec3 poissonPoint = poissonDisk[poissonIndex];
 	vec2 pVec = poissonPoint.xy * rotrand;
     vec2 uv = vTexCoord + pVec * blurUVCorrect;
     ivec2 coord = ivec2(gbufferSize * uv);
     
-	float sampleDepth = texelFetch(gDepthBufferSource, coord, gl_SampleID).z;
-	
-	float d = sampleDepth - focusDepth;
-	int l = clamp(int(d * J), -DOF_LEVELS+1, DOF_LEVELS-1);
-
-	
-	// Detect point in focus
-	if (l == 0) {
-	  if (poissonIndex > 0) continue;
-	  // in focus
-	  hasInFocus = true;
-  	  focusColor = texelFetch(gGBufferSourceA, coord, gl_SampleID).rgb;
-	  continue;
-	}
-
-	// Calculate distance level	
-	if (sampleDepth < focusDepth) {
-	  // in front of focus
+	  float sampleDepth = texelFetch(gDepthBufferSource, coord, gl_SampleID).z;
+	  if (sampleDepth >= 1.0) continue;
 	  
-	}
-	else { 
-	  // behind focus
-      if (hasInFocus) continue;
-	  float r = K * (d - d0);
+	  color += texelFetch(gGBufferSourceA, coord, gl_SampleID).rgb;	
 	  
-	  if (r < poissonPoint.z) continue;
-	  vec3 c = texelFetch(gGBufferSourceA, coord, gl_SampleID).rgb;
-	  backColor += c;
-	  bcCount += 1;
-	  
-	  //color = vec3(0.5 + l * 0.1, 0, 0);
-	  
-	  float ds = poissonPoint.z / K + d0;
-  	  int ls = clamp(int(ds * J), 0, l);
-
-	  float dl = (2*float(l)+1) / (2*J);
-	  float rl = (dl - d0) * K;
-	  float a = 1- r / rl;
-	  backSampleTotal[ls] += a;
-	  backColors[l] += a * c;
-	  backSampleCount[l] += 1;
-    }
+	  //float inFocus = abs(sampleDepth - focusDepth);
+	  //float radius = gPPDofBlur * inFocus * 100;
+	  //float bokehArea = radius * radius;
+	  //if (bokehArea >= radiusSquared) {
+	    //float contrib = exp(-1000.1 * inFocus) / gGBufferSampleCount;
+		//color += texelFetch(gGBufferSourceA, coord, i).rgb * contrib;	
+		//sampleCount += offFocus;	
+	  //}
   }
-
-  if (!hasInFocus) {
-    for (int i=1; i<DOF_LEVELS; i++) {
-	  backSampleTotal[i] += backSampleTotal[i-1];
-	  //backColors[i] += backColors[i-1];
-	  //backSampleCount[i] += backSampleCount[i-1];
-	}
-
-    // Blur back color
-    for (int i=DOF_LEVELS-1; i>=0; i--) {
-	  float bst = backSampleTotal[i];
-	  float bsc = backSampleCount[i];
-	  if (bst == 0 || bsc == 0) continue;
-	  float alpha = float(bsc) / float(bst);
-	  color += mix(color, backColors[i] / float(bsc), alpha);
-    }
-	
-	color = backColor / bcCount;
-  }
-  else {
-    color = focusColor;
-  }
-   
-  FragColor = vec4(color, 1);
+  
+  color = vec3((color / (float(pointCount))).rgb);
+  
+  FragColor = vec4(color.rgb, 1);
 }

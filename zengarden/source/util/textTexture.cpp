@@ -22,8 +22,9 @@ int NextDivisibleBy(int A)
 void TextTexture::SetText(const QString& Text, const QFont& Font)
 {
   /// Calculate image size for the text
+  QString text = Text == "" ? " " : Text;
   QFontMetrics fm(Font);
-  QRect rect = fm.boundingRect(Text);
+  QRect rect = fm.boundingRect(text);
   mTextSize = rect.size() + QSize(1, 1);
   mWidth = NextDivisibleBy<16>(mTextSize.width());
   mHeight = NextDivisibleBy<16>(mTextSize.height());
@@ -36,7 +37,7 @@ void TextTexture::SetText(const QString& Text, const QFont& Font)
   painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing);
   painter.setFont(Font);
   painter.setPen(Qt::white);
-  painter.drawText(0, 0, mWidth, mHeight, Qt::AlignTop | Qt::AlignLeft, Text);
+  painter.drawText(0, 0, mWidth, mHeight, Qt::AlignTop | Qt::AlignLeft, text);
   painter.end();
   mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
   mUptodate = false;

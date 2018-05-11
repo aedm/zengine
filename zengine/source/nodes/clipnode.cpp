@@ -9,6 +9,7 @@ static SharedString TrackNumberSlotName = make_shared<string>("Track");
 static SharedString ClearColorBufferSlotName = make_shared<string>("Clear color buffer");
 static SharedString ClearDepthBufferSlotName = make_shared<string>("Clear depth buffer");
 static SharedString CopyToSecondaryBufferSlotName = make_shared<string>("Copy to secondary buffer");
+static SharedString TargetSquareBufferSlotName = make_shared<string>("Target square buffer");
 static SharedString ApplyPostprocessBeforeSlotName = make_shared<string>("After postprocess");
 
 ClipNode::ClipNode()
@@ -19,6 +20,7 @@ ClipNode::ClipNode()
   , mClearColorBuffer(this, ClearColorBufferSlotName)
   , mClearDepthBuffer(this, ClearDepthBufferSlotName)
   , mCopyToSecondaryBuffer(this, CopyToSecondaryBufferSlotName)
+  , mTargetSquareBuffer(this, TargetSquareBufferSlotName)
   , mApplyPostprocessBefore(this, ApplyPostprocessBeforeSlotName)
 {}
 
@@ -30,16 +32,21 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   if (mCopyToSecondaryBuffer.Get() >= 0.5f) {
     int width = int(globals->RenderTargetSize.x);
     int height = int(globals->RenderTargetSize.y);
-    OpenGL->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer, 
+    OpenGL->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer,
       0, 0, width, height, 0, 0, width, height);
     OpenGL->SetFrameBuffer(renderTarget->mSecondaryFramebuffer);
     OpenGL->SetFrameBuffer(renderTarget->mGBufferId);
   }
-  
+
   bool clearColor = mClearColorBuffer.Get() >= 0.5f;
   bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
+
   if (clearDepth || clearColor) {
-    if (globals->DirectToScreen >= 0.5f) {
+    globals->DirectToSquare = mTargetSquareBuffer.Get();
+    if (globals->DirectToSquare >= 0.5f) {
+      renderTarget->SetSquareBufferAsTarget(globals);
+    }
+    else if (globals->DirectToScreen >= 0.5f) {
       renderTarget->SetColorBufferAsTarget(globals);
     }
     else {
@@ -57,11 +64,11 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
 
 void ClipNode::HandleMessage(Message* message) {
   switch (message->mType) {
-    case MessageType::VALUE_CHANGED:
-      SendMsg(MessageType::VALUE_CHANGED);
-      break;
-    case MessageType::SCENE_TIME_EDITED:
-      SendMsg(MessageType::SCENE_TIME_EDITED);
-    default: break;
+  case MessageType::VALUE_CHANGED:
+    SendMsg(MessageType::VALUE_CHANGED);
+    break;
+  case MessageType::SCENE_TIME_EDITED:
+    SendMsg(MessageType::SCENE_TIME_EDITED);
+  default: break;
   }
 }

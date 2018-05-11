@@ -16,6 +16,7 @@ public:
   FloatSlot mClearColorBuffer;
   FloatSlot mClearDepthBuffer;
   FloatSlot mCopyToSecondaryBuffer;
+  FloatSlot mTargetSquareBuffer;
 
   FloatSlot mApplyPostprocessBefore;
 

@@ -109,11 +109,25 @@ Vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
 
 void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
   int id = value["id"].GetInt();
-  auto& node = mNodes.at(id);
+  shared_ptr<Node> node = mNodes.at(id);
   const auto& slots = node->GetSerializableSlots();
 
   if (value.HasMember("slots")) {
     rapidjson::Value& jsonSlots = value["slots"];
+
+    if (IsPointerOf<Ghost>(node)) {
+      /// Connect original node first
+      if (jsonSlots.HasMember("Original")) {
+        const rapidjson::Value& jsonSlot = jsonSlots["Original"];
+        if (jsonSlot.HasMember("connect")) {
+          const rapidjson::Value& jsonConnect = jsonSlot["connect"];
+          int connId = jsonConnect.GetInt();
+          shared_ptr<Node> connNode = mNodes.at(connId);
+          PointerCast<Ghost>(node)->mOriginalNode.Connect(connNode);
+        }
+      }
+    }
+
     for (rapidjson::Value::ConstMemberIterator itr = jsonSlots.MemberBegin();
       itr != jsonSlots.MemberEnd(); ++itr) {
       const rapidjson::Value& jsonSlot = itr->value;
@@ -143,13 +157,13 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         if (jsonConnect.IsArray()) {
           for (UINT i = 0; i < jsonConnect.Size(); i++) {
             int connId = jsonConnect[i].GetInt();
-            auto& connNode = mNodes.at(connId);
+            shared_ptr<Node> connNode = mNodes.at(connId);
             slot->Connect(connNode);
           }
         }
         else {
           int connId = jsonConnect.GetInt();
-          auto& connNode = mNodes.at(connId);
+          shared_ptr<Node> connNode = mNodes.at(connId);
           slot->Connect(connNode);
         }
       }

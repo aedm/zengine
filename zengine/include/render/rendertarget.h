@@ -14,6 +14,7 @@ public:
   /// Sets the final color buffer as render target, G-Buffer as source
   void SetColorBufferAsTarget(Globals* globals);
   void SetShadowBufferAsTarget(Globals* globals);
+  void SetSquareBufferAsTarget(Globals* globals);
 
   void Resize(Vec2 size);
   Vec2 GetSize();
@@ -37,6 +38,12 @@ public:
   /// Secondary texture. For some fx.
   FrameBufferId mSecondaryFramebuffer = 0;
   Texture* mSecondaryTexture = nullptr;
+
+  /// Square target textures. For some fx.
+  FrameBufferId mSquareFramebuffer = 0;
+  Texture* mSquareDepthTexture = nullptr;
+  Texture* mSquareTexture1 = nullptr;
+  Texture* mSquareTexture2 = nullptr;
 
   /// Final color buffer (framebuffer or texture)
   /// Default framebuffer id is 0

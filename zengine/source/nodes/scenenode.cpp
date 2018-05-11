@@ -24,7 +24,7 @@ SceneNode::SceneNode()
   , mSkyLightSpread(this, SkylightSpreadSlotName, false, true, true, 0.0f, 30.0f)
   , mSkyLightSampleSpread(this, SkylightSampleSpreadSlotName, false, true, true, 0.0f, 20.0f)
   , mSceneTimes(this, nullptr, true, false, false, false)
-  , mDOFEnabled(this, DOFEnabledSlotName) 
+  , mDOFEnabled(this, DOFEnabledSlotName)
   , mDOFFocusDistance(this, DOFFocusDistanceSlotName, false, true, true, 0.0f, 100.0f)
   , mDOFBlur(this, DOFBlurSlotName, false, true, true, 0.0f, 30.0f)
 {
@@ -44,6 +44,7 @@ SceneNode::~SceneNode() {
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   bool directToScreen = globals->DirectToScreen > 0.5f;
+  bool directToSquare = globals->DirectToSquare > 0.5f;
 
   /// Get camera
   auto& camera = mCamera.GetNode();
@@ -52,7 +53,6 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   /// Pass #1: skylight shadow
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
-
   Vec3 s = mShadowMapSize.Get();
   Vec3 lightDir = mSkyLightDirection.Get().Normal();
 
@@ -76,9 +76,13 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   RenderDrawables(globals, PassType::SHADOW);
 
   /// Pass #2: draw to G-Buffer / screen
-  if (directToScreen) {
+  if (directToSquare) {
+    renderTarget->SetSquareBufferAsTarget(globals);
+  }
+  else if (directToScreen) {
     renderTarget->SetColorBufferAsTarget(globals);
-  } else {
+  }
+  else {
     renderTarget->SetGBufferAsTarget(globals);
   }
   //OpenGL->Clear(true, true, 0x303030);
@@ -87,7 +91,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   RenderDrawables(globals, PassType::SOLID);
 
   /// Hack: set DOF settings
-  if (!directToScreen) {
+  if (!directToSquare && !directToScreen) {
     globals->PPDofEnabled = mDOFEnabled.Get();
     globals->PPDofFocusDistance = mDOFFocusDistance.Get();
     globals->PPDofBlur = mDOFBlur.Get();
@@ -107,26 +111,26 @@ void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
 
 void SceneNode::HandleMessage(Message* message) {
   switch (message->mType) {
-    case MessageType::TRANSITIVE_CLOSURE_CHANGED:
-      mIsUpToDate = false;
-      break;
-    case MessageType::VALUE_CHANGED:
-    case MessageType::SLOT_CONNECTION_CHANGED:
-      EnqueueMessage(MessageType::NEEDS_REDRAW);
-      break;
-    case MessageType::SCENE_TIME_EDITED:
-    {
-      auto source = PointerCast<SceneTimeNode>(message->mSource);
-      mSceneTime = source->Get();
-      for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
-        if (node != source) {
-          PointerCast<SceneTimeNode>(node)->Set(mSceneTime);
-        }
+  case MessageType::TRANSITIVE_CLOSURE_CHANGED:
+    mIsUpToDate = false;
+    break;
+  case MessageType::VALUE_CHANGED:
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    EnqueueMessage(MessageType::NEEDS_REDRAW);
+    break;
+  case MessageType::SCENE_TIME_EDITED:
+  {
+    auto source = PointerCast<SceneTimeNode>(message->mSource);
+    mSceneTime = source->Get();
+    for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
+      if (node != source) {
+        PointerCast<SceneTimeNode>(node)->Set(mSceneTime);
       }
-      SendMsg(MessageType::SCENE_TIME_EDITED);
-      break;
     }
-    default: break;
+    SendMsg(MessageType::SCENE_TIME_EDITED);
+    break;
+  }
+  default: break;
   }
 }
 

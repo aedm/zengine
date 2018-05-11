@@ -13,7 +13,7 @@ using namespace std;
 
 const wstring EngineFolder = L"engine/main/";
 const wstring ShaderExtension = L".shader";
-#define FULLSCREEN
+//#define FULLSCREEN
 
 /// HACK HACK HACK
 void hack() {
@@ -33,6 +33,7 @@ void hack() {
   FORCE(MovieNode);
   FORCE(ClipNode);
   FORCE(PropertiesNode);
+  FORCE(HalfCubeMeshNode);
 }
 
 
@@ -166,7 +167,7 @@ int CALLBACK WinMain(
     loading->mMovie.GetNode()->Draw(renderTarget, 0);
     wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
   }
-  Sleep(3000);
+  //Sleep(3000);
   //glClearColor(0, 1, 0, 1);
   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   //wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
@@ -178,12 +179,14 @@ int CALLBACK WinMain(
   delete json;
 
   /// Compile shaders, upload resources
-  vector<shared_ptr<Node>> nodes;
-  doc->GenerateTransitiveClosure(nodes, false);
-  for (const auto& node : nodes) node->Update();
+  for (int i = 0; i < 20; i++) {
+    vector<shared_ptr<Node>> nodes;
+    doc->GenerateTransitiveClosure(nodes, true);
+    for (const auto& node : nodes) node->Update();
+  }
 
   /// No more OpenGL resources should be allocated after this point
-  PleaseNoNewResources = true;
+  //PleaseNoNewResources = true;
 
   /// Calculate demo length
   shared_ptr<MovieNode> movieNode = doc->mMovie.GetNode();
