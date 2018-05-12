@@ -20,6 +20,26 @@ protected:
   Vec3 mValue;
 };
 
+class FloatsToVec4Node : public ValueNode<ValueType::VEC4> {
+public:
+  FloatsToVec4Node();
+
+  FloatSlot mX;
+  FloatSlot mY;
+  FloatSlot mZ;
+  FloatSlot mW;
+
+  virtual const Vec4& Get() override;
+
+  virtual void HandleMessage(Message* message) override;
+
+protected:
+  virtual void Operate() override;
+
+  Vec4 mValue;
+};
+
+
 class FloatToFloatNode : public ValueNode<ValueType::FLOAT> {
 public:
   FloatToFloatNode();

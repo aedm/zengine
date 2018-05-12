@@ -21,6 +21,7 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<Vec3Node>());
   AddPrototype(registry->GetNodeClass<Vec4Node>());
   AddPrototype(registry->GetNodeClass<FloatsToVec3Node>());
+  AddPrototype(registry->GetNodeClass<FloatsToVec4Node>());
   AddPrototype(registry->GetNodeClass<FloatToFloatNode>());
   AddPrototype(registry->GetNodeClass<MaddNode>());
   AddPrototype(registry->GetNodeClass<Pass>());

@@ -13,7 +13,7 @@ using namespace std;
 
 const wstring EngineFolder = L"engine/main/";
 const wstring ShaderExtension = L".shader";
-//#define FULLSCREEN
+#define FULLSCREEN
 
 /// HACK HACK HACK
 void hack() {
@@ -25,6 +25,7 @@ void hack() {
   FORCE(Pass);
   FORCE(StubNode);
   FORCE(FloatsToVec3Node);
+  FORCE(FloatsToVec4Node);
   FORCE(StaticMeshNode);
   FORCE(GlobalTimeNode);
   FORCE(SceneTimeNode);
