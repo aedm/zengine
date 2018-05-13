@@ -125,6 +125,7 @@
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\resourcemanager.h" />
     <ClInclude Include="include\resources\texture.h" />
+    <ClInclude Include="include\serialize\lodepng.h" />
     <ClInclude Include="include\shaders\engineshaders.h" />
     <ClInclude Include="include\shaders\enginestubs.h" />
     <ClInclude Include="include\shaders\material.h" />
@@ -176,6 +177,7 @@
     </ClCompile>
     <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
     <ClCompile Include="source\serialize\json\jsonserializer.cpp" />
+    <ClCompile Include="source\serialize\lodepng.cpp" />
     <ClCompile Include="source\shaders\engineshaders.cpp" />
     <ClCompile Include="source\shaders\enginestubs.cpp" />
     <ClCompile Include="source\shaders\material.cpp" />

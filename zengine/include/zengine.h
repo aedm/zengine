@@ -36,6 +36,8 @@
 #include "nodes/cameranode.h"
 #include "nodes/meshgenerators.h"
 
+#include "serialize/lodepng.h"
+
 /// Inits Zengine. Returns true if everything went okay.
 bool InitZengine();
 

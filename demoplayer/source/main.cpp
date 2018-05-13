@@ -8,12 +8,13 @@
 #include <zengine.h>
 #include <bass/bass.h>
 #include <vector>
+#include <shellapi.h>
 
 using namespace std;
 
 const wstring EngineFolder = L"engine/main/";
 const wstring ShaderExtension = L".shader";
-#define FULLSCREEN
+//#define FULLSCREEN
 
 /// HACK HACK HACK
 void hack() {
@@ -40,17 +41,17 @@ void hack() {
 
 static PIXELFORMATDESCRIPTOR pfd = {
   sizeof(PIXELFORMATDESCRIPTOR),
-  1, PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER, 
-  PFD_TYPE_RGBA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+  1, PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+  PFD_TYPE_RGBA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   32, 0, 0, PFD_MAIN_PLANE, 0, 0, 0, 0
 };
 
 bool running = true;
 LRESULT CALLBACK gdi01_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   switch (uMsg) {
-    case WM_DESTROY:
-      running = false;
-      break;
+  case WM_DESTROY:
+    running = false;
+    break;
   }
   return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -68,11 +69,12 @@ void LoadEngineShaderFolder(const wstring& folder) {
   for (wstring& fileName : engineStubSourceFiles) {
     if (fileName[fileName.length() - 1] == L'.') continue;
     if (wstring(fileName.end() - 7, fileName.end()) == ShaderExtension) {
-      string stubName(fileName.begin() + EngineFolder.length(), 
-                      fileName.end() - ShaderExtension.length());
+      string stubName(fileName.begin() + EngineFolder.length(),
+        fileName.end() - ShaderExtension.length());
       string source(System::ReadFile(fileName.c_str()));
       TheEngineStubs->SetStubSource(stubName, source);;
-    } else {
+    }
+    else {
       LoadEngineShaderFolder((fileName + L"/").c_str());
     }
   }
@@ -94,60 +96,57 @@ int CALLBACK WinMain(
 ) {
   TheLogger->onLog += Log;
 
-  WNDCLASS wc = { 0, gdi01_WindowProc, 0, 0, hInstance, LoadIcon(NULL, IDI_APPLICATION), 
+  /// Check the command line
+  LPWSTR *args;
+  int argsCount;
+  args = CommandLineToArgvW(GetCommandLineW(), &argsCount);
+  bool recordVideo = argsCount == 2 && wcscmp(args[1], L"--video") == 0;
+  bool windowed = argsCount == 2 && wcscmp(args[1], L"--window") == 0;
+  LocalFree(args);
+
+  WNDCLASS wc = { 0, gdi01_WindowProc, 0, 0, hInstance, LoadIcon(NULL, IDI_APPLICATION),
     LoadCursor(NULL, IDC_ARROW), (HBRUSH)(COLOR_WINDOW + 1), NULL, L"GDI01" };
   RegisterClass(&wc);
 
-#ifdef FULLSCREEN
-  int windowWidth = GetSystemMetrics(SM_CXSCREEN);
-  int windowHeight = GetSystemMetrics(SM_CYSCREEN);
-  //static DEVMODEW dmScreenSettings = {
-  //  L"", 0, 0, sizeof(dmScreenSettings), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-  //  L"", 0, 0, DWORD(-1), DWORD(-1), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-  //};
-  //ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
-  //HWND hwnd = CreateWindowW(L"edit", 0, WS_POPUP | WS_VISIBLE | WS_MAXIMIZE, 
-  //  0, 0, 0, 0, 0, 0, 0, 0);
-  //HDC hDC = GetDC(hwnd);
-  //ShowCursor(FALSE);
-  //UpdateWindow(hwnd);
-
-  auto hwnd = CreateWindowW(L"static", NULL, WS_POPUP | WS_VISIBLE, 0, 0, 
-    windowWidth, windowHeight, NULL, NULL, NULL, 0);
-  auto hDC = GetDC(hwnd);
-  SetPixelFormat(hDC, ChoosePixelFormat(hDC, &pfd), &pfd);
-  wglMakeCurrent(hDC, wglCreateContext(hDC));
-  ShowCursor(FALSE);
-#else 
-  int windowWidth = 1280;
-  int windowHeight = 720;
-
-  HWND hwnd = CreateWindowEx(
-    0,
-    L"GDI01",
-    L"teszkos demo",
-    WS_OVERLAPPEDWINDOW,
-    CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
-    HWND_DESKTOP, NULL, hInstance, NULL);
-  HDC hDC = GetDC(hwnd);
-  ShowWindow(hwnd, nCmdShow);
-  UpdateWindow(hwnd);
-
-  SetPixelFormat(hDC, ChoosePixelFormat(hDC, &pfd), &pfd);
-  wglMakeCurrent(hDC, wglCreateContext(hDC));
-#endif 
-
-  DWORD chan;
-  QWORD pos;
-  BASS_DEVICEINFO di;
-  for (int a = 1; BASS_GetDeviceInfo(a, &di); a++) {
-    if (di.flags&BASS_DEVICE_ENABLED) // enabled output device
-      INFO("dev %d: %s\n", a, di.name);
+  int windowWidth = 1280, windowHeight = 720;
+  if (!windowed) {
+    windowWidth = GetSystemMetrics(SM_CXSCREEN);
+    windowHeight = GetSystemMetrics(SM_CYSCREEN);
   }
 
-  if (!BASS_Init(1, 44100, 0, 0, NULL)) ERR("Can't initialize BASS");
-  chan = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_AUTOFREE);
-  pos = BASS_ChannelGetLength(chan, BASS_POS_BYTE);
+  /// Create window
+  HWND hwnd = 0;
+  if (windowed || recordVideo) {
+    hwnd = CreateWindowEx(0, L"GDI01", L"teszkos demo", WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
+      HWND_DESKTOP, NULL, hInstance, NULL);
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
+  }
+  else {
+    hwnd = CreateWindowW(L"static", NULL, WS_POPUP | WS_VISIBLE, 0, 0,
+      windowWidth, windowHeight, NULL, NULL, NULL, 0);
+    ShowCursor(FALSE);
+  }
+
+  /// Create device context
+  HDC hDC = GetDC(hwnd);
+  SetPixelFormat(hDC, ChoosePixelFormat(hDC, &pfd), &pfd);
+  wglMakeCurrent(hDC, wglCreateContext(hDC));
+
+  /// Initialize BASS
+  DWORD bassChannel = 0;
+  if (!recordVideo) {
+    QWORD pos;
+    BASS_DEVICEINFO di;
+    for (int a = 1; BASS_GetDeviceInfo(a, &di); a++) {
+      if (di.flags & BASS_DEVICE_ENABLED) // enabled output device
+        INFO("dev %d: %s\n", a, di.name);
+    }
+    if (!BASS_Init(1, 44100, 0, 0, NULL)) ERR("Can't initialize BASS");
+    bassChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_AUTOFREE);
+    pos = BASS_ChannelGetLength(bassChannel, BASS_POS_BYTE);
+  }
 
   /// Initialize Zengine
   InitZengine();
@@ -164,14 +163,8 @@ int CALLBACK WinMain(
   delete json;
 
   /// Show loading screen
-  for (int i = 0; i < 10; i++) {
-    loading->mMovie.GetNode()->Draw(renderTarget, 0);
-    wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
-  }
-  //Sleep(3000);
-  //glClearColor(0, 1, 0, 1);
-  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
+  loading->mMovie.GetNode()->Draw(renderTarget, 0);
+  wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
 
   /// Load demo file
   json = System::ReadFile(L"demo.zen");
@@ -180,11 +173,9 @@ int CALLBACK WinMain(
   delete json;
 
   /// Compile shaders, upload resources
-  for (int i = 0; i < 20; i++) {
-    vector<shared_ptr<Node>> nodes;
-    doc->GenerateTransitiveClosure(nodes, true);
-    for (const auto& node : nodes) node->Update();
-  }
+  vector<shared_ptr<Node>> nodes;
+  doc->GenerateTransitiveClosure(nodes, true);
+  for (const auto& node : nodes) node->Update();
 
   /// No more OpenGL resources should be allocated after this point
   //PleaseNoNewResources = true;
@@ -195,11 +186,17 @@ int CALLBACK WinMain(
   float beatsPerSecond = doc->mProperties.GetNode()->mBPM.Get() / 60.0f;;
 
   /// Start music
-  BASS_ChannelSetPosition(chan, BASS_ChannelSeconds2Bytes(chan, 0), BASS_POS_BYTE);
-  BASS_ChannelPlay(chan, FALSE);
+  if (!recordVideo) {
+    BASS_ChannelSetPosition(bassChannel, BASS_ChannelSeconds2Bytes(bassChannel, 0), BASS_POS_BYTE);
+    BASS_ChannelPlay(bassChannel, FALSE);
+  }
+
+  vector<unsigned char> pixels(windowWidth * windowHeight * 4);
+  vector<unsigned char> pixelsFlip(windowWidth * windowHeight * 4);
 
   /// Play demo
   DWORD startTime = timeGetTime();
+  UINT frameNumber = 0;
   while (running) {
     /// Handle Win32 events
     MSG msg;
@@ -211,16 +208,46 @@ int CALLBACK WinMain(
     if (GetAsyncKeyState(VK_ESCAPE)) break;
 
     /// Measure elapsed time
-    float time = beatsPerSecond * float(timeGetTime() - startTime) / 1000.0f;
+    float time;
+    if (recordVideo) {
+      // Record at 60fps
+      time = float(frameNumber) / 60.0f;
+    }
+    else {
+      time = beatsPerSecond * float(timeGetTime() - startTime) / 1000.0f;
+    }
     if (time > movieLength) break;
     GlobalTimeNode::OnTimeChanged(time);
 
     /// Render demo frame
     movieNode->Draw(renderTarget, time);
+
+    /// Save rendered image to file
+    if (recordVideo) {
+      /// Read framebuffer
+      glReadPixels(0, 0, windowWidth, windowHeight, GL_RGBA, GL_UNSIGNED_BYTE,
+        &pixels[0]);
+
+      /// Flip scanlines
+      for (int i = 0; i < windowHeight; i++) {
+        memcpy(&pixelsFlip[i*windowWidth * 4],
+          &pixels[(windowHeight - 1 - i)*windowWidth * 4], windowWidth * 4);
+      }
+
+      char filename[100];
+      sprintf(filename, "videodump-%08d.png", frameNumber);
+      lodepng::encode(string(filename), &pixelsFlip[0], windowWidth, windowHeight);
+    }
+
     wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
+    frameNumber++;
   };
 
   /// Köszön olvasó.
   CloseZengine();
-  BASS_Free();
+  if (!recordVideo) {
+    BASS_Free();
+  }
+
+  return 0;
 }

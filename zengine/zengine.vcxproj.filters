@@ -188,6 +188,7 @@
     </ClInclude>
     <ClInclude Include="include\nodes\texturenode.h" />
     <ClInclude Include="include\dom\ghost.h" />
+    <ClInclude Include="include\serialize\lodepng.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -298,6 +299,7 @@
       <Filter>source\shaders</Filter>
     </ClCompile>
     <ClCompile Include="source\dom\ghost.cpp" />
+    <ClCompile Include="source\serialize\lodepng.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">
