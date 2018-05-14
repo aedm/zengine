@@ -1,0 +1,71 @@
+#include <Windows.h>
+#include <gdiplus.h>
+#include <GdiPlusFlat.h>
+#pragma comment (lib,"Gdiplus.lib")
+#include "imagerecorder.h"
+
+using namespace Gdiplus;
+using namespace Gdiplus::DllExports;
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+  UINT num = 0;          // number of image encoders
+  UINT size = 0;         // size of the image encoder array in bytes
+
+  ImageCodecInfo* pImageCodecInfo = NULL;
+
+  GetImageEncodersSize(&num, &size);
+  if (size == 0)
+    return -1;  // Failure
+
+  pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+  if (pImageCodecInfo == NULL)
+    return -1;  // Failure
+
+  GetImageEncoders(num, size, pImageCodecInfo);
+
+  for (UINT j = 0; j < num; ++j) {
+    if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
+      *pClsid = pImageCodecInfo[j].Clsid;
+      free(pImageCodecInfo);
+      return j;  // Success
+    }
+  }
+
+  free(pImageCodecInfo);
+  return -1;  // Failure
+}
+
+ImageRecorder::ImageRecorder()
+{
+  GdiplusStartupInput gdiplusStartupInput;
+  ULONG_PTR gdiplusToken;
+  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+  GetEncoderClsid(L"image/jpeg", &mImageCLSID);
+}
+
+ImageRecorder::~ImageRecorder()
+{}
+
+void ImageRecorder::RecordImage(unsigned char* pixels, int width, int height, 
+  int frameNumber) 
+{
+  GpBitmap* pBitmap;
+  GdipCreateBitmapFromScan0(width, height, width * 4, PixelFormat32bppARGB, 
+    pixels, &pBitmap);
+
+  ULONG uQuality = 95;
+  EncoderParameters encoderParams;
+  encoderParams.Count = 1;
+  encoderParams.Parameter[0].NumberOfValues = 1;
+  encoderParams.Parameter[0].Guid = EncoderQuality;
+  encoderParams.Parameter[0].Type = EncoderParameterValueTypeLong;
+  encoderParams.Parameter[0].Value = &uQuality;
+
+  wchar_t filename[100];
+  wsprintf(filename, L"videodump-%08d.jpeg", frameNumber);
+
+  GdipSaveImageToFile(pBitmap, filename, &mImageCLSID, &encoderParams);
+  GdipDisposeImage(pBitmap);
+}

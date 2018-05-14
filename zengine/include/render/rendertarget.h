@@ -5,7 +5,7 @@
 
 class RenderTarget {
 public:
-  RenderTarget(Vec2 size);
+  RenderTarget(Vec2 size, bool forFrameGrabbing = false);
   ~RenderTarget();
 
   /// Sets the G-Buffer as render target
@@ -23,6 +23,7 @@ public:
   FrameBufferId GetPostprocessTargetFramebufferId();
   Texture* GetPostprocessSourceTexture();
   void SwapPostprocessBuffers();
+  void FinishFrame();
 
   /// G-buffer (MSAA)
   /// A: [4x16F] RGB: HDR final color, A: unused
@@ -49,19 +50,19 @@ public:
   /// Default framebuffer id is 0
   FrameBufferId mColorBufferId = 0;
 
-  /// A-buffer, holds OIT fragments
-  /// ARGB 16F: translucent emissive color (alpha blend)
-  /// RGB 16F: premultiplied light color (additive blend)
-  /// D24: fragment depth
-  /// R32: previous A-buffer link index
-  Texture* mABuffer = nullptr;
+  /// When color buffer texture is created for framegrabbing
+  Texture* mColorTexture = nullptr;
 
   /// Skylight shadow
   FrameBufferId mShadowBufferId = 0;
   Texture* mShadowTexture = nullptr;
 
+  Vec2 mSize = Vec2(0, 0);
 private:
-  Vec2 mSize;
+  /// Screen size, can be different than render target size when grabbing frames
+  Vec2 mScreenSize = Vec2(0, 0);
+
+  const Vec2 mFrameGrabberSize = Vec2(1920, 1080);
 
   void DropResources();
 
@@ -72,5 +73,5 @@ private:
   /// Current postprocess draw framebuffer index (the other one is the source)
   int mPostprocessTargetBufferIndex = 0;
 
-
+  const bool mForFrameGrabbing;
 };

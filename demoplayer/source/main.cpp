@@ -1,14 +1,19 @@
-#define WIN32_LEAN_AND_MEAN
-#define WIN32_EXTRA_LEAN
+//#define WIN32_LEAN_AND_MEAN
+//#define WIN32_EXTRA_LEAN
 #define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <Mmsystem.h>
 #include <time.h>
+
+#define GLEW_STATIC
+#include <glew/glew.h>
 #include <GL/gl.h>
+
 #include <zengine.h>
 #include <bass/bass.h>
 #include <vector>
 #include <shellapi.h>
+#include "imagerecorder.h"
 
 using namespace std;
 
@@ -88,6 +93,7 @@ void LoadEngineShaders() {
 }
 
 
+
 int CALLBACK WinMain(
   _In_ HINSTANCE hInstance,
   _In_ HINSTANCE hPrevInstance,
@@ -109,7 +115,7 @@ int CALLBACK WinMain(
   RegisterClass(&wc);
 
   int windowWidth = 1280, windowHeight = 720;
-  if (!windowed) {
+  if (!windowed && !recordVideo) {
     windowWidth = GetSystemMetrics(SM_CXSCREEN);
     windowHeight = GetSystemMetrics(SM_CYSCREEN);
   }
@@ -134,6 +140,9 @@ int CALLBACK WinMain(
   SetPixelFormat(hDC, ChoosePixelFormat(hDC, &pfd), &pfd);
   wglMakeCurrent(hDC, wglCreateContext(hDC));
 
+  /// Set up image recorder
+  ImageRecorder imageRecorder;
+
   /// Initialize BASS
   DWORD bassChannel = 0;
   if (!recordVideo) {
@@ -154,7 +163,7 @@ int CALLBACK WinMain(
 
   LoadEngineShaders();
   Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
-  RenderTarget* renderTarget = new RenderTarget(windowSize);
+  RenderTarget* renderTarget = new RenderTarget(windowSize, recordVideo);
 
   /// Load precalc project file
   char* json = System::ReadFile(L"loading.zen");
@@ -191,8 +200,10 @@ int CALLBACK WinMain(
     BASS_ChannelPlay(bassChannel, FALSE);
   }
 
-  vector<unsigned char> pixels(windowWidth * windowHeight * 4);
-  vector<unsigned char> pixelsFlip(windowWidth * windowHeight * 4);
+  int videoWidth = int(renderTarget->mSize.x);
+  int videoHeight = int(renderTarget->mSize.y);
+  vector<unsigned char> pixels(videoWidth * videoHeight * 4);
+  vector<unsigned char> pixelsFlip(videoWidth * videoHeight * 4);
 
   /// Play demo
   DWORD startTime = timeGetTime();
@@ -205,7 +216,7 @@ int CALLBACK WinMain(
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
-    if (GetAsyncKeyState(VK_ESCAPE)) break;
+    if (!recordVideo && GetAsyncKeyState(VK_ESCAPE)) break;
 
     /// Measure elapsed time
     float time;
@@ -221,22 +232,21 @@ int CALLBACK WinMain(
 
     /// Render demo frame
     movieNode->Draw(renderTarget, time);
+    renderTarget->FinishFrame();
 
     /// Save rendered image to file
     if (recordVideo) {
       /// Read framebuffer
-      glReadPixels(0, 0, windowWidth, windowHeight, GL_RGBA, GL_UNSIGNED_BYTE,
-        &pixels[0]);
+      glGetTextureImage(renderTarget->mColorTexture->mHandle, 0,
+        GL_BGRA, GL_UNSIGNED_BYTE, videoHeight * videoWidth * 4, &pixels[0]);
 
       /// Flip scanlines
-      for (int i = 0; i < windowHeight; i++) {
-        memcpy(&pixelsFlip[i*windowWidth * 4],
-          &pixels[(windowHeight - 1 - i)*windowWidth * 4], windowWidth * 4);
+      for (int i = 0; i < videoHeight; i++) {
+        memcpy(&pixelsFlip[i*videoWidth * 4],
+          &pixels[(videoHeight - 1 - i)*videoWidth * 4], videoWidth * 4);
       }
 
-      char filename[100];
-      sprintf(filename, "videodump-%08d.png", frameNumber);
-      lodepng::encode(string(filename), &pixelsFlip[0], windowWidth, windowHeight);
+      imageRecorder.RecordImage(&pixelsFlip[0], videoWidth, videoHeight, frameNumber);
     }
 
     wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
