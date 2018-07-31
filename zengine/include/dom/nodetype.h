@@ -55,22 +55,6 @@ struct NodeClass {
 };
 
 
-/// Use this in .cpp files, not in headers!
-/// Registers a Node type in the engine. This makes the engine know about
-/// all the Node types that can be utilised, and it also enables serialization
-/// and deserialization of objects;
-#define REGISTER_NODECLASS(nodeClass, nodeClassName)                              \
-  struct NodeClass_##nodeClass: public NodeClass {                                \
-    NodeClass_##nodeClass() {                                                     \
-      mClassName = string(nodeClassName);                                         \
-      NodeRegistry::GetInstance()->Register<nodeClass>(this);                     \
-    }                                                                             \
-    virtual shared_ptr<Node> Manufacture() override {                             \
-      return make_shared<nodeClass>();                                            \
-    }                                                                             \
-  } NodeClassInstance_##nodeClass;                            \
-
-
 /// Poor man's reflection. This class keeps track of all possilbe Node classes.
 class NodeRegistry {
 public:
@@ -107,3 +91,19 @@ NodeClass* NodeRegistry::GetNodeClass() {
   return mNodeIndexMap.at(type_index(typeid(T)));
 }
 
+
+/// Use this in .cpp files, not in headers!
+/// Registers a Node type in the engine. This makes the engine know about
+/// all the Node types that can be utilised, and it also enables serialization
+/// and deserialization of objects;
+#define REGISTER_NODECLASS(nodeClass, nodeClassName)                               \
+  struct NodeClass_##nodeClass: public NodeClass {                                 \
+    NodeClass_##nodeClass() {                                                      \
+      mClassName = string(nodeClassName);                                          \
+      NodeRegistry::GetInstance()->Register<nodeClass>(this);					   \
+    }                                                                              \
+    virtual shared_ptr<Node> Manufacture() override {                              \
+      return make_shared<nodeClass>();                                             \
+    }                                                                              \
+  } NodeClassInstance_##nodeClass;                                                 \
+//__pragma(comment(linker, "/include:" #nodeClass));
