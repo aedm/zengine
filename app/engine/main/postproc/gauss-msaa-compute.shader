@@ -1,14 +1,13 @@
 #version 430
 
-:export int MAX_BLUR_RADIUS 8
-:import int IMAGE_SIZE
-:import int SAMPLE_COUNT
+#define MAX_BLUR_RADIUS 8
+#define SAMPLE_COUNT 4
 
 :global image2DMS gGBufferSourceA
 :global image2DMS gDepthBufferSource
 
-:input integer ScaleDown
-:input integer BlurRadius
+:input int ScaleDown
+:input int BlurRadius
 
 const float BlurKernel[MAX_BLUR_RADIUS][MAX_BLUR_RADIUS] = {
   { 1, 0, 0, 0, 0, 0, 0, 0 },
@@ -21,20 +20,26 @@ const float BlurKernel[MAX_BLUR_RADIUS][MAX_BLUR_RADIUS] = {
   { 0.15144468046442158, 0.14100450516459187, 0.11380723852605518, 0.07962779935118171, 0.04829670167193745, 0.025393827358369248, 0.011574354612399057, 0.004573233083254649 },
 };
 
-shared vec4 sourceColor[IMAGE_SIZE][SAMPLE_COUNT];
-shared float sourceDepth[IMAGE_SIZE][SAMPLE_COUNT];
+const int MaxPixelCount = gl_WorkGroupSize.x + 2 * MAX_BLUR_RADIUS;
 
-layout(local_size_x = IMAGE_SIZE) in;
+shared vec4 sourceColor[MaxPixelCount][SAMPLE_COUNT];
+shared float sourceDepth[MaxPixelCount][SAMPLE_COUNT];
 
-SHADER {
-	const int sampleCount = imageSamples(gDepthBufferSource);
-    
-  const uint x = gl_LocalInvocationID.x;
-  const uint y = gl_WorkGroupID.y;
+layout(local_size_x = 256) in;
+
+SHADER {    
+  const uint x = gl_GlobalInvocationID.x;
+  const uint y = gl_GlobalInvocationID.y;
   
   // Load from memory
-	vec4 color = imageLoad(gGBufferSourceA, ivec3(x, y, 0);
-
+  for (uint i=0; i<SAMPLE_COUNT; i++) {
+    sourceColor[x][i] = imageLoad(gGBufferSourceA, gl_GlobalInvocationID, i);
+  }  
+	
+  const int totalBlurRadius = BlurRadius * ScaleDown;
+  if (x < totalBlurRadius) {
+    
+  }
   
   // Wait for it
   memoryBarrierShared();
