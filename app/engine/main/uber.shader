@@ -1,8 +1,8 @@
 :name "UberShader"
 :returns void
 
-//const int poissonCount = 109;
-const int poissonCount = 8;
+const int poissonCount = 109;
+//const int poissonCount = 8;
 vec3 poissonDisk[109] = vec3[](
   vec3(0, 0, 0),
   vec3(0.22047275640740338, 2.0245790958599343, 2.0365482443858056),

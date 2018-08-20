@@ -23,7 +23,7 @@ SHADER
   int gbufferSampleCount = int(gGBufferSampleCount);
   
   // Random rotation
-  float rand = Noise(gl_FragCoord.xy + vec2(1.2341234, 10.934367 + gl_SampleID)) * gTime * 10.1 + gl_SampleID;
+  float rand = Noise(gl_FragCoord.xy + vec2(1.2341234, 10.934367 + gl_SampleID)) * gTime * 100.1 + gl_SampleID;
   float sinrand = sin(rand);
   float cosrand = cos(rand);
   mat2 rotrand = mat2(cosrand, sinrand, sinrand, -cosrand);
@@ -40,19 +40,23 @@ SHADER
   vec3 sumColor = vec3(0, 0, 0);
   float sumAlpha = 0;
   
-  for (int poissonIndex = 0; poissonIndex < poissonCount; poissonIndex++) {
+  int sampleCount = min(poissonCount, 100);
+  for (int poissonIndex = 0; poissonIndex < sampleCount; poissonIndex++) {
     vec3 poissonPoint = poissonDisk[poissonIndex];
 
     vec2 pVec = poissonPoint.xy * rotrand;
     vec2 uv = vTexCoord + pVec * blurUVCorrect;
+    
+    if (uv.x < 0 || uv.y < 0 || uv.x > 1 || uv.y > 1) continue;
+    
     ivec2 coord = ivec2(gbufferSize * uv);
   
     float sampleDepth = texelFetch(gDepthBufferSource, coord, gl_SampleID).z;
     if (sampleDepth >= maxDepth) continue;
 
     const float p = 0.2;
-    float coc = min(abs(sampleDepth - focusDepth) * 40, 1.0);
-    float cocAlpha = coc - poissonPoint.z * 0.04;
+    float coc = min(abs(sampleDepth - focusDepth) * 100, 1.0);
+    float cocAlpha = coc - poissonPoint.z * 0.08;
     
     if (cocAlpha <= 0.0) continue;
     float zAlpha = max((maxDepth - sampleDepth) / depthTolerance, 0);

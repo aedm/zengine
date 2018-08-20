@@ -620,7 +620,8 @@ void GraphWatcher::HandleDragEnterEvent(QDragEnterEvent* event) {
 
   QString fileName = urlList.at(0).toLocalFile();
   if (fileName.endsWith(".obj") || fileName.endsWith(".3ds") ||
-    fileName.endsWith(".png") || fileName.endsWith(".jpg")) {
+    fileName.endsWith(".png") || fileName.endsWith(".jpg") ||
+    fileName.endsWith(".fbx")) {
     event->acceptProposedAction();
   }
 }
@@ -634,7 +635,8 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
 
   QString fileName = urlList.at(0).toLocalFile();
   QFileInfo fileInfo(fileName);
-  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds") {
+  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds" || 
+    fileInfo.suffix() == "fbx") {
     Mesh* mesh = Util::LoadMesh(fileName);
     shared_ptr<MeshNode> node = StaticMeshNode::Create(mesh);
     node->SetName(fileInfo.fileName().toStdString());
