@@ -9,7 +9,7 @@ static SharedString ShadowPassSlotName = make_shared<string>("Shadow Pass");
 
 Material::Material()
   : mSolidPass(this, SolidPassSlotName)
-  , mShadowPass(this, ShadowPassSlotName) 
+  , mShadowPass(this, ShadowPassSlotName)
 {}
 
 
