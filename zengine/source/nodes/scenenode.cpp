@@ -13,6 +13,7 @@ static SharedString SkylightSampleSpreadSlotName = make_shared<string>("Sample s
 static SharedString DOFEnabledSlotName = make_shared<string>("DOF enabled");
 static SharedString DOFFocusDistanceSlotName = make_shared<string>("DOF focus distance");
 static SharedString DOFBlurSlotName = make_shared<string>("DOF blur");
+static SharedString ZPrepassDisabledSlotName = make_shared<string>("Disable Z prepass");
 
 SceneNode::SceneNode()
   : mDrawables(this, DrawablesSlotName, true)
@@ -27,6 +28,7 @@ SceneNode::SceneNode()
   , mDOFEnabled(this, DOFEnabledSlotName)
   , mDOFFocusDistance(this, DOFFocusDistanceSlotName, false, true, true, 0.0f, 100.0f)
   , mDOFBlur(this, DOFBlurSlotName, false, true, true, 0.0f, 30.0f)
+  , mZPrepassDisabled(this, ZPrepassDisabledSlotName)
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
@@ -75,7 +77,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->Time = mGlobalTimeNode->Get();
   RenderDrawables(globals, PassType::SHADOW);
 
-  /// Pass #2: draw to G-Buffer / screen
+  /// Set up render target
   if (directToSquare) {
     renderTarget->SetSquareBufferAsTarget(globals);
   }
@@ -85,7 +87,14 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   else {
     renderTarget->SetGBufferAsTarget(globals);
   }
-  //OpenGL->Clear(true, true, 0x303030);
+
+  /// Pass #2: Z prepass, using the shadow pass material
+  if (mZPrepassDisabled.Get() < 0.5) {
+    camera->SetupGlobals(globals);
+    RenderDrawables(globals, PassType::SHADOW);
+  }
+
+  /// Pass #3: draw to G-Buffer / screen
   camera->SetupGlobals(globals);
   globals->SkylightTexture = renderTarget->mShadowTexture;
   RenderDrawables(globals, PassType::SOLID);

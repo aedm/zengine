@@ -617,7 +617,10 @@ void OpenGLAPI::SetRenderState(const RenderState* state) {
 
 void OpenGLAPI::SetDepthTest(bool enable) {
   if (enable == DepthTestEnabledShadow) return;
-  if (enable) glEnable(GL_DEPTH_TEST);
+  if (enable) {
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+  }
   else glDisable(GL_DEPTH_TEST);
   DepthTestEnabledShadow = enable;
 }
