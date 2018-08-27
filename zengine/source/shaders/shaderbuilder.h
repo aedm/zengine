@@ -11,7 +11,6 @@ public:
 private:
   ShaderBuilder(const shared_ptr<StubNode>& vertexStub, 
     const shared_ptr<StubNode>& fragmentStub);
-  ~ShaderBuilder();
 
   shared_ptr<ShaderSource> MakeShaderSource();
 
