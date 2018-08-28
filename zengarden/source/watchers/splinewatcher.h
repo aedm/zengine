@@ -11,7 +11,6 @@ class SplineWidget;
 class FloatSplineWatcher: public WatcherUI {
 public:
   FloatSplineWatcher(const shared_ptr<Node>& node);
-  virtual ~FloatSplineWatcher();
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   

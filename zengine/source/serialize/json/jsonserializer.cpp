@@ -257,11 +257,13 @@ void JSONSerializer::SerializeFloatSplineNode(
   rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node)
 {
   for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT); layer++) {
-    SplineFloatComponent* component = node->GetComponent(SplineLayer(layer));
+    Spline<float>* component = layer == UINT(SplineLayer::BASE) ? 
+      &node->mBaseLayer : node->GetComponent(SplineLayer(layer));
+
     auto& points = component->GetPoints();
     rapidjson::Value pointArray(rapidjson::kArrayType);
     for (UINT i = 0; i < points.size(); i++) {
-      const SplinePoint& point = points[i];
+      const SplinePoint<float>& point = points[i];
       rapidjson::Value p(rapidjson::kObjectType);
       p.AddMember("time", point.mTime, *mAllocator);
       p.AddMember("value", point.mValue, *mAllocator);

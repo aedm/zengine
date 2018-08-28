@@ -258,7 +258,13 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
       auto& jsonPoint = jsonPoints[i];
       float time(jsonPoint["time"].GetDouble());
       float value(jsonPoint["value"].GetDouble());
-      int pIndex = node->AddPoint(layer, time, value);
+      int pIndex = 0;
+      if (l == UINT(SplineLayer::BASE)) {
+        pIndex = node->AddBasePoint(time, value);
+      }
+      else {
+        pIndex = node->AddLayerPoint(layer, time, value);
+      }
       node->SetAutotangent(layer, pIndex, jsonPoint["autotangent"].GetBool());
       node->SetBreakpoint(layer, pIndex, jsonPoint["breakpoint"].GetBool());
       node->SetLinear(layer, pIndex, jsonPoint["linear"].GetBool());

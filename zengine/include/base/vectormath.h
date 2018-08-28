@@ -40,6 +40,8 @@ public:
   Vec3();
   Vec3(float x, float y, float z);
 
+  static Vec3 From(float x);
+
   float x, y, z;
 
   Vec3 operator * (float f) const;

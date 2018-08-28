@@ -80,6 +80,10 @@ Vec3::Vec3(float x, float y, float z) {
   this->z = z;
 }
 
+Vec3 Vec3::From(float x) {
+  return Vec3(x, x, x);
+}
+
 float Vec3::Dot(const Vec3& op) const {
   return x * op.x + y * op.y + z * op.z;
 }

@@ -8,8 +8,6 @@ static const float DefaultPixelsPerValue = 30.0f;
 FloatSplineWatcher::FloatSplineWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node) {}
 
-FloatSplineWatcher::~FloatSplineWatcher() {}
-
 void FloatSplineWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
 
@@ -71,7 +69,13 @@ void FloatSplineWatcher::AddPoint(SplineLayer layer) {
   shared_ptr<FloatSplineNode> spline = GetSpline();
   float time = spline->mTimeSlot.Get();
   float value = spline->GetComponent(layer)->Get(time);
-  int index = spline->AddPoint(layer, time, value);
+  int index = -1;
+  if (layer == SplineLayer::BASE) {
+    index = spline->AddBasePoint(time, value);
+  }
+  else {
+    index = spline->AddLayerPoint(layer, time, value);
+  }
   mSelectedPointIndex = -1;
   SelectPoint(layer, index);
 }
@@ -106,7 +110,12 @@ void FloatSplineWatcher::HandleValueEdited() {
   if (ok) {
     shared_ptr<FloatSplineNode> spline = GetSpline();
     auto& point = spline->GetComponent(mSelectedLayer)->GetPoints()[mSelectedPointIndex];
-    spline->SetPointValue(mSelectedLayer, mSelectedPointIndex, point.mTime, f);
+    if (mSelectedLayer == SplineLayer::BASE) {
+      spline->SetBaseValue(mSelectedPointIndex, point.mTime, f);
+    }
+    else {
+      spline->SetLayerValue(mSelectedLayer, mSelectedPointIndex, point.mTime, f);
+    }
     mUI.valueLineEdit->clearFocus();
   }
 }
@@ -120,7 +129,12 @@ void FloatSplineWatcher::HandleTimeEdited() {
   if (ok) {
     shared_ptr<FloatSplineNode> spline = GetSpline();
     auto& point = spline->GetComponent(mSelectedLayer)->GetPoints()[mSelectedPointIndex];
-    spline->SetPointValue(mSelectedLayer, mSelectedPointIndex, f, point.mValue);
+    if (mSelectedLayer == SplineLayer::BASE) {
+      spline->SetBaseValue(mSelectedPointIndex, f, point.mValue);
+    }
+    else {
+      spline->SetLayerValue(mSelectedLayer, mSelectedPointIndex, f, point.mValue);
+    }
     mUI.timeLineEdit->clearFocus();
   }
 }
@@ -155,7 +169,12 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
       QPoint diff = event->pos() - mOriginalMousePos;
       Vec2 p = mOriginalPoint + GetStepsPerPixel().Dot(Vec2(diff.x(), diff.y()));
       shared_ptr<FloatSplineNode> spline = PointerCast<FloatSplineNode>(GetNode());
-      spline->SetPointValue(mHoveredLayer, mHoveredPointIndex, p.x, p.y);
+      if (mSelectedLayer == SplineLayer::BASE) {
+        spline->SetBaseValue(mHoveredPointIndex, p.x, p.y);
+      }
+      else {
+        spline->SetLayerValue(mHoveredLayer, mHoveredPointIndex, p.x, p.y);
+      }
       mSplineWidget->update();
       SelectPoint(mSelectedLayer, mSelectedPointIndex);
     }
@@ -172,7 +191,7 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
            layer++) {
         auto& points = spline->GetComponent(SplineLayer(layer))->GetPoints();
         for (int i = 0; i < points.size(); i++) {
-          const SplinePoint& p = points[i];
+          const SplinePoint<float>& p = points[i];
           QPointF pt = ToScreenCoord(p.mTime, p.mValue);
           if (abs(pt.x() - mouse.x()) <= 4.0f && abs(pt.y() - mouse.y()) <= 4.0f) {
             if (i != mHoveredPointIndex && layer != UINT(mHoveredLayer)) {
@@ -214,7 +233,8 @@ void FloatSplineWatcher::HandleMouseLeftDown(QMouseEvent* event) {
     mOriginalMousePos = event->pos();
 
     shared_ptr<FloatSplineNode> spline = GetSpline();
-    const SplinePoint& p =
+    const SplinePoint<float>& p = (mSelectedLayer == SplineLayer::BASE) ?
+      spline->mBaseLayer.GetPoints()[mHoveredPointIndex] :
       spline->GetComponent(mHoveredLayer)->GetPoints()[mHoveredPointIndex];
     mOriginalPoint = Vec2(p.mTime, p.mValue);
   } else {
@@ -276,7 +296,7 @@ void FloatSplineWatcher::UpdateTimeEdit() {
     mUI.timeLineEdit->setEnabled(false);
     return;
   }
-  const SplinePoint& p =
+  const SplinePoint<float>& p =
     GetSpline()->GetComponent(mSelectedLayer)->GetPoints()[mSelectedPointIndex];
   mUI.timeLineEdit->setEnabled(true);
   mUI.timeLineEdit->setText(QString::number(p.mTime, 'f'));
@@ -289,7 +309,7 @@ void FloatSplineWatcher::UpdateValueEdit() {
     mUI.valueLineEdit->setEnabled(false);
     return;
   }
-  const SplinePoint& p =
+  const SplinePoint<float>& p =
     GetSpline()->GetComponent(mSelectedLayer)->GetPoints()[mSelectedPointIndex];
   mUI.valueLineEdit->setEnabled(true);
   mUI.valueLineEdit->setText(QString::number(p.mValue, 'f'));
@@ -391,11 +411,10 @@ void FloatSplineWatcher::DrawSpline(QPaintEvent* ev) {
   for (UINT i = 0; i < sampleCount; i++) {
     float splineVal = spline->GetValue(t);
     float y = (splineVal - mLeftCenterPoint.y) * ppsy + heightHalf;
-    drawPoints[i * 2] = QPointF(float(i), y);
-    drawPoints[i * 2 + 1] = QPointF(float(i), y);
+    drawPoints[i] = QPointF(float(i), y);
     t += spp.x;
   }
-  painter.drawLines(drawPoints + 1, sampleCount - 1);
+  painter.drawPolyline(drawPoints, sampleCount);
 
   /// Draw spline components
   painter.setPen(QColor(210, 210, 210));
@@ -424,7 +443,7 @@ void FloatSplineWatcher::DrawSpline(QPaintEvent* ev) {
 void FloatSplineWatcher::DrawSplineComponentControl(
   QPainter& painter, SplineLayer layer) {
   shared_ptr<FloatSplineNode> spline = GetSpline();
-  SplineFloatComponent* component = spline->GetComponent(layer);
+  Spline<float>* component = spline->GetComponent(layer);
   float height = float(mSplineWidget->height());
   float width = float(mSplineWidget->width());
 
@@ -451,7 +470,7 @@ void FloatSplineWatcher::DrawSplineComponentControl(
                      ? QBrush(QColor(0, 255, 255))
                      : (i == mHoveredPointIndex && layer == mHoveredLayer)
                      ? QBrush(QColor(255, 255, 0)) : Qt::NoBrush);
-    const SplinePoint& point = points[i];
+    const SplinePoint<float>& point = points[i];
     QPointF p = ToScreenCoord(point.mTime, point.mValue);
     painter.drawRect(QRectF(p.x() - 4, p.y() - 4, 8, 8));
   }
