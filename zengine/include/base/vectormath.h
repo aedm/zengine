@@ -11,6 +11,7 @@ public:
 
   Vec2();
   Vec2(float x, float y);
+  Vec2(float x);
 
   Vec2 operator + (const Vec2& op) const;
   Vec2 operator - (const Vec2& op) const;
@@ -20,6 +21,7 @@ public:
   Vec2 operator / (float F) const;
 
   Vec2& operator *= (float F);
+  Vec2& operator /= (float f);
   Vec2& operator += (const Vec2& op);
   Vec2& operator -= (const Vec2& op);
 
@@ -39,9 +41,8 @@ public:
 
   Vec3();
   Vec3(float x, float y, float z);
-
-  static Vec3 From(float x);
-
+  Vec3(float x);
+  
   float x, y, z;
 
   Vec3 operator * (float f) const;
@@ -74,13 +75,19 @@ public:
 
   Vec4();
   Vec4(float x, float y, float z, float w);
+  Vec4(float x);
   Vec4(Vec3 v, float w);
 
   float x, y, z, w;
 
   float Dot(const Vec4& v) const;
+  Vec4 operator * (float f) const;
+  Vec4 operator / (float f) const;
+  Vec4 operator + (const Vec4& v) const;
   Vec4 operator - (const Vec4& v) const;
   Vec4 operator * (const Matrix& m) const;
+
+  Vec4& operator /= (float f);
 
   bool operator == (const Vec4& v) const;
   float& operator[] (int n);

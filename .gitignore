@@ -26,3 +26,6 @@ app/assimp-vc140-mt.dll
 app/zengarden-debug64.exe
 *.user
 demoplayer/app/demo-debug64.exe
+*.max
+*.fbx
+*.zenu

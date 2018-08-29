@@ -40,7 +40,9 @@ struct SplinePoint
 template <typename T>
 class Spline {
   friend class SplineNode<ValueType::FLOAT>;
+  friend class SplineNode<ValueType::VEC2>;
   friend class SplineNode<ValueType::VEC3>;
+  friend class SplineNode<ValueType::VEC4>;
 
 public:
   /// Returns the points of the spline
@@ -221,7 +223,10 @@ public:
   };
 
   /// Returns spline components value at a given time
-  VType GetValue(float time);
+  VType GetValue(float time) {
+    return mBaseLayer.Get(time) + 
+      VType(GetNoiseValue(time) + GetBeatSpikeValue(time) + GetBeatQuantizerValue(time));
+  };
 
   /// Noise component
   FloatSlot mNoiseEnabled;
@@ -387,4 +392,6 @@ protected:
 
 
 typedef SplineNode<ValueType::FLOAT> FloatSplineNode;
+typedef SplineNode<ValueType::VEC2> Vec2SplineNode;
 typedef SplineNode<ValueType::VEC3> Vec3SplineNode;
+typedef SplineNode<ValueType::VEC4> Vec4SplineNode;

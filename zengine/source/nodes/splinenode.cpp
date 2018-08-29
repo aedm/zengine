@@ -5,7 +5,9 @@
 #include <math.h>
 
 REGISTER_NODECLASS(FloatSplineNode, "Float Spline");
+REGISTER_NODECLASS(Vec2SplineNode, "Vec2 Spline");
 REGISTER_NODECLASS(Vec3SplineNode, "Vec3 Spline");
+REGISTER_NODECLASS(Vec4SplineNode, "Vec4 Spline");
 
 static SharedString TimeSlotName = make_shared<string>("Time");
 static SharedString PropertiesSlotName = make_shared<string>("Properties");
@@ -16,9 +18,9 @@ static SharedString BeatSpikeLengthSlotName = make_shared<string>("Beat spike le
 static SharedString BeatSpikeEasingSlotName = make_shared<string>("Beat spike easing");
 static SharedString BeatQuantizerFrequencySlotName = make_shared<string>("Quantizer freq");
 
-template <>
-SplineNode<ValueType::FLOAT>::SplineNode()
-  : ValueNode<ValueType::FLOAT>()
+template <ValueType T>
+SplineNode<T>::SplineNode()
+  : ValueNode<T>()
   , mTimeSlot(this, TimeSlotName, false, false, false)
   , mNoiseEnabled(this, NoiseEnabledSlotName)
   , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) 
@@ -34,24 +36,10 @@ SplineNode<ValueType::FLOAT>::SplineNode()
   mBeatSpikeLength.SetDefaultValue(0.5f);
 }
 
-template <>
-SplineNode<ValueType::VEC3>::SplineNode()
-  : ValueNode<ValueType::VEC3>()
-  , mTimeSlot(this, TimeSlotName, false, false, false)
-  , mNoiseEnabled(this, NoiseEnabledSlotName)
-  , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f)
-  , mBeatSpikeEnabled(this, BeatSpikeEnabledSlotName)
-  , mBeatSpikeLength(this, BeatSpikeLengthSlotName)
-  , mBeatSpikeEasing(this, BeatSpikeEasingSlotName)
-  , mBeatQuantizerFrequency(this, BeatQuantizerFrequencySlotName)
-  , mSceneTimeNode(make_shared<SceneTimeNode>())
-{
-  mTimeSlot.Connect(mSceneTimeNode);
-  mNoiseVelocity.SetDefaultValue(20.0f);
-  mBeatSpikeEasing.SetDefaultValue(1.0f);
-  mBeatSpikeLength.SetDefaultValue(0.5f);
-}
-
+template class SplineNode<ValueType::FLOAT>;
+template class SplineNode<ValueType::VEC2>;
+template class SplineNode<ValueType::FLOAT>;
+template class SplineNode<ValueType::VEC4>;
 
 //float FloatSplineNode::EvaluateLinearSpline(vector<SplinePoint>& points, float time) {
 //  if (points.size() == 0) return 0.0f;
@@ -74,15 +62,3 @@ SplineNode<ValueType::VEC3>::SplineNode()
 //  if (p2.mTime - p1.mTime < Epsilon) return p1.mValue;
 //  return p1.mValue + (p2.mValue - p1.mValue) * (time - p1.mTime) / (p2.mTime - p1.mTime);
 //}
-
-template <>
-float SplineNode<ValueType::FLOAT>::GetValue(float time) {
-  return mBaseLayer.Get(time) + GetNoiseValue(time) + GetBeatSpikeValue(time) +
-    GetBeatQuantizerValue(time);
-}
-
-template <>
-Vec3 SplineNode<ValueType::VEC3>::GetValue(float time) {
-  return mBaseLayer.Get(time) + Vec3::From(GetNoiseValue(time)) + 
-    Vec3::From(GetBeatSpikeValue(time)) + Vec3::From(GetBeatQuantizerValue(time));
-}

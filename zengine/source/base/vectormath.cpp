@@ -8,6 +8,11 @@ Vec2::Vec2(float x, float y) {
   this->y = y;
 }
 
+Vec2::Vec2(float x) {
+  this->x = x;
+  this->y = x;
+}
+
 Vec2 Vec2::operator- (const Vec2& op) const {
   return Vec2(x - op.x, y - op.y);
 }
@@ -35,6 +40,12 @@ Vec2 Vec2::operator/ (float f) const {
 Vec2& Vec2::operator*=(float f) {
   x *= f;
   y *= f;
+  return *this;
+}
+
+Vec2& Vec2::operator/=(float f) {
+  x /= f;
+  y /= f;
   return *this;
 }
 
@@ -80,8 +91,10 @@ Vec3::Vec3(float x, float y, float z) {
   this->z = z;
 }
 
-Vec3 Vec3::From(float x) {
-  return Vec3(x, x, x);
+Vec3::Vec3(float x) {
+  this->x = x;
+  this->y = x;
+  this->z = x;
 }
 
 float Vec3::Dot(const Vec3& op) const {
@@ -173,6 +186,13 @@ Vec4::Vec4(float x, float y, float z, float w) {
   this->w = w;
 }
 
+Vec4::Vec4(float x) {
+  this->x = x;
+  this->y = x;
+  this->z = x;
+  this->w = x;
+}
+
 Vec4::Vec4(Vec3 v, float w) {
   this->x = v.x;
   this->y = v.y;
@@ -182,6 +202,18 @@ Vec4::Vec4(Vec3 v, float w) {
 
 float Vec4::Dot(const Vec4& v) const {
   return x*v.x + y*v.y + z*v.z + w*v.w;
+}
+
+Vec4 Vec4::operator* (float f) const {
+  return Vec4(x * f, y * f, z * f, w * f);
+}
+
+Vec4 Vec4::operator/ (float f) const {
+  return Vec4(x / f, y / f, z / f, w / f);
+}
+
+Vec4 Vec4::operator+(const Vec4& v) const {
+  return Vec4(x + v.x, y + v.y, z + v.z, w + v.w);
 }
 
 Vec4 Vec4::operator-(const Vec4& v) const {
@@ -213,6 +245,14 @@ Vec4 Vec4::operator*(const Matrix& m) const {
     x*m.m[8] + y*m.m[9] + z*m.m[10] + w*m.m[11],
     x*m.m[12] + y*m.m[13] + z*m.m[14] + w*m.m[15]
   );
+}
+
+Vec4& Vec4::operator/=(float f) {
+  x /= f;
+  y /= f;
+  z /= f;
+  w /= f;
+  return *this;
 }
 
 Matrix::Matrix() {}
