@@ -2,6 +2,7 @@
 #include <ui_operatorSelector.h>
 #include <QtCore/QDir>
 #include "../util/util.h"
+#include "../zengarden.h"
 
 Prototypes* ThePrototypes = NULL;
 
@@ -65,8 +66,10 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   vector<const Prototype*> allPrototypes;
   AddCategoryToTreeWidget(&mMainCategory, selector.treeWidget, nullptr, allPrototypes);
 
+  float ratio = ZenGarden::GetInstance()->devicePixelRatio();
+
   dialog.setModal(true);
-  dialog.resize(200, 400);
+  dialog.resize(ratio * 200, ratio * 400);
   dialog.move(Position);
   connect(selector.treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
     this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
