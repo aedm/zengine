@@ -313,14 +313,14 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
 
       if (stubReference->mType != ValueType::NONE) {
         stream << GetTypeString(stubReference->mType) << ' ' << 
-          stubReference->mVariableName;
+          stubReference->mVariableName << ";" << endl;
       }
     }
   }
 
   /// Defines
   for (auto define : shaderStage->mDefines) {
-    shaderStage->mSourceStream << "#define " << define << endl;
+    stream << "#define " << define << endl;
   }
 }
 
@@ -365,15 +365,6 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
 
       stream << "#define SHADER " << GetTypeString(stubMeta->returnType) << 
         ' ' << stubReference->mFunctionName << "()" << endl;
-      //bool isFirstParameter = true;
-      //for (StubParameter* param : stubMeta->parameters) {
-      //  if (param->mType != ValueType::TEXTURE) {
-      //    if (!isFirstParameter) stream << ", ";
-      //    stream << GetTypeString(param->mType) << ' ' << *param->mName;
-      //    isFirstParameter = false;
-      //  }
-      //}
-      //stream << ')' << endl;
 
       /// Main shader code
       stream << stubMeta->strippedSource;
@@ -405,30 +396,6 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
         stream << stubReference->mVariableName << " = ";
       }
       stream << stubReference->mFunctionName << "(";
-      //bool isFirstParameter = true;
-      //for (StubParameter* param : stubMeta->parameters) {
-      //  if (param->mType != ValueType::TEXTURE) {
-      //    if (!isFirstParameter) stream << ", ";
-      //    Slot* slot = stub->GetSlotByParameter(param);
-      //    auto paramNode = slot->GetReferencedNode();
-      //    if (paramNode == nullptr) {
-      //      /// Node not connected to param
-      //      ERR("Parameter not connected");
-      //      throw exception();
-      //    }
-      //    if (IsPointerOf<StubNode>(paramNode)) {
-      //      /// Call parameter is the result of a former function call
-      //      auto paramStubReference = shaderStage->mStubMap.at(paramNode);
-      //      stream << paramStubReference->mVariableName;
-      //    }
-      //    else {
-      //      /// Call parameter is a uniform
-      //      auto valueReference = mUniformMap.at(paramNode);
-      //      stream << valueReference->mName;
-      //    }
-      //    isFirstParameter = false;
-      //  }
-      //}
       stream << ");" << endl;
     }
   }

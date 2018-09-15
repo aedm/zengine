@@ -2,7 +2,10 @@
 :returns void
 
 const int poissonCount = 109;
-//const int poissonCount = 8;
+
+const int ShadowSampleCount = min(poissonCount, 20);
+const int DOFSampleCount = min(poissonCount, 20);
+
 vec3 poissonDisk[109] = vec3[](
   vec3(0, 0, 0),
   vec3(0.22047275640740338, 2.0245790958599343, 2.0365482443858056),
@@ -135,7 +138,7 @@ float CalculateSoftShadow(vec3 lightProjectionCoord, float sampleSpread, float s
   // Calculate penumbra
   float distance = 0;
   float distCount = 0;
-  for (int i=0; i<poissonCount; i++) {
+  for (int i=0; i<ShadowSampleCount; i++) {
     vec2 sampleCoord = poissonDisk[i].xy;
     vec2 p = s.xy + sampleCoord * gSkylightTextureSizeRecip * sampleSpread;
     float shadowZ = texture(gSkylightTexture, p).z;
@@ -148,12 +151,12 @@ float CalculateSoftShadow(vec3 lightProjectionCoord, float sampleSpread, float s
   float sp = distance * spread;
   
   float shadow = 0;
-  for (int i=0; i<poissonCount; i++) {
+  for (int i=0; i<ShadowSampleCount; i++) {
     vec2 sampleCoord = poissonDisk[i].xy;
     vec2 p = s.xy + sampleCoord * gSkylightTextureSizeRecip * sp;
     shadow += (texture(gSkylightTexture, p).z < s.z) ? 0 : 1.0;
   }
-  shadow /= poissonCount;
+  shadow /= ShadowSampleCount;
   return shadow;
 }  
 
@@ -165,7 +168,7 @@ float CalculateSoftShadow2(vec3 lightProjectionCoord, float sampleSpread, float 
   // Calculate penumbra
   float distance = 0;
   float distCount = 0;
-  for (int i=0; i<poissonCount; i++) {
+  for (int i=0; i<ShadowSampleCount; i++) {
     vec2 sampleCoord = poissonDisk[i].xy;
     vec2 p = s.xy + sampleCoord * gSkylightTextureSizeRecip * sampleSpread;
     float shadowZ = texture(gSkylightTexture, p).z;
@@ -178,12 +181,12 @@ float CalculateSoftShadow2(vec3 lightProjectionCoord, float sampleSpread, float 
   float sp = distance * spread;
   
   float shadow = 0;
-  for (int i=0; i<poissonCount; i++) {
+  for (int i=0; i<ShadowSampleCount; i++) {
     vec2 sampleCoord = poissonDisk[i].xy;
     vec2 p = s.xy + sampleCoord * gSkylightTextureSizeRecip * sp;
     shadow += (texture(gSkylightTexture, p).z <= s.z) ? 0 : 1.0;
   }
-  shadow /= poissonCount;
+  shadow /= ShadowSampleCount;
   return shadow;
 }  
 
@@ -205,7 +208,7 @@ float CalculateSoftShadow3(vec3 lightProjectionCoord, mat4 skylightProjection, v
   // Calculate penumbra
   float distance = 0;
   float distCount = 0;
-  for (int i=0; i<poissonCount; i++) {
+  for (int i=0; i<ShadowSampleCount; i++) {
     vec2 pd = rotrand * poissonDisk[i].xy * sampleSpread * 0.01;
 	vec3 sMod = s + pd.x * sdx + pd.y * sdy;
 	vec3 pmod = pd.x * sdx + pd.y * sdy;
@@ -219,12 +222,12 @@ float CalculateSoftShadow3(vec3 lightProjectionCoord, mat4 skylightProjection, v
   float sp = spread * distance * 0.1;
   
   float shadow = 0;
-  for (int i=0; i<poissonCount; i++) {
+  for (int i=0; i<ShadowSampleCount; i++) {
     vec2 pd = rotrand * poissonDisk[i].xy * sp;
 	vec3 sMod = s + pd.x * sdx + pd.y * sdy;
     shadow += (texture(gSkylightTexture, sMod.xy).z < sMod.z) ? 0 : 1.0;
   }
-  shadow /= poissonCount;
+  shadow /= ShadowSampleCount;
   return shadow;
 } 
 
@@ -318,6 +321,13 @@ mat4 RotateZ(float angle) {
 
 mat4 Rotate(vec3 angle) {
   return RotateX(angle.x) * RotateY(angle.y) * RotateZ(angle.z);
+}
+
+// Axis is unit!
+vec3 Rodrigues(vec3 axis, vec3 v, float angle) {
+  float ca = cos(angle);
+  float sa = sin(angle);
+  return v * ca + cross(axis, v) * sa + axis * axis * dot(axis, v) * (1 - ca);
 }
   
 SHADER 

@@ -9,6 +9,7 @@ public:
 
   PassSlot mSolidPass;
   PassSlot mShadowPass;
+  PassSlot mZPostPass;
 
   const shared_ptr<Pass> GetPass(PassType passType);
 

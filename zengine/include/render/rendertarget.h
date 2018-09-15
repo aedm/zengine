@@ -10,6 +10,7 @@ public:
 
   /// Sets the G-Buffer as render target
   void SetGBufferAsTarget(Globals* globals);
+  void SetGBufferAsTargetForZPostPass(Globals* globals);
 
   /// Sets the final color buffer as render target, G-Buffer as source
   void SetColorBufferAsTarget(Globals* globals);
@@ -29,6 +30,7 @@ public:
   /// A: [4x16F] RGB: HDR final color, A: unused
   /// B: [1x32] R: Last chain link in A-buffer linked list (todo)
   FrameBufferId mGBufferId = 0;
+  FrameBufferId mGBufferForZPostPassId = 0;
   Texture* mDepthBuffer = nullptr;
   Texture* mGBufferA = nullptr;
 

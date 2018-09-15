@@ -40,7 +40,7 @@ SHADER
   vec3 sumColor = vec3(0, 0, 0);
   float sumAlpha = 0;
   
-  int sampleCount = min(poissonCount, 100);
+  int sampleCount = DOFSampleCount;
   for (int poissonIndex = 0; poissonIndex < sampleCount; poissonIndex++) {
     vec3 poissonPoint = poissonDisk[poissonIndex];
 

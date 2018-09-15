@@ -74,6 +74,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightAmbient = mSkyLightAmbient.Get();
   globals->SkylightSpread = mSkyLightSpread.Get();
   globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
+  globals->SkylightTexture = nullptr;
   globals->Time = mGlobalTimeNode->Get();
   RenderDrawables(globals, PassType::SHADOW);
 
@@ -90,6 +91,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
 
   /// Pass #2: Z prepass, using the shadow pass material
   if (mZPrepassDisabled.Get() < 0.5) {
+    globals->SkylightTexture = renderTarget->mShadowTexture;
     camera->SetupGlobals(globals);
     RenderDrawables(globals, PassType::SHADOW);
   }
@@ -101,6 +103,12 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
 
   /// Hack: set DOF settings
   if (!directToSquare && !directToScreen) {
+    /// Pass #4: Z Postpass
+    camera->SetupGlobals(globals);
+    renderTarget->SetGBufferAsTargetForZPostPass(globals);
+    globals->SkylightTexture = renderTarget->mShadowTexture;
+    RenderDrawables(globals, PassType::ZPOST);
+
     globals->PPDofEnabled = mDOFEnabled.Get();
     globals->PPDofFocusDistance = mDOFFocusDistance.Get();
     globals->PPDofBlur = mDOFBlur.Get();
