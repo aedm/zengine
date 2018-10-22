@@ -31,9 +31,11 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
       if (startTime <= time && endTime > time) {
         /// Should this be after postprocess?
         if (clip->mApplyPostprocessBefore.Get() >= 0.5f) {
-          TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+          if (!postprocessApplied) {
+            TheEngineShaders->ApplyPostProcess(renderTarget, &mGlobals);
+            postprocessApplied = true;
+          }
           mGlobals.DirectToScreen = 1.0f;
-          postprocessApplied = true;
         }
 
         /// Render clip

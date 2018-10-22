@@ -31,6 +31,20 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
+void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) {
+  globals->RenderTargetSize = mSize;
+  globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
+  globals->DepthBufferSource = mDepthBuffer;
+  globals->GBufferSourceA = 0;
+  globals->SquareTexture1 = mSquareTexture1;
+  globals->SquareTexture2 = mSquareTexture2;
+  globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
+  globals->SecondaryTexture = mSecondaryTexture;
+  globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
+  OpenGL->SetFrameBuffer(mGBufferForZPostPassId);
+  OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
+}
+
 void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
   OpenGL->SetFrameBuffer(mColorBufferId);
   globals->RenderTargetSize = mSize;
@@ -87,6 +101,8 @@ void RenderTarget::Resize(Vec2 size) {
     width, height, TexelType::ARGB16F, nullptr, true, false);
   mGBufferId =
     OpenGL->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
+  mGBufferForZPostPassId =
+    OpenGL->CreateFrameBuffer(0, mGBufferA->mHandle, 0, true);
 
   /// Create framebuffer for DOF result
   mDOFColorTexture = TheResourceManager->CreateGPUTexture(

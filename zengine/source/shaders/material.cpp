@@ -6,12 +6,13 @@ REGISTER_NODECLASS(Material, "Material");
 
 static SharedString SolidPassSlotName = make_shared<string>("Solid Pass");
 static SharedString ShadowPassSlotName = make_shared<string>("Shadow Pass");
+static SharedString ZPostPassSlotName = make_shared<string>("Z Postpass");
 
 Material::Material()
   : mSolidPass(this, SolidPassSlotName)
   , mShadowPass(this, ShadowPassSlotName)
+  , mZPostPass(this, ZPostPassSlotName)
 {}
-
 
 Material::~Material() {}
 
@@ -30,6 +31,7 @@ const shared_ptr<Pass> Material::GetPass(PassType passType) {
   switch (passType) {
     case PassType::SHADOW: return mShadowPass.GetNode();
     case PassType::SOLID: return mSolidPass.GetNode();
+    case PassType::ZPOST: return mZPostPass.GetNode();
   }
   SHOULD_NOT_HAPPEN;
   return nullptr;

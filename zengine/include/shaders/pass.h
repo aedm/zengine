@@ -10,6 +10,7 @@ using namespace std;
 enum class PassType {
   SHADOW,
   SOLID,
+  ZPOST,
 };
 
 struct PassUniform {

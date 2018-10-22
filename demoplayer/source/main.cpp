@@ -222,7 +222,7 @@ int CALLBACK WinMain(
     float time;
     if (recordVideo) {
       // Record at 60fps
-      time = float(frameNumber) / 60.0f;
+      time = beatsPerSecond * float(frameNumber) / 60.0f;
     }
     else {
       time = beatsPerSecond * float(timeGetTime() - startTime) / 1000.0f;
