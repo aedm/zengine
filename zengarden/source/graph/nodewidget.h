@@ -4,6 +4,8 @@
 #include "graphwatcher.h"
 #include "../watchers/watcherui.h"
 #include <zengine.h>
+#include <memory>
+#include <QImage>
 
 /// NodeWidget is a Watcher for a Node on a Graph. Every Node has a NodeWidget associated
 /// to it.
@@ -58,5 +60,9 @@ private:
   TextTexture* mTitleTexture;
 
   GraphWatcher* mGraphWatcher;
+
+  /// Image representation of the widget
+  unique_ptr<QImage> mImage;
+  void PaintToImage();
 };
 
