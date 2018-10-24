@@ -55,7 +55,7 @@ void ImageRecorder::RecordImage(unsigned char* pixels, int width, int height,
   GdipCreateBitmapFromScan0(width, height, width * 4, PixelFormat32bppARGB, 
     pixels, &pBitmap);
 
-  ULONG uQuality = 95;
+  ULONG uQuality = 99;
   EncoderParameters encoderParams;
   encoderParams.Count = 1;
   encoderParams.Parameter[0].NumberOfValues = 1;
