@@ -23,7 +23,7 @@ public:
   Vec2 GetInputPosition(int slotIndex);
 
   struct WidgetSlot {
-    TextTexture mTexture;
+    //TextTexture mTexture;
     Vec2 mPosition;
     Vec2 mSize;
     Vec2 mSpotPos;
@@ -57,12 +57,16 @@ private:
 
   void CreateWidgetSlots();
 
-  TextTexture* mTitleTexture;
+  //TextTexture* mTitleTexture;
 
   GraphWatcher* mGraphWatcher;
 
   /// Image representation of the widget
   unique_ptr<QImage> mImage;
+  Texture* mTexture = nullptr;
+  bool mUptodate = false;
+  void DiscardTexture();
+
   void PaintToImage();
 };
 
