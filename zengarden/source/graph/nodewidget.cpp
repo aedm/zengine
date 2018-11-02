@@ -87,11 +87,26 @@ void NodeWidget::CalculateLayout()
   Vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
   mOutputPosition = Vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
   GetDirectNode()->SetSize(size);
+
+  mUptodate = false;
 }
 
 
 void NodeWidget::UpdateGraph() {
   if (mGraphWatcher) mGraphWatcher->Update();
+}
+
+void NodeWidget::UpdateTexture() {
+  if (!mUptodate) {
+    DiscardTexture();
+    PaintToImage();
+    const unsigned char* bits = mImage.bits();
+    mTexture = TheResourceManager->CreateTexture(mImage.width(), mImage.height(),
+      TexelType::ARGB8, (void*)bits);
+    //mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
+    //  TexelType::ARGB8, (void*)bits, false, false);
+    mUptodate = true;
+  }
 }
 
 static Vec4 LiveHeaderColor = Vec4(0, 0.2, 0.4, Opacity);
@@ -100,14 +115,7 @@ static Vec4 ReferenceHeaderColor = Vec4(0.4, 0.0, 0.2, Opacity);
 
 
 void NodeWidget::Paint() {
-  if (!mUptodate) {
-    DiscardTexture();
-    PaintToImage();
-    const unsigned char* bits = mImage->bits();
-    mTexture = TheResourceManager->CreateGPUTexture(mImage->width(), mImage->height(),
-      TexelType::ARGB8, (void*)bits, false, false);
-    mUptodate = true;
-  }
+  UpdateTexture();
 
   shared_ptr<Node> node = GetDirectNode();
   Vec2 position = node->GetPosition();
@@ -283,13 +291,14 @@ void NodeWidget::PaintToImage()
   Vec2 size = node->GetSize();
   int iWidth = int(ceilf(size.x));
   int iHeight = int(ceilf(size.y));
-  if (mImage == nullptr || mImage->width() != iWidth || mImage->height() != iHeight) {
-    mImage = make_unique<QImage>(iWidth, iHeight, QImage::Format_ARGB32);
-  }
+  //if (mImage == nullptr || mImage->width() != iWidth || mImage->height() != iHeight) {
+  //  mImage = make_unique<QImage>(iWidth, iHeight, QImage::Format_ARGB32);
+  //}
 
-  QPainter painter(mImage.get());
-  painter.fillRect(0, 0, size.x, size.y, QColor::fromRgbF(0, 0, 0, 1));
-  return;
+  QPixmap pixmap(iWidth, iHeight);
+  pixmap.fill(QColor(0, 0, 0, 1));
+  QPainter painter;
+  painter.begin(&pixmap);
 
   Vec4 headerColor = LiveHeaderColor;
   if (node->IsGhostNode()) {
@@ -380,4 +389,7 @@ void NodeWidget::PaintToImage()
   painter.drawRect(QRectF(0, 0, size.x, size.y));
   //ThePainter->mColor->Set(frameColor);
   //ThePainter->DrawRect(position, size);
+
+  painter.end();
+  mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
 }

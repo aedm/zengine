@@ -43,6 +43,8 @@ private:
 
   void UpdateGraph();
 
+  void UpdateTexture();
+
   //Vec2 mPosition;
   //Vec2 mSize;
   Vec2 mOutputPosition;
@@ -62,7 +64,8 @@ private:
   GraphWatcher* mGraphWatcher;
 
   /// Image representation of the widget
-  unique_ptr<QImage> mImage;
+  QImage mImage;
+
   Texture* mTexture = nullptr;
   bool mUptodate = false;
   void DiscardTexture();

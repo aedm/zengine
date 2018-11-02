@@ -37,6 +37,10 @@ GraphWatcher::~GraphWatcher() {
 void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   OpenGL->OnContextSwitch();
 
+  for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
+    mWidgetMap.at(node)->UpdateTexture();
+  }
+
   Vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
 
