@@ -74,7 +74,7 @@ void NodeWidget::CreateWidgetSlots()
 
 void NodeWidget::CalculateLayout()
 {
-  const int fontHeight = 12;
+  const int fontHeight = 22;
   mTitleHeight = fontHeight; // mTitleTexture->mTextSize.height() + TitlePadding * 2.0f + 1.0f;
   float slotY = mTitleHeight + SlotSpacing;
   for (WidgetSlot* sw : mWidgetSlots) {
@@ -100,11 +100,23 @@ void NodeWidget::UpdateTexture() {
   if (!mUptodate) {
     DiscardTexture();
     PaintToImage();
-    const unsigned char* bits = mImage.bits();
-    mTexture = TheResourceManager->CreateTexture(mImage.width(), mImage.height(),
-      TexelType::ARGB8, (void*)bits);
-    //mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
-    //  TexelType::ARGB8, (void*)bits, false, false);
+    /// This makes a copy of the array
+    unsigned char* bits = mImage.bits();
+    int height = mImage.height();
+    int width = mImage.width();
+    unsigned char* current = bits;
+    for (int i = 0; i < height *width; i++) {
+      /// Swap RGBA and BGRA
+      unsigned char temp = current[0];
+      current[0] = current[2];
+      current[2] = temp;
+      current += 4;
+    }
+
+    //mTexture = TheResourceManager->CreateTexture(mImage.width(), mImage.height(),
+    //  TexelType::ARGB8, (void*)bits);
+    mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
+      TexelType::ARGB8, (void*)bits, false, false);
     mUptodate = true;
   }
 }
@@ -305,17 +317,19 @@ void NodeWidget::PaintToImage()
     headerColor = PointerCast<Ghost>(node)->IsDirectReference()
       ? ReferenceHeaderColor : GhostHeaderColor;
   }
-  painter.setPen(QColorFromVec4(headerColor));
-  painter.drawRect(QRectF(0, 0, size.x, mTitleHeight));
-  //ThePainter->mColor->Set(headerColor);
-  //ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
 
-  painter.setPen(QColor::fromRgbF(0, 0, 0, Opacity));
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(QColorFromVec4(headerColor));
+  painter.drawRect(QRectF(0, 0, size.x, mTitleHeight));
+
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(QColor::fromRgbF(0, 0, 0, Opacity));
   painter.drawRect(QRectF(0, mTitleHeight, size.x, size.y - mTitleHeight));
   //ThePainter->mColor->Set(Vec4(0, 0, 0, Opacity));
   //ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
 
-  painter.setPen(QColor::fromRgbF(0.2, 0.7, 0.9, 1));
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(QColor::fromRgbF(0.2, 0.7, 0.9, 1));
   Vec2 outputTopLeft = mOutputPosition - ConnectionSpotSize * 0.5f;
   painter.drawRect(QRectF(outputTopLeft.x, outputTopLeft.y, 
     ConnectionSpotSize.x, ConnectionSpotSize.y));
@@ -324,7 +338,7 @@ void NodeWidget::PaintToImage()
   //  ConnectionSpotSize);
 
   painter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
-  painter.drawText(QRectF(0, 0, size.x, mTitleHeight), Qt::AlignCenter, 
+  painter.drawText(QRectF(0, 0, size.x, mTitleHeight), Qt::AlignCenter,
     QString::fromStdString(node->GetName()));
   //ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
   //float centerX = floor((size.x - float(mTitleTexture->mTextSize.width())) * 0.5f);
@@ -350,13 +364,14 @@ void NodeWidget::PaintToImage()
 
     WidgetSlot* sw = mWidgetSlots[i];
     painter.setPen(QColorFromVec4(slotFrameColor));
+    painter.setBrush(Qt::NoBrush);
     painter.drawRect(QRectF(sw->mPosition.x, sw->mPosition.y,
       sw->mSize.x, sw->mSize.y));
     //ThePainter->mColor->Set(slotFrameColor);
     //ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
 
     painter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
-    painter.drawText(QPointF(sw->mPosition.x, sw->mPosition.y), 
+    painter.drawText(QPointF(sw->mPosition.x, sw->mPosition.y),
       QString::fromStdString(*sw->mSlot->GetName()));
     //ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
     //ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
@@ -386,7 +401,9 @@ void NodeWidget::PaintToImage()
   }
 
   painter.setPen(QColorFromVec4(frameColor));
+  painter.setBrush(Qt::NoBrush);
   painter.drawRect(QRectF(0, 0, size.x, size.y));
+
   //ThePainter->mColor->Set(frameColor);
   //ThePainter->DrawRect(position, size);
 

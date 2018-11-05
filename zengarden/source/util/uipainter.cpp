@@ -82,7 +82,7 @@ UiPainter::UiPainter() {
   mSolidBox->mMaterial.Connect(mSolidColorMaterial);
   mSolidBox->mMesh.Connect(mBoxMeshNode);
 
-  mTexturedBox->mMaterial.Connect(mSolidColorMaterial);
+  mTexturedBox->mMaterial.Connect(mSolidTextureMaterial);
   mTexturedBox->mMesh.Connect(mTexturedBoxMeshNode);
 
   mTextBox->mMaterial.Connect(mTextTextureMaterial);
