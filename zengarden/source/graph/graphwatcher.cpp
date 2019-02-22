@@ -197,7 +197,7 @@ bool HasIntersection(Vec2 pos1, Vec2 size1, Vec2 pos2, Vec2 size2) {
 
 void GraphWatcher::DeselectAll() {
   for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
-    widget->mIsSelected = false;
+    widget->SetSelected(false);
   }
   mSelectedNodeWidgets.clear();
 }
@@ -207,7 +207,7 @@ void GraphWatcher::SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget) 
   DeselectAll();
   ASSERT(mSelectedNodeWidgets.find(nodeWidget) == mSelectedNodeWidgets.end());
   mSelectedNodeWidgets.insert(nodeWidget);
-  nodeWidget->mIsSelected = true;
+  nodeWidget->SetSelected(true);
   ZenGarden::GetInstance()->SetNodeForPropertyEditor(nodeWidget->GetDirectNode());
 }
 
@@ -639,7 +639,7 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
 
   QString fileName = urlList.at(0).toLocalFile();
   QFileInfo fileInfo(fileName);
-  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds" || 
+  if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds" ||
     fileInfo.suffix() == "fbx") {
     Mesh* mesh = Util::LoadMesh(fileName);
     shared_ptr<MeshNode> node = StaticMeshNode::Create(mesh);

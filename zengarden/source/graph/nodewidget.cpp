@@ -56,6 +56,15 @@ NodeWidget::~NodeWidget() {
 }
 
 
+void NodeWidget::SetSelected(bool isSelected) {
+  mIsSelected = isSelected;
+  mUptodate = false;
+}
+
+bool NodeWidget::IsSelected() {
+  return mIsSelected;
+}
+
 void NodeWidget::CreateWidgetSlots()
 {
   for (auto x : mWidgetSlots) delete x;
@@ -119,6 +128,7 @@ void NodeWidget::UpdateTexture() {
 
     //mTexture = TheResourceManager->CreateTexture(mImage.width(), mImage.height(),
     //  TexelType::ARGB8, (void*)bits);
+
     mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
       TexelType::ARGB8, (void*)bits, false, false);
     mUptodate = true;

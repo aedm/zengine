@@ -13,7 +13,7 @@
 
 class NodeWidget: public WatcherUI {
   friend class MoveNodeCommand;
-  friend class GraphWatcher;
+  //friend class GraphWatcher;
 
 public:
   NodeWidget(const shared_ptr<Node>& node, GraphWatcher* graphWatcher);
@@ -23,8 +23,10 @@ public:
   Vec2 GetOutputPosition();
   Vec2 GetInputPosition(int slotIndex);
 
+  void SetSelected(bool isSelected);
+  bool IsSelected();
+
   struct WidgetSlot {
-    //TextTexture mTexture;
     Vec2 mPosition;
     Vec2 mSize;
     Vec2 mSpotPos;
@@ -32,6 +34,11 @@ public:
   };
 
   vector<WidgetSlot*>	mWidgetSlots;
+
+  /// Original positions in move/resize operations
+  /// TODO: remove these.
+  Vec2 mOriginalPosition;
+  Vec2 mOriginalSize;
 
 private:
   virtual void OnSlotStructureChanged() override;
@@ -52,8 +59,6 @@ private:
 
   /// Viewer states
   bool mIsSelected;
-  Vec2 mOriginalPosition;
-  Vec2 mOriginalSize;
 
   QString mNodeTitle;
 
