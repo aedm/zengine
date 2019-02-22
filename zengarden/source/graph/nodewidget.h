@@ -5,6 +5,7 @@
 #include "../watchers/watcherui.h"
 #include <zengine.h>
 #include <memory>
+#include <functional>
 #include <QImage>
 #include <QPainter>
 
@@ -13,18 +14,36 @@
 
 class NodeWidget: public WatcherUI {
   friend class MoveNodeCommand;
-  //friend class GraphWatcher;
 
 public:
-  NodeWidget(const shared_ptr<Node>& node, GraphWatcher* graphWatcher);
+  NodeWidget(const shared_ptr<Node>& node, const std::function<void()>& onNeedsRedraw);
   virtual ~NodeWidget();
+
+  enum class FrameColor {
+    DEFAULT,
+    SELECTED,
+    HOVERED,
+    CONNECTION_FROM,
+    VALID_CONNECTION,
+    INVALID_CONNECTION,
+  };
+
+  /// Set the Node widget's frame color
+  void SetFrameColor(FrameColor frameColor);
+
+  enum class SlotColor {
+    DEFAULT,
+    HOVERED,
+    CONNECTION_FROM,
+    VALID_CONNECTION,
+    INVALID_CONNECTION,
+  };
+  /// Highlights a slot (eg. when connecting them)
+  void SetSlotColor(int slotIndex, SlotColor slotColor);
 
   void Paint();
   Vec2 GetOutputPosition();
   Vec2 GetInputPosition(int slotIndex);
-
-  void SetSelected(bool isSelected);
-  bool IsSelected();
 
   struct WidgetSlot {
     Vec2 mPosition;
@@ -49,8 +68,6 @@ private:
   /// Layout
   void CalculateLayout();
 
-  void UpdateGraph();
-
   void UpdateTexture();
 
   //Vec2 mPosition;
@@ -58,7 +75,12 @@ private:
   Vec2 mOutputPosition;
 
   /// Viewer states
-  bool mIsSelected;
+  FrameColor mFrameColor = FrameColor::DEFAULT;
+  SlotColor mSlotColor = SlotColor::DEFAULT;
+  int mColoredSlotIndex = -1;
+
+  /// Index of the currently highlighted slot
+  int mHighlightedSlotIndex = -1;
 
   QString mNodeTitle;
 
@@ -69,7 +91,8 @@ private:
 
   //TextTexture* mTitleTexture;
 
-  GraphWatcher* mGraphWatcher;
+  //weak_ptr<GraphWatcher> mGraphWatcher;
+  std::function<void()> mOnNeedsRedraw;
 
   /// Image representation of the widget
   QImage mImage;

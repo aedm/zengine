@@ -29,17 +29,12 @@ GraphWatcher::~GraphWatcher() {
   for (auto& it : mWidgetMap) {
     shared_ptr<NodeWidget> watcher = it.second;
     if (watcher->GetDirectNode()) watcher->GetDirectNode()->RemoveWatcher(watcher);
-    watcher->mGraphWatcher = nullptr;
   }
 }
 
 
 void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   OpenGL->OnContextSwitch();
-
-  for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
-    mWidgetMap.at(node)->UpdateTexture();
-  }
 
   Vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
@@ -197,7 +192,7 @@ bool HasIntersection(Vec2 pos1, Vec2 size1, Vec2 pos2, Vec2 size2) {
 
 void GraphWatcher::DeselectAll() {
   for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
-    widget->SetSelected(false);
+    widget->SetFrameColor(NodeWidget::FrameColor::DEFAULT);
   }
   mSelectedNodeWidgets.clear();
 }
@@ -207,7 +202,7 @@ void GraphWatcher::SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget) 
   DeselectAll();
   ASSERT(mSelectedNodeWidgets.find(nodeWidget) == mSelectedNodeWidgets.end());
   mSelectedNodeWidgets.insert(nodeWidget);
-  nodeWidget->SetSelected(true);
+  nodeWidget->SetFrameColor(NodeWidget::FrameColor::SELECTED);
   ZenGarden::GetInstance()->SetNodeForPropertyEditor(nodeWidget->GetDirectNode());
 }
 
@@ -218,6 +213,10 @@ void GraphWatcher::StorePositionOfSelectedNodes() {
   }
 }
 
+
+bool GraphWatcher::IsWidgetSelected(const shared_ptr<NodeWidget>& nodeWidget) {
+  return mSelectedNodeWidgets.find(nodeWidget) != mSelectedNodeWidgets.end();
+}
 
 void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
   Vec2 mousePos = MouseToWorld(event);
@@ -246,7 +245,7 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
         }
       }
       else {
-        if (!mHoveredWidget->mIsSelected) {
+        if (IsWidgetSelected(mHoveredWidget)) {
           /// Select node
           SelectSingleWidget(mHoveredWidget);
         }
@@ -295,7 +294,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   case State::SELECT_RECTANGLE:
     for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
       shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
-      if (widget->mIsSelected) mSelectedNodeWidgets.insert(widget);
+      if (IsWidgetSelected(widget)) mSelectedNodeWidgets.insert(widget);
     }
     mCurrentState = State::DEFAULT;
     GetGLWidget()->update();
@@ -391,8 +390,10 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
   case State::SELECT_RECTANGLE:
     for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
       shared_ptr<NodeWidget> widget = mWidgetMap.at(node);
-      widget->mIsSelected = HasIntersection(mOriginalMousePos,
+      bool selected = HasIntersection(mOriginalMousePos,
         mCurrentMousePos - mOriginalMousePos, node->GetPosition(), node->GetSize());
+      widget->SetFrameColor(selected 
+        ? NodeWidget::FrameColor::SELECTED : NodeWidget::FrameColor::DEFAULT);
     }
     GetGLWidget()->update();
     break;
