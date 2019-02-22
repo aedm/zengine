@@ -6,6 +6,7 @@
 #include <zengine.h>
 #include <memory>
 #include <QImage>
+#include <QPainter>
 
 /// NodeWidget is a Watcher for a Node on a Graph. Every Node has a NodeWidget associated
 /// to it.
@@ -54,6 +55,8 @@ private:
   Vec2 mOriginalPosition;
   Vec2 mOriginalSize;
 
+  QString mNodeTitle;
+
   /// Height of the titlebar
   float mTitleHeight;
 
@@ -65,6 +68,9 @@ private:
 
   /// Image representation of the widget
   QImage mImage;
+
+  /// Painter used to draw the widget texture
+  QPainter mPainter;
 
   Texture* mTexture = nullptr;
   bool mUptodate = false;

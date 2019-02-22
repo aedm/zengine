@@ -6,7 +6,8 @@
 #include <QImage>
 #include <QGLWidget>
 #include <QPixmap>
-#include <QPainter>
+#include <QGuiApplication>
+#include <QScreen>
 
 /// Layout of the widget
 
@@ -17,7 +18,7 @@ static const float TitlePadding = ADJUST(3.0f);
 static const float SlotSpacing = ADJUST(5.0f);
 
 /// Space between slots
-static const Vec2 SlotPadding = ADJUST(Vec2(10.0f, 1.0f));
+static const Vec2 SlotPadding = ADJUST(Vec2(5.0f, 1.0f));
 
 /// Left margin in front of slots
 static const float SlotLeftMargin = ADJUST(5.0f);
@@ -72,10 +73,13 @@ void NodeWidget::CreateWidgetSlots()
 }
 
 
-void NodeWidget::CalculateLayout()
-{
-  const int fontHeight = 22;
-  mTitleHeight = fontHeight; // mTitleTexture->mTextSize.height() + TitlePadding * 2.0f + 1.0f;
+void NodeWidget::CalculateLayout() {
+  const QFont& font = mPainter.font();
+  double dpi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
+  const double fontHeightPoints = font.pointSizeF();
+  const int fontHeight = int(fontHeightPoints / 72.0 * dpi);
+
+  mTitleHeight = fontHeight + TitlePadding * 2.0f + 1.0f;
   float slotY = mTitleHeight + SlotSpacing;
   for (WidgetSlot* sw : mWidgetSlots) {
     sw->mPosition = Vec2(SlotLeftMargin, slotY);
@@ -273,6 +277,7 @@ void NodeWidget::OnNameChange() {
   //ZenGarden::OpenGLMakeCurrent();
   //mTitleTexture = new TextTexture();
   //mTitleTexture->SetText(text, ThePainter->mTitleFont);
+  mNodeTitle = text;
   UpdateGraph();
 }
 
@@ -309,8 +314,7 @@ void NodeWidget::PaintToImage()
 
   QPixmap pixmap(iWidth, iHeight);
   pixmap.fill(QColor(0, 0, 0, 1));
-  QPainter painter;
-  painter.begin(&pixmap);
+  mPainter.begin(&pixmap);
 
   Vec4 headerColor = LiveHeaderColor;
   if (node->IsGhostNode()) {
@@ -318,28 +322,29 @@ void NodeWidget::PaintToImage()
       ? ReferenceHeaderColor : GhostHeaderColor;
   }
 
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(QColorFromVec4(headerColor));
-  painter.drawRect(QRectF(0, 0, size.x, mTitleHeight));
+  mPainter.setPen(Qt::NoPen);
+  mPainter.setBrush(QColorFromVec4(headerColor));
+  mPainter.drawRect(QRectF(0, 0, size.x, mTitleHeight));
 
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(QColor::fromRgbF(0, 0, 0, Opacity));
-  painter.drawRect(QRectF(0, mTitleHeight, size.x, size.y - mTitleHeight));
+  mPainter.setPen(Qt::NoPen);
+  mPainter.setBrush(QColor::fromRgbF(0, 0, 0, Opacity));
+  mPainter.drawRect(QRectF(0, mTitleHeight, size.x, size.y - mTitleHeight));
   //ThePainter->mColor->Set(Vec4(0, 0, 0, Opacity));
   //ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
 
-  painter.setPen(Qt::NoPen);
-  painter.setBrush(QColor::fromRgbF(0.2, 0.7, 0.9, 1));
+  mPainter.setPen(Qt::NoPen);
+  mPainter.setBrush(QColor::fromRgbF(0.2, 0.7, 0.9, 1));
   Vec2 outputTopLeft = mOutputPosition - ConnectionSpotSize * 0.5f;
-  painter.drawRect(QRectF(outputTopLeft.x, outputTopLeft.y, 
+  mPainter.drawRect(QRectF(outputTopLeft.x, outputTopLeft.y,
     ConnectionSpotSize.x, ConnectionSpotSize.y));
   //ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
   //ThePainter->DrawBox(position + mOutputPosition - ConnectionSpotSize * 0.5f,
   //  ConnectionSpotSize);
 
-  painter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
-  painter.drawText(QRectF(0, 0, size.x, mTitleHeight), Qt::AlignCenter,
-    QString::fromStdString(node->GetName()));
+  mPainter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
+  mPainter.drawText(
+    QRectF(0, 0, size.x - ConnectionSpotPadding - ConnectionSpotSize.x, mTitleHeight),
+    Qt::AlignVCenter | Qt::AlignCenter, mNodeTitle);
   //ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
   //float centerX = floor((size.x - float(mTitleTexture->mTextSize.width())) * 0.5f);
   //ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
@@ -363,16 +368,17 @@ void NodeWidget::PaintToImage()
     }
 
     WidgetSlot* sw = mWidgetSlots[i];
-    painter.setPen(QColorFromVec4(slotFrameColor));
-    painter.setBrush(Qt::NoBrush);
-    painter.drawRect(QRectF(sw->mPosition.x, sw->mPosition.y,
+    mPainter.setPen(QColorFromVec4(slotFrameColor));
+    mPainter.setBrush(Qt::NoBrush);
+    mPainter.drawRect(QRectF(sw->mPosition.x, sw->mPosition.y,
       sw->mSize.x, sw->mSize.y));
     //ThePainter->mColor->Set(slotFrameColor);
     //ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
 
-    painter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
-    painter.drawText(QPointF(sw->mPosition.x, sw->mPosition.y),
-      QString::fromStdString(*sw->mSlot->GetName()));
+    mPainter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
+    mPainter.drawText(QRectF(sw->mPosition.x + SlotPadding.x, sw->mPosition.y,
+      sw->mSize.x - SlotPadding.x, sw->mSize.y),
+      Qt::AlignVCenter, QString::fromStdString(*sw->mSlot->GetName()));
     //ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
     //ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
 
@@ -400,13 +406,13 @@ void NodeWidget::PaintToImage()
     else frameColor = Vec4(1, 1, 1, 0.3);
   }
 
-  painter.setPen(QColorFromVec4(frameColor));
-  painter.setBrush(Qt::NoBrush);
-  painter.drawRect(QRectF(0, 0, size.x, size.y));
+  mPainter.setPen(QColorFromVec4(frameColor));
+  mPainter.setBrush(Qt::NoBrush);
+  mPainter.drawRect(QRectF(0, 0, size.x, size.y));
 
   //ThePainter->mColor->Set(frameColor);
   //ThePainter->DrawRect(position, size);
 
-  painter.end();
+  mPainter.end();
   mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
 }
