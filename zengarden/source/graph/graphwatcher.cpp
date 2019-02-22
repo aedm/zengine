@@ -147,7 +147,8 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   GetGLWidget()->makeCurrent();
   auto graph = PointerCast<Graph>(GetNode());
   for (const auto& node : graph->mNodes.GetDirectMultiNodes()) {
-    shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
+    shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, 
+      std::bind(&GraphWatcher::HandleNodeWidgetRedraw, this));
     mWidgetMap[node] = widget;
   }
 
@@ -562,7 +563,8 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
   for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     auto it = mWidgetMap.find(node);
     if (it == mWidgetMap.end()) {
-      shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, this);
+      shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, 
+        std::bind(&GraphWatcher::HandleNodeWidgetRedraw, this));
       mWidgetMap[node] = widget;
       changed = true;
     }
@@ -669,3 +671,11 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
     event->acceptProposedAction();
   }
 }
+
+void GraphWatcher::HandleNodeWidgetRedraw() {
+  if (!mRedrawRequested) {
+    mRedrawRequested = true;
+    Update();
+  }
+}
+

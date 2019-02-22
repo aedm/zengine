@@ -108,5 +108,9 @@ private:
   /// Finds which widget and slot is hovered by the mouse pointer.
   /// Return true if either the hovered node or the hoeverd slot changed.
   bool UpdateHoveredWidget(Vec2 mousePos);
+
+  /// NodeWidgets can request a redraw
+  void HandleNodeWidgetRedraw();
+  bool mRedrawRequested = false;
 };
 
