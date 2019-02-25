@@ -21,7 +21,6 @@ public:
 
   enum class FrameColor {
     DEFAULT,
-    SELECTED,
     HOVERED,
     CONNECTION_FROM,
     VALID_CONNECTION,
@@ -40,6 +39,9 @@ public:
   };
   /// Highlights a slot (eg. when connecting them)
   void SetSlotColor(int slotIndex, SlotColor slotColor);
+
+  void SetSelected(bool isSelected);
+  bool IsSelected();
 
   void Paint();
   Vec2 GetOutputPosition();
@@ -78,6 +80,7 @@ private:
   FrameColor mFrameColor = FrameColor::DEFAULT;
   SlotColor mSlotColor = SlotColor::DEFAULT;
   int mColoredSlotIndex = -1;
+  bool mIsSelected = false;
 
   /// Index of the currently highlighted slot
   int mHighlightedSlotIndex = -1;

@@ -103,7 +103,6 @@ private:
   void DeselectAll();
   void SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget);
   void StorePositionOfSelectedNodes();
-  bool IsWidgetSelected(const shared_ptr<NodeWidget>& nodeWidget);
 
   /// Finds which widget and slot is hovered by the mouse pointer.
   /// Return true if either the hovered node or the hoeverd slot changed.

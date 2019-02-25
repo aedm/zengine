@@ -48,7 +48,7 @@ struct {
   const QColor mFrameInvalidConnection = QColor::fromRgbF(1, 0, 0, 1);
 } Colors;
 
-NodeWidget::NodeWidget(const shared_ptr<Node>& node, 
+NodeWidget::NodeWidget(const shared_ptr<Node>& node,
   const std::function<void()>& onNeedsRedraw)
   : WatcherUI(node)
   , mOnNeedsRedraw(onNeedsRedraw)
@@ -75,6 +75,17 @@ void NodeWidget::SetSlotColor(int slotIndex, NodeWidget::SlotColor slotColor) {
   mColoredSlotIndex = slotIndex;
   mUptodate = false;
   mOnNeedsRedraw();
+}
+
+void NodeWidget::SetSelected(bool isSelected) {
+  if (mIsSelected == isSelected) return;
+  mIsSelected = isSelected;
+  mUptodate = false;
+  mOnNeedsRedraw();
+}
+
+bool NodeWidget::IsSelected() {
+  return mIsSelected;
 }
 
 void NodeWidget::CreateWidgetSlots() {
@@ -118,7 +129,6 @@ void NodeWidget::CalculateLayout() {
 
 void NodeWidget::UpdateTexture() {
   if (!mUptodate) {
-    DiscardTexture();
     PaintToImage();
     /// This makes a copy of the array
     unsigned char* bits = mImage.bits();
@@ -133,11 +143,16 @@ void NodeWidget::UpdateTexture() {
       current += 4;
     }
 
-    //mTexture = TheResourceManager->CreateTexture(mImage.width(), mImage.height(),
-    //  TexelType::ARGB8, (void*)bits);
-
-    mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
-      TexelType::ARGB8, (void*)bits, false, false);
+    if (mTexture && mTexture->mWidth == mImage.width() &&
+      mTexture->mHeight == mImage.height()) {
+      OpenGL->UploadTextureData(mTexture->mHandle, mTexture->mWidth, mTexture->mHeight,
+        TexelType::ARGB8, (void*)bits);
+    }
+    else {
+      DiscardTexture();
+      mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
+        TexelType::ARGB8, (void*)bits, false, false);
+    }
     mUptodate = true;
   }
 }
@@ -385,8 +400,8 @@ void NodeWidget::PaintToImage()
       case SlotColor::VALID_CONNECTION:
         slotColor = Colors.mSlotValidConnection;
         break;
-      case SlotColor::INVALID_CONNECTION: 
-        slotColor = Colors.mSlotInvalidConnection; 
+      case SlotColor::INVALID_CONNECTION:
+        slotColor = Colors.mSlotInvalidConnection;
         break;
       }
     }
@@ -411,30 +426,32 @@ void NodeWidget::PaintToImage()
 
   /// Paint frame
   QColor frameColor;
-  switch (mFrameColor) {
-  case FrameColor::DEFAULT:
-    frameColor = Colors.mFrameDefault;
-    break;
-  case FrameColor::SELECTED:
+  if (mIsSelected) {
     frameColor = Colors.mFrameSelected;
-    break;
-  case FrameColor::HOVERED:
-    frameColor = Colors.mFrameHovered;
-    break;
-  case FrameColor::CONNECTION_FROM:
-    frameColor = Colors.mFrameConnectionFrom;
-    break;
-  case FrameColor::VALID_CONNECTION:
-    frameColor = Colors.mFrameValidConnection;
-    break;
-  case FrameColor::INVALID_CONNECTION:
-    frameColor = Colors.mFrameInvalidConnection;
-    break;
+  } 
+  else {
+    switch (mFrameColor) {
+    case FrameColor::DEFAULT:
+      frameColor = Colors.mFrameDefault;
+      break;
+    case FrameColor::HOVERED:
+      frameColor = Colors.mFrameHovered;
+      break;
+    case FrameColor::CONNECTION_FROM:
+      frameColor = Colors.mFrameConnectionFrom;
+      break;
+    case FrameColor::VALID_CONNECTION:
+      frameColor = Colors.mFrameValidConnection;
+      break;
+    case FrameColor::INVALID_CONNECTION:
+      frameColor = Colors.mFrameInvalidConnection;
+      break;
+    }
   }
 
   mPainter.setPen(frameColor);
   mPainter.setBrush(Qt::NoBrush);
-  mPainter.drawRect(QRectF(0, 0, size.x, size.y));
+  mPainter.drawRect(QRectF(0, 0, size.x - 1, size.y - 1));
 
   mPainter.end();
   mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
