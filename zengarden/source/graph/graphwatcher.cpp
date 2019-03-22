@@ -463,13 +463,76 @@ bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
     }
   }
 
-  bool changed =
-    hovered != mHoveredWidget || (hovered != nullptr && slot != mHoveredSlotIndex);
-  mHoveredWidget = hovered;
-  mHoveredSlotIndex = slot;
-  return changed;
+  //bool changed =
+  //  hovered != mHoveredWidget || (hovered != nullptr && slot != mHoveredSlotIndex);
+  if (hovered != mHoveredWidget) {
+    if (mHoveredWidget) {
+      mHoveredWidget->SetFrameColor(NodeWidget::FrameColor::DEFAULT);
+      mHoveredWidget->SetSlotColor(-1, NodeWidget::SlotColor::DEFAULT);
+    }
+    if (hovered) {
+      hovered->SetFrameColor(NodeWidget::FrameColor::HOVERED);
+      hovered->SetSlotColor(slot, NodeWidget::SlotColor::HOVERED);
+    }
+    mHoveredWidget = hovered;
+  }
+  else {
+    if (slot != mHoveredSlotIndex) {
+      if (hovered) hovered->SetSlotColor(slot, NodeWidget::SlotColor::HOVERED);
+    }
+  }
+
+  //mHoveredSlotIndex = slot;
+  //return changed;
 }
 
+void GraphWatcher::FindHoveredWidget(Vec2 mousePos,
+  shared_ptr<NodeWidget>& oHoveredWidget, int oSlotIndex) 
+{
+  for (auto& it : mWidgetMap) {
+    shared_ptr<Node> node = it.first;
+    shared_ptr<NodeWidget> widget = it.second;
+    if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
+      oHoveredWidget = widget;
+      for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
+        NodeWidget::WidgetSlot* sw = widget->mWidgetSlots[o];
+        if (IsInsideRect(mousePos, node->GetPosition() + sw->mPosition, sw->mSize)) {
+          oSlotIndex = o;
+          break;
+        }
+      }
+      return;
+    }
+  }
+  oHoveredWidget = nullptr;
+  oSlotIndex = -1;
+}
+
+
+void GraphWatcher::SetHoveredWidget(shared_ptr<NodeWidget>& hoveredWidget, 
+  int hoveredSlotIndex, NodeWidget::FrameColor frameColor, 
+  NodeWidget::SlotColor slotColor)
+{
+  if (hoveredWidget != mHoveredWidget) {
+    if (mHoveredWidget) {
+      mHoveredWidget->SetFrameColor(NodeWidget::FrameColor::DEFAULT);
+      mHoveredWidget->SetSlotColor(-1, NodeWidget::SlotColor::DEFAULT);
+    }
+    if (hoveredWidget) {
+      hoveredWidget->SetFrameColor(frameColor);
+      hoveredWidget->SetSlotColor(hoveredSlotIndex, slotColor);
+    }
+    mHoveredWidget = hoveredWidget;
+  }
+  else {
+    if (hoveredSlotIndex != mHoveredSlotIndex) {
+      if (hoveredWidget) {
+        hoveredWidget->SetSlotColor(hoveredSlotIndex, slotColor);
+      }
+    }
+  }
+  mHoveredSlotIndex = hoveredSlotIndex;
+}
 
 void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
   auto scanCode = event->nativeScanCode();

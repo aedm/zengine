@@ -107,6 +107,10 @@ private:
   /// Finds which widget and slot is hovered by the mouse pointer.
   /// Return true if either the hovered node or the hoeverd slot changed.
   bool UpdateHoveredWidget(Vec2 mousePos);
+  void FindHoveredWidget(Vec2 mousePos, shared_ptr<NodeWidget>& oHoveredWidget,
+    int oSlotIndex);
+  void SetHoveredWidget(shared_ptr<NodeWidget>& hoveredWidget, int hoveredSlotIndex,
+    NodeWidget::FrameColor frameColor, NodeWidget::SlotColor slotColor);
 
   /// NodeWidgets can request a redraw
   void HandleNodeWidgetRedraw();
