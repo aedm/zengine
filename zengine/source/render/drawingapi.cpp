@@ -840,6 +840,7 @@ void OpenGLAPI::DeleteTexture(TextureHandle handle) {
 void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
                                   TexelType type, void* texelData) {
   ASSERT(!PleaseNoNewResources);
+  SetActiveTexture(0);
   BindTexture(handle);
   SetTextureData(width, height, type, texelData, true);
   CheckGLError();
