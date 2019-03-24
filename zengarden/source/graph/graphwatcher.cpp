@@ -64,7 +64,7 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
       }
       else {
         /// TODO: remove code duplication
-        auto connectedNode = slot->GetDirectNode();
+        auto& connectedNode = slot->GetDirectNode();
         if (connectedNode) {
           shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget != NULL) {
@@ -203,13 +203,11 @@ void GraphWatcher::DeselectAll() {
 
 
 void GraphWatcher::SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget) {
-  for (const shared_ptr<NodeWidget>& widget : mSelectedNodeWidgets) {
-    widget->SetSelected(widget == nodeWidget);
+  for (auto it : mWidgetMap) {
+    it.second->SetSelected(it.second == nodeWidget);
   }
   mSelectedNodeWidgets.clear();
-  ASSERT(mSelectedNodeWidgets.find(nodeWidget) == mSelectedNodeWidgets.end());
   mSelectedNodeWidgets.insert(nodeWidget);
-  nodeWidget->SetSelected(true);
   ZenGarden::GetInstance()->SetNodeForPropertyEditor(nodeWidget->GetDirectNode());
 }
 
@@ -229,25 +227,15 @@ void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
   case State::DEFAULT:
     if (mHoveredWidget) {
       if ((event->modifiers() & Qt::ShiftModifier) > 0) {
-        if (mHoveredSlotIndex >= 0) {
-          /// Start connecting from slot to node
-          mCurrentState = State::CONNECT_TO_NODE;
-          mClickedWidget = mHoveredWidget;
-          mClickedSlotIndex = mHoveredSlotIndex;
-          mIsConnectionValid = false;
-          DeselectAll();
-        }
-        else {
-          /// Start connecting from node to slot
-          mCurrentState = State::CONNECT_TO_SLOT;
-          mClickedWidget = mHoveredWidget;
-          mClickedSlotIndex = -1;
-          mIsConnectionValid = false;
-          DeselectAll();
-        }
+        mClickedWidget = mHoveredWidget;
+        mClickedSlotIndex = mHoveredSlotIndex;
+        mIsConnectionValid = false;
+        DeselectAll();
+        mCurrentState = 
+          mHoveredSlotIndex < 0 ? State::CONNECT_TO_SLOT : State::CONNECT_TO_NODE;
       }
       else {
-        if (mHoveredWidget->IsSelected()) {
+        if (mSelectedNodeWidgets.find(mHoveredWidget) == mSelectedNodeWidgets.end()) {
           /// Select node
           SelectSingleWidget(mHoveredWidget);
         }
@@ -465,22 +453,6 @@ void GraphWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event)
   GetGLWidget()->update();
 }
 
-
-void GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
-  bool found = false;
-  for (auto& it : mWidgetMap) {
-    shared_ptr<Node> node = it.first;
-    shared_ptr<NodeWidget> widget = it.second;
-    if (mHoveredWidget == widget) {
-      widget->SetFrameColor(NodeWidget::ColorState::HOVERED);
-      widget->SetSlotColor(mHoveredSlotIndex, NodeWidget::ColorState::HOVERED);
-    }
-    else {
-      widget->SetFrameColor(NodeWidget::ColorState::DEFAULT);
-      widget->SetSlotColor(-1, NodeWidget::ColorState::DEFAULT);
-    }
-  }
-}
 
 void GraphWatcher::FindHoveredWidget(Vec2 mousePos,
   shared_ptr<NodeWidget>* oHoveredWidget, int* oSlotIndex)

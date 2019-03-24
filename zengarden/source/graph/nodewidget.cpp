@@ -171,88 +171,6 @@ void NodeWidget::Paint() {
   ThePainter->DrawTexture(mTexture, position.x, position.y);
 }
 
-//void NodeWidget::Paint2()
-//{
-//  shared_ptr<Node> node = GetDirectNode();
-//  Vec2 position = node->GetPosition();
-//  Vec2 size = node->GetSize();
-//  int iWidth = int(ceilf(size.x));
-//  int iHeight = int(ceilf(size.y));
-//  if (mImage->width() != iWidth || mImage->height() != iHeight) {
-//    mImage = make_unique<QImage>(iWidth, iHeight, QImage::Format_ARGB32);
-//  }
-//
-//  Vec4 headerColor = LiveHeaderColor;
-//  if (node->IsGhostNode()) {
-//    headerColor = PointerCast<Ghost>(node)->IsDirectReference()
-//      ? ReferenceHeaderColor : GhostHeaderColor;
-//  }
-//  ThePainter->mColor->Set(headerColor);
-//  ThePainter->DrawBox(position, Vec2(size.x, mTitleHeight));
-//
-//  ThePainter->mColor->Set(Vec4(0, 0, 0, Opacity));
-//  ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
-//
-//  ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
-//  ThePainter->DrawBox(position + mOutputPosition - ConnectionSpotSize * 0.5f,
-//    ConnectionSpotSize);
-//
-//  ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
-//  float centerX = floor((size.x - float(mTitleTexture->mTextSize.width())) * 0.5f);
-//  ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
-//
-//  /// Paint slots
-//  for (int i = 0; i < mWidgetSlots.size(); i++) {
-//    Vec4 slotFrameColor(1, 1, 1, 0.1);
-//    if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
-//      if (mGraphWatcher->mClickedWidget.get() == this
-//        && mGraphWatcher->mClickedSlotIndex == i) {
-//        slotFrameColor = ConnectionColor;
-//      }
-//    }
-//    else if (mGraphWatcher->mHoveredWidget.get() == this
-//      && mGraphWatcher->mHoveredSlotIndex == i) {
-//      if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT) {
-//        slotFrameColor = mGraphWatcher->mIsConnectionValid
-//          ? ConnectionColorValid : ConnectionColorInvalid;
-//      }
-//      else slotFrameColor = Vec4(1, 1, 1, 0.2);
-//    }
-//
-//    WidgetSlot* sw = mWidgetSlots[i];
-//    ThePainter->mColor->Set(slotFrameColor);
-//    ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
-//
-//    ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
-//    ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
-//
-//    ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
-//    ThePainter->DrawBox(position + sw->mSpotPos - ConnectionSpotSize * 0.5f,
-//      ConnectionSpotSize);
-//  }
-//
-//  /// Paint frame
-//  Vec4 frameColor(1, 1, 1, 0.1);
-//  if (mIsSelected) {
-//    frameColor = Vec4(1, 1, 1, 1);
-//  }
-//  else if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_SLOT
-//    && mGraphWatcher->mClickedWidget.get() == this) {
-//    frameColor = ConnectionColor;
-//  }
-//  else if (mGraphWatcher->mHoveredWidget.get() == this) {
-//    if (mGraphWatcher->mCurrentState == GraphWatcher::State::CONNECT_TO_NODE) {
-//      if (mGraphWatcher->mClickedWidget.get() != this) {
-//        frameColor = mGraphWatcher->mIsConnectionValid
-//          ? ConnectionColorValid : ConnectionColorInvalid;
-//      }
-//    }
-//    else frameColor = Vec4(1, 1, 1, 0.3);
-//  }
-//  ThePainter->mColor->Set(frameColor);
-//  ThePainter->DrawRect(position, size);
-//}
-
 
 Vec2 NodeWidget::GetOutputPosition()
 {
@@ -274,10 +192,6 @@ const std::vector<NodeWidget::WidgetSlot*>& NodeWidget::GetWidgetSlots() {
 void NodeWidget::OnSlotStructureChanged() {
   CreateWidgetSlots();
   mOnNeedsRedraw();
-  //shared_ptr<Node> node = ZenGarden::GetInstance()->GetNodeInPropertyEditor();
-  //if (node == GetDirectNode()) {
-  //  ZenGarden::GetInstance()->SetNodeForPropertyEditor(node);;
-  //}
 }
 
 
@@ -310,11 +224,8 @@ void NodeWidget::OnNameChange() {
       }
     }
   }
-  mForceUpdate = true;
-  //ZenGarden::OpenGLMakeCurrent();
-  //mTitleTexture = new TextTexture();
-  //mTitleTexture->SetText(text, ThePainter->mTitleFont);
   mNodeTitle = text;
+  mForceUpdate = true;
   mOnNeedsRedraw();
 }
 
@@ -328,26 +239,23 @@ void NodeWidget::OnSlotConnectionChanged(Slot* slot) {
   mOnNeedsRedraw();
 }
 
+
 QColor QColorFromVec4(const Vec4& vec) {
   return QColor::fromRgbF(vec.x, vec.y, vec.z, vec.w);
 }
 
+
 void NodeWidget::DiscardTexture() {
   TheResourceManager->DiscardTexture(mTexture);
   mTexture = nullptr;
-  //SafeDelete(mTexture);
 }
 
 void NodeWidget::PaintToImage()
 {
   shared_ptr<Node> node = GetDirectNode();
-  //Vec2 position = node->GetPosition();
   Vec2 size = node->GetSize();
   int iWidth = int(ceilf(size.x));
   int iHeight = int(ceilf(size.y));
-  //if (mImage == nullptr || mImage->width() != iWidth || mImage->height() != iHeight) {
-  //  mImage = make_unique<QImage>(iWidth, iHeight, QImage::Format_ARGB32);
-  //}
 
   QPixmap pixmap(iWidth, iHeight);
   pixmap.fill(QColor(0, 0, 0, 1));
@@ -366,25 +274,17 @@ void NodeWidget::PaintToImage()
   mPainter.setPen(Qt::NoPen);
   mPainter.setBrush(QColor::fromRgbF(0, 0, 0, Opacity));
   mPainter.drawRect(QRectF(0, mTitleHeight, size.x, size.y - mTitleHeight));
-  //ThePainter->mColor->Set(Vec4(0, 0, 0, Opacity));
-  //ThePainter->DrawBox(position + Vec2(0, mTitleHeight), size - Vec2(0, mTitleHeight));
 
   mPainter.setPen(Qt::NoPen);
   mPainter.setBrush(QColor::fromRgbF(0.2, 0.7, 0.9, 1));
   Vec2 outputTopLeft = mOutputPosition - ConnectionSpotSize * 0.5f;
   mPainter.drawRect(QRectF(outputTopLeft.x, outputTopLeft.y,
     ConnectionSpotSize.x, ConnectionSpotSize.y));
-  //ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
-  //ThePainter->DrawBox(position + mOutputPosition - ConnectionSpotSize * 0.5f,
-  //  ConnectionSpotSize);
 
   mPainter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
   mPainter.drawText(
     QRectF(0, 0, size.x - ConnectionSpotPadding - ConnectionSpotSize.x, mTitleHeight),
     Qt::AlignVCenter | Qt::AlignCenter, mNodeTitle);
-  //ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
-  //float centerX = floor((size.x - float(mTitleTexture->mTextSize.width())) * 0.5f);
-  //ThePainter->DrawTextTexture(mTitleTexture, position + Vec2(centerX, TitlePadding + 1));
 
   /// Paint slots
   for (int i = 0; i < mWidgetSlots.size(); i++) {
@@ -414,19 +314,11 @@ void NodeWidget::PaintToImage()
     mPainter.setBrush(Qt::NoBrush);
     mPainter.drawRect(QRectF(sw->mPosition.x, sw->mPosition.y,
       sw->mSize.x, sw->mSize.y));
-    //ThePainter->mColor->Set(slotFrameColor);
-    //ThePainter->DrawRect(position + sw->mPosition, sw->mSize);
 
     mPainter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
     mPainter.drawText(QRectF(sw->mPosition.x + SlotPadding.x, sw->mPosition.y,
       sw->mSize.x - SlotPadding.x, sw->mSize.y),
       Qt::AlignVCenter, QString::fromStdString(*sw->mSlot->GetName()));
-    //ThePainter->mColor->Set(Vec4(0.9, 0.9, 0.9, 1));
-    //ThePainter->DrawTextTexture(&sw->mTexture, position + sw->mPosition + SlotPadding);
-
-    //ThePainter->mColor->Set(Vec4(0.2, 0.7, 0.9, 1));
-    //ThePainter->DrawBox(position + sw->mSpotPos - ConnectionSpotSize * 0.5f,
-    //  ConnectionSpotSize);
   }
 
   /// Paint frame

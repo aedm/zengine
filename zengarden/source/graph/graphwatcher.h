@@ -108,9 +108,6 @@ private:
   void SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget);
   void StorePositionOfSelectedNodes();
 
-  /// Finds which widget and slot is hovered by the mouse pointer.
-  void UpdateHoveredWidget(Vec2 mousePos);
-
   void FindHoveredWidget(Vec2 mousePos, shared_ptr<NodeWidget>* oHoveredWidget,
     int* oSlotIndex);
 
