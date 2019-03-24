@@ -266,6 +266,10 @@ Vec2 NodeWidget::GetInputPosition(int SlotIndex)
 }
 
 
+const std::vector<NodeWidget::WidgetSlot*> NodeWidget::GetWidgetSlots() {
+  return mWidgetSlots;
+}
+
 void NodeWidget::OnSlotStructureChanged() {
   CreateWidgetSlots();
   mOnNeedsRedraw();
