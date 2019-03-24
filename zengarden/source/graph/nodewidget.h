@@ -36,7 +36,9 @@ public:
   void SetSelected(bool isSelected);
   bool IsSelected();
 
+  bool NeedsRepaint();
   void Paint();
+
   Vec2 GetOutputPosition();
   Vec2 GetInputPosition(int slotIndex);
 
@@ -47,7 +49,7 @@ public:
     Vec2 mSpotPos;
     Slot* mSlot;
   };
-  const vector<WidgetSlot*>	GetWidgetSlots();
+  const vector<WidgetSlot*>& GetWidgetSlots();
 
 private:
   virtual void OnSlotStructureChanged() override;
@@ -99,7 +101,7 @@ private:
   QPainter mPainter;
 
   Texture* mTexture = nullptr;
-  bool mUptodate = false;
+  bool mForceUpdate = true;
   void DiscardTexture();
   void PaintToImage();
   void UpdateTexture();

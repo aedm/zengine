@@ -62,30 +62,30 @@ NodeWidget::~NodeWidget() {
   DiscardTexture();
 }
 
-void NodeWidget::SetFrameColor(NodeWidget::FrameColor frameColor) {
-  if (frameColor == mFrameColor) return;
-  mFrameColor = frameColor;
-  mUptodate = false;
-  mOnNeedsRedraw();
+void NodeWidget::SetFrameColor(NodeWidget::ColorState frameColorState) {
+  mNextPaintState.mFrameColorState = frameColorState;
 }
 
-void NodeWidget::SetSlotColor(int slotIndex, NodeWidget::SlotColor slotColor) {
-  if (slotColor == mSlotColor && slotIndex == mColoredSlotIndex) return;
-  mSlotColor = slotColor;
-  mColoredSlotIndex = slotIndex;
-  mUptodate = false;
-  mOnNeedsRedraw();
+void NodeWidget::SetSlotColor(int slotIndex, NodeWidget::ColorState slotColorState) {
+  mNextPaintState.mSlotColorState = slotColorState;
+  mNextPaintState.mColoredSlotIndex = slotIndex;
 }
 
 void NodeWidget::SetSelected(bool isSelected) {
-  if (mIsSelected == isSelected) return;
-  mIsSelected = isSelected;
-  mUptodate = false;
-  mOnNeedsRedraw();
+  mNextPaintState.mIsSelected = isSelected;
 }
 
 bool NodeWidget::IsSelected() {
-  return mIsSelected;
+  return mNextPaintState.mIsSelected;
+}
+
+bool NodeWidget::NeedsRepaint() {
+  return mForceUpdate ||
+    mCurrentPaintState.mFrameColorState != mNextPaintState.mFrameColorState ||
+    mCurrentPaintState.mSlotColorState != mNextPaintState.mSlotColorState ||
+    mCurrentPaintState.mColoredSlotIndex != mNextPaintState.mColoredSlotIndex ||
+    mCurrentPaintState.mIsSelected != mNextPaintState.mIsSelected ||
+    mCurrentPaintState.mHighlightedSlotIndex != mNextPaintState.mHighlightedSlotIndex;
 }
 
 void NodeWidget::CreateWidgetSlots() {
@@ -123,12 +123,12 @@ void NodeWidget::CalculateLayout() {
   mOutputPosition = Vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
   GetDirectNode()->SetSize(size);
 
-  mUptodate = false;
+  mForceUpdate = true;
 }
 
 
 void NodeWidget::UpdateTexture() {
-  if (!mUptodate) {
+  if (NeedsRepaint()) {
     PaintToImage();
     /// This makes a copy of the array
     unsigned char* bits = mImage.bits();
@@ -153,7 +153,8 @@ void NodeWidget::UpdateTexture() {
       mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
         TexelType::ARGB8, (void*)bits, false, false);
     }
-    mUptodate = true;
+    mForceUpdate = false;
+    mCurrentPaintState = mNextPaintState;
   }
 }
 
@@ -266,7 +267,7 @@ Vec2 NodeWidget::GetInputPosition(int SlotIndex)
 }
 
 
-const std::vector<NodeWidget::WidgetSlot*> NodeWidget::GetWidgetSlots() {
+const std::vector<NodeWidget::WidgetSlot*>& NodeWidget::GetWidgetSlots() {
   return mWidgetSlots;
 }
 
@@ -309,7 +310,7 @@ void NodeWidget::OnNameChange() {
       }
     }
   }
-  mUptodate = false;
+  mForceUpdate = true;
   //ZenGarden::OpenGLMakeCurrent();
   //mTitleTexture = new TextTexture();
   //mTitleTexture->SetText(text, ThePainter->mTitleFont);
@@ -390,21 +391,21 @@ void NodeWidget::PaintToImage()
     WidgetSlot* sw = mWidgetSlots[i];
 
     QColor slotColor = Colors.mSlotDefault;
-    if (mColoredSlotIndex == i) {
-      switch (mSlotColor) {
-      case SlotColor::DEFAULT:
+    if (mNextPaintState.mColoredSlotIndex == i) {
+      switch (mNextPaintState.mSlotColorState) {
+      case ColorState::DEFAULT:
         slotColor = Colors.mSlotDefault;
         break;
-      case SlotColor::HOVERED:
+      case ColorState::HOVERED:
         slotColor = Colors.mSlotHovered;
         break;
-      case SlotColor::CONNECTION_FROM:
+      case ColorState::CONNECTION_FROM:
         slotColor = Colors.mSlotConnectionFrom;
         break;
-      case SlotColor::VALID_CONNECTION:
+      case ColorState::VALID_CONNECTION:
         slotColor = Colors.mSlotValidConnection;
         break;
-      case SlotColor::INVALID_CONNECTION:
+      case ColorState::INVALID_CONNECTION:
         slotColor = Colors.mSlotInvalidConnection;
         break;
       }
@@ -430,24 +431,24 @@ void NodeWidget::PaintToImage()
 
   /// Paint frame
   QColor frameColor;
-  if (mIsSelected) {
+  if (mNextPaintState.mIsSelected) {
     frameColor = Colors.mFrameSelected;
   } 
   else {
-    switch (mFrameColor) {
-    case FrameColor::DEFAULT:
+    switch (mNextPaintState.mFrameColorState) {
+    case ColorState::DEFAULT:
       frameColor = Colors.mFrameDefault;
       break;
-    case FrameColor::HOVERED:
+    case ColorState::HOVERED:
       frameColor = Colors.mFrameHovered;
       break;
-    case FrameColor::CONNECTION_FROM:
+    case ColorState::CONNECTION_FROM:
       frameColor = Colors.mFrameConnectionFrom;
       break;
-    case FrameColor::VALID_CONNECTION:
+    case ColorState::VALID_CONNECTION:
       frameColor = Colors.mFrameValidConnection;
       break;
-    case FrameColor::INVALID_CONNECTION:
+    case ColorState::INVALID_CONNECTION:
       frameColor = Colors.mFrameInvalidConnection;
       break;
     }

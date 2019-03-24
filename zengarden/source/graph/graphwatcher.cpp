@@ -48,8 +48,9 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   ThePainter->mColor->Set(Vec4(1, 1, 1, 1));
   for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     shared_ptr<NodeWidget> nodeWidget = mWidgetMap.at(node);
-    for (int i = 0; i < nodeWidget->mWidgetSlots.size(); i++) {
-      Slot* slot = nodeWidget->mWidgetSlots[i]->mSlot;
+    auto& widgetSlots = nodeWidget->GetWidgetSlots();
+    for (int i = 0; i < widgetSlots.size(); i++) {
+      Slot* slot = widgetSlots[i]->mSlot;
       if (slot->mIsMultiSlot) {
         for (const auto& connectedNode : slot->GetDirectMultiNodes()) {
           shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
@@ -149,7 +150,7 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   GetGLWidget()->makeCurrent();
   auto graph = PointerCast<Graph>(GetNode());
   for (const auto& node : graph->mNodes.GetDirectMultiNodes()) {
-    shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, 
+    shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node,
       std::bind(&GraphWatcher::HandleNodeWidgetRedraw, this));
     mWidgetMap[node] = widget;
   }
@@ -213,9 +214,9 @@ void GraphWatcher::SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget) 
 }
 
 void GraphWatcher::StorePositionOfSelectedNodes() {
+  mOriginalWidgetPositions.clear();
   for (shared_ptr<NodeWidget> nodeWidget : mSelectedNodeWidgets) {
-    nodeWidget->mOriginalPosition = nodeWidget->GetDirectNode()->GetPosition();
-    nodeWidget->mOriginalSize = nodeWidget->GetDirectNode()->GetSize();
+    mOriginalWidgetPositions[nodeWidget] = nodeWidget->GetDirectNode()->GetPosition();
   }
 }
 
@@ -283,7 +284,8 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
       for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
         Vec2 pos = widget->GetDirectNode()->GetPosition();
         TheCommandStack->Execute(
-          new MoveNodeCommand(widget->GetDirectNode(), pos, widget->mOriginalPosition));
+          new MoveNodeCommand(widget->GetDirectNode(), pos,
+            mOriginalWidgetPositions.at(widget)));
       }
     }
     else {
@@ -303,7 +305,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   case State::CONNECT_TO_NODE:
     if (mIsConnectionValid) {
       shared_ptr<Node> node = mHoveredWidget->GetDirectNode();
-      Slot* slot = mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot;
+      Slot* slot = mClickedWidget->GetWidgetSlots()[mClickedSlotIndex]->mSlot;
       TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
     }
     GetGLWidget()->update();
@@ -312,7 +314,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   case State::CONNECT_TO_SLOT:
     if (mIsConnectionValid) {
       shared_ptr<Node> node = mClickedWidget->GetDirectNode();
-      Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
+      Slot* slot = mHoveredWidget->GetWidgetSlots()[mHoveredSlotIndex]->mSlot;
       TheCommandStack->Execute(new ConnectNodeToSlotCommand(node, slot));
     }
     GetGLWidget()->update();
@@ -328,7 +330,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
   if ((event->modifiers() & Qt::ShiftModifier) > 0) {
     if (mHoveredSlotIndex >= 0) {
       /// Remove connection
-      Slot* slot = mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot;
+      Slot* slot = mHoveredWidget->GetWidgetSlots()[mHoveredSlotIndex]->mSlot;
       if (slot->mIsMultiSlot) {
         /// HACK HACK HACK
         slot->DisconnectAll(true);
@@ -360,6 +362,16 @@ void GraphWatcher::HandleMouseRightUp(QMouseEvent* event) {
 void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) {
   Vec2 mousePos = MouseToWorld(event);
   mCurrentMousePos = mousePos;
+
+  /// Reset all frame colors
+  for (auto& it : mWidgetMap) {
+    shared_ptr<NodeWidget> widget = it.second;
+    widget->SetFrameColor(NodeWidget::ColorState::DEFAULT);
+    widget->SetSlotColor(-1, NodeWidget::ColorState::DEFAULT);
+  }
+
+  FindHoveredWidget(mousePos, &mHoveredWidget, &mHoveredSlotIndex);
+
   switch (mCurrentState) {
   case State::MOVE_NODES:
   {
@@ -368,7 +380,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
       shared_ptr<Node> originalNode = mHoveredWidget->GetDirectNode();
       shared_ptr<Ghost> ghost = make_shared<Ghost>();
       ghost->mOriginalNode.Connect(originalNode);
-      Vec2 position = mHoveredWidget->mOriginalPosition + mouseDiff;
+      Vec2 position = mOriginalWidgetPositions[mHoveredWidget] + mouseDiff;
       ghost->SetPosition(position);
       TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
       /// Adding new nodes to a graph resets watcher state, but we want to move the ghost
@@ -383,7 +395,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
 
     mAreNodesMoved = true;
     for (shared_ptr<NodeWidget> widget : mSelectedNodeWidgets) {
-      widget->GetDirectNode()->SetPosition(widget->mOriginalPosition + mouseDiff);
+      widget->GetDirectNode()->SetPosition(mOriginalWidgetPositions[widget] + mouseDiff);
     }
     GetGLWidget()->update();
   }
@@ -399,24 +411,28 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
     break;
   case State::CONNECT_TO_NODE:
     mIsConnectionValid = false;
-    UpdateHoveredWidget(mousePos);
     if (mHoveredWidget && mHoveredWidget != mClickedWidget) {
-      if (mClickedWidget->mWidgetSlots[mClickedSlotIndex]->mSlot->DoesAcceptNode(
-        mHoveredWidget->GetDirectNode())) {
-        /// TODO: check for graph cycles
-        mIsConnectionValid = true;
-      }
+      /// TODO: check for graph cycles
+      mIsConnectionValid =
+        mClickedWidget->GetWidgetSlots()[mClickedSlotIndex]->mSlot->DoesAcceptNode(
+          mHoveredWidget->GetDirectNode());
+      mHoveredWidget->SetFrameColor(mIsConnectionValid
+        ? NodeWidget::ColorState::VALID_CONNECTION
+        : NodeWidget::ColorState::INVALID_CONNECTION);
     }
     GetGLWidget()->update();
     break;
   case State::CONNECT_TO_SLOT:
     mIsConnectionValid = false;
-    UpdateHoveredWidget(mousePos);
-    if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
-      if (mHoveredWidget->mWidgetSlots[mHoveredSlotIndex]->mSlot->DoesAcceptNode(
-        mClickedWidget->GetDirectNode())) {
+    if (mHoveredWidget) {
+      mHoveredWidget->SetFrameColor(NodeWidget::ColorState::HOVERED);
+      if (mHoveredSlotIndex >= 0 && mHoveredWidget != mClickedWidget) {
         /// TODO: check for graph cycles
-        mIsConnectionValid = true;
+        mIsConnectionValid = (mHoveredWidget->GetWidgetSlots()[mHoveredSlotIndex]->mSlot->DoesAcceptNode(
+          mClickedWidget->GetDirectNode()));
+        mHoveredWidget->SetSlotColor(mHoveredSlotIndex, mIsConnectionValid
+          ? NodeWidget::ColorState::VALID_CONNECTION
+          : NodeWidget::ColorState::INVALID_CONNECTION);
       }
     }
     GetGLWidget()->update();
@@ -430,7 +446,13 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
   }
   break;
   default:
-    if (UpdateHoveredWidget(mousePos)) GetGLWidget()->update();
+    if (mHoveredWidget) {
+      mHoveredWidget->SetFrameColor(NodeWidget::ColorState::HOVERED);
+      mHoveredWidget->SetSlotColor(mHoveredSlotIndex, NodeWidget::ColorState::HOVERED);
+    }
+    if (NeedsWidgetRepaint()) {
+      GetGLWidget()->update();
+    }
     break;
   }
 }
@@ -444,95 +466,46 @@ void GraphWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event)
 }
 
 
-bool GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
-  shared_ptr<NodeWidget> hovered = nullptr;
-  int slot = -1;
+void GraphWatcher::UpdateHoveredWidget(Vec2 mousePos) {
+  bool found = false;
   for (auto& it : mWidgetMap) {
     shared_ptr<Node> node = it.first;
     shared_ptr<NodeWidget> widget = it.second;
-    if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
-      hovered = widget;
-      for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
-        NodeWidget::WidgetSlot* sw = widget->mWidgetSlots[o];
-        if (IsInsideRect(mousePos, node->GetPosition() + sw->mPosition, sw->mSize)) {
-          slot = o;
-          break;
-        }
-      }
-      break;
+    if (mHoveredWidget == widget) {
+      widget->SetFrameColor(NodeWidget::ColorState::HOVERED);
+      widget->SetSlotColor(mHoveredSlotIndex, NodeWidget::ColorState::HOVERED);
+    }
+    else {
+      widget->SetFrameColor(NodeWidget::ColorState::DEFAULT);
+      widget->SetSlotColor(-1, NodeWidget::ColorState::DEFAULT);
     }
   }
-
-  //bool changed =
-  //  hovered != mHoveredWidget || (hovered != nullptr && slot != mHoveredSlotIndex);
-  if (hovered != mHoveredWidget) {
-    if (mHoveredWidget) {
-      mHoveredWidget->SetFrameColor(NodeWidget::FrameColor::DEFAULT);
-      mHoveredWidget->SetSlotColor(-1, NodeWidget::SlotColor::DEFAULT);
-    }
-    if (hovered) {
-      hovered->SetFrameColor(NodeWidget::FrameColor::HOVERED);
-      hovered->SetSlotColor(slot, NodeWidget::SlotColor::HOVERED);
-    }
-    mHoveredWidget = hovered;
-  }
-  else {
-    if (slot != mHoveredSlotIndex) {
-      if (hovered) hovered->SetSlotColor(slot, NodeWidget::SlotColor::HOVERED);
-    }
-  }
-
-  //mHoveredSlotIndex = slot;
-  //return changed;
 }
 
 void GraphWatcher::FindHoveredWidget(Vec2 mousePos,
-  shared_ptr<NodeWidget>& oHoveredWidget, int oSlotIndex) 
+  shared_ptr<NodeWidget>* oHoveredWidget, int* oSlotIndex)
 {
+  *oHoveredWidget = nullptr;
+  *oSlotIndex = -1;
+
   for (auto& it : mWidgetMap) {
     shared_ptr<Node> node = it.first;
     shared_ptr<NodeWidget> widget = it.second;
     if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
-      oHoveredWidget = widget;
-      for (int o = 0; o < widget->mWidgetSlots.size(); o++) {
-        NodeWidget::WidgetSlot* sw = widget->mWidgetSlots[o];
+      *oHoveredWidget = widget;
+      auto& widgetSlots = widget->GetWidgetSlots();
+      for (int o = 0; o < widgetSlots.size(); o++) {
+        NodeWidget::WidgetSlot* sw = widgetSlots[o];
         if (IsInsideRect(mousePos, node->GetPosition() + sw->mPosition, sw->mSize)) {
-          oSlotIndex = o;
+          *oSlotIndex = o;
           break;
         }
       }
       return;
     }
   }
-  oHoveredWidget = nullptr;
-  oSlotIndex = -1;
 }
 
-
-void GraphWatcher::SetHoveredWidget(shared_ptr<NodeWidget>& hoveredWidget, 
-  int hoveredSlotIndex, NodeWidget::FrameColor frameColor, 
-  NodeWidget::SlotColor slotColor)
-{
-  if (hoveredWidget != mHoveredWidget) {
-    if (mHoveredWidget) {
-      mHoveredWidget->SetFrameColor(NodeWidget::FrameColor::DEFAULT);
-      mHoveredWidget->SetSlotColor(-1, NodeWidget::SlotColor::DEFAULT);
-    }
-    if (hoveredWidget) {
-      hoveredWidget->SetFrameColor(frameColor);
-      hoveredWidget->SetSlotColor(hoveredSlotIndex, slotColor);
-    }
-    mHoveredWidget = hoveredWidget;
-  }
-  else {
-    if (hoveredSlotIndex != mHoveredSlotIndex) {
-      if (hoveredWidget) {
-        hoveredWidget->SetSlotColor(hoveredSlotIndex, slotColor);
-      }
-    }
-  }
-  mHoveredSlotIndex = hoveredSlotIndex;
-}
 
 void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
   auto scanCode = event->nativeScanCode();
@@ -625,7 +598,7 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
   for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     auto it = mWidgetMap.find(node);
     if (it == mWidgetMap.end()) {
-      shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node, 
+      shared_ptr<NodeWidget> widget = node->Watch<NodeWidget>(node,
         std::bind(&GraphWatcher::HandleNodeWidgetRedraw, this));
       mWidgetMap[node] = widget;
       changed = true;
@@ -741,3 +714,9 @@ void GraphWatcher::HandleNodeWidgetRedraw() {
   }
 }
 
+bool GraphWatcher::NeedsWidgetRepaint() {
+  for (auto& it : mWidgetMap) {
+    if (it.second->NeedsRepaint()) return true;
+  }
+  return false;
+}
