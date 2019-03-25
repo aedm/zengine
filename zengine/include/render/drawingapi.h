@@ -2,6 +2,7 @@
 
 #include "../base/defines.h"
 #include "../dom/nodetype.h"
+#include "../resources/texture.h"
 #include <vector>
 #include <string>
 
@@ -85,7 +86,7 @@ struct ShaderProgram {
   /// Vertex attributes, pipeline input
   struct Attribute {
     Attribute(const string& name, ValueType type, AttributeId handle,
-              VertexAttributeUsage usage);
+      VertexAttributeUsage usage);
 
     const string mName;
     const ValueType mType;
@@ -94,9 +95,9 @@ struct ShaderProgram {
   };
 
   ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-                ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
-                vector<Sampler>& samplers, vector<Attribute>& attributes,
-                UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
+    ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
+    vector<Sampler>& samplers, vector<Attribute>& attributes,
+    UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
   ~ShaderProgram();
 
   const ShaderHandle mProgramHandle;
@@ -132,7 +133,7 @@ public:
 
   /// Shader functions
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
-                                                  const char* FragmentSource);
+    const char* FragmentSource);
   void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
   void SetUniform(UniformId Id, ValueType Type, const void* Values);
 
@@ -142,8 +143,8 @@ public:
   void* MapVertexBuffer(VertexBufferHandle Handle);
   void UnMapVertexBuffer(VertexBufferHandle Handle);
   AttributeMapper* CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs,
-                                         const vector<ShaderProgram::Attribute>& ShaderAttribs,
-                                         UINT Stride);
+    const vector<ShaderProgram::Attribute>& ShaderAttribs,
+    UINT Stride);
   void SetVertexBuffer(VertexBufferHandle Handle);
   void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
 
@@ -156,46 +157,51 @@ public:
 
   /// Rendering
   void RenderIndexedMesh(IndexBufferHandle IndexHandle,
-                         UINT IndexCount,
-                         VertexBufferHandle VertexHandle,
-                         const AttributeMapper* Mapper,
-                         PrimitiveTypeEnum PrimitiveType);
+    UINT IndexCount,
+    VertexBufferHandle VertexHandle,
+    const AttributeMapper* Mapper,
+    PrimitiveTypeEnum PrimitiveType);
 
   void RenderMesh(VertexBufferHandle VertexHandle,
-                  UINT VertexCount,
-                  const AttributeMapper* Mapper,
-                  PrimitiveTypeEnum PrimitiveType);
+    UINT VertexCount,
+    const AttributeMapper* Mapper,
+    PrimitiveTypeEnum PrimitiveType);
 
   void Render(IndexBufferHandle IndexBuffer,
-              UINT Count,
-              PrimitiveTypeEnum PrimitiveType,
-              UINT InstanceCount);
+    UINT Count,
+    PrimitiveTypeEnum PrimitiveType,
+    UINT InstanceCount);
 
   /// Texture and surface handling
-  TextureHandle CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample,
-                              bool doesRepeat, bool mipmap);
-  void DeleteTexture(TextureHandle Handle);
-  void UploadTextureData(TextureHandle Handle, int Width, int Height, TexelType Type,
-                         void* TexelData);
-  void UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height,
-                            TexelType Type, void* TexelData);
-  void SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle Texture, 
-                  UINT SlotIndex, bool isMultiSample);
+  static UINT GetTexelByteCount(TexelType type);
+
+  shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
+    const shared_ptr<vector<char>>& texelData, bool gpuMemoryOnly,
+    bool isMultisample, bool doesRepeat, bool generateMipmaps);
+
+  //TextureHandle CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample,
+  //                            bool doesRepeat, bool mipmap);
+  void DeleteTextureGPUData(Texture::Handle handle);
+  void UploadTextureGPUData(const shared_ptr<Texture>& texture, void* texelData);
+
+  //void UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height,
+  //                          TexelType Type, void* TexelData);
+  void SetTexture(const ShaderProgram::Sampler& sampler, 
+    const shared_ptr<Texture>& texture, UINT slotIndex);
 
   /// Framebuffer operations
-  FrameBufferId CreateFrameBuffer(TextureHandle depthBuffer,
-                                  TextureHandle targetBufferA,
-                                  TextureHandle targetBufferB,
-                                  bool isMultiSample);
+  FrameBufferId CreateFrameBuffer(const shared_ptr<Texture>& depthBuffer,
+    const shared_ptr<Texture>& targetBufferA,
+    const shared_ptr<Texture>& targetBufferB);
   void DeleteFrameBuffer(FrameBufferId frameBufferId);
   void SetFrameBuffer(FrameBufferId frameBufferid);
   void BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
-                       int srcX0, int srcY0, int srcX1, int srcY1,
-                       int dstX0, int dstY0, int dstX1, int dstY1);
+    int srcX0, int srcY0, int srcX1, int srcY1,
+    int dstX0, int dstY0, int dstX1, int dstY1);
 
   /// Render parameters
   void SetViewport(int X, int Y, int Width, int Height, float DepthMin = 0.0f,
-                   float DepthMax = 1.0f);
+    float DepthMax = 1.0f);
   void SetRenderState(const RenderState* State);
 
   /// Drawing
@@ -203,7 +209,7 @@ public:
 
 private:
   void SetTextureData(UINT Width, UINT Height, TexelType Type, void* TexelData,
-                      bool generateMipmap);
+    bool generateMipmap);
   void SetTextureSubData(UINT X, UINT Y, UINT Width, UINT Height, TexelType Type, void* TexelData);
 
   /// Shadowed buffer binds

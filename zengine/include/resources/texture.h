@@ -1,29 +1,28 @@
 #pragma once
 
 #include "../base/defines.h"
+#include <memory>
+#include <vector>
 
 /// Texture map
 class Texture {
-  friend class ResourceManager;
-
-protected:
-  Texture(int width, int height, TexelType type, TextureHandle handle, 
-          OWNERSHIP void* texelData, bool isRenderTarget);
-  ~Texture();
-
 public:
-  static UINT GetTexelByteCount(TexelType type);
+  typedef	UINT Handle;
 
-  const TexelType mType;
-
+  const Handle mHandle;
   const int	mWidth;
   const int mHeight;
+  const TexelType mType;
+  const bool mIsMultisample;
+  const bool mDoesRepeat;
+  const bool mGenerateMipmaps;
+  const shared_ptr<vector<char>> mTexelData;
 
-  const void* mTexelData;
-  const UINT mTexelDataByteCount;
+  ~Texture();
 
-  const TextureHandle mHandle;
-
-  const bool mIsMultisampe;
+private:
+  Texture(Handle handle, int width, int height, TexelType type,
+    const shared_ptr<vector<char>> texelData, bool isMultisample, bool doesRepeat, 
+    bool generateMipmaps);
 };
 

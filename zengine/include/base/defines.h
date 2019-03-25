@@ -23,7 +23,6 @@ const float		Pi							= 3.14159265358979f;
 /// API types
 typedef			UINT						DrawingAPIHandle;	/// OpenGL uses UINTs
 
-typedef			DrawingAPIHandle			TextureHandle;
 typedef			DrawingAPIHandle			VertexBufferHandle;
 typedef			DrawingAPIHandle			IndexBufferHandle;
 typedef			DrawingAPIHandle			ShaderHandle;
