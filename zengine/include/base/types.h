@@ -15,7 +15,7 @@ class Texture;
 	ITEM(UINT, Uint, UINT) \
 	ITEM(MATRIX44, Matrix, Matrix) \
 	ITEM(STRING, String, std::string) \
-	ITEM(TEXTURE, Texture, Texture*) \
+	ITEM(TEXTURE, Texture, shared_ptr<Texture>) \
 
 /// Value types
 enum class ValueType {

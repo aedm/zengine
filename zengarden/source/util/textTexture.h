@@ -9,16 +9,13 @@
 class TextTexture {
 public:
   TextTexture();
-  ~TextTexture();
 
   void SetText(const QString& Text, const QFont& Font);
   QSize mTextSize;
-  Texture* GetTexture();
+  shared_ptr<Texture> GetTexture();
 
 private:
-  void DestroyTexture();
-
-  Texture* mTexture = nullptr;
+  shared_ptr<Texture> mTexture;
   QImage mImage;
 
   int mWidth = 0;

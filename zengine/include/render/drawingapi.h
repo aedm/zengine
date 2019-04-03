@@ -215,8 +215,8 @@ private:
   /// Shadowed buffer binds
   void BindVertexBuffer(VertexBufferHandle BufferID);
   void BindIndexBuffer(IndexBufferHandle BufferID);
-  void BindTexture(TextureHandle TextureID);
-  void BindMultisampleTexture(TextureHandle TextureID);
+  void BindTexture(Texture::Handle TextureID);
+  void BindMultisampleTexture(Texture::Handle TextureID);
   void BindFrameBuffer(FrameBufferId frameBufferID);
 
   void SetActiveTexture(UINT ActiveTextureIndex); // silly OpenGL.
@@ -242,9 +242,9 @@ private:
   VertexBufferHandle BoundVertexBufferShadow;
   IndexBufferHandle BoundIndexBufferShadow;
 
-  TextureHandle BoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
-  TextureHandle BoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
-  TextureHandle ActiveTextureShadow;
+  Texture::Handle BoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
+  Texture::Handle BoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
+  Texture::Handle ActiveTextureShadow;
 
   bool DepthTestEnabledShadow;
   RenderState::FaceMode mFaceMode;

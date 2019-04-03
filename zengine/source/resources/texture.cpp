@@ -29,8 +29,5 @@ Texture::Texture(Handle handle, int width, int height, TexelType type,
   , mIsMultisample(isMultisample)
   , mDoesRepeat(doesRepeat)
   , mGenerateMipmaps(generateMipmaps)
-{
-  , mTexelDataByteCount(texelData ? width * height * GetTexelByteCount(type) : 0)
-
-}
+{}
 

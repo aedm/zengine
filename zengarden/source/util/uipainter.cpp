@@ -131,9 +131,9 @@ void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
   mSolidBox->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_TRIANGLES);
 }
 
-void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
-  float w(Tex->mWidth);
-  float h(Tex->mHeight);
+void UiPainter::DrawTexture(const shared_ptr<Texture>& texture, float x, float y) {
+  float w(texture->mWidth);
+  float h(texture->mHeight);
   VertexPosUV vertices[] = {
     {Vec3(x, y, 0), Vec2(0, 0)},
     {Vec3(x + w, y, 0), Vec2(1, 0)},
@@ -141,7 +141,7 @@ void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
     {Vec3(x + w, y + h, 0), Vec2(1, 1)},
   };
 
-  mTextureNode->Set(Tex);
+  mTextureNode->Set(texture);
   mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
   mTexturedBox->Draw(&mGlobals, PassType::SOLID);
 }
@@ -150,7 +150,7 @@ void UiPainter::DrawTexture(Texture* Tex, float x, float y) {
 void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
   float w = Tex->mTextSize.width();
   float h = Tex->mTextSize.height();
-  Texture* texture = Tex->GetTexture();
+  shared_ptr<Texture> texture = Tex->GetTexture();
   float u = w / float(texture->mWidth);
   float v = h / float(texture->mHeight);
   VertexPosUV vertices[] = {

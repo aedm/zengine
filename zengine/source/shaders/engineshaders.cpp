@@ -128,7 +128,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
 
 
 void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* globals,
-                                      Texture* sourceColorMSAA) {
+  const shared_ptr<Texture>& sourceColorMSAA) {
   mPostProcess_GaussianBlur_Blend_MSAA->Update();
   if (!mPostProcess_GaussianBlur_Blend_MSAA->isComplete()) return;
 

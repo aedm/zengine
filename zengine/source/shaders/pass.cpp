@@ -189,7 +189,7 @@ void Pass::Set(Globals* globals) {
     const ShaderSource::Sampler* source = samplerMapper.mSource;
     const ShaderProgram::Sampler* target = samplerMapper.mTarget;
 
-    Texture* tex = nullptr;
+    shared_ptr<Texture> tex = nullptr;
     if (samplerMapper.mSource->mGlobalType == ShaderGlobalType::LOCAL) {
       ASSERT(samplerMapper.mSource->mNode != nullptr);
       tex = PointerCast<TextureNode>(samplerMapper.mSource->mNode)->Get();
@@ -198,10 +198,9 @@ void Pass::Set(Globals* globals) {
       /// Global uniform, takes value from the Globals object
       int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
       void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
-      tex = *reinterpret_cast<Texture**>(sourcePointer);
+      tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
     }
-    OpenGL->SetTexture(*target, tex ? tex->mHandle : 0, i++,
-      tex ? tex->mIsMultisampe : false);
+    OpenGL->SetTexture(*target, tex ? tex : nullptr, i++);
   }
 }
 

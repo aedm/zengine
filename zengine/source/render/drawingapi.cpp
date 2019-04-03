@@ -939,8 +939,13 @@ void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler,
 {
   CheckGLError();
   SetActiveTexture(slotIndex);
-  if (texture->mIsMultisample) BindMultisampleTexture(texture->mHandle);
-  else BindTexture(texture->mHandle);
+  if (!texture) {
+    BindTexture(0);
+  }
+  else {
+    if (texture->mIsMultisample) BindMultisampleTexture(texture->mHandle);
+    else BindTexture(texture->mHandle);
+  }
   glUniform1i(sampler.mHandle, slotIndex);
   CheckGLError();
 }
@@ -951,17 +956,20 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   const shared_ptr<Texture>& targetBufferB)
 {
   ASSERT(!PleaseNoNewResources);
-  ASSERT(!targetBufferA || depthBuffer->mIsMultisample == targetBufferA->mIsMultisample);
+  ASSERT(!targetBufferA || !depthBuffer || 
+    depthBuffer->mIsMultisample == targetBufferA->mIsMultisample);
   CheckGLError();
   GLuint bufferId;
   glGenFramebuffers(1, &bufferId);
   BindFrameBuffer(bufferId);
   CheckGLError();
 
-  GLenum target = isMultiSample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+  bool isMultisample = (depthBuffer ? depthBuffer : targetBufferA)->mIsMultisample;
+  GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
   if (depthBuffer) {
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, depthBuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, 
+      depthBuffer->mHandle, 0);
   }
 
   if (!targetBufferA) {
@@ -970,7 +978,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   else if (!targetBufferB) {
     CheckGLError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
-      targetBufferA, 0);
+      targetBufferA->mHandle, 0);
     GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
     CheckGLError();
     glDrawBuffers(1, attachments);
@@ -979,9 +987,9 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   else {
     CheckGLError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
-      targetBufferA, 0);
+      targetBufferA->mHandle, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, target,
-      targetBufferB, 0);
+      targetBufferB->mHandle, 0);
     GLuint attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     CheckGLError();
     glDrawBuffers(2, attachments);

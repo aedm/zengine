@@ -279,9 +279,10 @@ void JSONSerializer::SerializeFloatSplineNode(
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
   const shared_ptr<TextureNode>& node)
 {
-  Texture* texture = node->Get();
+  shared_ptr<Texture> texture = node->Get();
   ASSERT(texture->mTexelData);
-  string b64 = base64_encode((UCHAR*)texture->mTexelData, texture->mTexelDataByteCount);
+  string b64 = base64_encode((UCHAR*)&(*texture->mTexelData)[0], 
+      UINT((*texture->mTexelData).size()));
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
   nodeValue.AddMember("type", rapidjson::Value(
