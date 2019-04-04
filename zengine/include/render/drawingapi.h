@@ -178,14 +178,9 @@ public:
   shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
     const shared_ptr<vector<char>>& texelData, bool gpuMemoryOnly,
     bool isMultisample, bool doesRepeat, bool generateMipmaps);
-
-  //TextureHandle CreateTexture(int Width, int Height, TexelType Type, bool isMultiSample,
-  //                            bool doesRepeat, bool mipmap);
   void DeleteTextureGPUData(Texture::Handle handle);
   void UploadTextureGPUData(const shared_ptr<Texture>& texture, void* texelData);
 
-  //void UploadTextureSubData(TextureHandle Handle, UINT X, UINT Y, int Width, int Height,
-  //                          TexelType Type, void* TexelData);
   void SetTexture(const ShaderProgram::Sampler& sampler, 
     const shared_ptr<Texture>& texture, UINT slotIndex);
 

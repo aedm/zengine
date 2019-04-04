@@ -42,8 +42,6 @@ void TextTexture::SetText(const QString& Text, const QFont& Font)
 shared_ptr<Texture> TextTexture::GetTexture() {
   if (!mUptodate) {
     if (mTexture == nullptr || mTexture->mWidth != mWidth || mTexture->mHeight != mHeight) {
-      //mTexture = TheResourceManager->CreateGPUTexture(
-      //  mWidth, mHeight, TexelType::ARGB8, mImage.bits(), false, false);
       mTexture = OpenGL->MakeTexture(mWidth, mHeight, TexelType::ARGB8, nullptr, true,
         false, false, false);
     }

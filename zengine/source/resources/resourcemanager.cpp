@@ -40,33 +40,3 @@ void ResourceManager::DiscardMesh(Mesh* meshInstance) {
   mMeshes.erase(meshInstance);
   delete meshInstance;
 }
-
-//Texture* ResourceManager::CreateTexture(int width, int height, TexelType type,
-//                                        OWNERSHIP void* texelData) {
-//  TextureHandle handle = OpenGL->CreateTexture(width, height, type, false, true, true);
-//  if (texelData) {
-//    OpenGL->UploadTextureData(handle, width, height, type, texelData);
-//    // TODO: error handling
-//  }
-//  Texture* texture = new Texture(width, height, type, handle, texelData, false);
-//  return texture;
-//}
-
-//Texture* ResourceManager::CreateGPUTexture(int width, int height, TexelType type,
-//                                           void* texelData, bool multiSample,
-//                                           bool doesRepeat) {
-//  TextureHandle handle =
-//    OpenGL->CreateTexture(width, height, type, multiSample, doesRepeat, false);
-//  if (texelData) {
-//    OpenGL->UploadTextureData(handle, width, height, type, texelData);
-//    // TODO: error handling
-//  }
-//  Texture* texture = new Texture(width, height, type, handle, nullptr, multiSample);
-//  return texture;
-//}
-//
-//void ResourceManager::DiscardTexture(Texture* textureInstance) {
-//  if (!textureInstance) return;
-//  OpenGL->DeleteTexture(textureInstance->mHandle);
-//  delete textureInstance;
-//}

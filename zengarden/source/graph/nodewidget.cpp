@@ -92,11 +92,9 @@ void NodeWidget::CreateWidgetSlots() {
   for (auto x : mWidgetSlots) delete x;
   mWidgetSlots.clear();
 
-  //mGraphWatcher.lock()->GetGLWidget()->makeCurrent();
   for (Slot* slot : GetDirectNode()->GetPublicSlots()) {
     if (slot->DoesAcceptNode(StaticValueNodesList[int(ValueType::STRING)])) continue;
     WidgetSlot* sw = new WidgetSlot();
-    //sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->mTitleFont);
     sw->mSlot = slot;
     mWidgetSlots.push_back(sw);
   }
@@ -153,8 +151,6 @@ void NodeWidget::UpdateTexture() {
     }
     else {
       DiscardTexture();
-      //mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
-      //  TexelType::ARGB8, (void*)bits, false, false);
       mTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8, texels, true,
         false, false, false);
     }

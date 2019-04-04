@@ -666,8 +666,6 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
     QImage rgba = image.convertToFormat(QImage::Format_ARGB32);
     auto pixels = make_shared<vector<char>>(rgba.byteCount());
     memcpy(&(*pixels)[0], rgba.bits(), rgba.byteCount());
-    //Texture* texture = TheResourceManager->CreateTexture(
-    //  rgba.width(), rgba.height(), TexelType::ARGB8, pixels);
     shared_ptr<Texture> texture = OpenGL->MakeTexture(
       rgba.width(), rgba.height(), TexelType::ARGB8, pixels, false, false, true, true);
 

@@ -17,7 +17,7 @@ public:
   ~Texture();
 
   const Handle mHandle;
-  const int	mWidth;
+  const int mWidth;
   const int mHeight;
   const TexelType mType;
   const bool mIsMultisample;
