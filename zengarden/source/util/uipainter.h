@@ -24,7 +24,7 @@ public:
   void DrawLine(const Vec2& from, const Vec2& to);
   void DrawRect(const Vec2& topLeft, const Vec2& size);
   void DrawBox(const Vec2& topLeft, const Vec2& size);
-  void DrawTexture(Texture* texture, float x, float y);
+  void DrawTexture(const shared_ptr<Texture>& texture, float x, float y);
   void DrawTextTexture(TextTexture* texture, const Vec2& position);
 
   shared_ptr<Vec4Node> mColor = make_shared<Vec4Node>();

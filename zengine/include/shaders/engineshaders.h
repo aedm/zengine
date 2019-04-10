@@ -36,7 +36,7 @@ private:
   /// in: Gbuffer (MSAA) + postprocess source buffer
   /// out: screen
   void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
-                         Texture* sourceColorMSAA);
+    const shared_ptr<Texture>& sourceColorMSAA);
 
   shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First = make_shared<Pass>();
   shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal = make_shared<Pass>();

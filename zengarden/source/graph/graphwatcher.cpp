@@ -664,10 +664,11 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
   else if (fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg") {
     QImage image(fileName);
     QImage rgba = image.convertToFormat(QImage::Format_ARGB32);
-    char* pixels = new char[rgba.byteCount()];
-    memcpy(pixels, rgba.bits(), rgba.byteCount());
-    Texture* texture = TheResourceManager->CreateTexture(
-      rgba.width(), rgba.height(), TexelType::ARGB8, pixels);
+    auto pixels = make_shared<vector<char>>(rgba.byteCount());
+    memcpy(&(*pixels)[0], rgba.bits(), rgba.byteCount());
+    shared_ptr<Texture> texture = OpenGL->MakeTexture(
+      rgba.width(), rgba.height(), TexelType::ARGB8, pixels, false, false, true, true);
+
     shared_ptr<TextureNode> node = make_shared<TextureNode>();
     node->Set(texture);
 

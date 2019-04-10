@@ -4,13 +4,8 @@
 #include <QPainter>
 #include <QGLWidget>
 
-TextTexture::TextTexture()
-{}
+TextTexture::TextTexture() {}
 
-TextTexture::~TextTexture()
-{
-  DestroyTexture();
-}
 
 /// Returns the smallest value thats divisible by N and not smaller than A
 template<int N>
@@ -44,29 +39,16 @@ void TextTexture::SetText(const QString& Text, const QFont& Font)
 }
 
 
-Texture* TextTexture::GetTexture() {
+shared_ptr<Texture> TextTexture::GetTexture() {
   if (!mUptodate) {
-    /// Upload to texture
-    if (mTexture == nullptr || mTexture->mWidth < mWidth || mTexture->mHeight < mHeight) {
-      DestroyTexture();
-      mTexture = TheResourceManager->CreateGPUTexture(
-        mWidth, mHeight, TexelType::ARGB8, mImage.bits(), false, false);
+    if (mTexture == nullptr || mTexture->mWidth != mWidth || mTexture->mHeight != mHeight) {
+      mTexture = OpenGL->MakeTexture(mWidth, mHeight, TexelType::ARGB8, nullptr, true,
+        false, false, false);
     }
-    else {
-      OpenGL->UploadTextureSubData(
-        mTexture->mHandle, 0, 0, mWidth, mHeight, TexelType::ARGB8, mImage.bits());
-    }
+    OpenGL->UploadTextureGPUData(mTexture, mImage.bits());
     mUptodate = true;
   }
 
   return mTexture;
-}
-
-void TextTexture::DestroyTexture() {
-  if (mTexture) {
-    TheResourceManager->DiscardTexture(mTexture);
-    /// This is awful, use shared_ptr
-    mTexture = nullptr;
-  }
 }
 

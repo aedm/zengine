@@ -92,11 +92,9 @@ void NodeWidget::CreateWidgetSlots() {
   for (auto x : mWidgetSlots) delete x;
   mWidgetSlots.clear();
 
-  //mGraphWatcher.lock()->GetGLWidget()->makeCurrent();
   for (Slot* slot : GetDirectNode()->GetPublicSlots()) {
     if (slot->DoesAcceptNode(StaticValueNodesList[int(ValueType::STRING)])) continue;
     WidgetSlot* sw = new WidgetSlot();
-    //sw->mTexture.SetText(QString::fromStdString(*slot->GetName()), ThePainter->mTitleFont);
     sw->mSlot = slot;
     mWidgetSlots.push_back(sw);
   }
@@ -134,24 +132,27 @@ void NodeWidget::UpdateTexture() {
     unsigned char* bits = mImage.bits();
     int height = mImage.height();
     int width = mImage.width();
-    unsigned char* current = bits;
-    for (int i = 0; i < height *width; i++) {
+    shared_ptr<vector<char>> texels = make_shared<vector<char>>(height * width * 4);
+    unsigned char* source = bits;
+    unsigned char* dest = reinterpret_cast<unsigned char*>(&(*texels)[0]);
+    for (int i = 0; i < height * width; i++) {
       /// Swap RGBA and BGRA
-      unsigned char temp = current[0];
-      current[0] = current[2];
-      current[2] = temp;
-      current += 4;
+      dest[0] = source[2];
+      dest[1] = source[1];
+      dest[2] = source[0];
+      dest[3] = source[3];
+      dest += 4;
+      source += 4;
     }
 
     if (mTexture && mTexture->mWidth == mImage.width() &&
       mTexture->mHeight == mImage.height()) {
-      OpenGL->UploadTextureData(mTexture->mHandle, mTexture->mWidth, mTexture->mHeight,
-        TexelType::ARGB8, (void*)bits);
+      OpenGL->UploadTextureGPUData(mTexture, &(*texels)[0]);
     }
     else {
       DiscardTexture();
-      mTexture = TheResourceManager->CreateGPUTexture(mImage.width(), mImage.height(),
-        TexelType::ARGB8, (void*)bits, false, false);
+      mTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8, texels, true,
+        false, false, false);
     }
     mForceUpdate = false;
     mCurrentPaintState = mNextPaintState;
@@ -246,7 +247,6 @@ QColor QColorFromVec4(const Vec4& vec) {
 
 
 void NodeWidget::DiscardTexture() {
-  TheResourceManager->DiscardTexture(mTexture);
   mTexture = nullptr;
 }
 
@@ -325,7 +325,7 @@ void NodeWidget::PaintToImage()
   QColor frameColor;
   if (mNextPaintState.mIsSelected) {
     frameColor = Colors.mFrameSelected;
-  } 
+  }
   else {
     switch (mNextPaintState.mFrameColorState) {
     case ColorState::DEFAULT:

@@ -22,7 +22,7 @@ struct MappedAttributeOpenGL {
 };
 
 
-class AttributeMapperOpenGL: public AttributeMapper {
+class AttributeMapperOpenGL : public AttributeMapper {
 public:
   AttributeMapperOpenGL();
   virtual ~AttributeMapperOpenGL() {}
@@ -65,7 +65,8 @@ OpenGLAPI::OpenGLAPI() {
   if (err != GLEW_OK) {
     ERR(L"Cannot initialize OpenGL.");
     SHOULD_NOT_HAPPEN;
-  } else {
+  }
+  else {
     const wchar_t* versionName = NULL;
     for (GLVersion* version = gOpenGLVersions; version->version != NULL; version++) {
       if (*version->version) versionName = version->name;
@@ -121,7 +122,7 @@ void OpenGLAPI::OnContextSwitch() {
 }
 
 static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
-                                           const char* source) {
+  const char* source) {
   ASSERT(!PleaseNoNewResources);
 
   CheckGLError();
@@ -195,7 +196,8 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     glGetProgramInfoLog(program, length, &charCount, log);
     if (result == GL_FALSE) {
       ERR("Can't link shader: %s", log);
-    } else {
+    }
+    else {
       WARN("Shader compiler: %s", log);
     }
     CheckGLError();
@@ -213,7 +215,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   /// Query uniform blocks
   GLint uniformBlockCount;
   glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES,
-                          &uniformBlockCount);
+    &uniformBlockCount);
   /// There should only be "Uniforms"
   ASSERT(uniformBlockCount == 1);
 
@@ -223,49 +225,49 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 
   /// This is how OpenGL interface API works. Beautiful like a megmikrózott kefir.
   /// Get the number of active uniforms inside the uniform block, and the block size.
-  const GLenum blockPropsList[] = {GL_NUM_ACTIVE_VARIABLES, GL_BUFFER_DATA_SIZE};
-  #pragma pack(push, 1)
+  const GLenum blockPropsList[] = { GL_NUM_ACTIVE_VARIABLES, GL_BUFFER_DATA_SIZE };
+#pragma pack(push, 1)
   struct { GLint mUniformCount, mSize; } blockProps;
-  #pragma pack(pop)
+#pragma pack(pop)
   glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex,
-                         ElementCount(blockPropsList), blockPropsList,
-                         ElementCount(blockPropsList), nullptr,
-                         reinterpret_cast<GLint*>(&blockProps));
+    ElementCount(blockPropsList), blockPropsList,
+    ElementCount(blockPropsList), nullptr,
+    reinterpret_cast<GLint*>(&blockProps));
 
   //if (numActiveUnifs > 0) continue;
   vector<ShaderProgram::Uniform> uniforms;
   uniforms.reserve(blockProps.mUniformCount);
 
   std::vector<GLint> uniformLocations(blockProps.mUniformCount);
-  const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
+  const GLenum activeUnifProp[1] = { GL_ACTIVE_VARIABLES };
   glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex, 1, activeUnifProp,
-                         blockProps.mUniformCount, nullptr, &uniformLocations[0]);
+    blockProps.mUniformCount, nullptr, &uniformLocations[0]);
 
   /// Query the properties of each uniform inside the block
-  const GLenum uniformProperties[] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET};
-  #pragma pack(push, 1)
+  const GLenum uniformProperties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET };
+#pragma pack(push, 1)
   struct { GLint mNameLength, mType, mLocation, mOffset; } values;
-  #pragma pack(pop)
+#pragma pack(pop)
 
   for (int blockIndex = 0; blockIndex < blockProps.mUniformCount; ++blockIndex) {
     glGetProgramResourceiv(program, GL_UNIFORM, uniformLocations[blockIndex],
-                           ElementCount(uniformProperties), uniformProperties,
-                           ElementCount(uniformProperties), nullptr,
-                           reinterpret_cast<GLint*>(&values));
+      ElementCount(uniformProperties), uniformProperties,
+      ElementCount(uniformProperties), nullptr,
+      reinterpret_cast<GLint*>(&values));
 
     /// Get the name
     vector<char> name(values.mNameLength);
     glGetProgramResourceName(program, GL_UNIFORM, uniformLocations[blockIndex],
-                             values.mNameLength, nullptr, &name[0]);
+      values.mNameLength, nullptr, &name[0]);
 
     ValueType nodeType;
     switch (values.mType) {
-      case GL_FLOAT:		  nodeType = ValueType::FLOAT;		break;
-      case GL_FLOAT_VEC2:	nodeType = ValueType::VEC2;		  break;
-      case GL_FLOAT_VEC3:	nodeType = ValueType::VEC3;		  break;
-      case GL_FLOAT_VEC4:	nodeType = ValueType::VEC4;		  break;
-      case GL_FLOAT_MAT4:	nodeType = ValueType::MATRIX44;	break;
-      default: SHOULD_NOT_HAPPEN; break;
+    case GL_FLOAT:		  nodeType = ValueType::FLOAT;		break;
+    case GL_FLOAT_VEC2:	nodeType = ValueType::VEC2;		  break;
+    case GL_FLOAT_VEC3:	nodeType = ValueType::VEC3;		  break;
+    case GL_FLOAT_VEC4:	nodeType = ValueType::VEC4;		  break;
+    case GL_FLOAT_MAT4:	nodeType = ValueType::MATRIX44;	break;
+    default: SHOULD_NOT_HAPPEN; break;
     }
 
     uniforms.push_back(
@@ -288,9 +290,9 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     GLsizei size;
     GLenum type;
     glGetActiveUniform(program, uniformIndex, uniformNameMaxLength, &nameLength, &size,
-                       &type, &samplerName[0]);
+      &type, &samplerName[0]);
     if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE ||
-        type == GL_SAMPLER_2D_SHADOW) {
+      type == GL_SAMPLER_2D_SHADOW) {
       GLint location = glGetUniformLocation(program, &samplerName[0]);
       samplers.push_back(ShaderProgram::Sampler(string(&samplerName[0]), location));
     }
@@ -315,7 +317,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     GLenum type;
 
     glGetActiveAttrib(program, uniformIndex, attributeNameMaxLength, &nameLength, &size,
-                      &type, &attributeName[0]);
+      &type, &attributeName[0]);
 
     /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
     AttributeId location = glGetAttribLocation(program, &attributeName[0]);
@@ -325,11 +327,11 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 
     ValueType valueType;
     switch (type) {
-      case GL_FLOAT:		  valueType = ValueType::FLOAT;		break;
-      case GL_FLOAT_VEC2:	valueType = ValueType::VEC2;		break;
-      case GL_FLOAT_VEC3:	valueType = ValueType::VEC3;		break;
-      case GL_FLOAT_VEC4:	valueType = ValueType::VEC4;		break;
-      default: SHOULD_NOT_HAPPEN; break;
+    case GL_FLOAT:		  valueType = ValueType::FLOAT;		break;
+    case GL_FLOAT_VEC2:	valueType = ValueType::VEC2;		break;
+    case GL_FLOAT_VEC3:	valueType = ValueType::VEC3;		break;
+    case GL_FLOAT_VEC4:	valueType = ValueType::VEC4;		break;
+    default: SHOULD_NOT_HAPPEN; break;
     }
 
     /// Map attribute name to usage
@@ -359,13 +361,13 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   CheckGLError();
 
   return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
-                                    uniforms, samplers, attributes, blockProps.mSize,
-                                    uboHandle);
+    uniforms, samplers, attributes, blockProps.mSize,
+    uboHandle);
 }
 
 
 void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
-                                 void* uniforms) {
+  void* uniforms) {
   CheckGLError();
   glUseProgram(program->mProgramHandle);
   CheckGLError();
@@ -383,24 +385,24 @@ void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
   CheckGLError();
 
   switch (type) {
-    case ValueType::FLOAT:
-      glUniform1f(id, *(const GLfloat*)values);
-      break;
-    case ValueType::VEC2:
-      glUniform2fv(id, 1, (const GLfloat*)values);
-      break;
-    case ValueType::VEC3:
-      glUniform3fv(id, 1, (const GLfloat*)values);
-      break;
-    case ValueType::VEC4:
-      glUniform4fv(id, 1, (const GLfloat*)values);
-      break;
-    case ValueType::MATRIX44:
-      glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
-      break;
-    default:
-      NOT_IMPLEMENTED;
-      break;
+  case ValueType::FLOAT:
+    glUniform1f(id, *(const GLfloat*)values);
+    break;
+  case ValueType::VEC2:
+    glUniform2fv(id, 1, (const GLfloat*)values);
+    break;
+  case ValueType::VEC3:
+    glUniform3fv(id, 1, (const GLfloat*)values);
+    break;
+  case ValueType::VEC4:
+    glUniform4fv(id, 1, (const GLfloat*)values);
+    break;
+  case ValueType::MATRIX44:
+    glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
+    break;
+  default:
+    NOT_IMPLEMENTED;
+    break;
   }
   CheckGLError();
 }
@@ -519,13 +521,13 @@ AttributeMapper* OpenGLAPI::CreateAttributeMapper(
         MappedAttributeOpenGL attr;
         attr.Index = shaderAttr.mHandle;
         switch (gVertexAttributeType[(UINT)bufferAttr.Usage]) {
-          case ValueType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
-          case ValueType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
-          case ValueType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
-          case ValueType::VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
-          default:
-            ERR(L"Unhandled vertex attribute type");
-            break;
+        case ValueType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
+        case ValueType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
+        case ValueType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
+        case ValueType::VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
+        default:
+          ERR(L"Unhandled vertex attribute type");
+          break;
         }
         attr.Offset = bufferAttr.Offset;
         mapper->MappedAttributes.push_back(attr);
@@ -543,9 +545,9 @@ AttributeMapper* OpenGLAPI::CreateAttributeMapper(
 
 GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
   switch (primitiveType) {
-    case PRIMITIVE_LINES:		return GL_LINES;
-    case PRIMITIVE_LINE_STRIP:	return GL_LINE_STRIP;
-    case PRIMITIVE_TRIANGLES:	return GL_TRIANGLES;
+  case PRIMITIVE_LINES:		return GL_LINES;
+  case PRIMITIVE_LINE_STRIP:	return GL_LINE_STRIP;
+  case PRIMITIVE_TRIANGLES:	return GL_TRIANGLES;
   }
   SHOULD_NOT_HAPPEN;
   return 0;
@@ -553,9 +555,9 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
 
 
 void OpenGLAPI::RenderIndexedMesh(IndexBufferHandle indexHandle,
-                                  UINT indexCount, VertexBufferHandle vertexHandle,
-                                  const AttributeMapper* mapper,
-                                  PrimitiveTypeEnum primitiveType) {
+  UINT indexCount, VertexBufferHandle vertexHandle,
+  const AttributeMapper* mapper,
+  PrimitiveTypeEnum primitiveType) {
   BindVertexBuffer(vertexHandle);
   static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
 
@@ -566,8 +568,8 @@ void OpenGLAPI::RenderIndexedMesh(IndexBufferHandle indexHandle,
 
 
 void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
-                           const AttributeMapper* mapper,
-                           PrimitiveTypeEnum primitiveType) {
+  const AttributeMapper* mapper,
+  PrimitiveTypeEnum primitiveType) {
   BindVertexBuffer(vertexHandle);
   static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
   glDrawArrays(GetGLPrimitive(primitiveType), 0, vertexCount);
@@ -576,14 +578,15 @@ void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
 
 
 void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
-                       PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
+  PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
   CheckGLError();
   if (indexBuffer != 0) {
     BindIndexBuffer(indexBuffer);
     CheckGLError();
     glDrawElementsInstanced(
       GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, InstanceCount);
-  } else {
+  }
+  else {
     glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, InstanceCount);
   }
   CheckGLError();
@@ -591,7 +594,7 @@ void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
 
 
 void OpenGLAPI::SetViewport(int x, int y, int width, int height,
-                            float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
+  float depthMin /*= 0.0f*/, float depthMax /*= 1.0f*/) {
   glViewport(x, y, width, height);
   glDepthRange(depthMin, depthMax);
   CheckGLError();
@@ -629,17 +632,17 @@ void OpenGLAPI::SetDepthTest(bool enable) {
 void OpenGLAPI::SetBlendMode(RenderState::BlendMode blendMode) {
   if (blendMode == mBlendMode) return;
   switch (blendMode) {
-    case RenderState::BlendMode::NORMAL:
-      SetBlending(false);
-      break;
-    case RenderState::BlendMode::ADDITIVE:
-      SetBlending(true);
-      glBlendFunc(GL_ONE, GL_ONE);
-      break;
-    case RenderState::BlendMode::ALPHA:
-      SetBlending(true);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      break;
+  case RenderState::BlendMode::NORMAL:
+    SetBlending(false);
+    break;
+  case RenderState::BlendMode::ADDITIVE:
+    SetBlending(true);
+    glBlendFunc(GL_ONE, GL_ONE);
+    break;
+  case RenderState::BlendMode::ALPHA:
+    SetBlending(true);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    break;
   }
   mBlendMode = blendMode;
   CheckGLError();
@@ -690,17 +693,17 @@ void OpenGLAPI::SetBlending(bool enable) {
 void OpenGLAPI::SetFaceMode(RenderState::FaceMode faceMode) {
   if (mFaceMode == faceMode) return;
   switch (faceMode) {
-    case RenderState::FaceMode::FRONT:
-      glEnable(GL_CULL_FACE);
-      glCullFace(GL_FRONT);
-      break;
-    case RenderState::FaceMode::FRONT_AND_BACK:
-      glDisable(GL_CULL_FACE);
-      break;
-    case RenderState::FaceMode::BACK:
-      glEnable(GL_CULL_FACE);
-      glCullFace(GL_BACK);
-      break;
+  case RenderState::FaceMode::FRONT:
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    break;
+  case RenderState::FaceMode::FRONT_AND_BACK:
+    glDisable(GL_CULL_FACE);
+    break;
+  case RenderState::FaceMode::BACK:
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    break;
   }
   mFaceMode = faceMode;
   CheckGLError();
@@ -726,70 +729,93 @@ void OpenGLAPI::SetClearColor(UINT clearColor) {
 
 /// Converts a single TexelType to OpenGL enums
 static void GetTextureType(TexelType type, GLint &internalFormat, GLenum &format,
-                           GLenum &glType) {
+  GLenum &glType) {
   switch (type) {
-    case TexelType::ARGB8:
-      internalFormat = GL_RGBA;
-      format = GL_BGRA;
-      glType = GL_UNSIGNED_BYTE;
-      break;
-    case TexelType::ARGB16:
-      internalFormat = GL_RGBA16;
-      format = GL_BGRA;
-      glType = GL_UNSIGNED_SHORT;
-      break;
-    case TexelType::ARGB16F:
-      internalFormat = GL_RGBA16F;
-      format = GL_BGRA;
-      glType = GL_FLOAT;
-      break;
-    case TexelType::ARGB32F:
-      internalFormat = GL_RGBA32F;
-      format = GL_BGRA;
-      glType = GL_FLOAT;
-      break;
-    case TexelType::DEPTH32F:
-      internalFormat = GL_DEPTH_COMPONENT32F;
-      format = GL_DEPTH_COMPONENT;
-      glType = GL_FLOAT;
-      break;
-    default:
-      NOT_IMPLEMENTED;
-      break;
+  case TexelType::ARGB8:
+    internalFormat = GL_RGBA;
+    format = GL_BGRA;
+    glType = GL_UNSIGNED_BYTE;
+    break;
+  case TexelType::ARGB16:
+    internalFormat = GL_RGBA16;
+    format = GL_BGRA;
+    glType = GL_UNSIGNED_SHORT;
+    break;
+  case TexelType::ARGB16F:
+    internalFormat = GL_RGBA16F;
+    format = GL_BGRA;
+    glType = GL_FLOAT;
+    break;
+  case TexelType::ARGB32F:
+    internalFormat = GL_RGBA32F;
+    format = GL_BGRA;
+    glType = GL_FLOAT;
+    break;
+  case TexelType::DEPTH32F:
+    internalFormat = GL_DEPTH_COMPONENT32F;
+    format = GL_DEPTH_COMPONENT;
+    glType = GL_FLOAT;
+    break;
+  default:
+    NOT_IMPLEMENTED;
+    break;
   }
 }
 
+UINT OpenGLAPI::GetTexelByteCount(TexelType type) {
+  switch (type) {
+  case TexelType::ARGB8:
+  case TexelType::DEPTH32F:
+    return 4;
+  case TexelType::ARGB16:
+  case TexelType::ARGB16F:
+    return 8;
+  case TexelType::ARGB32F:
+    return 16;
+  }
+  SHOULD_NOT_HAPPEN;
+  return 0;
+}
 
-TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
-                                       bool isMultiSample, bool doesRepeat, bool mipmap) {
+
+shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type,
+  const shared_ptr<vector<char>>& texelData, bool gpuMemoryOnly, bool isMultisample,
+  bool doesRepeat, bool generateMipmaps)
+{
   ASSERT(!PleaseNoNewResources);
+  ASSERT(!(texelData != nullptr && isMultisample));
+  ASSERT(!(texelData == nullptr && generateMipmaps));
+
   CheckGLError();
-  GLuint texture;
-  glGenTextures(1, &texture);
+  GLuint handle;
+  glGenTextures(1, &handle);
   SetActiveTexture(0);
   CheckGLError();
 
-  if (isMultiSample) {
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+  if (isMultisample) {
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, handle);
     CheckGLError();
     GLint internalFormat;
     GLenum format, glType;
     GetTextureType(type, internalFormat, format, glType);
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-                            ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
-                            internalFormat, width, height, false);
+      ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
+      internalFormat, width, height, false);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-  } else {
-    BindTexture(texture);
+  }
+  else {
+    BindTexture(handle);
     if (type == TexelType::DEPTH32F) {
       //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    } else {
-      if (mipmap) {
+    }
+    else {
+      if (generateMipmaps) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
-      } else {
+      }
+      else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -797,29 +823,78 @@ TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
     auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-    SetTextureData(width, height, type, NULL, mipmap);
+
+    void* data = texelData ? &(*texelData)[0] : nullptr;
+    SetTextureData(width, height, type, data, generateMipmaps);
   }
+
   CheckGLError();
-  return texture;
+  return make_shared<Texture>(handle, width, height, type,
+    gpuMemoryOnly ? nullptr : texelData, isMultisample, doesRepeat, generateMipmaps);
 }
 
 
+
+//TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
+//                                       bool isMultiSample, bool doesRepeat, bool mipmap) {
+//  ASSERT(!PleaseNoNewResources);
+//  CheckGLError();
+//  GLuint texture;
+//  glGenTextures(1, &texture);
+//  SetActiveTexture(0);
+//  CheckGLError();
+//
+//  if (isMultiSample) {
+//    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+//    CheckGLError();
+//    GLint internalFormat;
+//    GLenum format, glType;
+//    GetTextureType(type, internalFormat, format, glType);
+//    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+//                            ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
+//                            internalFormat, width, height, false);
+//    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+//  } else {
+//    BindTexture(texture);
+//    if (type == TexelType::DEPTH32F) {
+//      //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+//      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+//      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+//    } else {
+//      if (mipmap) {
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+//      } else {
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//      }
+//      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    }
+//    auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+//    SetTextureData(width, height, type, NULL, mipmap);
+//  }
+//  CheckGLError();
+//  return texture;
+//}
+
+
 void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
-                               void* texelData, bool generateMipmap) {
+  void* texelData, bool generateMipmap) {
   ASSERT(!PleaseNoNewResources);
   GLint internalFormat;
   GLenum format;
   GLenum glType;
   GetTextureType(type, internalFormat, format, glType);
   glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, glType,
-               texelData);
+    texelData);
   if (generateMipmap) glGenerateMipmap(GL_TEXTURE_2D);
   CheckGLError();
 }
 
 
 void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
-                                  TexelType type, void* texelData) {
+  TexelType type, void* texelData) {
   ASSERT(!PleaseNoNewResources);
   GLint internalFormat;
   GLenum format;
@@ -831,77 +906,90 @@ void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
 }
 
 
-void OpenGLAPI::DeleteTexture(TextureHandle handle) {
+void OpenGLAPI::DeleteTextureGPUData(Texture::Handle handle) {
   glDeleteTextures(1, &handle);
   CheckGLError();
 }
 
 
-void OpenGLAPI::UploadTextureData(TextureHandle handle, int width, int height,
-                                  TexelType type, void* texelData) {
+void OpenGLAPI::UploadTextureGPUData(const shared_ptr<Texture>& texture,
+  void* texelData) {
   ASSERT(!PleaseNoNewResources);
+  ASSERT(!texture->mTexelData);
   SetActiveTexture(0);
-  BindTexture(handle);
-  SetTextureData(width, height, type, texelData, true);
+  BindTexture(texture->mHandle);
+  SetTextureData(texture->mWidth, texture->mHeight, texture->mType, texelData,
+    texture->mGenerateMipmaps);
   CheckGLError();
 }
 
 
-void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
-                                     int width, int height, TexelType type,
-                                     void* texelData) {
-  ASSERT(!PleaseNoNewResources);
-  BindTexture(handle);
-  SetTextureSubData(width, x, y, height, type, texelData);
-  CheckGLError();
-}
+//void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
+//                                     int width, int height, TexelType type,
+//                                     void* texelData) {
+//  ASSERT(!PleaseNoNewResources);
+//  BindTexture(handle);
+//  SetTextureSubData(width, x, y, height, type, texelData);
+//  CheckGLError();
+//}
 
 
-void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler, TextureHandle texture,
-                           UINT slotIndex, bool isRenderTarget) {
+void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler,
+  const shared_ptr<Texture>& texture, UINT slotIndex)
+{
   CheckGLError();
   SetActiveTexture(slotIndex);
-  if (isRenderTarget) BindMultisampleTexture(texture);
-  else BindTexture(texture);
+  if (!texture) {
+    BindTexture(0);
+  }
+  else {
+    if (texture->mIsMultisample) BindMultisampleTexture(texture->mHandle);
+    else BindTexture(texture->mHandle);
+  }
   glUniform1i(sampler.mHandle, slotIndex);
   CheckGLError();
 }
 
 
-FrameBufferId OpenGLAPI::CreateFrameBuffer(TextureHandle depthBuffer,
-                                           TextureHandle targetBufferA,
-                                           TextureHandle targetBufferB,
-                                           bool isMultiSample) 
+FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffer,
+  const shared_ptr<Texture>& targetBufferA,
+  const shared_ptr<Texture>& targetBufferB)
 {
   ASSERT(!PleaseNoNewResources);
+  ASSERT(!targetBufferA || !depthBuffer || 
+    depthBuffer->mIsMultisample == targetBufferA->mIsMultisample);
   CheckGLError();
   GLuint bufferId;
   glGenFramebuffers(1, &bufferId);
   BindFrameBuffer(bufferId);
   CheckGLError();
 
-  GLenum target = isMultiSample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+  bool isMultisample = (depthBuffer ? depthBuffer : targetBufferA)->mIsMultisample;
+  GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
   if (depthBuffer) {
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, depthBuffer, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, 
+      depthBuffer->mHandle, 0);
   }
 
   if (!targetBufferA) {
     /// No target buffer
-  } else if (!targetBufferB) {
+  }
+  else if (!targetBufferB) {
     CheckGLError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
-                           targetBufferA, 0);
-    GLuint attachments[] = {GL_COLOR_ATTACHMENT0};
+      targetBufferA->mHandle, 0);
+    GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
     CheckGLError();
     glDrawBuffers(1, attachments);
     CheckGLError();
-  } else {
+  }
+  else {
     CheckGLError();
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
-      targetBufferA, 0);
+      targetBufferA->mHandle, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, target,
-      targetBufferB, 0);
+      targetBufferB->mHandle, 0);
     GLuint attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     CheckGLError();
     glDrawBuffers(2, attachments);
@@ -936,15 +1024,15 @@ void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
 
 
 void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
-                                int srcX0, int srcY0, int srcX1, int srcY1,
-                                int dstX0, int dstY0, int dstX1, int dstY1) {
+  int srcX0, int srcY0, int srcX1, int srcY1,
+  int dstX0, int dstY0, int dstX1, int dstY1) {
 
   CheckGLError();
   BindReadFramebuffer(source);
   BindDrawFramebuffer(target);
   glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
-                    dstX0, dstY0, dstX1, dstY1,
-                    GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    dstX0, dstY0, dstX1, dstY1,
+    GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
   //glBlitNamedFramebuffer(source, target, 
   //                       srcX0, srcY0, srcX1, srcY1,
@@ -989,17 +1077,17 @@ void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
 
 
 void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset,
-                                      UINT stride) {
+  UINT stride) {
   GLint size = 0;
   GLenum type = 0;
   switch (nodeType) {
-    case ValueType::FLOAT:		size = 1;	type = GL_FLOAT;	break;
-    case ValueType::VEC2:		size = 2;	type = GL_FLOAT;	break;
-    case ValueType::VEC3:		size = 3;	type = GL_FLOAT;	break;
-    case ValueType::VEC4:		size = 4;	type = GL_FLOAT;	break;
-    default:
-      ERR(L"Unhandled vertex attribute type");
-      break;
+  case ValueType::FLOAT:		size = 1;	type = GL_FLOAT;	break;
+  case ValueType::VEC2:		size = 2;	type = GL_FLOAT;	break;
+  case ValueType::VEC3:		size = 3;	type = GL_FLOAT;	break;
+  case ValueType::VEC4:		size = 4;	type = GL_FLOAT;	break;
+  default:
+    ERR(L"Unhandled vertex attribute type");
+    break;
   }
   CheckGLError();
   glEnableVertexAttribArray(index);
@@ -1022,10 +1110,10 @@ void AttributeMapperOpenGL::Set() const {
 }
 
 ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-                             ShaderHandle fragmentProgramHandle,
-                             vector<Uniform>& uniforms, vector<Sampler>& samplers,
-                             vector<Attribute>& attributes, UINT uniformBlockSize,
-                             ShaderHandle uniformBufferHandle)
+  ShaderHandle fragmentProgramHandle,
+  vector<Uniform>& uniforms, vector<Sampler>& samplers,
+  vector<Attribute>& attributes, UINT uniformBlockSize,
+  ShaderHandle uniformBufferHandle)
   : mProgramHandle(shaderHandle)
   , mVertexShaderHandle(vertexProgramHandle)
   , mFragmentShaderHandle(fragmentProgramHandle)
@@ -1057,7 +1145,7 @@ ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
   , mHandle(handle) {}
 
 ShaderProgram::Attribute::Attribute(const string& name, ValueType type,
-                                    AttributeId handle, VertexAttributeUsage usage)
+  AttributeId handle, VertexAttributeUsage usage)
   : mName(name)
   , mType(type)
   , mHandle(handle)

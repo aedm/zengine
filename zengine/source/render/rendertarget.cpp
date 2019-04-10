@@ -95,59 +95,54 @@ void RenderTarget::Resize(Vec2 size) {
   UINT height = UINT(size.y);
 
   /// Create G-Buffer
-  mDepthBuffer = TheResourceManager->CreateGPUTexture(
-    width, height, TexelType::DEPTH32F, nullptr, true, false);
-  mGBufferA = TheResourceManager->CreateGPUTexture(
-    width, height, TexelType::ARGB16F, nullptr, true, false);
-  mGBufferId =
-    OpenGL->CreateFrameBuffer(mDepthBuffer->mHandle, mGBufferA->mHandle, 0, true);
-  mGBufferForZPostPassId =
-    OpenGL->CreateFrameBuffer(0, mGBufferA->mHandle, 0, true);
+  mDepthBuffer = OpenGL->MakeTexture(width, height, TexelType::DEPTH32F, nullptr, true,
+    true, false, false);
+  mGBufferA = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
+    true, false, false);
+  mGBufferId = OpenGL->CreateFrameBuffer(mDepthBuffer, mGBufferA, nullptr);
+  mGBufferForZPostPassId = OpenGL->CreateFrameBuffer(0, mGBufferA, nullptr);
 
   /// Create framebuffer for DOF result
-  mDOFColorTexture = TheResourceManager->CreateGPUTexture(
-    width, height, TexelType::ARGB16F, nullptr, true, false);
-  mDOFBufferId =
-    OpenGL->CreateFrameBuffer(0, mDOFColorTexture->mHandle, 0, true);
+  mDOFColorTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
+    true, false, false);
+  mDOFBufferId = OpenGL->CreateFrameBuffer(0, mDOFColorTexture, nullptr);
 
   /// Create secondary framebuffer, no MSAA
-  mSecondaryTexture = TheResourceManager->CreateGPUTexture(
-    width, height, TexelType::ARGB16F, nullptr, false, false);
-  mSecondaryFramebuffer =
-    OpenGL->CreateFrameBuffer(0, mSecondaryTexture->mHandle, 0, false);
+  mSecondaryTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
+    false, false, false);
+  mSecondaryFramebuffer = OpenGL->CreateFrameBuffer(0, mSecondaryTexture, nullptr);
 
   /// Create square framebuffer, no MSAA
-  mSquareDepthTexture = TheResourceManager->CreateGPUTexture(
-    SquareBufferSize, SquareBufferSize, TexelType::DEPTH32F, nullptr, false, false);
-  mSquareTexture1 = TheResourceManager->CreateGPUTexture(
-    SquareBufferSize, SquareBufferSize, TexelType::ARGB16F, nullptr, false, false);
-  mSquareTexture2 = TheResourceManager->CreateGPUTexture(
-    SquareBufferSize, SquareBufferSize, TexelType::ARGB16F, nullptr, false, false);
-  mSquareFramebuffer = OpenGL->CreateFrameBuffer(mSquareDepthTexture->mHandle,
-    mSquareTexture1->mHandle, mSquareTexture2->mHandle, false);
+  mSquareDepthTexture = OpenGL->MakeTexture(SquareBufferSize, SquareBufferSize, 
+    TexelType::DEPTH32F, nullptr, true, false, false, false);
+  mSquareTexture1 = OpenGL->MakeTexture(SquareBufferSize, SquareBufferSize,
+    TexelType::ARGB16F, nullptr, true, false, false, false);
+  mSquareTexture2 = OpenGL->MakeTexture(SquareBufferSize, SquareBufferSize,
+    TexelType::ARGB16F, nullptr, true, false, false, false);
+  mSquareFramebuffer = OpenGL->CreateFrameBuffer(mSquareDepthTexture,
+    mSquareTexture1, mSquareTexture2);
 
   /// Create shadow map
   if (mShadowBufferId == 0) {
-    mShadowTexture = TheResourceManager->CreateGPUTexture(
-      ShadowMapSize, ShadowMapSize, TexelType::DEPTH32F, nullptr, false, false);
-    mShadowBufferId =
-      OpenGL->CreateFrameBuffer(mShadowTexture->mHandle, 0, 0, false);
+    mShadowTexture = OpenGL->MakeTexture(ShadowMapSize, ShadowMapSize, 
+      TexelType::DEPTH32F, nullptr, true, false, false, false);
+    mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture, 0, 0);
   }
 
   /// Video output framebuffer
   if (mForFrameGrabbing && mColorBufferId == 0) {
-    mColorTexture = TheResourceManager->CreateGPUTexture(
-      width, height, TexelType::ARGB8, nullptr, false, false);
-    mColorBufferId = OpenGL->CreateFrameBuffer(0, mColorTexture->mHandle, 0, false);
+    mShadowTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8,
+      nullptr, true, false, false, false);
+    mColorBufferId = OpenGL->CreateFrameBuffer(0, mColorTexture, 0);
   }
 
   /// Create gaussian ping-pong textures
   for (UINT i = 0; i < ElementCount(mPostprocessTextures); i++) {
     // Don't multisample these
-    mPostprocessTextures[i] = TheResourceManager->CreateGPUTexture(
-      width, height, TexelType::ARGB16F, nullptr, false, false);
-    mPostprocessFramebuffers[i] =
-      OpenGL->CreateFrameBuffer(0, mPostprocessTextures[i]->mHandle, 0, false);
+    mPostprocessTextures[i] = OpenGL->MakeTexture(width, height, TexelType::ARGB16F,
+      nullptr, true, false, false, false);
+    mPostprocessFramebuffers[i] = 
+      OpenGL->CreateFrameBuffer(0, mPostprocessTextures[i], 0);
   }
 }
 
@@ -163,7 +158,7 @@ FrameBufferId RenderTarget::GetPostprocessTargetFramebufferId() {
   return mPostprocessFramebuffers[mPostprocessTargetBufferIndex];
 }
 
-Texture* RenderTarget::GetPostprocessSourceTexture() {
+shared_ptr<Texture> RenderTarget::GetPostprocessSourceTexture() {
   return mPostprocessTextures[1 - mPostprocessTargetBufferIndex];
 }
 
@@ -182,10 +177,7 @@ void RenderTarget::FinishFrame()
 
 void RenderTarget::DropResources() {
   OpenGL->DeleteFrameBuffer(mGBufferId);
-  TheResourceManager->DiscardTexture(mDepthBuffer);
-  TheResourceManager->DiscardTexture(mGBufferA);
   for (UINT i = 0; i < ElementCount(mPostprocessTextures); i++) {
     OpenGL->DeleteFrameBuffer(mPostprocessFramebuffers[i]);
-    TheResourceManager->DiscardTexture(mPostprocessTextures[i]);
   }
 }

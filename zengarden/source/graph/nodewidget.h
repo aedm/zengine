@@ -100,7 +100,7 @@ private:
   /// Painter used to draw the widget texture
   QPainter mPainter;
 
-  Texture* mTexture = nullptr;
+  shared_ptr<Texture> mTexture = nullptr;
   bool mForceUpdate = true;
   void DiscardTexture();
   void PaintToImage();

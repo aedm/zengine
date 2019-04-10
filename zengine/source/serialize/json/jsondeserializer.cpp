@@ -203,14 +203,16 @@ void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
     ERR("Unknown texture type: %s", typeString);
   }
   TexelType texelType = (TexelType)texelTypeInt;
-  UINT byteSize = width * height * Texture::GetTexelByteCount(texelType);
-  char* texels = new char[byteSize];
+  UINT byteSize = width * height * OpenGLAPI::GetTexelByteCount(texelType);
+  shared_ptr<vector<char>> texels = make_shared<vector<char>>(byteSize);
 
   string texelContent = base64_decode(texelString);
   ASSERT(byteSize == texelContent.length());
-  memcpy(texels, texelContent.c_str(), byteSize);
+  memcpy(&(*texels)[0], texelContent.c_str(), byteSize);
 
-  Texture* texture = TheResourceManager->CreateTexture(width, height, texelType, texels);
+  //Texture* texture = TheResourceManager->CreateTexture(width, height, texelType, texels);
+  shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, texels, false,
+    false, true, true);
   node->Set(texture);
 }
 
