@@ -294,7 +294,7 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
 void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
   const shared_ptr<StaticMeshNode>& node)
 {
-  Mesh* mesh = node->GetMesh();
+  const shared_ptr<Mesh>& mesh = node->GetMesh();
   ASSERT(mesh->mRawVertexData != nullptr);
   nodeValue.AddMember("format", mesh->mFormat->mBinaryFormat, *mAllocator);
   nodeValue.AddMember("vertexcount", mesh->mVertexCount, *mAllocator);

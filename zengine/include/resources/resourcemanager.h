@@ -16,14 +16,6 @@ public:
   ResourceManager();
   ~ResourceManager();
 
-  /// -------------- MESH MANAGEMENT --------------
-
-  /// Creates a mesh object
-  Mesh* CreateMesh();
-
-  /// Frees mesh resources and deletes Mesh object
-  /// TODO: this should be done by the destructor instead
-  void DiscardMesh(Mesh* mesh);
 
   /// -------------- VERTEX FORMAT MANAGEMENT --------------
 
@@ -31,5 +23,4 @@ public:
 
 private:
   map<UINT, VertexFormat*> mVertexFormats;
-  set<Mesh*> mMeshes;
 };

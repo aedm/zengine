@@ -61,59 +61,11 @@ namespace Util {
     return Vec3(v[1].toFloat(), v[2].toFloat(), v[3].toFloat());
   }
 
-  OWNERSHIP Mesh* LoadMesh2(const QString& fileName) {
-    unique_ptr<char> fileContent(ReadFileQt(fileName));
-    QString contentString(fileContent.get());
-    QStringList lines = contentString.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
-
-    vector<Vec3> coords;
-    vector<Vec3> normals;
-    vector<Vec2> texcoord;
-    struct Triplet { UINT c, n, t; };
-    vector<Triplet> triplets;
-
-    for (QString& line : lines) {
-      if (line.startsWith("v ")) {
-        /// Vertex definition
-        coords.push_back(ObjLineToVec3(line));
-      } else if (line.startsWith("vn ")) {
-        /// Normal definition
-        normals.push_back(ObjLineToVec3(line));
-      } else if (line.startsWith("vt ")) {
-        /// Texcoord definition
-        Vec3 t = ObjLineToVec3(line);
-        texcoord.push_back(Vec2(t.x, t.y));
-      } else if (line.startsWith("f ")) {
-        /// Face definition
-        QStringList t = line.right(line.length() - 2).split(' ', QString::SkipEmptyParts);
-        for (QString& s : t) {
-          QStringList a = s.split('/');
-          triplets.push_back({a[0].toUInt(), a[2].toUInt(), a[1].toUInt()});
-        }
-      }
-    }
-
-    vector<VertexPosUVNorm> vertices(triplets.size());
-
-    for (UINT i = 0; i < triplets.size(); i++) {
-      vertices[i].position = coords[triplets[i].c - 1];
-      vertices[i].normal = normals[triplets[i].n - 1];
-      UINT tindex = triplets[i].t;
-      vertices[i].uv = tindex == 0 ? Vec2(0, 0) : texcoord[tindex - 1];
-    }
-
-    Mesh* mesh = TheResourceManager->CreateMesh();
-    mesh->AllocateVertices(VertexPosUVNorm::format, triplets.size());
-    mesh->UploadVertices(&vertices[0]);
-
-    return mesh;
-  }
-
   static Vec3 ToVec3(const aiVector3D& v) {
     return Vec3(v.x, v.y, v.z);
   }
 
-  OWNERSHIP Mesh* LoadMesh(const QString& fileName) {
+  shared_ptr<Mesh> LoadMesh(const QString& fileName) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(fileName.toStdString(),
                                              aiProcess_CalcTangentSpace |
@@ -175,7 +127,7 @@ namespace Util {
       vertices[i].tangent = ToVec3(mesh->mTangents[i]);
     }
 
-    Mesh* zenmesh = TheResourceManager->CreateMesh();
+    shared_ptr<Mesh> zenmesh = make_shared<Mesh>();
     zenmesh->AllocateVertices(VertexPosUVNormTangent::format, vertices.size());
     zenmesh->UploadVertices(&vertices[0]);
     zenmesh->AllocateIndices(indices.size());

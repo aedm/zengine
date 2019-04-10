@@ -16,7 +16,7 @@ CubeMeshNode::CubeMeshNode()
 {}
 
 void CubeMeshNode::Operate() {
-  if (!mMesh) mMesh = TheResourceManager->CreateMesh();
+  if (!mMesh) mMesh = make_shared<Mesh>();
 
   float x = mSizeX.Get();
   float y = mSizeY.Get();
@@ -103,7 +103,7 @@ HalfCubeMeshNode::HalfCubeMeshNode()
 {}
 
 void HalfCubeMeshNode::Operate() {
-  if (!mMesh) mMesh = TheResourceManager->CreateMesh();
+  if (!mMesh) mMesh = make_shared<Mesh>();
 
   VertexPosNorm vertices[] = {
     /// Top

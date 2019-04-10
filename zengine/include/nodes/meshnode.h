@@ -9,10 +9,10 @@ class MeshNode: public Node {
 public:
   MeshNode();
 
-  Mesh*	GetMesh() const;
+  const shared_ptr<Mesh>& GetMesh() const;
 
 protected:
-  Mesh*	mMesh = nullptr;
+  shared_ptr<Mesh> mMesh;
 };
 
 typedef TypedSlot<MeshNode> MeshSlot;
@@ -22,9 +22,5 @@ typedef TypedSlot<MeshNode> MeshSlot;
 class StaticMeshNode: public MeshNode {
 public:
   StaticMeshNode();
-  virtual ~StaticMeshNode();
-
-  void Set(OWNERSHIP Mesh* mesh);
-
-  static shared_ptr<StaticMeshNode> Create(OWNERSHIP Mesh* mesh);
+  void Set(const shared_ptr<Mesh>& mesh);
 };

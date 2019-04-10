@@ -44,7 +44,7 @@ private:
   shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA = make_shared<Pass>();
   shared_ptr<Pass> mPostProcess_DOF = make_shared<Pass>();
 
-  Mesh* mFullScreenQuad = nullptr;
+  shared_ptr<Mesh> mFullScreenQuad;
 };
 
 extern EngineShaders* TheEngineShaders;

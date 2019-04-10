@@ -20,7 +20,6 @@ EngineShaders::~EngineShaders() {
   mPostProcess_GaussianBlurVertical->Dispose();
   mPostProcess_GaussianBlur_Blend_MSAA->Dispose();
   mPostProcess_DOF->Dispose();
-  TheResourceManager->DiscardMesh(mFullScreenQuad);
 }
 
 
@@ -205,7 +204,7 @@ void EngineShaders::BuildPostProcessPasses() {
     {Vec3(1, 1, 0), Vec2(1, 1)},
   };
 
-  mFullScreenQuad = TheResourceManager->CreateMesh();
+  mFullScreenQuad = make_shared<Mesh>();
   mFullScreenQuad->SetIndices(quadIndices);
   mFullScreenQuad->SetVertices(quadVertices);
 }

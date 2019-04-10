@@ -88,12 +88,10 @@ public:
 
 
 class Mesh {
-  friend class ResourceManager;
-
+public:
   Mesh();
   ~Mesh();
 
-public:
   void Render(const vector<ShaderProgram::Attribute>& usedAttributes,
               UINT instanceCount,
               PrimitiveTypeEnum primitive) const;
