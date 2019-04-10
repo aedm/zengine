@@ -61,16 +61,20 @@ UiPainter::UiPainter() {
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
 
   /// Meshes
-  mLineMeshNode = StaticMeshNode::Create(TheResourceManager->CreateMesh());
-  mRectMeshNode = StaticMeshNode::Create(TheResourceManager->CreateMesh());
+  mLineMeshNode = make_shared<StaticMeshNode>();
+  mLineMeshNode->Set(make_shared<Mesh>());
+  mRectMeshNode = make_shared<StaticMeshNode>();
+  mRectMeshNode->Set(make_shared<Mesh>());
 
-  Mesh* boxMesh = TheResourceManager->CreateMesh();
+  shared_ptr<Mesh> boxMesh = make_shared<Mesh>();
   boxMesh->SetIndices(boxIndices);
-  mBoxMeshNode = StaticMeshNode::Create(boxMesh);
+  mBoxMeshNode = make_shared<StaticMeshNode>();
+  mBoxMeshNode->Set(boxMesh);
 
-  Mesh* textureMesh = TheResourceManager->CreateMesh();
+  shared_ptr<Mesh> textureMesh = make_shared<Mesh>();
   textureMesh->SetIndices(boxIndices);
-  mTexturedBoxMeshNode = StaticMeshNode::Create(textureMesh);
+  mTexturedBoxMeshNode = make_shared<StaticMeshNode>();
+  mTexturedBoxMeshNode->Set(textureMesh);
 
   /// Models
   mSolidLine->mMaterial.Connect(mSolidColorMaterial);

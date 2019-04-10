@@ -222,7 +222,7 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   int binaryFormat = value["format"].GetInt();
   UINT vertexCount = value["vertexcount"].GetInt();
   VertexFormat* format = TheResourceManager->GetVertexFormat(binaryFormat);
-  Mesh* mesh = TheResourceManager->CreateMesh();
+  shared_ptr<Mesh> mesh = make_shared<Mesh>();
 
   mesh->AllocateVertices(format, vertexCount);
   vector<float> rawVertices(vertexCount * format->mStride / sizeof(float));

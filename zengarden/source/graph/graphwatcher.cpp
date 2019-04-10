@@ -651,8 +651,9 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
   QFileInfo fileInfo(fileName);
   if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds" ||
     fileInfo.suffix() == "fbx") {
-    Mesh* mesh = Util::LoadMesh(fileName);
-    shared_ptr<MeshNode> node = StaticMeshNode::Create(mesh);
+    shared_ptr<Mesh> mesh = Util::LoadMesh(fileName);
+    shared_ptr<StaticMeshNode> node = make_shared<StaticMeshNode>();
+    node->Set(mesh);
     node->SetName(fileInfo.fileName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
 

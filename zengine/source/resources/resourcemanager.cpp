@@ -16,7 +16,6 @@ ResourceManager::ResourceManager() {
 }
 
 ResourceManager::~ResourceManager() {
-  for (Mesh* mesh : mMeshes) delete mesh;
   for (auto vertexFormat : mVertexFormats) delete vertexFormat.second;
 }
 
@@ -30,13 +29,3 @@ VertexFormat* ResourceManager::GetVertexFormat(UINT binaryFormat) {
   return format;
 }
 
-Mesh* ResourceManager::CreateMesh() {
-  Mesh* mesh = new Mesh();
-  mMeshes.insert(mesh);
-  return mesh;
-}
-
-void ResourceManager::DiscardMesh(Mesh* meshInstance) {
-  mMeshes.erase(meshInstance);
-  delete meshInstance;
-}

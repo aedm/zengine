@@ -14,7 +14,7 @@ namespace Util {
   OWNERSHIP char* ReadFileQt(const QString& FileName);
 
   /// Loads a static mesh from a Wavefront .obj file
-  OWNERSHIP Mesh* LoadMesh(const QString& fileName);
+  shared_ptr<Mesh> LoadMesh(const QString& fileName);
 
   /// Disposes a set of nodes
   void DisposeNodes(const set<shared_ptr<Node>>& nodes);

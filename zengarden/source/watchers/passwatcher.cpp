@@ -16,10 +16,10 @@ PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
     {Vec3(Position.x + w, Position.y + h, 0), Vec2(u, v)},
   };
 
-  Mesh* boxMesh = TheResourceManager->CreateMesh();
+  shared_ptr<Mesh> boxMesh = make_shared<Mesh>();
   boxMesh->SetIndices(boxIndices);
   boxMesh->SetVertices(vertices);
-  mMesh = StaticMeshNode::Create(boxMesh);
+  mMesh->Set(boxMesh);
 
   mDrawable->mMaterial.Connect(mMaterial);
   mDrawable->mMesh.Connect(mMesh);
