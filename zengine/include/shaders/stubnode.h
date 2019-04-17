@@ -2,57 +2,58 @@
 
 #include "../dom/node.h"
 #include "../nodes/valuenodes.h"
+#include "shadervaluetype.h"
 #include <vector>
 #include <map>
 
 using namespace std;
 
-/// Macro list for global uniforms (name, type, variable/token)
-#define GLOBALUSAGE_LIST \
-  ITEM(Time,                          FLOAT) \
-  ITEM(Camera,                        MATRIX44) \
-  ITEM(World,                         MATRIX44) \
-  ITEM(View,                          MATRIX44) \
-  ITEM(Projection,                    MATRIX44) \
-  ITEM(Transformation,                MATRIX44) \
-  ITEM(SkylightCamera,                MATRIX44) \
-  ITEM(SkylightProjection,            MATRIX44) \
-  ITEM(SkylightTransformation,        MATRIX44) \
-  ITEM(SkylightTexture,               TEXTURE) \
-  ITEM(SkylightTextureSizeRecip,      FLOAT) \
-  ITEM(SkylightDirection,             VEC3) \
-  ITEM(SkylightColor,                 VEC3) \
-  ITEM(SkylightAmbient,               FLOAT) \
-  ITEM(SkylightSpread,                FLOAT) \
-  ITEM(SkylightSampleSpread,          FLOAT) \
-  ITEM(RenderTargetSize,              VEC2) \
-  ITEM(RenderTargetSizeRecip,         VEC2) \
-  ITEM(ViewportSize,                  VEC2) \
-  ITEM(PixelSize,                     VEC2) \
-  ITEM(DiffuseColor,                  VEC4) \
-  ITEM(AmbientColor,                  VEC4) \
-  ITEM(DepthBias,                     FLOAT) \
-  ITEM(DepthBufferSource,             TEXTURE) \
-  ITEM(GBufferSourceA,                TEXTURE) \
-  ITEM(GBufferSampleCount,            FLOAT) \
-  ITEM(SecondaryTexture,              TEXTURE) \
-  ITEM(PPGauss,                       TEXTURE) \
-  ITEM(PPGaussPixelSize,              VEC2) \
-  ITEM(PPGaussRelativeSize,           VEC2) \
-  ITEM(PPDofEnabled,                  FLOAT) \
-  ITEM(PPDofFocusDistance,            FLOAT) \
-  ITEM(PPDofBlur,                     FLOAT) \
-  ITEM(DirectToScreen,                FLOAT) \
-  ITEM(DirectToSquare,                FLOAT) \
-  ITEM(SquareTexture1,                TEXTURE) \
-  ITEM(SquareTexture2,                TEXTURE) \
+/// Macro list for global uniforms (name/usage, type)
+#define GLOBALUNIFORM_LIST \
+  ITEM(Time,                          ShaderValueType::FLOAT) \
+  ITEM(Camera,                        ShaderValueType::MATRIX44) \
+  ITEM(World,                         ShaderValueType::MATRIX44) \
+  ITEM(View,                          ShaderValueType::MATRIX44) \
+  ITEM(Projection,                    ShaderValueType::MATRIX44) \
+  ITEM(Transformation,                ShaderValueType::MATRIX44) \
+  ITEM(SkylightCamera,                ShaderValueType::MATRIX44) \
+  ITEM(SkylightProjection,            ShaderValueType::MATRIX44) \
+  ITEM(SkylightTransformation,        ShaderValueType::MATRIX44) \
+  ITEM(SkylightTextureSizeRecip,      ShaderValueType::FLOAT) \
+  ITEM(SkylightDirection,             ShaderValueType::VEC3) \
+  ITEM(SkylightColor,                 ShaderValueType::VEC3) \
+  ITEM(SkylightAmbient,               ShaderValueType::FLOAT) \
+  ITEM(SkylightSpread,                ShaderValueType::FLOAT) \
+  ITEM(SkylightSampleSpread,          ShaderValueType::FLOAT) \
+  ITEM(RenderTargetSize,              ShaderValueType::VEC2) \
+  ITEM(RenderTargetSizeRecip,         ShaderValueType::VEC2) \
+  ITEM(ViewportSize,                  ShaderValueType::VEC2) \
+  ITEM(PixelSize,                     ShaderValueType::VEC2) \
+  ITEM(DiffuseColor,                  ShaderValueType::VEC4) \
+  ITEM(AmbientColor,                  ShaderValueType::VEC4) \
+  ITEM(DepthBias,                     ShaderValueType::FLOAT) \
+  ITEM(GBufferSampleCount,            ShaderValueType::FLOAT) \
+  ITEM(PPGaussPixelSize,              ShaderValueType::VEC2) \
+  ITEM(PPGaussRelativeSize,           ShaderValueType::VEC2) \
+  ITEM(PPDofEnabled,                  ShaderValueType::FLOAT) \
+  ITEM(PPDofFocusDistance,            ShaderValueType::FLOAT) \
+  ITEM(PPDofBlur,                     ShaderValueType::FLOAT) \
+  ITEM(DirectToScreen,                ShaderValueType::FLOAT) \
+  ITEM(DirectToSquare,                ShaderValueType::FLOAT) \
 
+#define GLOBALSAMPLER_LIST \
+  ITEM(SkylightTexture) \
+  ITEM(DepthBufferSource) \
+  ITEM(GBufferSourceA) \
+  ITEM(SecondaryTexture) \
+  ITEM(PPGauss) \
+  ITEM(SquareTexture1) \
+  ITEM(SquareTexture2) \
 
-enum class ShaderGlobalType {
+enum class GlobalUniformUsage {
 #undef ITEM
 #define ITEM(name, type) name,
-  GLOBALUSAGE_LIST
-
+  GLOBALUNIFORM_LIST
   LOCAL,	/// For non-global uniforms
 };
 
@@ -63,8 +64,9 @@ extern const int GlobalUniformOffsets[];
 /// A struct to store global uniforms
 struct Globals {
 #undef ITEM
-#define ITEM(name, type) ValueTypes<ValueType::type>::Type name;
-  GLOBALUSAGE_LIST
+#define ITEM(name, type) ShaderValueTypes<type>::Type name;
+  GLOBALUNIFORM_LIST
+
 };
 
 /// Stub parameter, becomes a slot
