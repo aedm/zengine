@@ -4,11 +4,17 @@
 #include <include/render/drawingapi.h>
 #include <include/base/helpers.h>
 
-VertexFormat* VertexPos::format;
-VertexFormat* VertexPosNorm::format;
-VertexFormat* VertexPosUVNorm::format;
-VertexFormat* VertexPosUVNormTangent::format;
-VertexFormat* VertexPosUV::format;
+shared_ptr<VertexFormat> VertexPos::format = make_shared<VertexFormat>(
+  VERTEXATTRIB_POSITION_MASK);
+shared_ptr<VertexFormat> VertexPosNorm::format = make_shared<VertexFormat>(
+  VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
+shared_ptr<VertexFormat> VertexPosUVNorm::format = make_shared<VertexFormat>(
+  VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
+shared_ptr<VertexFormat> VertexPosUVNormTangent::format = make_shared<VertexFormat>(
+  VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK |
+  VERTEXATTRIB_TANGENT_MASK);
+shared_ptr<VertexFormat> VertexPosUV::format = make_shared<VertexFormat>(
+  VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
 
 VertexFormat::VertexFormat(UINT binaryFormat) {
   memset(mAttributesArray, 0, sizeof(void*) * (UINT)VertexAttributeUsage::COUNT);
@@ -71,30 +77,32 @@ Mesh::~Mesh() {
 }
 
 void Mesh::Render(const vector<ShaderProgram::Attribute>& usedAttributes,
-                  UINT instanceCount,
-                  PrimitiveTypeEnum primitive) const {
+  UINT instanceCount,
+  PrimitiveTypeEnum primitive) const {
   /// Set vertex buffer and attributes
   OpenGL->SetVertexBuffer(mVertexHandle);
   for (const ShaderProgram::Attribute& desc : usedAttributes) {
     VertexAttribute* attribute = mFormat->mAttributesArray[(UINT)desc.mUsage];
     if (attribute != nullptr) {
       OpenGL->EnableVertexAttribute(desc.mHandle,
-                                    gVertexAttributeType[(UINT)desc.mUsage],
-                                    attribute->Offset,
-                                    mFormat->mStride);
-    } else {
+        gVertexAttributeType[(UINT)desc.mUsage],
+        attribute->Offset,
+        mFormat->mStride);
+    }
+    else {
       SHOULD_NOT_HAPPEN;
     }
   }
 
   if (mIndexHandle) {
     OpenGL->Render(mIndexHandle, mIndexCount, primitive, instanceCount);
-  } else {
+  }
+  else {
     OpenGL->Render(0, mVertexCount, primitive, instanceCount);
   }
 }
 
-void Mesh::AllocateVertices(VertexFormat* format, UINT vertexCount) {
+void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount) {
   this->mFormat = format;
   this->mVertexCount = vertexCount;
   UINT newBufferSize = format->mStride * vertexCount;

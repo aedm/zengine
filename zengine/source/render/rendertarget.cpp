@@ -1,7 +1,6 @@
 #include <include/render/rendertarget.h>
 #include <include/base/helpers.h>
-#include <include/resources/resourcemanager.h>
-
+#include <include/render/drawingapi.h>
 
 static const int ShadowMapSize = 2048;
 static const int SquareBufferSize = 1024;

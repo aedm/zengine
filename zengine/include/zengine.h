@@ -1,8 +1,6 @@
 #pragma once
 /// Include file for Zengine.
 
-#include "resources/resourcemanager.h"
-
 #include "base/helpers.h"
 
 #include "dom/nodetype.h"

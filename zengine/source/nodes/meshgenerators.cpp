@@ -1,5 +1,4 @@
 #include <include/nodes/meshgenerators.h>
-#include <include/resources/resourcemanager.h>
 
 REGISTER_NODECLASS(CubeMeshNode, "Cube");
 REGISTER_NODECLASS(HalfCubeMeshNode, "HalfCube");
