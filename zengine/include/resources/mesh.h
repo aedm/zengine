@@ -24,7 +24,7 @@ struct VertexPos {
   Vec3 position;
 
   /// Vertex format descriptor for this struct
-  static VertexFormat* format;
+  static shared_ptr<VertexFormat> format;
 };
 
 struct VertexPosNorm {
@@ -32,7 +32,7 @@ struct VertexPosNorm {
   Vec3 normal;
 
   /// Vertex format descriptor for this struct
-  static VertexFormat* format;
+  static shared_ptr<VertexFormat> format;
 };
 
 struct VertexPosUVNorm {
@@ -41,7 +41,7 @@ struct VertexPosUVNorm {
   Vec3 normal;
 
   /// Vertex format descriptor for this struct
-  static VertexFormat* format;
+  static shared_ptr<VertexFormat> format;
 };
 
 struct VertexPosUVNormTangent {
@@ -51,7 +51,7 @@ struct VertexPosUVNormTangent {
   Vec3 tangent;
 
   /// Vertex format descriptor for this struct
-  static VertexFormat* format;
+  static shared_ptr<VertexFormat> format;
 };
 
 
@@ -60,18 +60,16 @@ struct VertexPosUV {
   Vec2 uv;
 
   /// Vertex format descriptor for this struct
-  static VertexFormat* format;
+  static shared_ptr<VertexFormat> format;
 };
 
 
 /// Describes the memory layout of a vertex format
 class VertexFormat {
-  friend class ResourceManager;
-
+public:
   VertexFormat(UINT binaryFormat);
   ~VertexFormat();
 
-public:
   bool HasAttribute(VertexAttributeUsage attrib);
 
   /// Size of all data of a single vertex in bytes
@@ -96,7 +94,7 @@ public:
               UINT instanceCount,
               PrimitiveTypeEnum primitive) const;
 
-  void AllocateVertices(VertexFormat* format, UINT vertexCount);
+  void AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount);
   void AllocateIndices(UINT indexCount);
   void AllocateWireframeIndices(UINT indexCount);
 
@@ -122,7 +120,7 @@ public:
   UINT mWireframeIndexCount;
   IndexBufferHandle	mWireframeIndexHandle;
 
-  VertexFormat* mFormat;
+  shared_ptr<VertexFormat> mFormat;
 
   /// Raw mesh data for deserialization
   void* mRawVertexData = nullptr;

@@ -123,7 +123,6 @@
     <ClInclude Include="include\nodes\vectornodes.h" />
     <ClInclude Include="include\render\drawingapi.h" />
     <ClInclude Include="include\resources\mesh.h" />
-    <ClInclude Include="include\resources\resourcemanager.h" />
     <ClInclude Include="include\resources\texture.h" />
     <ClInclude Include="include\serialize\lodepng.h" />
     <ClInclude Include="include\shaders\engineshaders.h" />
@@ -169,7 +168,6 @@
     <ClCompile Include="source\render\drawingapi.cpp" />
     <ClCompile Include="source\render\rendertarget.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
-    <ClCompile Include="source\resources\resourcemanager.cpp" />
     <ClCompile Include="source\resources\texture.cpp" />
     <ClCompile Include="source\serialize\json\base64\base64.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>

@@ -1,7 +1,6 @@
 #include <algorithm>
 #include "jsondeserializer.h"
 #include "jsonserializer.h"
-#include <include/resources/resourcemanager.h>
 #include "base64/base64.h"
 #include <include/dom/ghost.h>
 
@@ -221,7 +220,7 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   const shared_ptr<StaticMeshNode>& node) {
   int binaryFormat = value["format"].GetInt();
   UINT vertexCount = value["vertexcount"].GetInt();
-  VertexFormat* format = TheResourceManager->GetVertexFormat(binaryFormat);
+  shared_ptr<VertexFormat> format = make_shared<VertexFormat>(binaryFormat);
   shared_ptr<Mesh> mesh = make_shared<Mesh>();
 
   mesh->AllocateVertices(format, vertexCount);

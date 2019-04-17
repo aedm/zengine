@@ -68,9 +68,6 @@
     <ClInclude Include="include\zengine.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\resources\resourcemanager.h">
-      <Filter>include\resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\base\helpers.h">
       <Filter>include\base</Filter>
     </ClInclude>
@@ -207,9 +204,6 @@
       <Filter>source\resources</Filter>
     </ClCompile>
     <ClCompile Include="source\resources\texture.cpp">
-      <Filter>source\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="source\resources\resourcemanager.cpp">
       <Filter>source\resources</Filter>
     </ClCompile>
     <ClCompile Include="source\zengine.cpp">

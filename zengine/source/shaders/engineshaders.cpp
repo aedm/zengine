@@ -1,6 +1,5 @@
 #include <include/shaders/engineshaders.h>
 #include <include/shaders/enginestubs.h>
-#include <include/resources/resourcemanager.h>
 
 #define GLEW_STATIC
 #include <glew/glew.h>
