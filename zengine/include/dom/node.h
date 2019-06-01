@@ -134,7 +134,6 @@ public:
   
   /// Type of object this slot accepts
   virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const;
-  virtual bool DoesAcceptValueNode(ValueType type) const;
 
   /// Returns the name of the slot
   SharedString GetName();
@@ -175,7 +174,7 @@ class Node: public enable_shared_from_this<Node> {
   friend class Slot;
   friend class Watcher;
   friend class MessageQueue;
-  template<ValueType T> friend class ValueSlot;
+  template<typename T> friend class ValueSlot;
 
 public:
   virtual ~Node();
@@ -198,9 +197,6 @@ public:
   virtual shared_ptr<Node> GetReferencedNode();
 
   virtual bool IsGhostNode();
-
-  /// ValueNodes returns the value type, all others return or ValueType::NONE
-  ValueType GetValueType() const;
 
   /// Disconnects all outgoing connections
   void Dispose();
@@ -229,9 +225,6 @@ protected:
 
   /// True if Operate() needs to be called
   bool mIsUpToDate;
-
-  /// Value type. Only ValueNodes have a non-NONE value.
-  ValueType mValueType = ValueType::NONE;
 
   /// Enqueues message
   void EnqueueMessage(MessageType message, Slot* slot = nullptr, 
@@ -324,9 +317,7 @@ private:
   set<shared_ptr<Watcher>> mWatchers;
 };
 
-template <ValueType T> class ValueNode;
-
-/// Typed slot
+/// A slot which only accepts a certain Node class, eg TypedSlot<ValueNode<float>>
 template<class N>
 class TypedSlot: public Slot {
 public:
@@ -340,10 +331,6 @@ public:
 
   virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
     return IsPointerOf<N>(node->GetReferencedNode());
-  }
-
-  virtual bool DoesAcceptValueNode(ValueType type) const override {
-    return false;
   }
 };
 

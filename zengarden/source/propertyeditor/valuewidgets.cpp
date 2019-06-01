@@ -102,7 +102,7 @@ void TextBox::HandleEditingFinished() {
   onEditingFinished();
 }
 
-ValueEditor<ValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float value)
+ValueEditor<ShaderValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float value)
   : QWidget(parent)
   , mValue(value) 
 {
@@ -123,20 +123,20 @@ ValueEditor<ValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float 
   layout->addWidget(mTextBox);
 
   mSlider->onValueChange += 
-    Delegate(this, &ValueEditor<ValueType::FLOAT>::SliderValueChanged);
+    Delegate(this, &ValueEditor<ShaderValueType::FLOAT>::SliderValueChanged);
   mTextBox->onEditingFinished += 
-    Delegate(this, &ValueEditor<ValueType::FLOAT>::SpinBoxValueChanged);
+    Delegate(this, &ValueEditor<ShaderValueType::FLOAT>::SpinBoxValueChanged);
 }
 
 
-void ValueEditor<ValueType::FLOAT>::SetTextBoxValue(float value) {
+void ValueEditor<ShaderValueType::FLOAT>::SetTextBoxValue(float value) {
   if (mAllowTextboxValueChanges) {
     mTextBox->setText(QString::number(value, 'g', 3));
   }
 }
 
 
-void ValueEditor<ValueType::FLOAT>::SliderValueChanged(float value) {
+void ValueEditor<ShaderValueType::FLOAT>::SliderValueChanged(float value) {
   if (mIsReadOnly || value == mValue) return;
   mValue = value;
   SetTextBoxValue(value);
@@ -146,7 +146,7 @@ void ValueEditor<ValueType::FLOAT>::SliderValueChanged(float value) {
 }
 
 
-void ValueEditor<ValueType::FLOAT>::SpinBoxValueChanged() {
+void ValueEditor<ShaderValueType::FLOAT>::SpinBoxValueChanged() {
   float value = mTextBox->text().toFloat();
   if (mIsReadOnly || value == mValue) return;
   /// TODO: slider should set and repaint itself
@@ -157,18 +157,18 @@ void ValueEditor<ValueType::FLOAT>::SpinBoxValueChanged() {
 }
 
 
-void ValueEditor<ValueType::FLOAT>::Set(float value) {
+void ValueEditor<ShaderValueType::FLOAT>::Set(float value) {
   if (mIsReadOnly || value == mValue) return;
   mValue = value;
   SetTextBoxValue(value);
   mSlider->Set(value);
 }
 
-void ValueEditor<ValueType::FLOAT>::SetRange(float minimum, float maximum) {
+void ValueEditor<ShaderValueType::FLOAT>::SetRange(float minimum, float maximum) {
   mSlider->SetRange(minimum, maximum);
 }
 
-void ValueEditor<ValueType::FLOAT>::SetReadOnly(bool readOnly) {
+void ValueEditor<ShaderValueType::FLOAT>::SetReadOnly(bool readOnly) {
   mSlider->SetReadOnly(readOnly);
   mTextBox->setReadOnly(readOnly);
   mIsReadOnly = readOnly;
@@ -176,7 +176,7 @@ void ValueEditor<ValueType::FLOAT>::SetReadOnly(bool readOnly) {
 
 
 
-template <ValueType T>
+template <ShaderValueType T>
 ValueEditor<T>::ValueEditor(QWidget* parent, QString name, const VectorType& value) {
   static const char* suffixes[] = { ".x", ".y", ".z", ".w" };
   mValue = value;
@@ -191,7 +191,7 @@ ValueEditor<T>::ValueEditor(QWidget* parent, QString name, const VectorType& val
   }
 }
 
-template <ValueType T>
+template <ShaderValueType T>
 void ValueEditor<T>::Set(const VectorType& value) {
   mValue = value;
   for (UINT i = 0; i < VectorType::Dimensions; i++) {
@@ -200,7 +200,7 @@ void ValueEditor<T>::Set(const VectorType& value) {
 }
 
 
-template <ValueType T>
+template <ShaderValueType T>
 void ValueEditor<T>::SetRange(float minimum, float maximum) {
   for (UINT i = 0; i < VectorType::Dimensions; i++) {
     mFloatEditors[i]->SetRange(minimum, maximum);
@@ -208,7 +208,7 @@ void ValueEditor<T>::SetRange(float minimum, float maximum) {
 }
 
 
-template <ValueType T>
+template <ShaderValueType T>
 void ValueEditor<T>::SetReadOnly(bool readOnly) {
   for (UINT i = 0; i < VectorType::Dimensions; i++) {
     mFloatEditors[i]->SetReadOnly(readOnly);
@@ -216,7 +216,7 @@ void ValueEditor<T>::SetReadOnly(bool readOnly) {
 }
 
 
-template <ValueType T>
+template <ShaderValueType T>
 void ValueEditor<T>::HandleFloatValueChange(QWidget* floatEditor,
   const float& value) {
   for (UINT i = 0; i < VectorType::Dimensions; i++) {
@@ -231,7 +231,7 @@ void ValueEditor<T>::HandleFloatValueChange(QWidget* floatEditor,
   }
 }
 
-template class ValueEditor<ValueType::FLOAT>;
-template class ValueEditor<ValueType::VEC2>;
-template class ValueEditor<ValueType::VEC3>;
-template class ValueEditor<ValueType::VEC4>;
+template class ValueEditor<ShaderValueType::FLOAT>;
+template class ValueEditor<ShaderValueType::VEC2>;
+template class ValueEditor<ShaderValueType::VEC3>;
+template class ValueEditor<ShaderValueType::VEC4>;

@@ -24,11 +24,11 @@ protected:
 
 
 /// Editor for static float/vector nodes
-template<ValueType T>
+template<ShaderValueType T>
 class StaticValueWatcher : public PropertyEditor {
 public:
-  typedef typename ValueTypes<T>::Type VectorType;
-  StaticValueWatcher(const shared_ptr<StaticValueNode<T>>& node);
+  typedef typename ShaderValueTypes<T>::Type VectorType;
+  StaticValueWatcher(const shared_ptr<StaticValueNode<VectorType>>& node);
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 

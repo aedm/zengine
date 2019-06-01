@@ -25,6 +25,7 @@
 #include "nodes/drawable.h"
 #include "nodes/valuenodes.h"
 #include "nodes/meshnode.h"
+#include "nodes/texturenode.h"
 #include "nodes/timenode.h"
 #include "nodes/scenenode.h"
 #include "nodes/clipnode.h"

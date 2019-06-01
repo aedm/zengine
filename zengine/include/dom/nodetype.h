@@ -10,15 +10,15 @@ class Node;
 class Slot;
 
 /// Type helpers
-template<ValueType T> struct ValueTypes;
-#undef ITEM
-#define ITEM(name, capitalizedName, type) \
-  template<> struct ValueTypes<ValueType::name> { typedef type Type; };
-VALUETYPE_LIST
+//template<ValueType T> struct ValueTypes;
+//#undef ITEM
+//#define ITEM(name, capitalizedName, type) \
+//  template<> struct ValueTypes<ValueType::name> { typedef type Type; };
+//VALUETYPE_LIST
 
 
-/// Array for attribute types, index by VertexAttributeEnum
-extern const ValueType gVertexAttributeType[];
+///// Array for attribute types, index by VertexAttributeEnum
+//extern const ValueType gVertexAttributeType[];
 
 
 /// Returns true if the node is an instance of a certain class

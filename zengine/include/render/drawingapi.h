@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../base/defines.h"
-#include "../dom/nodetype.h"
+//#include "../dom/nodetype.h"
 #include "../resources/texture.h"
+#include "../shaders/shadervaluetype.h"
+//#include "../resources/mesh.h"
 #include <vector>
 #include <string>
 
@@ -46,27 +48,18 @@ protected:
 };
 
 
-/// An attribute of a vertex format, eg. position or UV
-/// TODO: make this part of VertexFormat
-struct VertexAttribute {
-  VertexAttributeUsage Usage;
-  int Size;
-  int Offset;
-};
-
-
 /// Output of platform-dependent shader compilation
 /// All metadata is determined by the shader compiler of the OpenGL driver.
 struct ShaderProgram {
   /// Uniform properties returned by the driver
   struct Uniform {
-    Uniform(const string& name, ValueType type, UINT offset);
+    Uniform(const string& name, ShaderValueType type, UINT offset);
 
     /// Uniform name, must match the generated name inside the uniform block
     const string mName;
 
     /// Type (float, vec2...)
-    const ValueType mType;
+    const ShaderValueType mType;
 
     /// Data offset inside the uniform block
     const UINT mOffset;
@@ -85,11 +78,11 @@ struct ShaderProgram {
 
   /// Vertex attributes, pipeline input
   struct Attribute {
-    Attribute(const string& name, ValueType type, AttributeId handle,
+    Attribute(const string& name, ShaderValueType type, AttributeId handle,
       VertexAttributeUsage usage);
 
     const string mName;
-    const ValueType mType;
+    const ShaderValueType mType;
     const AttributeId mHandle;
     const VertexAttributeUsage mUsage;
   };
@@ -135,7 +128,7 @@ public:
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
     const char* FragmentSource);
   void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
-  void SetUniform(UniformId Id, ValueType Type, const void* Values);
+  void SetUniform(UniformId Id, ShaderValueType Type, const void* Values);
 
   /// Vertex buffer handling
   VertexBufferHandle CreateVertexBuffer(UINT Size);
@@ -146,7 +139,7 @@ public:
     const vector<ShaderProgram::Attribute>& ShaderAttribs,
     UINT Stride);
   void SetVertexBuffer(VertexBufferHandle Handle);
-  void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
+  void EnableVertexAttribute(UINT Index, ShaderValueType Type, UINT Offset, UINT Stride);
 
   /// Index buffer handling
   IndexBufferHandle CreateIndexBuffer(UINT IndexCount);

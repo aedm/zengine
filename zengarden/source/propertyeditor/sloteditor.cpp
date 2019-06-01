@@ -22,11 +22,13 @@ SlotEditor::~SlotEditor() {
 }
 
 
-template <ValueType T>
+template <ShaderValueType T>
 bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
-  if (!IsPointerOf<ValueNode<T>>(slot->GetReferencedNode())) return false;
+  if (!IsPointerOf<ValueNode<ShaderValueTypes<T>::Type>>(slot->GetReferencedNode())) {
+    return false;
+  }
 
-  auto valueSlot = SafeCast<ValueSlot<T>*>(slot);
+  auto valueSlot = SafeCast<ValueSlot<ShaderValueTypes<T>::Type>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
   shared_ptr<SlotWatcher> watcher = slotNode->Watch<TypedSlotWatcher<T>>(valueSlot);
 
@@ -57,10 +59,10 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     hLayout->setSpacing(4);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
-    if (!AddSlot<ValueType::FLOAT>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ValueType::VEC2>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ValueType::VEC3>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ValueType::VEC4>(slot, watcherWidget, hLayout)) {
+    if (!AddSlot<ShaderValueType::FLOAT>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ShaderValueType::VEC2>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ShaderValueType::VEC3>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ShaderValueType::VEC4>(slot, watcherWidget, hLayout)) {
       QLabel* label = new QLabel(QString::fromStdString(*slot->GetName().get()), widget);
       hLayout->addWidget(label);
     }
@@ -117,14 +119,14 @@ SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node) {}
 
 
-template <ValueType T>
-TypedSlotWatcher<T>::TypedSlotWatcher(ValueSlot<T>* slot)
+template <ShaderValueType T>
+TypedSlotWatcher<T>::TypedSlotWatcher(ValueSlot<Type>* slot)
   : SlotWatcher(slot->GetReferencedNode())
   , mSlot(slot) 
 {}
 
 
-template <ValueType T>
+template <ShaderValueType T>
 void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   SlotWatcher::SetWatcherWidget(watcherWidget);
 
@@ -132,7 +134,7 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  shared_ptr<ValueNode<T>> valueNode = PointerCast<ValueNode<T>>(GetNode());
+  shared_ptr<ValueNode<Type>> valueNode = PointerCast<ValueNode<Type>>(GetNode());
   auto value = valueNode->Get();
 
   mEditor = new ValueEditor<T>(watcherWidget, 
@@ -147,19 +149,19 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-template <ValueType T>
+template <ShaderValueType T>
 void TypedSlotWatcher<T>::UpdateReadOnly() {
   mEditor->SetReadOnly(!mSlot->IsDefaulted());
 }
 
 
-template <ValueType T>
+template <ShaderValueType T>
 void TypedSlotWatcher<T>::HandleValueChange(QWidget* widget, const Type& value) {
   mSlot->SetDefaultValue(value);
 }
 
 
-template class TypedSlotWatcher<ValueType::FLOAT>;
-template class TypedSlotWatcher<ValueType::VEC2>;
-template class TypedSlotWatcher<ValueType::VEC3>;
-template class TypedSlotWatcher<ValueType::VEC4>;
+template class TypedSlotWatcher<ShaderValueType::FLOAT>;
+template class TypedSlotWatcher<ShaderValueType::VEC2>;
+template class TypedSlotWatcher<ShaderValueType::VEC3>;
+template class TypedSlotWatcher<ShaderValueType::VEC4>;

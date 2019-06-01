@@ -131,6 +131,7 @@
     <ClInclude Include="include\shaders\pass.h" />
     <ClInclude Include="include\render\rendertarget.h" />
     <ClInclude Include="include\shaders\shadersource.h" />
+    <ClInclude Include="include\shaders\shadervaluetype.h" />
     <ClInclude Include="include\shaders\stubnode.h" />
     <ClInclude Include="include\shaders\valuestubslot.h" />
     <ClInclude Include="include\zengine.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="source\nodes\movienode.cpp" />
     <ClCompile Include="source\nodes\propertiesnode.cpp" />
     <ClCompile Include="source\nodes\scenenode.cpp" />
+    <ClCompile Include="source\nodes\texturenode.cpp" />
     <ClCompile Include="source\nodes\timenode.cpp" />
     <ClCompile Include="source\nodes\splinenode.cpp" />
     <ClCompile Include="source\nodes\valuenodes.cpp" />
@@ -182,6 +184,7 @@
     <ClCompile Include="source\shaders\pass.cpp" />
     <ClCompile Include="source\shaders\shadersource.cpp" />
     <ClCompile Include="source\shaders\shaderbuilder.cpp" />
+    <ClCompile Include="source\shaders\shadervaluetype.cpp" />
     <ClCompile Include="source\shaders\stubnode.cpp" />
     <ClCompile Include="source\shaders\shaderTokenizer.cpp" />
     <ClCompile Include="source\shaders\stubanalyzer.cpp" />

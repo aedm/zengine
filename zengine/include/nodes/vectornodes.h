@@ -2,7 +2,7 @@
 
 #include "valuenodes.h"
 
-class FloatsToVec3Node: public ValueNode<ValueType::VEC3> {
+class FloatsToVec3Node: public ValueNode<Vec3> {
 public:
   FloatsToVec3Node();
 
@@ -20,7 +20,7 @@ protected:
   Vec3 mValue;
 };
 
-class FloatsToVec4Node : public ValueNode<ValueType::VEC4> {
+class FloatsToVec4Node : public ValueNode<Vec4> {
 public:
   FloatsToVec4Node();
 
@@ -40,7 +40,7 @@ protected:
 };
 
 
-class FloatToFloatNode : public ValueNode<ValueType::FLOAT> {
+class FloatToFloatNode : public ValueNode<float> {
 public:
   FloatToFloatNode();
 
@@ -56,7 +56,7 @@ protected:
   float mValue;
 };
 
-class MaddNode : public ValueNode<ValueType::FLOAT> {
+class MaddNode : public ValueNode<float> {
 public:
   MaddNode();
 

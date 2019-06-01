@@ -12,16 +12,15 @@ ShaderSource::ShaderSource(
 {}
 
 ShaderSource::Uniform::Uniform(const string& name, const shared_ptr<Node>& node,
-                               ShaderGlobalType globalType, ValueType type)
+  GlobalUniformUsage globalType, ShaderValueType type)
   : mName(name)
   , mNode(node)
   , mGlobalType(globalType)
-  , mType(type) 
+  , mType(type)
 {}
 
 ShaderSource::Sampler::Sampler(const string& name, const shared_ptr<Node>& node,
-                               ShaderGlobalType globalType,
-                               bool isMultiSampler, bool isShadow)
+  GlobalSamplerUsage globalType, bool isMultiSampler, bool isShadow)
   : mName(name)
   , mNode(node)
   , mGlobalType(globalType)

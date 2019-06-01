@@ -60,16 +60,18 @@ void PropertyEditor::HandleNameTexBoxChanged() {
 }
 
 
-template<ValueType T>
-StaticValueWatcher<T>::StaticValueWatcher(const shared_ptr<StaticValueNode<T>>& node)
+template<ShaderValueType T>
+StaticValueWatcher<T>::StaticValueWatcher(
+  const shared_ptr<StaticValueNode<VectorType>>& node)
   : PropertyEditor(node) {}
 
 
-template<ValueType T>
+template<ShaderValueType T>
 void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
-  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(GetNode());
+  shared_ptr<StaticValueNode<VectorType>> vectorNode =
+    PointerCast<StaticValueNode<VectorType>>(GetNode());
   mVectorEditor = new ValueEditor<T>(watcherWidget, "", vectorNode->Get());
   mVectorEditor->onValueChange +=
     Delegate(this, &StaticValueWatcher<T>::HandleEditorValueChange);
@@ -77,16 +79,17 @@ void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-template<ValueType T>
+template<ShaderValueType T>
 void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
   const VectorType& value)
 {
-  shared_ptr<StaticValueNode<T>> vectorNode = PointerCast<StaticValueNode<T>>(GetNode());
+  shared_ptr<StaticValueNode<VectorType>> vectorNode =
+    PointerCast<StaticValueNode<VectorType>>(GetNode());
   vectorNode->Set(value);
 }
 
 
-template class StaticValueWatcher<ValueType::FLOAT>;
-template class StaticValueWatcher<ValueType::VEC2>;
-template class StaticValueWatcher<ValueType::VEC3>;
-template class StaticValueWatcher<ValueType::VEC4>;
+template class StaticValueWatcher<ShaderValueType::FLOAT>;
+template class StaticValueWatcher<ShaderValueType::VEC2>;
+template class StaticValueWatcher<ShaderValueType::VEC3>;
+template class StaticValueWatcher<ShaderValueType::VEC4>;

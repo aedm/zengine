@@ -11,7 +11,7 @@ static SharedString ZSlotName = make_shared<string>("Z");
 static SharedString WSlotName = make_shared<string>("W");
 
 FloatsToVec3Node::FloatsToVec3Node()
-  : ValueNode<ValueType::VEC3>()
+  : ValueNode<Vec3>()
   , mValue(0, 0, 0)
   , mX(this, XSlotName)
   , mY(this, YSlotName)
@@ -40,7 +40,7 @@ void FloatsToVec3Node::Operate() {
 }
 
 FloatToFloatNode::FloatToFloatNode()
-  : ValueNode<ValueType::FLOAT>()
+  : ValueNode<float>()
   , mX(this, XSlotName)
   , mValue(0)
 {}
@@ -67,7 +67,7 @@ void FloatToFloatNode::Operate() {
 }
 
 FloatsToVec4Node::FloatsToVec4Node()
-  : ValueNode<ValueType::VEC4>()
+  : ValueNode<Vec4>()
   , mValue(0, 0, 0, 0)
   , mX(this, XSlotName)
   , mY(this, YSlotName)
@@ -101,7 +101,7 @@ static SharedString BSlotName = make_shared<string>("B");
 static SharedString CSlotName = make_shared<string>("C");
 
 MaddNode::MaddNode()
-  : ValueNode<ValueType::FLOAT>()
+  : ValueNode<float>()
   , mValue(1)
   , mA(this, ASlotName)
   , mB(this, BSlotName)

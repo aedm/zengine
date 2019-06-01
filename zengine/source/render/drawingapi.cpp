@@ -153,6 +153,13 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
   return shader;
 }
 
+/// Array for attribute names
+const char* gVertexAttributeName[] = {
+  "aPosition",
+  "aTexCoord",
+  "aNormal",
+  "aTangent",
+};
 
 shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
@@ -260,13 +267,13 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     glGetProgramResourceName(program, GL_UNIFORM, uniformLocations[blockIndex],
       values.mNameLength, nullptr, &name[0]);
 
-    ValueType nodeType;
+    ShaderValueType nodeType;
     switch (values.mType) {
-    case GL_FLOAT:		  nodeType = ValueType::FLOAT;		break;
-    case GL_FLOAT_VEC2:	nodeType = ValueType::VEC2;		  break;
-    case GL_FLOAT_VEC3:	nodeType = ValueType::VEC3;		  break;
-    case GL_FLOAT_VEC4:	nodeType = ValueType::VEC4;		  break;
-    case GL_FLOAT_MAT4:	nodeType = ValueType::MATRIX44;	break;
+    case GL_FLOAT:		  nodeType = ShaderValueType::FLOAT;		break;
+    case GL_FLOAT_VEC2:	nodeType = ShaderValueType::VEC2;		  break;
+    case GL_FLOAT_VEC3:	nodeType = ShaderValueType::VEC3;		  break;
+    case GL_FLOAT_VEC4:	nodeType = ShaderValueType::VEC4;		  break;
+    case GL_FLOAT_MAT4:	nodeType = ShaderValueType::MATRIX44;	break;
     default: SHOULD_NOT_HAPPEN; break;
     }
 
@@ -325,12 +332,12 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     /// Shader compiler reports gl_InstanceID as an attribute at -1, who knows why.
     if (location < 0) continue;
 
-    ValueType valueType;
+    ShaderValueType valueType;
     switch (type) {
-    case GL_FLOAT:		  valueType = ValueType::FLOAT;		break;
-    case GL_FLOAT_VEC2:	valueType = ValueType::VEC2;		break;
-    case GL_FLOAT_VEC3:	valueType = ValueType::VEC3;		break;
-    case GL_FLOAT_VEC4:	valueType = ValueType::VEC4;		break;
+    case GL_FLOAT:		  valueType = ShaderValueType::FLOAT;		break;
+    case GL_FLOAT_VEC2:	valueType = ShaderValueType::VEC2;		break;
+    case GL_FLOAT_VEC3:	valueType = ShaderValueType::VEC3;		break;
+    case GL_FLOAT_VEC4:	valueType = ShaderValueType::VEC4;		break;
     default: SHOULD_NOT_HAPPEN; break;
     }
 
@@ -381,27 +388,27 @@ void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
 }
 
 
-void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
+void OpenGLAPI::SetUniform(UniformId id, ShaderValueType type, const void* values) {
   CheckGLError();
 
   switch (type) {
-  case ValueType::FLOAT:
+  case ShaderValueType::FLOAT:
     glUniform1f(id, *(const GLfloat*)values);
     break;
-  case ValueType::VEC2:
+  case ShaderValueType::VEC2:
     glUniform2fv(id, 1, (const GLfloat*)values);
     break;
-  case ValueType::VEC3:
+  case ShaderValueType::VEC3:
     glUniform3fv(id, 1, (const GLfloat*)values);
     break;
-  case ValueType::VEC4:
+  case ShaderValueType::VEC4:
     glUniform4fv(id, 1, (const GLfloat*)values);
     break;
-  case ValueType::MATRIX44:
+  case ShaderValueType::MATRIX44:
     glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
     break;
   default:
-    NOT_IMPLEMENTED;
+    SHOULD_NOT_HAPPEN;
     break;
   }
   CheckGLError();
@@ -520,11 +527,11 @@ AttributeMapper* OpenGLAPI::CreateAttributeMapper(
       if (bufferAttr.Usage == shaderAttr.mUsage) {
         MappedAttributeOpenGL attr;
         attr.Index = shaderAttr.mHandle;
-        switch (gVertexAttributeType[(UINT)bufferAttr.Usage]) {
-        case ValueType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
-        case ValueType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
-        case ValueType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
-        case ValueType::VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
+        switch (VertexAttributeUsageToValueType(bufferAttr.Usage)) {
+        case ShaderValueType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
+        case ShaderValueType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
+        case ShaderValueType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
+        case ShaderValueType::VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
         default:
           ERR(L"Unhandled vertex attribute type");
           break;
@@ -956,7 +963,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   const shared_ptr<Texture>& targetBufferB)
 {
   ASSERT(!PleaseNoNewResources);
-  ASSERT(!targetBufferA || !depthBuffer || 
+  ASSERT(!targetBufferA || !depthBuffer ||
     depthBuffer->mIsMultisample == targetBufferA->mIsMultisample);
   CheckGLError();
   GLuint bufferId;
@@ -968,7 +975,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
   if (depthBuffer) {
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
       depthBuffer->mHandle, 0);
   }
 
@@ -1076,15 +1083,15 @@ void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
 }
 
 
-void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset,
+void OpenGLAPI::EnableVertexAttribute(UINT index, ShaderValueType nodeType, UINT offset,
   UINT stride) {
   GLint size = 0;
   GLenum type = 0;
   switch (nodeType) {
-  case ValueType::FLOAT:		size = 1;	type = GL_FLOAT;	break;
-  case ValueType::VEC2:		size = 2;	type = GL_FLOAT;	break;
-  case ValueType::VEC3:		size = 3;	type = GL_FLOAT;	break;
-  case ValueType::VEC4:		size = 4;	type = GL_FLOAT;	break;
+  case ShaderValueType::FLOAT:  size = 1;	type = GL_FLOAT;	break;
+  case ShaderValueType::VEC2:   size = 2;	type = GL_FLOAT;	break;
+  case ShaderValueType::VEC3:   size = 3;	type = GL_FLOAT;	break;
+  case ShaderValueType::VEC4:   size = 4;	type = GL_FLOAT;	break;
   default:
     ERR(L"Unhandled vertex attribute type");
     break;
@@ -1135,7 +1142,7 @@ ShaderProgram::~ShaderProgram() {
   CheckGLError();
 }
 
-ShaderProgram::Uniform::Uniform(const string& name, ValueType type, UINT offset)
+ShaderProgram::Uniform::Uniform(const string& name, ShaderValueType type, UINT offset)
   : mName(name)
   , mType(type)
   , mOffset(offset) {}
@@ -1144,7 +1151,7 @@ ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
   : mName(name)
   , mHandle(handle) {}
 
-ShaderProgram::Attribute::Attribute(const string& name, ValueType type,
+ShaderProgram::Attribute::Attribute(const string& name, ShaderValueType type,
   AttributeId handle, VertexAttributeUsage usage)
   : mName(name)
   , mType(type)

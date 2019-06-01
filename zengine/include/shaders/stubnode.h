@@ -57,9 +57,18 @@ enum class GlobalUniformUsage {
   LOCAL,	/// For non-global uniforms
 };
 
+enum class GlobalSamplerUsage {
+#undef ITEM
+#define ITEM(name) name,
+  GLOBALSAMPLER_LIST
+  LOCAL,	/// For non-global uniforms
+};
+
 extern const EnumMapperA GlobalUniformMapper[];
-extern const ValueType GlobalUniformTypes[];
+extern const EnumMapperA GlobalSamplerMapper[];
+extern const ShaderValueType GlobalUniformTypes[];
 extern const int GlobalUniformOffsets[];
+extern const int GlobalSamplerOffsets[];
 
 /// A struct to store global uniforms
 struct Globals {
@@ -67,28 +76,53 @@ struct Globals {
 #define ITEM(name, type) ShaderValueTypes<type>::Type name;
   GLOBALUNIFORM_LIST
 
+#undef ITEM
+#define ITEM(name) shared_ptr<Texture> name;
+  GLOBALSAMPLER_LIST
 };
 
 /// Stub parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct StubParameter {
-  ValueType mType;
+  enum class Type {
+    TVOID,
+    FLOAT,
+    VEC2,
+    VEC3,
+    VEC4,
+    MATRIX44,
+    SAMPLER2D,
+    NONE,
+  };
+
+  Type mType;
   SharedString mName;
+
+  static bool IsValidShaderValueType(Type type);
+  static ShaderValueType ToShaderValueType(Type type);
 };
 
 /// Stub variables are outputs of a shader stage and inputs of the next shader stage.
 /// ":output vec4 MyColor" -- creates "outMyColor" output variable.
 /// ":input vec4 MyColor" -- creates "inMyColor" input variable.
-struct StubVariable {
-  ValueType type;
+struct StubInOutVariable {
+  ShaderValueType type;
   string name;
 };
 
-/// --
-struct StubGlobal {
-  ValueType type;
+/// Global uniforms
+/// ":global vec2 gRenderTargetSize"
+struct StubGlobalUniform {
+  ShaderValueType type;
   string name;
-  ShaderGlobalType usage;
+  GlobalUniformUsage usage;
+};
+
+/// Global samplers
+/// ":global sampler2D gSquareTexture"
+struct StubGlobalSampler {
+  string name;
+  GlobalSamplerUsage usage;
   bool isMultiSampler; // type is "sampler2DMS"
   bool isShadow; // type is "sampler2DShadow"
 };
@@ -96,12 +130,13 @@ struct StubGlobal {
 
 /// All metadata collected from a stub source.
 struct StubMetadata {
-  StubMetadata(const string& name, ValueType returnType,
+  StubMetadata(const string& name, StubParameter::Type returnType,
     const string& strippedSource,
     const vector<OWNERSHIP StubParameter*>& parameters,
-    const vector<StubGlobal*>& globals,
-    const vector<StubVariable*>& inputs,
-    const vector<StubVariable*>& outputs);
+    const vector<StubGlobalUniform*>& globalUniforms,
+    const vector<StubGlobalSampler*>& globalSamplers,
+    const vector<StubInOutVariable*>& inputs,
+    const vector<StubInOutVariable*>& outputs);
 
   ~StubMetadata();
 
@@ -109,7 +144,7 @@ struct StubMetadata {
   const string name;
 
   /// Value of the ":returns" directive.
-  const ValueType returnType;
+  const StubParameter::Type returnType;
 
   /// The source without any directives.
   const string strippedSource;
@@ -118,13 +153,14 @@ struct StubMetadata {
   const vector<StubParameter*> parameters;
 
   /// List of globals. (":global")
-  const vector<StubGlobal*> globals;
+  const vector<StubGlobalUniform*> globalUniforms;
+  const vector<StubGlobalSampler*> globalSamplers;
 
   /// List of stage inputs. (":input")
-  const vector<StubVariable*> inputs;
+  const vector<StubInOutVariable*> inputs;
 
   /// List of stage outputs. (":output")
-  const vector<StubVariable*> outputs;
+  const vector<StubInOutVariable*> outputs;
 };
 
 
@@ -166,6 +202,6 @@ protected:
   map<string, Slot*> mParameterNameSlotMap;
 };
 
-
 typedef TypedSlot<StubNode> StubSlot;
 
+ShaderValueType NodeToValueType(const shared_ptr<Node>& node);

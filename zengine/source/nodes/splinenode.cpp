@@ -31,7 +31,7 @@ void SplinePoint::SetValue(float time, float value) {
 
 
 FloatSplineNode::FloatSplineNode()
-  : ValueNode<ValueType::FLOAT>()
+  : ValueNode<float>()
   , mTimeSlot(this, TimeSlotName, false, false, false)
   , mNoiseEnabled(this, NoiseEnabledSlotName)
   , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) 

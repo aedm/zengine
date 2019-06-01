@@ -21,7 +21,7 @@ private:
   void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Adds a slot to the UI. Returns false on type mismatch
-  template <ValueType T>
+  template <ShaderValueType T>
   bool AddSlot(Slot* slot, QWidget* parent, QLayout* layout);
 
   QIcon mGhostIcon;
@@ -40,10 +40,12 @@ protected:
 
 
 /// A parameter panel item for value slots
-template <ValueType T>
+template <ShaderValueType T>
 class TypedSlotWatcher : public SlotWatcher {
+  typedef typename ShaderValueTypes<T>::Type Type;
+
 public:
-  TypedSlotWatcher(ValueSlot<T>* slot);
+  TypedSlotWatcher(ValueSlot<Type>* slot);
 
   /// Enable/disable editing
   virtual void UpdateReadOnly() override;
@@ -51,12 +53,10 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  typedef typename ValueTypes<T>::Type Type;
-
   ValueEditor<T>* mEditor = nullptr;
 
   /// The slot through which the Node is inspected
-  ValueSlot<T>* mSlot = nullptr;
+  ValueSlot<Type>* mSlot = nullptr;
 
   /// Handles value change on UI
   void HandleValueChange(QWidget* widget, const Type& value);
