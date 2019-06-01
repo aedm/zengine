@@ -117,12 +117,12 @@ void ShaderBuilder::CollectInputsAndOutputs(
 }
 
 StubParameter::Type NodeToParamType(const shared_ptr<Node>& node) {
-  if (IsPointerOf<FloatNode>(node)) return StubParameter::Type::FLOAT;
-  if (IsPointerOf<Vec2Node>(node)) return StubParameter::Type::VEC2;
-  if (IsPointerOf<Vec3Node>(node)) return StubParameter::Type::VEC3;
-  if (IsPointerOf<Vec4Node>(node)) return StubParameter::Type::VEC4;
-  if (IsPointerOf<MatrixNode>(node)) return StubParameter::Type::MATRIX44;
-  if (IsPointerOf<TextureNode>(node)) return StubParameter::Type::SAMPLER2D;
+  if (IsPointerOf<ValueNode<float>>(node)) return StubParameter::Type::FLOAT;
+  if (IsPointerOf<ValueNode<Vec2>>(node)) return StubParameter::Type::VEC2;
+  if (IsPointerOf<ValueNode<Vec3>>(node)) return StubParameter::Type::VEC3;
+  if (IsPointerOf<ValueNode<Vec4>>(node)) return StubParameter::Type::VEC4;
+  if (IsPointerOf<ValueNode<Matrix>>(node)) return StubParameter::Type::MATRIX44;
+  if (IsPointerOf<ValueNode<shared_ptr<Texture>>>(node)) return StubParameter::Type::SAMPLER2D;
   SHOULD_NOT_HAPPEN;
   return StubParameter::Type::NONE;
 }
@@ -329,7 +329,7 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
       StubMetadata* stubMeta = stub->GetStubMetadata();
       auto& stubReference = shaderStage->mStubMap.at(node);
 
-      if (stubReference->mType != StubParameter::Type::NONE) {
+      if (stubReference->mType != StubParameter::Type::TVOID) {
         stream << GetParamTypeString(stubReference->mType) << ' ' <<
           stubReference->mVariableName << ";" << endl;
       }
@@ -410,7 +410,7 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
       auto& stubReference = shaderStage->mStubMap.at(node);
 
       stream << "  ";
-      if (stubReference->mType != StubParameter::Type::NONE) {
+      if (stubReference->mType != StubParameter::Type::TVOID) {
         stream << stubReference->mVariableName << " = ";
       }
       stream << stubReference->mFunctionName << "(";

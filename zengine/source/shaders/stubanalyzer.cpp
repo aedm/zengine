@@ -18,7 +18,7 @@ OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
 StubAnalyzer::StubAnalyzer(const char* stubSource)
   : mName(nullptr)
   , mCurrentLineNumber(-1)
-  , mReturnType(StubParameter::Type::NONE) {
+  , mReturnType(StubParameter::Type::TVOID) {
   vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
     mCurrentLineNumber = line->LineNumber;

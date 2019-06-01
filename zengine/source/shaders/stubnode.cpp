@@ -260,11 +260,11 @@ ShaderValueType StubParameter::ToShaderValueType(Type type)
 }
 
 ShaderValueType NodeToValueType(const shared_ptr<Node>& node) {
-  if (IsPointerOf<FloatNode>(node)) return ShaderValueType::FLOAT;
-  if (IsPointerOf<Vec2Node>(node)) return ShaderValueType::VEC2;
-  if (IsPointerOf<Vec3Node>(node)) return ShaderValueType::VEC3;
-  if (IsPointerOf<Vec4Node>(node)) return ShaderValueType::VEC4;
-  if (IsPointerOf<MatrixNode>(node)) return ShaderValueType::MATRIX44;
+  if (IsPointerOf<ValueNode<float>>(node)) return ShaderValueType::FLOAT;
+  if (IsPointerOf<ValueNode<Vec2>>(node)) return ShaderValueType::VEC2;
+  if (IsPointerOf<ValueNode<Vec3>>(node)) return ShaderValueType::VEC3;
+  if (IsPointerOf<ValueNode<Vec4>>(node)) return ShaderValueType::VEC4;
+  if (IsPointerOf<ValueNode<Matrix>>(node)) return ShaderValueType::MATRIX44;
   SHOULD_NOT_HAPPEN;
   return ShaderValueType(-1);
 }
