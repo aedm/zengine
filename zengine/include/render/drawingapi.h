@@ -1,10 +1,8 @@
 #pragma once
 
 #include "../base/defines.h"
-//#include "../dom/nodetype.h"
 #include "../resources/texture.h"
 #include "../shaders/shadervaluetype.h"
-//#include "../resources/mesh.h"
 #include <vector>
 #include <string>
 

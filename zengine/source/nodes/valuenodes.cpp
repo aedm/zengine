@@ -40,30 +40,6 @@ REGISTER_NODECLASS(Vec4Node, "Vec4")
 REGISTER_NODECLASS(MatrixNode, "Matrix")
 
 
-//#undef ITEM
-//#define ITEM(name, capitalizedName, type) make_shared<StaticValueNode<ValueType::name>>(),
-//shared_ptr<Node> StaticValueNodesList[] = {
-//  VALUETYPE_LIST
-//};
-
-
-///// Slot factory
-//Slot* CreateValueSlot(ValueType type, Node* owner, SharedString name, 
-//  bool isMultiSlot, bool isPublic, bool isSerializable, float minimum, float maximum) 
-//{
-//  switch (type) {
-//#undef ITEM
-//#define ITEM(upperName, capitalizedName, type) \
-//    case ValueType::upperName: \
-//      return new capitalizedName##Slot(owner, name, \
-//        isMultiSlot, isPublic, isSerializable, minimum, maximum);
-//    VALUETYPE_LIST
-//  default:
-//    SHOULD_NOT_HAPPEN;
-//    return nullptr;
-//  }
-//}
-
 template<>
 void StaticValueNode<Matrix>::Set(const Matrix& newValue) {
   mValue = newValue;

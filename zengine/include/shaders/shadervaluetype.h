@@ -27,19 +27,8 @@ template<> struct ShaderValueTypes<ShaderValueType::VEC4> { typedef Vec4 Type; }
 template<> struct ShaderValueTypes<ShaderValueType::MATRIX44> { typedef Matrix Type; };
 
 
-/// Macrolist for attribute types (name, type, token)
-//#define VERTEXATTRIBUTE_LIST \
-//	ITEM(POSITION,		ValueType::VEC3,		"aPosition"	) \
-//	ITEM(TEXCOORD,		ValueType::VEC2,		"aTexCoord"	) \
-//	ITEM(NORMAL,		  ValueType::VEC3,		"aNormal"	) \
-//	ITEM(TANGENT,		  ValueType::VEC3,		"aTangent"	) \
-
-
 /// Possible variable types in vertex attributes
 enum class VertexAttributeUsage {
-  //#undef ITEM
-  //#define ITEM(name, type, token) name,
-  //  VERTEXATTRIBUTE_LIST
   POSITION,
   TEXCOORD,
   NORMAL,
@@ -57,7 +46,6 @@ enum VertexAttributeMask {
   VERTEXATTRIB_TEXCOORD_MASK = 1 << (UINT)VertexAttributeUsage::TEXCOORD,
   VERTEXATTRIB_NORMAL_MASK = 1 << (UINT)VertexAttributeUsage::NORMAL,
   VERTEXATTRIB_TANGENT_MASK = 1 << (UINT)VertexAttributeUsage::TANGENT,
-  //VERTEXATTRIB_COLOR_MASK			= 1 << VERTEXATTRIB_COLOR
 };
 
 /// Convert vertex attribute usage to value type

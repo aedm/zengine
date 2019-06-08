@@ -132,12 +132,6 @@ const T& ValueSlot<T>::GetDefaultValue() {
 }
 
 
-//template<typename T>
-//bool ValueSlot<T>::DoesAcceptValueNode(ValueType type) const {
-//  return T == type;
-//}
-
-
 template<typename T>
 bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
   if (mNode == target || (target == nullptr && mNode == mDefault)) return true;
@@ -186,11 +180,6 @@ bool ValueSlot<T>::IsDefaulted() {
   return GetReferencedNode() == mDefault;
 }
 
-//#undef ITEM
-//#define ITEM(name, capitalizedName, type) \
-//typedef ValueSlot<ValueType::name> capitalizedName##Slot; \
-//typedef StaticValueNode<ValueType::name> capitalizedName##Node;
-//VALUETYPE_LIST
 
 /// Node and slot types
 typedef ValueSlot<float> FloatSlot;
@@ -206,7 +195,3 @@ typedef StaticValueNode<Vec3> Vec3Node;
 typedef StaticValueNode<Vec4> Vec4Node;
 typedef StaticValueNode<Matrix> MatrixNode;
 typedef StaticValueNode<string> StringNode;
-
-
-///// An instance of each static value nodes
-//extern shared_ptr<Node> StaticValueNodesList[];

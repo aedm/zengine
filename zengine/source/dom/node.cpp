@@ -4,13 +4,6 @@
 #include <include/base/helpers.h>
 #include <algorithm>
 
-/// Array for variable sizes in bytes
-//const int gVariableByteSizes[] = {
-//#undef ITEM
-//#define ITEM(name, capitalizedName, type) sizeof(type),
-//  VALUETYPE_LIST
-//};
-
 MessageQueue TheMessageQueue;
 
 void MessageQueue::Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target,
