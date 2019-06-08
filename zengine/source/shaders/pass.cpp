@@ -232,7 +232,7 @@ void Pass::Set(Globals* globals) {
     }
     else {
       /// Global uniform, takes value from the Globals object
-      int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
+      int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
       void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
       tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
     }
