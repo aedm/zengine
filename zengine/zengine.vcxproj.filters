@@ -183,9 +183,10 @@
     <ClInclude Include="include\shaders\shadersource.h">
       <Filter>include\shaders</Filter>
     </ClInclude>
-    <ClInclude Include="include\nodes\texturenode.h" />
     <ClInclude Include="include\dom\ghost.h" />
     <ClInclude Include="include\serialize\lodepng.h" />
+    <ClInclude Include="include\nodes\texturenode.h" />
+    <ClInclude Include="include\shaders\valuetype.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -208,9 +209,6 @@
     </ClCompile>
     <ClCompile Include="source\zengine.cpp">
       <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\base\types.cpp">
-      <Filter>source\base</Filter>
     </ClCompile>
     <ClCompile Include="source\nodes\meshnode.cpp">
       <Filter>source\nodes</Filter>
@@ -294,6 +292,8 @@
     </ClCompile>
     <ClCompile Include="source\dom\ghost.cpp" />
     <ClCompile Include="source\serialize\lodepng.cpp" />
+    <ClCompile Include="source\nodes\texturenode.cpp" />
+    <ClCompile Include="source\shaders\valuetype.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

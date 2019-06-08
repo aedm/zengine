@@ -9,7 +9,7 @@ public:
     const shared_ptr<StubNode>& vertexStub, const shared_ptr<StubNode>& fragmentStub);
 
 private:
-  ShaderBuilder(const shared_ptr<StubNode>& vertexStub, 
+  ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
     const shared_ptr<StubNode>& fragmentStub);
 
   shared_ptr<ShaderSource> MakeShaderSource();
@@ -17,7 +17,7 @@ private:
   /// How to reference a certain Node dependency within GLSL code? 
   /// Stubs translate to a function call and a variable to store its return value.
   struct StubReference {
-    StubReference(ValueType type);
+    StubReference(StubParameter::Type type);
 
     /// The variable name in the main function
     string mVariableName;
@@ -26,7 +26,7 @@ private:
     string mFunctionName;
 
     /// Stub return type
-    const ValueType mType;
+    const StubParameter::Type mType;
   };
 
   /// Non-stub Nodes translate to a uniform/sampler value
@@ -35,7 +35,7 @@ private:
     string mName;
 
     /// Value type
-    ValueType mType;
+    StubParameter::Type mType;
   };
 
   /// Inputs and output of the shader stage
@@ -84,13 +84,13 @@ private:
   void CollectDependencies(const shared_ptr<Node>& root, ShaderStage* shaderStage);
 
   /// Traverses stub graph for a shader stage, called only by CollectDependencies
-  void TraverseDependencies(const shared_ptr<Node>& root, 
+  void TraverseDependencies(const shared_ptr<Node>& root,
     ShaderBuilder::ShaderStage* shaderStage, set<shared_ptr<Node>>& visitedNodes);
 
   /// Generates function and variable names
   void GenerateNames();
 
-  /// Generate metadata
+  /// Collect uniforms and samplers
   void AddGlobalsToDependencies(ShaderStage* shaderStage);
   void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage);
   void AddLocalsToDependencies();
@@ -101,8 +101,9 @@ private:
   void GenerateSourceFunctions(ShaderStage* shaderStage);
   void GenerateSourceMain(ShaderStage* shaderStage);
 
-  static const string& GetTypeString(ValueType type, bool isMultiSampler = false,
-                                     bool isShadow = false);
+  static const string& GetValueTypeString(ValueType type);
+  static const string& GetParamTypeString(StubParameter::Type type,
+    bool isMultiSampler = false, bool isShadow = false);
 
   ShaderStage mVertexStage;
   ShaderStage mFragmentStage;
@@ -110,7 +111,8 @@ private:
   /// References of uniform/smapler nodes
   map<shared_ptr<Node>, shared_ptr<ValueReference>> mUniformMap;
   map<shared_ptr<Node>, shared_ptr<ValueReference>> mSamplerMap;
-  set<ShaderGlobalType> mUsedGlobals;
+  set<GlobalUniformUsage> mUsedGlobalUniforms;
+  set<GlobalSamplerUsage> mUsedGlobalSamplers;
 
   /// Metadata
   vector<ShaderSource::Uniform> mUniforms;

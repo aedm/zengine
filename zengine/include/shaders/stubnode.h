@@ -2,91 +2,128 @@
 
 #include "../dom/node.h"
 #include "../nodes/valuenodes.h"
+#include "../resources/texture.h"
+#include "valuetype.h"
 #include <vector>
 #include <map>
 
 using namespace std;
 
-/// Macro list for global uniforms (name, type, variable/token)
-#define GLOBALUSAGE_LIST \
-  ITEM(Time,                          FLOAT) \
-  ITEM(Camera,                        MATRIX44) \
-  ITEM(World,                         MATRIX44) \
-  ITEM(View,                          MATRIX44) \
-  ITEM(Projection,                    MATRIX44) \
-  ITEM(Transformation,                MATRIX44) \
-  ITEM(SkylightCamera,                MATRIX44) \
-  ITEM(SkylightProjection,            MATRIX44) \
-  ITEM(SkylightTransformation,        MATRIX44) \
-  ITEM(SkylightTexture,               TEXTURE) \
-  ITEM(SkylightTextureSizeRecip,      FLOAT) \
-  ITEM(SkylightDirection,             VEC3) \
-  ITEM(SkylightColor,                 VEC3) \
-  ITEM(SkylightAmbient,               FLOAT) \
-  ITEM(SkylightSpread,                FLOAT) \
-  ITEM(SkylightSampleSpread,          FLOAT) \
-  ITEM(RenderTargetSize,              VEC2) \
-  ITEM(RenderTargetSizeRecip,         VEC2) \
-  ITEM(ViewportSize,                  VEC2) \
-  ITEM(PixelSize,                     VEC2) \
-  ITEM(DiffuseColor,                  VEC4) \
-  ITEM(AmbientColor,                  VEC4) \
-  ITEM(DepthBias,                     FLOAT) \
-  ITEM(DepthBufferSource,             TEXTURE) \
-  ITEM(GBufferSourceA,                TEXTURE) \
-  ITEM(GBufferSampleCount,            FLOAT) \
-  ITEM(SecondaryTexture,              TEXTURE) \
-  ITEM(PPGauss,                       TEXTURE) \
-  ITEM(PPGaussPixelSize,              VEC2) \
-  ITEM(PPGaussRelativeSize,           VEC2) \
-  ITEM(PPDofEnabled,                  FLOAT) \
-  ITEM(PPDofFocusDistance,            FLOAT) \
-  ITEM(PPDofBlur,                     FLOAT) \
-  ITEM(DirectToScreen,                FLOAT) \
-  ITEM(DirectToSquare,                FLOAT) \
-  ITEM(SquareTexture1,                TEXTURE) \
-  ITEM(SquareTexture2,                TEXTURE) \
+/// Macro list for global uniforms (name/usage, type)
+#define GLOBALUNIFORM_LIST \
+  ITEM(Time,                          ValueType::FLOAT) \
+  ITEM(Camera,                        ValueType::MATRIX44) \
+  ITEM(World,                         ValueType::MATRIX44) \
+  ITEM(View,                          ValueType::MATRIX44) \
+  ITEM(Projection,                    ValueType::MATRIX44) \
+  ITEM(Transformation,                ValueType::MATRIX44) \
+  ITEM(SkylightCamera,                ValueType::MATRIX44) \
+  ITEM(SkylightProjection,            ValueType::MATRIX44) \
+  ITEM(SkylightTransformation,        ValueType::MATRIX44) \
+  ITEM(SkylightTextureSizeRecip,      ValueType::FLOAT) \
+  ITEM(SkylightDirection,             ValueType::VEC3) \
+  ITEM(SkylightColor,                 ValueType::VEC3) \
+  ITEM(SkylightAmbient,               ValueType::FLOAT) \
+  ITEM(SkylightSpread,                ValueType::FLOAT) \
+  ITEM(SkylightSampleSpread,          ValueType::FLOAT) \
+  ITEM(RenderTargetSize,              ValueType::VEC2) \
+  ITEM(RenderTargetSizeRecip,         ValueType::VEC2) \
+  ITEM(ViewportSize,                  ValueType::VEC2) \
+  ITEM(PixelSize,                     ValueType::VEC2) \
+  ITEM(DiffuseColor,                  ValueType::VEC4) \
+  ITEM(AmbientColor,                  ValueType::VEC4) \
+  ITEM(DepthBias,                     ValueType::FLOAT) \
+  ITEM(GBufferSampleCount,            ValueType::FLOAT) \
+  ITEM(PPGaussPixelSize,              ValueType::VEC2) \
+  ITEM(PPGaussRelativeSize,           ValueType::VEC2) \
+  ITEM(PPDofEnabled,                  ValueType::FLOAT) \
+  ITEM(PPDofFocusDistance,            ValueType::FLOAT) \
+  ITEM(PPDofBlur,                     ValueType::FLOAT) \
+  ITEM(DirectToScreen,                ValueType::FLOAT) \
+  ITEM(DirectToSquare,                ValueType::FLOAT) \
 
+#define GLOBALSAMPLER_LIST \
+  ITEM(SkylightTexture) \
+  ITEM(DepthBufferSource) \
+  ITEM(GBufferSourceA) \
+  ITEM(SecondaryTexture) \
+  ITEM(PPGauss) \
+  ITEM(SquareTexture1) \
+  ITEM(SquareTexture2) \
 
-enum class ShaderGlobalType {
+enum class GlobalUniformUsage {
 #undef ITEM
 #define ITEM(name, type) name,
-  GLOBALUSAGE_LIST
+  GLOBALUNIFORM_LIST
+  LOCAL,	/// For non-global uniforms
+};
 
+enum class GlobalSamplerUsage {
+#undef ITEM
+#define ITEM(name) name,
+  GLOBALSAMPLER_LIST
   LOCAL,	/// For non-global uniforms
 };
 
 extern const EnumMapperA GlobalUniformMapper[];
+extern const EnumMapperA GlobalSamplerMapper[];
 extern const ValueType GlobalUniformTypes[];
 extern const int GlobalUniformOffsets[];
+extern const int GlobalSamplerOffsets[];
 
 /// A struct to store global uniforms
 struct Globals {
 #undef ITEM
-#define ITEM(name, type) ValueTypes<ValueType::type>::Type name;
-  GLOBALUSAGE_LIST
+#define ITEM(name, type) ValueTypes<type>::Type name;
+  GLOBALUNIFORM_LIST
+
+#undef ITEM
+#define ITEM(name) shared_ptr<Texture> name;
+  GLOBALSAMPLER_LIST
 };
 
 /// Stub parameter, becomes a slot
 /// ":param vec4 MyColor" or ":param sampler2d MyTexture"
 struct StubParameter {
-  ValueType mType;
+  enum class Type {
+    TVOID,
+    FLOAT,
+    VEC2,
+    VEC3,
+    VEC4,
+    MATRIX44,
+    SAMPLER2D,
+    NONE,
+  };
+
+  Type mType;
   SharedString mName;
+
+  static bool IsValidValueType(Type type);
+  static ValueType ToValueType(Type type);
 };
 
 /// Stub variables are outputs of a shader stage and inputs of the next shader stage.
 /// ":output vec4 MyColor" -- creates "outMyColor" output variable.
 /// ":input vec4 MyColor" -- creates "inMyColor" input variable.
-struct StubVariable {
+struct StubInOutVariable {
   ValueType type;
   string name;
 };
 
-/// --
-struct StubGlobal {
+/// Global uniforms
+/// ":global vec2 gRenderTargetSize"
+struct StubGlobalUniform {
   ValueType type;
   string name;
-  ShaderGlobalType usage;
+  GlobalUniformUsage usage;
+};
+
+/// Global samplers
+/// ":global sampler2D gSquareTexture"
+struct StubGlobalSampler {
+  string name;
+  GlobalSamplerUsage usage;
   bool isMultiSampler; // type is "sampler2DMS"
   bool isShadow; // type is "sampler2DShadow"
 };
@@ -94,12 +131,13 @@ struct StubGlobal {
 
 /// All metadata collected from a stub source.
 struct StubMetadata {
-  StubMetadata(const string& name, ValueType returnType,
+  StubMetadata(const string& name, StubParameter::Type returnType,
     const string& strippedSource,
     const vector<OWNERSHIP StubParameter*>& parameters,
-    const vector<StubGlobal*>& globals,
-    const vector<StubVariable*>& inputs,
-    const vector<StubVariable*>& outputs);
+    const vector<StubGlobalUniform*>& globalUniforms,
+    const vector<StubGlobalSampler*>& globalSamplers,
+    const vector<StubInOutVariable*>& inputs,
+    const vector<StubInOutVariable*>& outputs);
 
   ~StubMetadata();
 
@@ -107,7 +145,7 @@ struct StubMetadata {
   const string name;
 
   /// Value of the ":returns" directive.
-  const ValueType returnType;
+  const StubParameter::Type returnType;
 
   /// The source without any directives.
   const string strippedSource;
@@ -116,13 +154,14 @@ struct StubMetadata {
   const vector<StubParameter*> parameters;
 
   /// List of globals. (":global")
-  const vector<StubGlobal*> globals;
+  const vector<StubGlobalUniform*> globalUniforms;
+  const vector<StubGlobalSampler*> globalSamplers;
 
   /// List of stage inputs. (":input")
-  const vector<StubVariable*> inputs;
+  const vector<StubInOutVariable*> inputs;
 
   /// List of stage outputs. (":output")
-  const vector<StubVariable*> outputs;
+  const vector<StubInOutVariable*> outputs;
 };
 
 
@@ -164,6 +203,6 @@ protected:
   map<string, Slot*> mParameterNameSlotMap;
 };
 
-
 typedef TypedSlot<StubNode> StubSlot;
 
+ValueType NodeToValueType(const shared_ptr<Node>& node);

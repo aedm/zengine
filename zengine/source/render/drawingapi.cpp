@@ -153,6 +153,13 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
   return shader;
 }
 
+/// Array for attribute names
+const char* gVertexAttributeName[] = {
+  "aPosition",
+  "aTexCoord",
+  "aNormal",
+  "aTangent",
+};
 
 shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
@@ -401,7 +408,7 @@ void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
     glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
     break;
   default:
-    NOT_IMPLEMENTED;
+    SHOULD_NOT_HAPPEN;
     break;
   }
   CheckGLError();
@@ -520,7 +527,7 @@ AttributeMapper* OpenGLAPI::CreateAttributeMapper(
       if (bufferAttr.Usage == shaderAttr.mUsage) {
         MappedAttributeOpenGL attr;
         attr.Index = shaderAttr.mHandle;
-        switch (gVertexAttributeType[(UINT)bufferAttr.Usage]) {
+        switch (VertexAttributeUsageToValueType(bufferAttr.Usage)) {
         case ValueType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
         case ValueType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
         case ValueType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
@@ -956,7 +963,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   const shared_ptr<Texture>& targetBufferB)
 {
   ASSERT(!PleaseNoNewResources);
-  ASSERT(!targetBufferA || !depthBuffer || 
+  ASSERT(!targetBufferA || !depthBuffer ||
     depthBuffer->mIsMultisample == targetBufferA->mIsMultisample);
   CheckGLError();
   GLuint bufferId;
@@ -968,7 +975,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
   if (depthBuffer) {
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target, 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
       depthBuffer->mHandle, 0);
   }
 
@@ -1081,10 +1088,10 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
   GLint size = 0;
   GLenum type = 0;
   switch (nodeType) {
-  case ValueType::FLOAT:		size = 1;	type = GL_FLOAT;	break;
-  case ValueType::VEC2:		size = 2;	type = GL_FLOAT;	break;
-  case ValueType::VEC3:		size = 3;	type = GL_FLOAT;	break;
-  case ValueType::VEC4:		size = 4;	type = GL_FLOAT;	break;
+  case ValueType::FLOAT:  size = 1;	type = GL_FLOAT;	break;
+  case ValueType::VEC2:   size = 2;	type = GL_FLOAT;	break;
+  case ValueType::VEC3:   size = 3;	type = GL_FLOAT;	break;
+  case ValueType::VEC4:   size = 4;	type = GL_FLOAT;	break;
   default:
     ERR(L"Unhandled vertex attribute type");
     break;

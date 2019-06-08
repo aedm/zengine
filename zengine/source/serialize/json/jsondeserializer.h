@@ -3,6 +3,7 @@
 #include <include/dom/document.h>
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/meshnode.h>
+#include <include/nodes/texturenode.h>
 #include <include/nodes/splinenode.h>
 #include <include/shaders/stubnode.h>
 #include <rapidjson/include/rapidjson/document.h>

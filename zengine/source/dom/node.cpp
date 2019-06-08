@@ -4,13 +4,6 @@
 #include <include/base/helpers.h>
 #include <algorithm>
 
-/// Array for variable sizes in bytes
-const int gVariableByteSizes[] = {
-#undef ITEM
-#define ITEM(name, capitalizedName, type) sizeof(type),
-  VALUETYPE_LIST
-};
-
 MessageQueue TheMessageQueue;
 
 void MessageQueue::Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target,
@@ -219,10 +212,6 @@ bool Slot::DoesAcceptNode(const shared_ptr<Node>& node) const {
   return true;
 }
 
-bool Slot::DoesAcceptValueNode(ValueType type) const {
-  return true;
-}
-
 bool Slot::IsDefaulted() {
   /// Plain slots don't have default values, only ValueSlots
   return false;
@@ -271,11 +260,7 @@ shared_ptr<Node> Node::GetReferencedNode() {
 bool Node::IsGhostNode() {
   return false;
 }
-
-ValueType Node::GetValueType() const {
-  return mValueType;
-}
-
+  
 void Node::Dispose() {
   RemoveAllWatchers();
   while (mDependants.size() > 0) {

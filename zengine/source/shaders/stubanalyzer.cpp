@@ -11,14 +11,14 @@ OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
 
   return new StubMetadata(*analyzer.mName, analyzer.mReturnType,
                           analyzer.mStrippedSource, analyzer.mParameters, 
-                          analyzer.mGlobals,
+                          analyzer.mGlobalUniforms, analyzer.mGlobalSamplers,
                           analyzer.mInputs, analyzer.mOutputs);
 }
 
 StubAnalyzer::StubAnalyzer(const char* stubSource)
   : mName(nullptr)
   , mCurrentLineNumber(-1)
-  , mReturnType(ValueType::NONE) {
+  , mReturnType(StubParameter::Type::TVOID) {
   vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
     mCurrentLineNumber = line->LineNumber;
@@ -97,14 +97,22 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
 }
 
 
-void StubAnalyzer::AnalyzeVariable(SourceLine* line, vector<StubVariable*>& Storage) {
+void StubAnalyzer::AnalyzeVariable(SourceLine* line, 
+  vector<StubInOutVariable*>& Storage) 
+{
   if (line->SubStrings.size() < 4) {
     ERR("line %d: Wrong syntax", mCurrentLineNumber);
     return;
   }
 
-  StubVariable* parameter = new StubVariable();
-  parameter->type = TokenToType(line->SubStrings[2]);
+  StubParameter::Type variableType = TokenToType(line->SubStrings[2]);
+  if (!StubParameter::IsValidValueType(variableType)) {
+    ERR("line %d: Invalid type");
+    return;
+  }
+
+  StubInOutVariable* parameter = new StubInOutVariable();
+  parameter->type = StubParameter::ToValueType(variableType);
   parameter->name = line->SubStrings[3].ToString();
   Storage.push_back(parameter);
 }
@@ -116,46 +124,70 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
+  StubParameter::Type declaredType = TokenToType(line->SubStrings[2]);
   SubString& name = line->SubStrings[3];
+ 
+  /// Global sampler
+  if (declaredType == StubParameter::Type::SAMPLER2D) {
+    int usage = 
+      EnumMapperA::GetEnumFromString(GlobalSamplerMapper, name.Begin, name.Length);
+    if (usage < 0) {
+      ERR("line %d: Unrecognized global sampler '%s'.", mCurrentLineNumber,
+        name.ToString().c_str());
+      return;
+    }
+    StubGlobalSampler* globalSampler = new StubGlobalSampler();
+    globalSampler->name = name.ToString();
+    globalSampler->usage = (GlobalSamplerUsage)usage;
+    globalSampler->isMultiSampler = (line->SubStrings[2].Token == TOKEN_sampler2DMS);
+    globalSampler->isShadow = (line->SubStrings[2].Token == TOKEN_sampler2DShadow);
+    mGlobalSamplers.push_back(globalSampler);
+    return;
+  }
+
+  /// Global uniform
+  if (!StubParameter::IsValidValueType(declaredType)) {
+    ERR("line %d: Invalid uniform type'.", mCurrentLineNumber);
+    return;
+  }
+
   int usage =
     EnumMapperA::GetEnumFromString(GlobalUniformMapper, name.Begin, name.Length);
   if (usage < 0) {
     ERR("line %d: Unrecognized global uniform '%s'.", mCurrentLineNumber,
-        name.ToString().c_str());
+      name.ToString().c_str());
     return;
   }
 
-  ValueType declaredType = TokenToType(line->SubStrings[2]);
+  ValueType shaderType = StubParameter::ToValueType(declaredType);
   ValueType expectedType = GlobalUniformTypes[usage];
-  if (declaredType != expectedType) {
+  if (shaderType != expectedType) {
     ERR("line %d: wrong type for global uniform '%s'.", mCurrentLineNumber,
         name.ToString().c_str());
     return;
   }
 
-  StubGlobal* global = new StubGlobal();
-  global->name = name.ToString();
-  global->type = declaredType;
-  global->usage = (ShaderGlobalType)usage;
-  global->isMultiSampler = (line->SubStrings[2].Token == TOKEN_sampler2DMS);
-  global->isShadow = (line->SubStrings[2].Token == TOKEN_sampler2DShadow);
-  mGlobals.push_back(global);
+  StubGlobalUniform* globalUniform = new StubGlobalUniform();
+  globalUniform->name = name.ToString();
+  globalUniform->type = shaderType;
+  globalUniform->usage = (GlobalUniformUsage)usage;
+  mGlobalUniforms.push_back(globalUniform);
 }
 
 
-ValueType StubAnalyzer::TokenToType(const SubString& subStr) {
+StubParameter::Type StubAnalyzer::TokenToType(const SubString& subStr) {
   switch (subStr.Token) {
-    case TOKEN_void:		        return ValueType::NONE;
-    case TOKEN_float:		        return ValueType::FLOAT;
-    case TOKEN_vec2:		        return ValueType::VEC2;
-    case TOKEN_vec3:		        return ValueType::VEC3;
-    case TOKEN_vec4:		        return ValueType::VEC4;
-    case TOKEN_mat4:		        return ValueType::MATRIX44;
-    case TOKEN_sampler2D:	      return ValueType::TEXTURE;
-    case TOKEN_sampler2DMS:	    return ValueType::TEXTURE;
-    case TOKEN_sampler2DShadow:	return ValueType::TEXTURE;
+    case TOKEN_void:            return StubParameter::Type::TVOID;
+    case TOKEN_float:           return StubParameter::Type::FLOAT;
+    case TOKEN_vec2:            return StubParameter::Type::VEC2;
+    case TOKEN_vec3:            return StubParameter::Type::VEC3;
+    case TOKEN_vec4:            return StubParameter::Type::VEC4;
+    case TOKEN_mat4:            return StubParameter::Type::MATRIX44;
+    case TOKEN_sampler2D:       return StubParameter::Type::SAMPLER2D;
+    case TOKEN_sampler2DMS:     return StubParameter::Type::SAMPLER2D;
+    case TOKEN_sampler2DShadow: return StubParameter::Type::SAMPLER2D;
     default:
       ERR("line %d: Wrong type '%s'", mCurrentLineNumber, subStr.ToString().c_str());
-      return ValueType::NONE;
+      return StubParameter::Type::NONE;
   }
 }

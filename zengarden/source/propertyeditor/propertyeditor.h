@@ -28,7 +28,7 @@ template<ValueType T>
 class StaticValueWatcher : public PropertyEditor {
 public:
   typedef typename ValueTypes<T>::Type VectorType;
-  StaticValueWatcher(const shared_ptr<StaticValueNode<T>>& node);
+  StaticValueWatcher(const shared_ptr<StaticValueNode<VectorType>>& node);
 
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 

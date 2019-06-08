@@ -5,6 +5,8 @@
 #include <include/shaders/enginestubs.h>
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
+#include <include/nodes/texturenode.h>
+
 
 REGISTER_NODECLASS(Pass, "Pass");
 
@@ -85,6 +87,29 @@ void Pass::Operate() {
   mUniformArray.resize(mShaderProgram->mUniformBlockSize);
 }
 
+Slot* CreateValueSlot(ValueType type, Node* owner,
+  SharedString name, bool isMultiSlot = false,
+  bool isPublic = true, bool isSerializable = true,
+  float minimum = 0.0f, float maximum = 1.0f) 
+{
+  switch (type)
+  {
+  case ValueType::FLOAT:
+    return new FloatSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
+  case ValueType::VEC2:
+    return new Vec2Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
+  case ValueType::VEC3:
+    return new Vec3Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
+  case ValueType::VEC4:
+    return new Vec4Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
+  case ValueType::MATRIX44:
+    return new MatrixSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
+  default:
+    SHOULD_NOT_HAPPEN;
+    return nullptr;
+  }
+}
+
 void Pass::BuildShaderSource()
 {
   mIsUpToDate = false;
@@ -113,10 +138,10 @@ void Pass::BuildShaderSource()
       mUniformAndSamplerSlots.push_back(slot);
     }
   }
-  for (auto uniform : mShaderSource->mUniforms) {
+  for (auto& uniform : mShaderSource->mUniforms) {
     if (uniform.mNode) {
       shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
-        uniform.mNode->GetValueType(), this, nullptr, false, false, false, false));
+        NodeToValueType(uniform.mNode), this, nullptr, false, false, false, false));
       slot->Connect(uniform.mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
@@ -147,19 +172,25 @@ void Pass::Set(Globals* globals) {
   for (UniformMapper& uniformMapper : mUsedUniforms) {
     const ShaderSource::Uniform* source = uniformMapper.mSource;
     const ShaderProgram::Uniform* target = uniformMapper.mTarget;
-    if (source->mGlobalType == ShaderGlobalType::LOCAL) {
+    if (source->mGlobalType == GlobalUniformUsage::LOCAL) {
       /// Local uniform, takes value from a slot
       ASSERT(source->mNode != nullptr);
       switch (source->mType) {
 #undef ITEM
-#define ITEM(name, capitalizedName, type) \
-				case ValueType::name: { \
-          auto vNode = PointerCast<ValueNode<ValueType::name>>(source->mNode); \
-          vNode->Update(); \
-          *(reinterpret_cast<type*>(&mUniformArray[target->mOffset])) = vNode->Get(); \
-					break; \
-        }
-        VALUETYPE_LIST
+#define ITEM(name) \
+				  case name: { \
+            auto& vNode = \
+              PointerCast<ValueNode<ValueTypes<name>::Type>>(source->mNode); \
+            vNode->Update(); \
+            *(reinterpret_cast<ValueTypes<name>::Type*>( \
+              &mUniformArray[target->mOffset])) = vNode->Get(); \
+					  break; \
+          }
+        ITEM(ValueType::FLOAT);
+        ITEM(ValueType::VEC2);
+        ITEM(ValueType::VEC3);
+        ITEM(ValueType::VEC4);
+        ITEM(ValueType::MATRIX44);
       default: SHOULD_NOT_HAPPEN; break;
       }
     }
@@ -168,14 +199,19 @@ void Pass::Set(Globals* globals) {
       int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
       switch (source->mType) {
 #undef ITEM
-#define ITEM(name, capitalizedName, type) \
-				case ValueType::name: { \
+#define ITEM(name) \
+        case name: { \
           void* valuePointer = reinterpret_cast<char*>(globals)+offset; \
-          *(reinterpret_cast<type*>(&mUniformArray[target->mOffset])) = \
-            *reinterpret_cast<type*>(valuePointer); \
-					break; \
+          *(reinterpret_cast<ValueTypes<name>::Type*>( \
+            &mUniformArray[target->mOffset])) = \
+            *reinterpret_cast<ValueTypes<name>::Type*>(valuePointer); \
+          break; \
         }
-        VALUETYPE_LIST
+        ITEM(ValueType::FLOAT);
+        ITEM(ValueType::VEC2);
+        ITEM(ValueType::VEC3);
+        ITEM(ValueType::VEC4);
+        ITEM(ValueType::MATRIX44);
       default: SHOULD_NOT_HAPPEN; break;
       }
     }
@@ -190,13 +226,13 @@ void Pass::Set(Globals* globals) {
     const ShaderProgram::Sampler* target = samplerMapper.mTarget;
 
     shared_ptr<Texture> tex = nullptr;
-    if (samplerMapper.mSource->mGlobalType == ShaderGlobalType::LOCAL) {
+    if (samplerMapper.mSource->mGlobalType == GlobalSamplerUsage::LOCAL) {
       ASSERT(samplerMapper.mSource->mNode != nullptr);
       tex = PointerCast<TextureNode>(samplerMapper.mSource->mNode)->Get();
     }
     else {
       /// Global uniform, takes value from the Globals object
-      int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
+      int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
       void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
       tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
     }

@@ -24,9 +24,11 @@ SlotEditor::~SlotEditor() {
 
 template <ValueType T>
 bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
-  if (!IsPointerOf<ValueNode<T>>(slot->GetReferencedNode())) return false;
+  if (!IsPointerOf<ValueNode<ValueTypes<T>::Type>>(slot->GetReferencedNode())) {
+    return false;
+  }
 
-  auto valueSlot = SafeCast<ValueSlot<T>*>(slot);
+  auto valueSlot = SafeCast<ValueSlot<ValueTypes<T>::Type>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
   shared_ptr<SlotWatcher> watcher = slotNode->Watch<TypedSlotWatcher<T>>(valueSlot);
 
@@ -118,7 +120,7 @@ SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
 
 
 template <ValueType T>
-TypedSlotWatcher<T>::TypedSlotWatcher(ValueSlot<T>* slot)
+TypedSlotWatcher<T>::TypedSlotWatcher(ValueSlot<Type>* slot)
   : SlotWatcher(slot->GetReferencedNode())
   , mSlot(slot) 
 {}
@@ -132,7 +134,7 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  shared_ptr<ValueNode<T>> valueNode = PointerCast<ValueNode<T>>(GetNode());
+  shared_ptr<ValueNode<Type>> valueNode = PointerCast<ValueNode<Type>>(GetNode());
   auto value = valueNode->Get();
 
   mEditor = new ValueEditor<T>(watcherWidget, 

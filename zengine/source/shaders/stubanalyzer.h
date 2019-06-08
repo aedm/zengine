@@ -9,7 +9,7 @@ using namespace Shaders;
 class StubAnalyzer {
 public:
   /// Run analysis for a shader in stub source format.
-  /// Returns user-defined metadata extraced from source.
+  /// Returns user-defined metadata extracted from source.
   static OWNERSHIP StubMetadata*	FromText(const char* stubSource);
 
 private:
@@ -22,18 +22,19 @@ private:
   void AnalyzeParam(SourceLine* line);
   void AnalyzeGlobal(SourceLine* line);
   void AnalyzeVariable(SourceLine* line,
-                       vector<StubVariable*>& storage);
+                       vector<StubInOutVariable*>& storage);
 
-  ValueType TokenToType(const SubString& subStr);
+  StubParameter::Type TokenToType(const SubString& subStr);
 
   int mCurrentLineNumber;
 
   /// Builders
   string* mName;
   string mStrippedSource;
-  ValueType mReturnType;
+  StubParameter::Type mReturnType;
   vector<StubParameter*> mParameters;
-  vector<StubGlobal*> mGlobals;
-  vector<StubVariable*> mInputs;
-  vector<StubVariable*> mOutputs;
+  vector<StubGlobalUniform*> mGlobalUniforms;
+  vector<StubGlobalSampler*> mGlobalSamplers;
+  vector<StubInOutVariable*> mInputs;
+  vector<StubInOutVariable*> mOutputs;
 };

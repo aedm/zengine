@@ -93,7 +93,7 @@ void NodeWidget::CreateWidgetSlots() {
   mWidgetSlots.clear();
 
   for (Slot* slot : GetDirectNode()->GetPublicSlots()) {
-    if (slot->DoesAcceptNode(StaticValueNodesList[int(ValueType::STRING)])) continue;
+    if (IsInsanceOf<StringSlot*>(slot)) continue;
     WidgetSlot* sw = new WidgetSlot();
     sw->mSlot = slot;
     mWidgetSlots.push_back(sw);

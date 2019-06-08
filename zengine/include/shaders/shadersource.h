@@ -10,22 +10,22 @@ struct ShaderSource {
   /// Metadata for a uniform
   struct Uniform {
     Uniform(const string& name, const shared_ptr<Node>& node, 
-      ShaderGlobalType globalType, ValueType type);
+      GlobalUniformUsage globalType, ValueType type);
 
     const string mName;
     const shared_ptr<Node> mNode;
-    const ShaderGlobalType mGlobalType;
+    const GlobalUniformUsage mGlobalType;
     const ValueType mType;
   };
 
   /// Metadata for a sampler
   struct Sampler {
     Sampler(const string& name, const shared_ptr<Node>& node, 
-      ShaderGlobalType globalType, bool isMultiSampler, bool isShadow);
+      GlobalSamplerUsage globalType, bool isMultiSampler, bool isShadow);
 
     const string mName;
     const shared_ptr<Node> mNode;
-    const ShaderGlobalType mGlobalType;
+    const GlobalSamplerUsage mGlobalType;
     const bool mIsMultiSampler; // type is "sampler2DMS"
     const bool mIsShadow; // type is "sampler2DShadow"
   };

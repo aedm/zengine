@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../base/defines.h"
-#include "../dom/nodetype.h"
 #include "../resources/texture.h"
+#include "../shaders/valuetype.h"
 #include <vector>
 #include <string>
 
@@ -43,15 +43,6 @@ public:
 
 protected:
   AttributeMapper() {}
-};
-
-
-/// An attribute of a vertex format, eg. position or UV
-/// TODO: make this part of VertexFormat
-struct VertexAttribute {
-  VertexAttributeUsage Usage;
-  int Size;
-  int Offset;
 };
 
 

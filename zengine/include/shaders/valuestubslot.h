@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../nodes/valuenodes.h"
+#include "./valuetype.h"
 
-template <ValueType T>
+template <typename T>
 class ValueStubSlot: public ValueSlot<T> {
 public:
   ValueStubSlot(Node* owner, SharedString name);
@@ -10,13 +11,13 @@ public:
 };
 
 
-template <ValueType T>
+template <typename T>
 ValueStubSlot<T>::ValueStubSlot(Node* owner, SharedString name)
   : ValueSlot(owner, name)
 {}
 
 
-template <ValueType T>
+template <typename T>
 bool ValueStubSlot<T>::DoesAcceptNode(const shared_ptr<Node>& node) const {
   return IsPointerOf<StubNode>(node) || IsPointerOf<ValueNode<T>>(node);
 }

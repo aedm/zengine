@@ -13,12 +13,6 @@ enum class PassType {
   ZPOST,
 };
 
-struct PassUniform {
-  UniformId handle;
-  Node* node;
-  ShaderGlobalType globalType;
-  ValueType type;
-};
 
 /// A renderpass is a way to render an object. Materials consist of several
 /// render passes, eg. an opaque pass, a transparent pass, a shadow pass etc.

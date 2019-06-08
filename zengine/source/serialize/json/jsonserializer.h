@@ -4,6 +4,7 @@
 #include <include/dom/ghost.h>
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/meshnode.h>
+#include <include/nodes/texturenode.h>
 #include <include/nodes/splinenode.h>
 #include <include/shaders/stubnode.h>
 #include <string>
