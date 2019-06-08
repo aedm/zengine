@@ -2,6 +2,7 @@
 
 #include "../dom/node.h"
 #include "../nodes/valuenodes.h"
+#include "../resources/texture.h"
 #include "shadervaluetype.h"
 #include <vector>
 #include <map>

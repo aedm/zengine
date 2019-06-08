@@ -17,23 +17,6 @@ shared_ptr<VertexFormat> VertexPosUV::format = make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
 
 
-ShaderValueType VertexAttributeUsageToValueType(VertexAttributeUsage usage) {
-  switch (usage)
-  {
-  case VertexAttributeUsage::POSITION:
-    return ShaderValueType::VEC3;
-  case VertexAttributeUsage::TEXCOORD:
-    return ShaderValueType::VEC2;
-  case VertexAttributeUsage::NORMAL:
-    return ShaderValueType::VEC3;
-  case VertexAttributeUsage::TANGENT:
-    return ShaderValueType::VEC3;
-  default:
-    SHOULD_NOT_HAPPEN;
-    return ShaderValueType(-1);
-  }
-}
-
 VertexFormat::VertexFormat(UINT binaryFormat) {
   memset(mAttributesArray, 0, sizeof(void*) * (UINT)VertexAttributeUsage::COUNT);
 
@@ -104,8 +87,7 @@ void Mesh::Render(const vector<ShaderProgram::Attribute>& usedAttributes,
     if (attribute != nullptr) {
       OpenGL->EnableVertexAttribute(desc.mHandle,
         VertexAttributeUsageToValueType(desc.mUsage),
-        attribute->Offset,
-        mFormat->mStride);
+        attribute->Offset, mFormat->mStride);
     }
     else {
       SHOULD_NOT_HAPPEN;

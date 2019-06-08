@@ -210,9 +210,6 @@
     <ClCompile Include="source\zengine.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\base\types.cpp">
-      <Filter>source\base</Filter>
-    </ClCompile>
     <ClCompile Include="source\nodes\meshnode.cpp">
       <Filter>source\nodes</Filter>
     </ClCompile>

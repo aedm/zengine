@@ -19,3 +19,20 @@ UINT ValueTypeByteSize(ShaderValueType type) {
     return 0;
   }
 }
+
+ShaderValueType VertexAttributeUsageToValueType(VertexAttributeUsage usage) {
+  switch (usage)
+  {
+  case VertexAttributeUsage::POSITION:
+    return ShaderValueType::VEC3;
+  case VertexAttributeUsage::TEXCOORD:
+    return ShaderValueType::VEC2;
+  case VertexAttributeUsage::NORMAL:
+    return ShaderValueType::VEC3;
+  case VertexAttributeUsage::TANGENT:
+    return ShaderValueType::VEC3;
+  default:
+    SHOULD_NOT_HAPPEN;
+    return ShaderValueType(-1);
+  }
+}

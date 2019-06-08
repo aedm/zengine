@@ -146,7 +146,6 @@
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp" />
     <ClCompile Include="source\base\system.cpp" />
-    <ClCompile Include="source\base\types.cpp" />
     <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\document.cpp" />
     <ClCompile Include="source\dom\ghost.cpp" />
