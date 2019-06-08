@@ -22,7 +22,7 @@ const EnumMapperA GlobalSamplerMapper[] = {
 };
 
 /// Array for global uniform types
-const ShaderValueType GlobalUniformTypes[] = {
+const ValueType GlobalUniformTypes[] = {
 #undef ITEM
 #define ITEM(name, type) type,
   GLOBALUNIFORM_LIST
@@ -227,7 +227,7 @@ StubMetadata::~StubMetadata() {
   for (auto x : parameters) delete(x);
 }
 
-bool StubParameter::IsValidShaderValueType(Type type) {
+bool StubParameter::IsValidValueType(Type type) {
   switch (type) {
   case StubParameter::Type::FLOAT:
   case StubParameter::Type::VEC2:
@@ -240,31 +240,31 @@ bool StubParameter::IsValidShaderValueType(Type type) {
   }
 }
 
-ShaderValueType StubParameter::ToShaderValueType(Type type)
+ValueType StubParameter::ToValueType(Type type)
 {
   switch (type) {
   case StubParameter::Type::FLOAT:
-    return ShaderValueType::FLOAT;
+    return ValueType::FLOAT;
   case StubParameter::Type::VEC2:
-    return ShaderValueType::VEC2;
+    return ValueType::VEC2;
   case StubParameter::Type::VEC3:
-    return ShaderValueType::VEC3;
+    return ValueType::VEC3;
   case StubParameter::Type::VEC4:
-    return ShaderValueType::VEC4;
+    return ValueType::VEC4;
   case StubParameter::Type::MATRIX44:
-    return ShaderValueType::MATRIX44;
+    return ValueType::MATRIX44;
   default:
     SHOULD_NOT_HAPPEN;
-    return ShaderValueType(-1);
+    return ValueType(-1);
   }
 }
 
-ShaderValueType NodeToValueType(const shared_ptr<Node>& node) {
-  if (IsPointerOf<ValueNode<float>>(node)) return ShaderValueType::FLOAT;
-  if (IsPointerOf<ValueNode<Vec2>>(node)) return ShaderValueType::VEC2;
-  if (IsPointerOf<ValueNode<Vec3>>(node)) return ShaderValueType::VEC3;
-  if (IsPointerOf<ValueNode<Vec4>>(node)) return ShaderValueType::VEC4;
-  if (IsPointerOf<ValueNode<Matrix>>(node)) return ShaderValueType::MATRIX44;
+ValueType NodeToValueType(const shared_ptr<Node>& node) {
+  if (IsPointerOf<ValueNode<float>>(node)) return ValueType::FLOAT;
+  if (IsPointerOf<ValueNode<Vec2>>(node)) return ValueType::VEC2;
+  if (IsPointerOf<ValueNode<Vec3>>(node)) return ValueType::VEC3;
+  if (IsPointerOf<ValueNode<Vec4>>(node)) return ValueType::VEC4;
+  if (IsPointerOf<ValueNode<Matrix>>(node)) return ValueType::MATRIX44;
   SHOULD_NOT_HAPPEN;
-  return ShaderValueType(-1);
+  return ValueType(-1);
 }

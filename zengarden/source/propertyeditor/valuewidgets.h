@@ -58,12 +58,12 @@ public:
 };
 
 /// General template widget for editing float or vector values
-template<ShaderValueType T> class ValueEditor;
+template<ValueType T> class ValueEditor;
 
 
 /// A widget able to edit and display a float value
 template<> 
-class ValueEditor<ShaderValueType::FLOAT>: public QWidget {
+class ValueEditor<ValueType::FLOAT>: public QWidget {
 public:
   //static constexpr ValueType Type = ValueType::FLOAT;
 
@@ -99,12 +99,12 @@ protected:
 
 
 /// A widget able to edit and display a vector value
-template <ShaderValueType T>
+template <ValueType T>
 class ValueEditor: public QWidget {
 public:
   //static constexpr ValueType VType = VectorType;
   //typename ValueTypes<T>::Type;
-  typedef typename ShaderValueTypes<T>::Type VectorType;
+  typedef typename ValueTypes<T>::Type VectorType;
 
   ValueEditor(QWidget* parent, QString name, const VectorType& value);
 
@@ -119,7 +119,7 @@ public:
   void SetReadOnly(bool readOnly);
 
 protected:
-  typedef ValueEditor<ShaderValueType::FLOAT> FloatEditor;
+  typedef ValueEditor<ValueType::FLOAT> FloatEditor;
 
   /// Value of the vector
   VectorType mValue;

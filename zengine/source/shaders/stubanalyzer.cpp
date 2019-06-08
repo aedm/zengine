@@ -106,13 +106,13 @@ void StubAnalyzer::AnalyzeVariable(SourceLine* line,
   }
 
   StubParameter::Type variableType = TokenToType(line->SubStrings[2]);
-  if (!StubParameter::IsValidShaderValueType(variableType)) {
+  if (!StubParameter::IsValidValueType(variableType)) {
     ERR("line %d: Invalid type");
     return;
   }
 
   StubInOutVariable* parameter = new StubInOutVariable();
-  parameter->type = StubParameter::ToShaderValueType(variableType);
+  parameter->type = StubParameter::ToValueType(variableType);
   parameter->name = line->SubStrings[3].ToString();
   Storage.push_back(parameter);
 }
@@ -146,7 +146,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
   }
 
   /// Global uniform
-  if (!StubParameter::IsValidShaderValueType(declaredType)) {
+  if (!StubParameter::IsValidValueType(declaredType)) {
     ERR("line %d: Invalid uniform type'.", mCurrentLineNumber);
     return;
   }
@@ -159,8 +159,8 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  ShaderValueType shaderType = StubParameter::ToShaderValueType(declaredType);
-  ShaderValueType expectedType = GlobalUniformTypes[usage];
+  ValueType shaderType = StubParameter::ToValueType(declaredType);
+  ValueType expectedType = GlobalUniformTypes[usage];
   if (shaderType != expectedType) {
     ERR("line %d: wrong type for global uniform '%s'.", mCurrentLineNumber,
         name.ToString().c_str());

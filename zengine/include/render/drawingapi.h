@@ -2,7 +2,7 @@
 
 #include "../base/defines.h"
 #include "../resources/texture.h"
-#include "../shaders/shadervaluetype.h"
+#include "../shaders/valuetype.h"
 #include <vector>
 #include <string>
 
@@ -51,13 +51,13 @@ protected:
 struct ShaderProgram {
   /// Uniform properties returned by the driver
   struct Uniform {
-    Uniform(const string& name, ShaderValueType type, UINT offset);
+    Uniform(const string& name, ValueType type, UINT offset);
 
     /// Uniform name, must match the generated name inside the uniform block
     const string mName;
 
     /// Type (float, vec2...)
-    const ShaderValueType mType;
+    const ValueType mType;
 
     /// Data offset inside the uniform block
     const UINT mOffset;
@@ -76,11 +76,11 @@ struct ShaderProgram {
 
   /// Vertex attributes, pipeline input
   struct Attribute {
-    Attribute(const string& name, ShaderValueType type, AttributeId handle,
+    Attribute(const string& name, ValueType type, AttributeId handle,
       VertexAttributeUsage usage);
 
     const string mName;
-    const ShaderValueType mType;
+    const ValueType mType;
     const AttributeId mHandle;
     const VertexAttributeUsage mUsage;
   };
@@ -126,7 +126,7 @@ public:
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
     const char* FragmentSource);
   void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
-  void SetUniform(UniformId Id, ShaderValueType Type, const void* Values);
+  void SetUniform(UniformId Id, ValueType Type, const void* Values);
 
   /// Vertex buffer handling
   VertexBufferHandle CreateVertexBuffer(UINT Size);
@@ -137,7 +137,7 @@ public:
     const vector<ShaderProgram::Attribute>& ShaderAttribs,
     UINT Stride);
   void SetVertexBuffer(VertexBufferHandle Handle);
-  void EnableVertexAttribute(UINT Index, ShaderValueType Type, UINT Offset, UINT Stride);
+  void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
 
   /// Index buffer handling
   IndexBufferHandle CreateIndexBuffer(UINT IndexCount);

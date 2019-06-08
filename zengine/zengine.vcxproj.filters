@@ -185,8 +185,8 @@
     </ClInclude>
     <ClInclude Include="include\dom\ghost.h" />
     <ClInclude Include="include\serialize\lodepng.h" />
-    <ClInclude Include="include\shaders\shadervaluetype.h" />
     <ClInclude Include="include\nodes\texturenode.h" />
+    <ClInclude Include="include\shaders\valuetype.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -293,7 +293,7 @@
     <ClCompile Include="source\dom\ghost.cpp" />
     <ClCompile Include="source\serialize\lodepng.cpp" />
     <ClCompile Include="source\nodes\texturenode.cpp" />
-    <ClCompile Include="source\shaders\shadervaluetype.cpp" />
+    <ClCompile Include="source\shaders\valuetype.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

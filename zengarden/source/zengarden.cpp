@@ -198,19 +198,19 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
     shared_ptr<WatcherUI> watcher;
     if (IsExactType<FloatNode>(node)) {
       watcher =
-        node->Watch<StaticValueWatcher<ShaderValueType::FLOAT>>(PointerCast<FloatNode>(node));
+        node->Watch<StaticValueWatcher<ValueType::FLOAT>>(PointerCast<FloatNode>(node));
     }
     else if (IsExactType<Vec2Node>(node)) {
       watcher =
-        node->Watch<StaticValueWatcher<ShaderValueType::VEC2>>(PointerCast<Vec2Node>(node));
+        node->Watch<StaticValueWatcher<ValueType::VEC2>>(PointerCast<Vec2Node>(node));
     }
     else if (IsExactType<Vec3Node>(node)) {
       watcher =
-        node->Watch<StaticValueWatcher<ShaderValueType::VEC3>>(PointerCast<Vec3Node>(node));
+        node->Watch<StaticValueWatcher<ValueType::VEC3>>(PointerCast<Vec3Node>(node));
     }
     else if (IsExactType<Vec4Node>(node)) {
       watcher =
-        node->Watch<StaticValueWatcher<ShaderValueType::VEC4>>(PointerCast<Vec4Node>(node));
+        node->Watch<StaticValueWatcher<ValueType::VEC4>>(PointerCast<Vec4Node>(node));
     }
     else {
       watcher = node->Watch<SlotEditor>(node);

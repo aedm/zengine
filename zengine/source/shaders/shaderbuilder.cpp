@@ -21,7 +21,7 @@ shared_ptr<ShaderSource> ShaderBuilder::FromStubs(const shared_ptr<StubNode>& ve
 }
 
 
-ShaderBuilder::InOutVariable::InOutVariable(ShaderValueType type, const string& name, 
+ShaderBuilder::InOutVariable::InOutVariable(ValueType type, const string& name, 
   int layout)
   : mName(name)
   , mType(type)
@@ -421,7 +421,7 @@ void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
 }
 
 
-const string& ShaderBuilder::GetValueTypeString(ShaderValueType type) {
+const string& ShaderBuilder::GetValueTypeString(ValueType type) {
   static const string sfloat("float");
   static const string svec2("vec2");
   static const string svec3("vec3");
@@ -431,11 +431,11 @@ const string& ShaderBuilder::GetValueTypeString(ShaderValueType type) {
   static const string sinvalid("INVALID TYPE");
 
   switch (type) {
-  case ShaderValueType::FLOAT:      return sfloat;
-  case ShaderValueType::VEC2:      return svec2;
-  case ShaderValueType::VEC3:      return svec3;
-  case ShaderValueType::VEC4:      return svec4;
-  case ShaderValueType::MATRIX44:  return smatrix44;
+  case ValueType::FLOAT:      return sfloat;
+  case ValueType::VEC2:      return svec2;
+  case ValueType::VEC3:      return svec3;
+  case ValueType::VEC4:      return svec4;
+  case ValueType::MATRIX44:  return smatrix44;
   }
 
   SHOULD_NOT_HAPPEN;

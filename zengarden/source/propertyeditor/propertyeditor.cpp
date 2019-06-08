@@ -60,13 +60,13 @@ void PropertyEditor::HandleNameTexBoxChanged() {
 }
 
 
-template<ShaderValueType T>
+template<ValueType T>
 StaticValueWatcher<T>::StaticValueWatcher(
   const shared_ptr<StaticValueNode<VectorType>>& node)
   : PropertyEditor(node) {}
 
 
-template<ShaderValueType T>
+template<ValueType T>
 void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
@@ -79,7 +79,7 @@ void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-template<ShaderValueType T>
+template<ValueType T>
 void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
   const VectorType& value)
 {
@@ -89,7 +89,7 @@ void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
 }
 
 
-template class StaticValueWatcher<ShaderValueType::FLOAT>;
-template class StaticValueWatcher<ShaderValueType::VEC2>;
-template class StaticValueWatcher<ShaderValueType::VEC3>;
-template class StaticValueWatcher<ShaderValueType::VEC4>;
+template class StaticValueWatcher<ValueType::FLOAT>;
+template class StaticValueWatcher<ValueType::VEC2>;
+template class StaticValueWatcher<ValueType::VEC3>;
+template class StaticValueWatcher<ValueType::VEC4>;

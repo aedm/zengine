@@ -87,22 +87,22 @@ void Pass::Operate() {
   mUniformArray.resize(mShaderProgram->mUniformBlockSize);
 }
 
-Slot* CreateValueSlot(ShaderValueType type, Node* owner,
+Slot* CreateValueSlot(ValueType type, Node* owner,
   SharedString name, bool isMultiSlot = false,
   bool isPublic = true, bool isSerializable = true,
   float minimum = 0.0f, float maximum = 1.0f) 
 {
   switch (type)
   {
-  case ShaderValueType::FLOAT:
+  case ValueType::FLOAT:
     return new FloatSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ShaderValueType::VEC2:
+  case ValueType::VEC2:
     return new Vec2Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ShaderValueType::VEC3:
+  case ValueType::VEC3:
     return new Vec3Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ShaderValueType::VEC4:
+  case ValueType::VEC4:
     return new Vec4Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ShaderValueType::MATRIX44:
+  case ValueType::MATRIX44:
     return new MatrixSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
   default:
     SHOULD_NOT_HAPPEN;
@@ -180,17 +180,17 @@ void Pass::Set(Globals* globals) {
 #define ITEM(name) \
 				  case name: { \
             auto& vNode = \
-              PointerCast<ValueNode<ShaderValueTypes<name>::Type>>(source->mNode); \
+              PointerCast<ValueNode<ValueTypes<name>::Type>>(source->mNode); \
             vNode->Update(); \
-            *(reinterpret_cast<ShaderValueTypes<name>::Type*>( \
+            *(reinterpret_cast<ValueTypes<name>::Type*>( \
               &mUniformArray[target->mOffset])) = vNode->Get(); \
 					  break; \
           }
-        ITEM(ShaderValueType::FLOAT);
-        ITEM(ShaderValueType::VEC2);
-        ITEM(ShaderValueType::VEC3);
-        ITEM(ShaderValueType::VEC4);
-        ITEM(ShaderValueType::MATRIX44);
+        ITEM(ValueType::FLOAT);
+        ITEM(ValueType::VEC2);
+        ITEM(ValueType::VEC3);
+        ITEM(ValueType::VEC4);
+        ITEM(ValueType::MATRIX44);
       default: SHOULD_NOT_HAPPEN; break;
       }
     }
@@ -202,16 +202,16 @@ void Pass::Set(Globals* globals) {
 #define ITEM(name) \
         case name: { \
           void* valuePointer = reinterpret_cast<char*>(globals)+offset; \
-          *(reinterpret_cast<ShaderValueTypes<name>::Type*>( \
+          *(reinterpret_cast<ValueTypes<name>::Type*>( \
             &mUniformArray[target->mOffset])) = \
-            *reinterpret_cast<ShaderValueTypes<name>::Type*>(valuePointer); \
+            *reinterpret_cast<ValueTypes<name>::Type*>(valuePointer); \
           break; \
         }
-        ITEM(ShaderValueType::FLOAT);
-        ITEM(ShaderValueType::VEC2);
-        ITEM(ShaderValueType::VEC3);
-        ITEM(ShaderValueType::VEC4);
-        ITEM(ShaderValueType::MATRIX44);
+        ITEM(ValueType::FLOAT);
+        ITEM(ValueType::VEC2);
+        ITEM(ValueType::VEC3);
+        ITEM(ValueType::VEC4);
+        ITEM(ValueType::MATRIX44);
       default: SHOULD_NOT_HAPPEN; break;
       }
     }

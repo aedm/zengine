@@ -2,7 +2,7 @@
 
 #include "../base/defines.h"
 #include "../base/vectormath.h"
-#include "../shaders/shadervaluetype.h"
+#include "../shaders/valuetype.h"
 #include "../render/drawingapi.h"
 #include <vector>
 

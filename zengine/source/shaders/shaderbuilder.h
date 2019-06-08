@@ -40,10 +40,10 @@ private:
 
   /// Inputs and output of the shader stage
   struct InOutVariable {
-    InOutVariable(ShaderValueType type, const string& name, int layout = -1);
+    InOutVariable(ValueType type, const string& name, int layout = -1);
 
     /// Variable type
-    ShaderValueType mType;
+    ValueType mType;
 
     /// Variable name
     string mName;
@@ -101,7 +101,7 @@ private:
   void GenerateSourceFunctions(ShaderStage* shaderStage);
   void GenerateSourceMain(ShaderStage* shaderStage);
 
-  static const string& GetValueTypeString(ShaderValueType type);
+  static const string& GetValueTypeString(ValueType type);
   static const string& GetParamTypeString(StubParameter::Type type,
     bool isMultiSampler = false, bool isShadow = false);
 

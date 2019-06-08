@@ -22,13 +22,13 @@ SlotEditor::~SlotEditor() {
 }
 
 
-template <ShaderValueType T>
+template <ValueType T>
 bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
-  if (!IsPointerOf<ValueNode<ShaderValueTypes<T>::Type>>(slot->GetReferencedNode())) {
+  if (!IsPointerOf<ValueNode<ValueTypes<T>::Type>>(slot->GetReferencedNode())) {
     return false;
   }
 
-  auto valueSlot = SafeCast<ValueSlot<ShaderValueTypes<T>::Type>*>(slot);
+  auto valueSlot = SafeCast<ValueSlot<ValueTypes<T>::Type>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
   shared_ptr<SlotWatcher> watcher = slotNode->Watch<TypedSlotWatcher<T>>(valueSlot);
 
@@ -59,10 +59,10 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     hLayout->setSpacing(4);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
-    if (!AddSlot<ShaderValueType::FLOAT>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ShaderValueType::VEC2>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ShaderValueType::VEC3>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ShaderValueType::VEC4>(slot, watcherWidget, hLayout)) {
+    if (!AddSlot<ValueType::FLOAT>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ValueType::VEC2>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ValueType::VEC3>(slot, watcherWidget, hLayout) &&
+      !AddSlot<ValueType::VEC4>(slot, watcherWidget, hLayout)) {
       QLabel* label = new QLabel(QString::fromStdString(*slot->GetName().get()), widget);
       hLayout->addWidget(label);
     }
@@ -119,14 +119,14 @@ SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node) {}
 
 
-template <ShaderValueType T>
+template <ValueType T>
 TypedSlotWatcher<T>::TypedSlotWatcher(ValueSlot<Type>* slot)
   : SlotWatcher(slot->GetReferencedNode())
   , mSlot(slot) 
 {}
 
 
-template <ShaderValueType T>
+template <ValueType T>
 void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   SlotWatcher::SetWatcherWidget(watcherWidget);
 
@@ -149,19 +149,19 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-template <ShaderValueType T>
+template <ValueType T>
 void TypedSlotWatcher<T>::UpdateReadOnly() {
   mEditor->SetReadOnly(!mSlot->IsDefaulted());
 }
 
 
-template <ShaderValueType T>
+template <ValueType T>
 void TypedSlotWatcher<T>::HandleValueChange(QWidget* widget, const Type& value) {
   mSlot->SetDefaultValue(value);
 }
 
 
-template class TypedSlotWatcher<ShaderValueType::FLOAT>;
-template class TypedSlotWatcher<ShaderValueType::VEC2>;
-template class TypedSlotWatcher<ShaderValueType::VEC3>;
-template class TypedSlotWatcher<ShaderValueType::VEC4>;
+template class TypedSlotWatcher<ValueType::FLOAT>;
+template class TypedSlotWatcher<ValueType::VEC2>;
+template class TypedSlotWatcher<ValueType::VEC3>;
+template class TypedSlotWatcher<ValueType::VEC4>;

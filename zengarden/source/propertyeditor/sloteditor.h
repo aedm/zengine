@@ -21,7 +21,7 @@ private:
   void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Adds a slot to the UI. Returns false on type mismatch
-  template <ShaderValueType T>
+  template <ValueType T>
   bool AddSlot(Slot* slot, QWidget* parent, QLayout* layout);
 
   QIcon mGhostIcon;
@@ -40,9 +40,9 @@ protected:
 
 
 /// A parameter panel item for value slots
-template <ShaderValueType T>
+template <ValueType T>
 class TypedSlotWatcher : public SlotWatcher {
-  typedef typename ShaderValueTypes<T>::Type Type;
+  typedef typename ValueTypes<T>::Type Type;
 
 public:
   TypedSlotWatcher(ValueSlot<Type>* slot);

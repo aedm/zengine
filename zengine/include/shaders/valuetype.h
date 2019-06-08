@@ -7,7 +7,7 @@
 using namespace std;
 
 // Possible types of shader values and variables
-enum class ShaderValueType {
+enum class ValueType {
   FLOAT,
   VEC2,
   VEC3,
@@ -15,16 +15,16 @@ enum class ShaderValueType {
   MATRIX44,
 };
 
-UINT ValueTypeByteSize(ShaderValueType type);
+UINT ValueTypeByteSize(ValueType type);
 
 
 // Translation between shader types and C++ types
-template<ShaderValueType T> struct ShaderValueTypes;
-template<> struct ShaderValueTypes<ShaderValueType::FLOAT> { typedef float Type; };
-template<> struct ShaderValueTypes<ShaderValueType::VEC2> { typedef Vec2 Type; };
-template<> struct ShaderValueTypes<ShaderValueType::VEC3> { typedef Vec3 Type; };
-template<> struct ShaderValueTypes<ShaderValueType::VEC4> { typedef Vec4 Type; };
-template<> struct ShaderValueTypes<ShaderValueType::MATRIX44> { typedef Matrix Type; };
+template<ValueType T> struct ValueTypes;
+template<> struct ValueTypes<ValueType::FLOAT> { typedef float Type; };
+template<> struct ValueTypes<ValueType::VEC2> { typedef Vec2 Type; };
+template<> struct ValueTypes<ValueType::VEC3> { typedef Vec3 Type; };
+template<> struct ValueTypes<ValueType::VEC4> { typedef Vec4 Type; };
+template<> struct ValueTypes<ValueType::MATRIX44> { typedef Matrix Type; };
 
 
 /// Possible variable types in vertex attributes
@@ -49,7 +49,7 @@ enum VertexAttributeMask {
 };
 
 /// Convert vertex attribute usage to value type
-ShaderValueType VertexAttributeUsageToValueType(VertexAttributeUsage usage);
+ValueType VertexAttributeUsageToValueType(VertexAttributeUsage usage);
 
 
 /// An attribute of a vertex format, eg. position or UV
