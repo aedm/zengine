@@ -2,12 +2,9 @@
 
 REGISTER_NODECLASS(Graph, "Graph");
 
-static SharedString NodesSlotName = make_shared<string>("nodes");
-
 Graph::Graph()
-  : mNodes(this, NodesSlotName, true)
-{
-}
+  : mNodes(this, "nodes", true)
+{}
 
 void Graph::HandleMessage(Message* message) {
   switch (message->mType) {

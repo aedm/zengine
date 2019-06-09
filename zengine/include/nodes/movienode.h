@@ -6,7 +6,6 @@
 class MovieNode: public Node {
 public:
   MovieNode();
-  virtual ~MovieNode();
 
   ClipSlot mClips;
 

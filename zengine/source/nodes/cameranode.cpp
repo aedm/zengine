@@ -2,26 +2,16 @@
 
 REGISTER_NODECLASS(CameraNode, "Camera");
 
-static SharedString FovYSlotName = make_shared<string>("Field of view");
-static SharedString ZNearSlotName = make_shared<string>("Near Z");
-static SharedString ZFarSlotName = make_shared<string>("Far Z");
-static SharedString DistanceSlotName = make_shared<string>("Distance");
-static SharedString TargetSlotName = make_shared<string>("Target");
-static SharedString OrientationSlotName = make_shared<string>("Orientation");
-static SharedString ShakeSlotName = make_shared<string>("Shake");
-static SharedString ShakeTimeSlotName = make_shared<string>("ShakeTime");
-static SharedString ShakeSpeedSlotName = make_shared<string>("ShakeSpeed");
-
 CameraNode::CameraNode()
-  : mTarget(this, TargetSlotName, false, true, true, 0.0f, 150.0f)
-  , mDistance(this, DistanceSlotName, false, true, true, 0.0f, 150.0f)
-  , mOrientation(this, OrientationSlotName, false, true, true, -Pi, Pi)
-  , mFovY(this, FovYSlotName)
-  , mZNear(this, ZNearSlotName)
-  , mZFar(this, ZFarSlotName)
-  , mShake(this, ShakeSlotName)
-  , mShakeTime(this, ShakeTimeSlotName)
-  , mShakeSpeed(this, ShakeSpeedSlotName) {
+  : mTarget(this, "Target", false, true, true, 0.0f, 150.0f)
+  , mDistance(this, "Distance", false, true, true, 0.0f, 150.0f)
+  , mOrientation(this, "Orientation", false, true, true, -Pi, Pi)
+  , mFovY(this, "Field of view")
+  , mZNear(this, "Near Z")
+  , mZFar(this, "Far Z")
+  , mShake(this, "Shake")
+  , mShakeTime(this, "ShakeTime")
+  , mShakeSpeed(this, "ShakeSpeed") {
   mFovY.SetDefaultValue(60.0f * (Pi / 180.0f));
   mZNear.SetDefaultValue(1.0f);
   mZFar.SetDefaultValue(1000.0f);

@@ -5,17 +5,12 @@ REGISTER_NODECLASS(FloatsToVec4Node, "Floats To Vec4");
 REGISTER_NODECLASS(FloatToFloatNode, "Float To Float");
 REGISTER_NODECLASS(MaddNode, "MAdd");
 
-static SharedString XSlotName = make_shared<string>("X");
-static SharedString YSlotName = make_shared<string>("Y");
-static SharedString ZSlotName = make_shared<string>("Z");
-static SharedString WSlotName = make_shared<string>("W");
-
 FloatsToVec3Node::FloatsToVec3Node()
   : ValueNode<Vec3>()
   , mValue(0, 0, 0)
-  , mX(this, XSlotName)
-  , mY(this, YSlotName)
-  , mZ(this, ZSlotName)
+  , mX(this, "X")
+  , mY(this, "Y")
+  , mZ(this, "Z")
 {}
 
 const Vec3& FloatsToVec3Node::Get() {
@@ -41,7 +36,7 @@ void FloatsToVec3Node::Operate() {
 
 FloatToFloatNode::FloatToFloatNode()
   : ValueNode<float>()
-  , mX(this, XSlotName)
+  , mX(this, "X")
   , mValue(0)
 {}
 
@@ -69,10 +64,10 @@ void FloatToFloatNode::Operate() {
 FloatsToVec4Node::FloatsToVec4Node()
   : ValueNode<Vec4>()
   , mValue(0, 0, 0, 0)
-  , mX(this, XSlotName)
-  , mY(this, YSlotName)
-  , mZ(this, ZSlotName)
-  , mW(this, WSlotName)
+  , mX(this, "X")
+  , mY(this, "Y")
+  , mZ(this, "Z")
+  , mW(this, "W")
 {}
 
 const Vec4& FloatsToVec4Node::Get() {
@@ -96,16 +91,12 @@ void FloatsToVec4Node::Operate() {
   mValue = Vec4(mX.Get(), mY.Get(), mZ.Get(), mW.Get());
 }
 
-static SharedString ASlotName = make_shared<string>("A");
-static SharedString BSlotName = make_shared<string>("B");
-static SharedString CSlotName = make_shared<string>("C");
-
 MaddNode::MaddNode()
   : ValueNode<float>()
   , mValue(1)
-  , mA(this, ASlotName)
-  , mB(this, BSlotName)
-  , mC(this, CSlotName)
+  , mA(this, "A")
+  , mB(this, "B")
+  , mC(this, "C")
 {
   mA.SetDefaultValue(1);
   mB.SetDefaultValue(1);

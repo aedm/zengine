@@ -8,14 +8,6 @@ REGISTER_NODECLASS(FloatSplineNode, "Float Spline");
 
 const float Epsilon = 0.0001f;
 
-static SharedString TimeSlotName = make_shared<string>("Time");
-static SharedString PropertiesSlotName = make_shared<string>("Properties");
-static SharedString NoiseEnabledSlotName = make_shared<string>("Noise enabled");
-static SharedString NoiseVelocitySlotName = make_shared<string>("Noise velocity");
-static SharedString BeatSpikeEnabledSlotName = make_shared<string>("Beat spike enabled");
-static SharedString BeatSpikeLengthSlotName = make_shared<string>("Beat spike length");
-static SharedString BeatSpikeEasingSlotName = make_shared<string>("Beat spike easing");
-static SharedString BeatQuantizerFrequencySlotName = make_shared<string>("Quantizer freq");
 
 SplinePoint::SplinePoint() {
   mTangentBefore = mTangentAfter = 0.0f;
@@ -32,13 +24,13 @@ void SplinePoint::SetValue(float time, float value) {
 
 FloatSplineNode::FloatSplineNode()
   : ValueNode<float>()
-  , mTimeSlot(this, TimeSlotName, false, false, false)
-  , mNoiseEnabled(this, NoiseEnabledSlotName)
-  , mNoiseVelocity(this, NoiseVelocitySlotName, false, true, true, 0.0f, 30.0f) 
-  , mBeatSpikeEnabled(this, BeatSpikeEnabledSlotName)
-  , mBeatSpikeLength(this, BeatSpikeLengthSlotName)
-  , mBeatSpikeEasing(this, BeatSpikeEasingSlotName)
-  , mBeatQuantizerFrequency(this, BeatQuantizerFrequencySlotName)
+  , mTimeSlot(this, "Time", false, false, false)
+  , mNoiseEnabled(this, "Noise enabled")
+  , mNoiseVelocity(this, "Noise velocity", false, true, true, 0.0f, 30.0f)
+  , mBeatSpikeEnabled(this, "Beat spike enabled")
+  , mBeatSpikeLength(this, "Beat spike length")
+  , mBeatSpikeEasing(this, "Beat spike easing")
+  , mBeatQuantizerFrequency(this, "Quantizer freq")
   , mSceneTimeNode(make_shared<SceneTimeNode>())
 {
   mTimeSlot.Connect(mSceneTimeNode);

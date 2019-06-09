@@ -91,8 +91,8 @@ private:
 /// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
-  Slot(Node* owner, SharedString name, bool isMultiSlot = false,
-       bool isPublic = true, bool isSerializable = true, bool isTraversable = true);
+  Slot(Node* owner, const string& name, bool isMultiSlot = false, bool isPublic = true,
+    bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
   shared_ptr<Node> GetOwner();
@@ -135,8 +135,9 @@ public:
   /// Type of object this slot accepts
   virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const;
 
-  /// Returns the name of the slot
-  SharedString GetName();
+  /// The name of the slot. Can only be set once. The reason it's not a const
+  /// is that it's not necessarily known at constructor time.
+  const string mName;
 
   /// True if the slot can connect to multiple nodes
   const bool mIsMultiSlot;
@@ -160,9 +161,6 @@ protected:
 
   /// The slot is connected to these nodes (empty if not multislot)
   vector<shared_ptr<Node>> mMultiNodes;
-
-  /// Name of the slot. Can't be changed.
-  SharedString mName;
 
   /// Ghost slots will be the slots of ghost nodes. They are free parameters 
   /// that users can change.
@@ -259,7 +257,7 @@ public:
   const vector<Slot*>& GetTraversableSlots();
 
   /// Returns the slots that need to be serialized when saving / loading
-  const unordered_map<SharedString, Slot*>& GetSerializableSlots();
+  const unordered_map<string, Slot*>& GetSerializableSlots();
 
 protected:
   /// Registers a new slot
@@ -285,7 +283,7 @@ private:
   vector<Slot*>	mTraversableSlots;
 
   /// Slots that need to be serialized when saving / loading.
-  unordered_map<SharedString, Slot*> mSerializableSlotsByName;
+  unordered_map<string, Slot*> mSerializableSlotsByName;
   
   /// ------------------ Watcher operations ------------------
   /// This section can be disabled without hurting the engine.
@@ -321,7 +319,7 @@ private:
 template<class N>
 class TypedSlot: public Slot {
 public:
-  TypedSlot(Node* owner, SharedString name, bool isMultiSlot = false,
+  TypedSlot(Node* owner, const string& name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true)
     : Slot(owner, name, isMultiSlot, isPublic, isSerializable) {}
 

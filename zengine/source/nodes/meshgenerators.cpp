@@ -3,15 +3,11 @@
 REGISTER_NODECLASS(CubeMeshNode, "Cube");
 REGISTER_NODECLASS(HalfCubeMeshNode, "HalfCube");
 
-static SharedString CubeSizeXSlotName = make_shared<string>("SizeX");
-static SharedString CubeSizeYSlotName = make_shared<string>("SizeY");
-static SharedString CubeSizeZSlotName = make_shared<string>("SizeZ");
-
 CubeMeshNode::CubeMeshNode()
   : MeshNode()
-  , mSizeX(this, CubeSizeXSlotName)
-  , mSizeY(this, CubeSizeYSlotName)
-  , mSizeZ(this, CubeSizeZSlotName)
+  , mSizeX(this, "SizeX")
+  , mSizeY(this, "SizeY")
+  , mSizeZ(this, "SizeZ")
 {}
 
 void CubeMeshNode::Operate() {

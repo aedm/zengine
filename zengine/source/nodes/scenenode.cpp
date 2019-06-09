@@ -2,33 +2,20 @@
 #include <include/shaders/engineshaders.h>
 REGISTER_NODECLASS(SceneNode, "Scene");
 
-static SharedString DrawablesSlotName = make_shared<string>("Drawables");
-static SharedString CameraSlotName = make_shared<string>("Camera");
-static SharedString ShadowMapSizeSlotName = make_shared<string>("Shadow map size");
-static SharedString SkylightDirectionSlotName = make_shared<string>("Skylight direction");
-static SharedString SkylightColorSlotName = make_shared<string>("Skylight color");
-static SharedString SkylightAmbientSlotName = make_shared<string>("Ambient factor");
-static SharedString SkylightSpreadSlotName = make_shared<string>("Shadow spread");
-static SharedString SkylightSampleSpreadSlotName = make_shared<string>("Sample spread");
-static SharedString DOFEnabledSlotName = make_shared<string>("DOF enabled");
-static SharedString DOFFocusDistanceSlotName = make_shared<string>("DOF focus distance");
-static SharedString DOFBlurSlotName = make_shared<string>("DOF blur");
-static SharedString ZPrepassDisabledSlotName = make_shared<string>("Disable Z prepass");
-
 SceneNode::SceneNode()
-  : mDrawables(this, DrawablesSlotName, true)
-  , mCamera(this, CameraSlotName)
-  , mShadowMapSize(this, ShadowMapSizeSlotName, false, true, true, 0.0f, 100.0f)
-  , mSkyLightDirection(this, SkylightDirectionSlotName)
-  , mSkyLightColor(this, SkylightColorSlotName)
-  , mSkyLightAmbient(this, SkylightAmbientSlotName)
-  , mSkyLightSpread(this, SkylightSpreadSlotName, false, true, true, 0.0f, 30.0f)
-  , mSkyLightSampleSpread(this, SkylightSampleSpreadSlotName, false, true, true, 0.0f, 20.0f)
-  , mSceneTimes(this, nullptr, true, false, false, false)
-  , mDOFEnabled(this, DOFEnabledSlotName)
-  , mDOFFocusDistance(this, DOFFocusDistanceSlotName, false, true, true, 0.0f, 100.0f)
-  , mDOFBlur(this, DOFBlurSlotName, false, true, true, 0.0f, 30.0f)
-  , mZPrepassDisabled(this, ZPrepassDisabledSlotName)
+  : mDrawables(this, "Drawables", true)
+  , mCamera(this, "Camera")
+  , mShadowMapSize(this, "Shadow map size", false, true, true, 0.0f, 100.0f)
+  , mSkyLightDirection(this, "Skylight direction")
+  , mSkyLightColor(this, "Skylight color")
+  , mSkyLightAmbient(this, "Ambient factor")
+  , mSkyLightSpread(this, "Shadow spread", false, true, true, 0.0f, 30.0f)
+  , mSkyLightSampleSpread(this, "Sample spread", false, true, true, 0.0f, 20.0f)
+  , mSceneTimes(this, string(), true, false, false, false)
+  , mDOFEnabled(this, "DOF enabled")
+  , mDOFFocusDistance(this, "DOF focus distance", false, true, true, 0.0f, 100.0f)
+  , mDOFBlur(this, "DOF blur", false, true, true, 0.0f, 30.0f)
+  , mZPrepassDisabled(this, "Disable Z prepass")
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);

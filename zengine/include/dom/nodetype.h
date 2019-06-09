@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../base/types.h"
 #include <string>
 #include <unordered_map>
 #include <typeindex>

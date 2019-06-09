@@ -97,7 +97,7 @@ struct StubParameter {
   };
 
   Type mType;
-  SharedString mName;
+  string mName;
 
   static bool IsValidValueType(Type type);
   static ValueType ToValueType(Type type);

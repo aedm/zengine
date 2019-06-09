@@ -10,19 +10,13 @@
 
 REGISTER_NODECLASS(Pass, "Pass");
 
-static SharedString VertesStubSlotName = make_shared<string>("Vertex shader");
-static SharedString FragmentStubSlotName = make_shared<string>("Fragment shader");
-static SharedString UberShaderStubSlotName = make_shared<string>("Uber Shader");
-static SharedString FaceModeSlotName = make_shared<string>("Face mode");
-static SharedString BlendModeSlotName = make_shared<string>("Blending");
-
 Pass::Pass()
   : Node()
-  , mVertexStub(this, VertesStubSlotName)
-  , mFragmentStub(this, FragmentStubSlotName)
-  , mFaceModeSlot(this, FaceModeSlotName)
-  , mBlendModeSlot(this, BlendModeSlotName)
-  , mUberShader(this, UberShaderStubSlotName, false, false, false) {
+  , mVertexStub(this, "Vertex shader")
+  , mFragmentStub(this, "Fragment shader")
+  , mFaceModeSlot(this, "Face mode")
+  , mBlendModeSlot(this, "Blending")
+  , mUberShader(this, "Uber Shader", false, false, false) {
   mRenderstate.mDepthTest = true;
   mRenderstate.mFaceMode = RenderState::FaceMode::FRONT;
   mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
@@ -88,7 +82,7 @@ void Pass::Operate() {
 }
 
 Slot* CreateValueSlot(ValueType type, Node* owner,
-  SharedString name, bool isMultiSlot = false,
+  const string& name, bool isMultiSlot = false,
   bool isPublic = true, bool isSerializable = true,
   float minimum = 0.0f, float maximum = 1.0f) 
 {
@@ -133,7 +127,7 @@ void Pass::BuildShaderSource()
   for (auto& sampler : mShaderSource->mSamplers) {
     if (sampler.mNode) {
       shared_ptr<Slot> slot =
-        make_shared<TextureSlot>(this, nullptr, false, false, false, false);
+        make_shared<TextureSlot>(this, string(), false, false, false, false);
       slot->Connect(sampler.mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }
@@ -141,7 +135,7 @@ void Pass::BuildShaderSource()
   for (auto& uniform : mShaderSource->mUniforms) {
     if (uniform.mNode) {
       shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
-        NodeToValueType(uniform.mNode), this, nullptr, false, false, false, false));
+        NodeToValueType(uniform.mNode), this, string(), false, false, false, false));
       slot->Connect(uniform.mNode);
       mUniformAndSamplerSlots.push_back(slot);
     }

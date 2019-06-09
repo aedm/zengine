@@ -63,7 +63,7 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
       !AddSlot<ValueType::VEC2>(slot, watcherWidget, hLayout) &&
       !AddSlot<ValueType::VEC3>(slot, watcherWidget, hLayout) &&
       !AddSlot<ValueType::VEC4>(slot, watcherWidget, hLayout)) {
-      QLabel* label = new QLabel(QString::fromStdString(*slot->GetName().get()), widget);
+      QLabel* label = new QLabel(QString::fromStdString(slot->mName), widget);
       hLayout->addWidget(label);
     }
 
@@ -92,6 +92,7 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     mLayout->addWidget(sourceButton);
   }
 }
+
 
 void SlotEditor::OnSlotConnectionChanged(Slot* slot) {
   auto it = mSlotWatchers.find(slot);
@@ -137,8 +138,8 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   shared_ptr<ValueNode<Type>> valueNode = PointerCast<ValueNode<Type>>(GetNode());
   auto value = valueNode->Get();
 
-  mEditor = new ValueEditor<T>(watcherWidget, 
-    QString::fromStdString(*mSlot->GetName().get()), value);
+  mEditor = new ValueEditor<T>(watcherWidget,
+    QString::fromStdString(mSlot->mName), value);
   mEditor->onValueChange += Delegate(this, &TypedSlotWatcher<T>::HandleValueChange);
 
   layout->addWidget(mEditor);

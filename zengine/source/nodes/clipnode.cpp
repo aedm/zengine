@@ -2,31 +2,17 @@
 
 REGISTER_NODECLASS(ClipNode, "Clip");
 
-static SharedString SceneSlotName = make_shared<string>("scene");
-static SharedString StartSlotName = make_shared<string>("Start time");
-static SharedString LengthSlotName = make_shared<string>("Clip Length");
-static SharedString TrackNumberSlotName = make_shared<string>("Track");
-static SharedString ClearColorBufferSlotName = make_shared<string>("Clear color buffer");
-static SharedString ClearDepthBufferSlotName = make_shared<string>("Clear depth buffer");
-static SharedString CopyToSecondaryBufferSlotName = make_shared<string>("Copy to secondary buffer");
-static SharedString TargetSquareBufferSlotName = make_shared<string>("Target square buffer");
-static SharedString ApplyPostprocessBeforeSlotName = make_shared<string>("After postprocess");
-
 ClipNode::ClipNode()
-  : mSceneSlot(this, SceneSlotName)
-  , mStartTime(this, StartSlotName)
-  , mLength(this, LengthSlotName)
-  , mTrackNumber(this, TrackNumberSlotName)
-  , mClearColorBuffer(this, ClearColorBufferSlotName)
-  , mClearDepthBuffer(this, ClearDepthBufferSlotName)
-  , mCopyToSecondaryBuffer(this, CopyToSecondaryBufferSlotName)
-  , mTargetSquareBuffer(this, TargetSquareBufferSlotName)
-  , mApplyPostprocessBefore(this, ApplyPostprocessBeforeSlotName)
+  : mSceneSlot(this, "scene")
+  , mStartTime(this, "Start time")
+  , mLength(this, "Clip Length")
+  , mTrackNumber(this, "Track")
+  , mClearColorBuffer(this, "Clear color buffer")
+  , mClearDepthBuffer(this, "Clear depth buffer")
+  , mCopyToSecondaryBuffer(this, "Copy to secondary buffer")
+  , mTargetSquareBuffer(this, "Target square buffer")
+  , mApplyPostprocessBefore(this, "After postprocess")
 {}
-
-ClipNode::~ClipNode() {
-
-}
 
 void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime) {
   if (mCopyToSecondaryBuffer.Get() >= 0.5f) {

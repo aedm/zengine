@@ -3,21 +3,20 @@
 OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
   StubAnalyzer analyzer(stubSource);
 
-  if (analyzer.mName == nullptr) {
+  if (analyzer.mName.empty()) {
     ERR("Shader stub has no name.");
     WARN("source:\n%s", stubSource);
     return nullptr;
   }
 
-  return new StubMetadata(*analyzer.mName, analyzer.mReturnType,
+  return new StubMetadata(analyzer.mName, analyzer.mReturnType,
                           analyzer.mStrippedSource, analyzer.mParameters, 
                           analyzer.mGlobalUniforms, analyzer.mGlobalSamplers,
                           analyzer.mInputs, analyzer.mOutputs);
 }
 
 StubAnalyzer::StubAnalyzer(const char* stubSource)
-  : mName(nullptr)
-  , mCurrentLineNumber(-1)
+  : mCurrentLineNumber(-1)
   , mReturnType(StubParameter::Type::TVOID) {
   vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
@@ -70,7 +69,7 @@ void StubAnalyzer::AnalyzeName(SourceLine* line) {
     return;
   }
 
-  mName = line->SubStrings[2].ToStringPtr();
+  mName = line->SubStrings[2].ToString();
 }
 
 void StubAnalyzer::AnalyzeReturns(SourceLine* line) {
@@ -92,7 +91,7 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
 
   StubParameter* parameter = new StubParameter();
   parameter->mType = TokenToType(line->SubStrings[2]);
-  parameter->mName = SharedString(line->SubStrings[3].ToStringPtr());
+  parameter->mName = line->SubStrings[3].ToString();
   mParameters.push_back(parameter);
 }
 

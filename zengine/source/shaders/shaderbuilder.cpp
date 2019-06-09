@@ -140,7 +140,7 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
     StubParameter::Type returnType = stubNode->GetStubMetadata()->returnType;
     shaderStage->mStubMap[root] = make_shared<StubReference>(returnType);
 
-    for (auto slotPair : stubNode->mParameterSlotMap) {
+    for (auto& slotPair : stubNode->mParameterSlotMap) {
       shared_ptr<Node> node = slotPair.second->GetReferencedNode();
       if (node == nullptr) {
         WARN("Incomplete shader graph.");
@@ -150,7 +150,7 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
         auto& textureNode = PointerCast<TextureNode>(node);
         ASSERT(textureNode);
         if (textureNode->Get() != nullptr) {
-          shaderStage->mDefines.push_back(*slotPair.first->mName + "_CONNECTED");
+          shaderStage->mDefines.push_back(slotPair.first->mName + "_CONNECTED");
         }
       }
       if (visitedNodes.find(node) == visitedNodes.end()) {
@@ -363,18 +363,18 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
         if (param->mType == StubParameter::Type::SAMPLER2D) {
           /// Parameter is a texture
           auto& valueReference = mSamplerMap.at(paramNode);
-          stream << "#define " << *param->mName << ' ' << valueReference->mName << endl;
+          stream << "#define " << param->mName << ' ' << valueReference->mName << endl;
         }
         else if (IsPointerOf<StubNode>(paramNode)) {
           /// Parameter is the result of a former function call
           auto& stubReference = shaderStage->mStubMap.at(paramNode);
-          stream << "#define " << *param->mName << ' ' << stubReference->mVariableName <<
+          stream << "#define " << param->mName << ' ' << stubReference->mVariableName <<
             endl;
         }
         else {
           /// Parameter is a uniform
           auto& valueReference = mUniformMap.at(paramNode);
-          stream << "#define " << *param->mName << ' ' << valueReference->mName << endl;
+          stream << "#define " << param->mName << ' ' << valueReference->mName << endl;
         }
       }
 
@@ -391,7 +391,7 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
       stream << "#undef SHADER" << endl;
       for (UINT i = 0; i < stubMeta->parameters.size(); i++) {
         StubParameter* param = stubMeta->parameters[i];
-        stream << "#undef " << *param->mName << endl;
+        stream << "#undef " << param->mName << endl;
       }
     }
   }
@@ -466,7 +466,7 @@ const string& ShaderBuilder::GetParamTypeString(StubParameter::Type type,
   case StubParameter::Type::VEC4:       return svec4;
   case StubParameter::Type::MATRIX44:   return smatrix44;
   case StubParameter::Type::SAMPLER2D:  return ssampler2d;
-  case StubParameter::Type::TVOID:       return svoid;
+  case StubParameter::Type::TVOID:      return svoid;
   default:
     ERR("Unhandled type: %d", type);
     return serror;

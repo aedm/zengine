@@ -5,8 +5,6 @@
 
 REGISTER_NODECLASS(StubNode, "Stub");
 
-static SharedString SourceSlotName = make_shared<string>("Source");
-
 const EnumMapperA GlobalUniformMapper[] = {
 #undef ITEM
 #define ITEM(name, type) { "g" MAGIC(name), (UINT)GlobalUniformUsage::name },
@@ -42,7 +40,7 @@ const int GlobalSamplerOffsets[] = {
 
 StubNode::StubNode()
   : mMetadata(nullptr)
-  , mSource(this, SourceSlotName, false, false)
+  , mSource(this, "Source", false, false)
 {}
 
 
@@ -71,8 +69,8 @@ void StubNode::Operate() {
   mParameterSlotMap.clear();
 
   /// Create a new list of slots
-  for (auto param : mMetadata->parameters) {
-    auto it = mParameterNameSlotMap.find(*param->mName);
+  for (auto& param : mMetadata->parameters) {
+    auto it = mParameterNameSlotMap.find(param->mName);
     bool canReuseSlot = false;
     if (it != mParameterNameSlotMap.end()) {
       switch (param->mType)
@@ -142,7 +140,7 @@ void StubNode::Operate() {
   /// Index the new slots
   for (auto it = mParameterSlotMap.begin(); it != mParameterSlotMap.end(); ++it) {
     ASSERT(it->second != nullptr);
-    mParameterNameSlotMap[*it->first->mName] = it->second;
+    mParameterNameSlotMap[it->first->mName] = it->second;
   }
 
   NotifyWatchers(&Watcher::OnSlotStructureChanged);

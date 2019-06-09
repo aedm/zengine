@@ -29,7 +29,7 @@ private:
   int mCurrentLineNumber;
 
   /// Builders
-  string* mName;
+  string mName;
   string mStrippedSource;
   StubParameter::Type mReturnType;
   vector<StubParameter*> mParameters;

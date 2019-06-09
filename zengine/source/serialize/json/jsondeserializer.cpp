@@ -134,7 +134,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
       /// Find slot
       string slotName(itr->name.GetString());
       auto& it = std::find_if(slots.begin(), slots.end(),
-        [&](const auto& m) -> bool { return slotName == *m.first; });
+        [&](const auto& m) -> bool { return slotName == m.first; });
       if (it == slots.end()) {
         ERR("No such slot: %s", slotName.c_str());
         continue;;

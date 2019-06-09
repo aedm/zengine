@@ -2,22 +2,14 @@
 
 REGISTER_NODECLASS(Drawable, "Drawable");
 
-static SharedString MaterialSlotName = make_shared<string>("Material");
-static SharedString MeshSlotName = make_shared<string>("Mesh");
-static SharedString MoveSlotName = make_shared<string>("Move");
-static SharedString RotateSlotName = make_shared<string>("Rotate");
-static SharedString ChildrenSlotName = make_shared<string>("Children");
-static SharedString ScaleSlotName = make_shared<string>("Scale");
-static SharedString InstancesSlotName = make_shared<string>("Instances");
-
 Drawable::Drawable()
-  : mMesh(this, MeshSlotName)
-  , mMaterial(this, MaterialSlotName) 
-  , mMove(this, MoveSlotName, false, true, true, -100.0f, 100.0f)
-  , mRotate(this, RotateSlotName, false, true, true, -Pi, Pi)
-  , mChildren(this, ChildrenSlotName, true)
-  , mScale(this, ScaleSlotName)
-  , mInstances(this, InstancesSlotName)
+  : mMesh(this, "Mesh")
+  , mMaterial(this, "Material")
+  , mMove(this, "Move", false, true, true, -100.0f, 100.0f)
+  , mRotate(this, "Rotate", false, true, true, -Pi, Pi)
+  , mChildren(this, "Children", true)
+  , mScale(this, "Scale")
+  , mInstances(this, "Instances")
 {
   mInstances.SetDefaultValue(1);
 }
@@ -47,10 +39,10 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
     Matrix scale = Matrix::Scale(Vec3(s, s, s));
     globals.World = globals.World * scale;
   }
-  
+
   globals.View = globals.Camera * globals.World;
   globals.Transformation = globals.Projection * globals.View;
-  globals.SkylightTransformation = 
+  globals.SkylightTransformation =
     globals.SkylightProjection * (globals.SkylightCamera * globals.World);
 
   if (material && meshNode) {
@@ -75,10 +67,10 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
 
 void Drawable::HandleMessage(Message* message) {
   switch (message->mType) {
-    case MessageType::SLOT_CONNECTION_CHANGED:
-    case MessageType::VALUE_CHANGED:
-      EnqueueMessage(MessageType::NEEDS_REDRAW);
-      break;
-    default: break;
+  case MessageType::SLOT_CONNECTION_CHANGED:
+  case MessageType::VALUE_CHANGED:
+    EnqueueMessage(MessageType::NEEDS_REDRAW);
+    break;
+  default: break;
   }
 }
