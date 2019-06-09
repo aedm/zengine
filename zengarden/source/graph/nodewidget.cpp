@@ -318,7 +318,7 @@ void NodeWidget::PaintToImage()
     mPainter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
     mPainter.drawText(QRectF(sw->mPosition.x + SlotPadding.x, sw->mPosition.y,
       sw->mSize.x - SlotPadding.x, sw->mSize.y),
-      Qt::AlignVCenter, QString::fromStdString(*sw->mSlot->GetName()));
+      Qt::AlignVCenter, QString::fromStdString(sw->mSlot->mName));
   }
 
   /// Paint frame

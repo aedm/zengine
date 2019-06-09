@@ -5,7 +5,6 @@
 class Material: public Node {
 public:
   Material();
-  virtual ~Material();
 
   PassSlot mSolidPass;
   PassSlot mShadowPass;
@@ -18,7 +17,6 @@ protected:
 };
 
 typedef TypedSlot<Material> MaterialSlot;
-
 
 class SolidMaterial: public Node {
 public:

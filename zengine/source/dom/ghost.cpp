@@ -51,12 +51,10 @@ private:
   set<shared_ptr<Node>> mHadGhostSlot;
 };
 
-static SharedString OriginalSlotName = make_shared<string>("Original");
-
 Ghost::Ghost()
   : Node()
-  , mOriginalNode(this, OriginalSlotName, false, false, true, true)
-  , mMainInternalNode(this, nullptr, false, false, false, false)
+  , mOriginalNode(this, "Original", false, false, true, true)
+  , mMainInternalNode(this, string(), false, false, false, false)
 {
   Regenerate();
 }
@@ -128,7 +126,7 @@ void Ghost::Regenerate() {
       for (UINT i = 0; i < slotCount; i++) {
         Slot* originalSlot = originalSlots[i];
         Slot* internalSlot = internalNodeSlots[i];
-        ASSERT(*originalSlot->GetName() == *internalSlot->GetName());
+        ASSERT(originalSlot->mName == internalSlot->mName);
         if (originalSlot->IsGhost()) {
           /// TODO: initialize value
           AddSlot(internalSlot, true, true, true);

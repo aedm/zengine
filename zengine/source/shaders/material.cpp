@@ -4,18 +4,11 @@
 
 REGISTER_NODECLASS(Material, "Material");
 
-static SharedString SolidPassSlotName = make_shared<string>("Solid Pass");
-static SharedString ShadowPassSlotName = make_shared<string>("Shadow Pass");
-static SharedString ZPostPassSlotName = make_shared<string>("Z Postpass");
-
 Material::Material()
-  : mSolidPass(this, SolidPassSlotName)
-  , mShadowPass(this, ShadowPassSlotName)
-  , mZPostPass(this, ZPostPassSlotName)
+  : mSolidPass(this, "Solid Pass")
+  , mShadowPass(this, "Shadow Pass")
+  , mZPostPass(this, "Z Postpass")
 {}
-
-Material::~Material() {}
-
 
 void Material::HandleMessage(Message* message) {
   switch (message->mType) {
@@ -25,7 +18,6 @@ void Material::HandleMessage(Message* message) {
     default: break;
   }
 }
-
 
 const shared_ptr<Pass> Material::GetPass(PassType passType) {
   switch (passType) {
@@ -37,9 +29,7 @@ const shared_ptr<Pass> Material::GetPass(PassType passType) {
   return nullptr;
 }
 
-
 REGISTER_NODECLASS(SolidMaterial, "Solid Material");
-
 
 SolidMaterial::SolidMaterial()
   : mGhostSlot(this, nullptr, false, false, false, true)
@@ -67,14 +57,13 @@ SolidMaterial::SolidMaterial()
   SetupSlots();
 }
 
-
 SolidMaterial::~SolidMaterial() {
+  /// TODO: this could possibly be removed
   mMaterial->Dispose();
   mSolidPass->Dispose();
   mSolidVertexStub->Dispose();
   mSolidFragmentStub->Dispose();
 }
-
 
 shared_ptr<Node> SolidMaterial::GetReferencedNode() {
   return mMaterial;

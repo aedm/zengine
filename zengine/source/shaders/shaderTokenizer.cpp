@@ -167,14 +167,6 @@ string SubString::ToString() const
 	return string(Begin, Length);
 }
 
-OWNERSHIP string* SubString::ToStringPtr() const
-{
-  if (Token == TOKEN_STRING) {
-    return new string(Begin + 1, Length - 2);
-  }
-  return new string(Begin, Length);
-}
-
 SourceLine::SourceLine(int _LineNumber, const char* LineBegin)
 	: LineNumber(_LineNumber)
 	, EntireLine(LineBegin, 0, TOKEN_UNKNOWN)

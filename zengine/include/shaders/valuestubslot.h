@@ -6,13 +6,13 @@
 template <typename T>
 class ValueStubSlot: public ValueSlot<T> {
 public:
-  ValueStubSlot(Node* owner, SharedString name);
+  ValueStubSlot(Node* owner, const string& name);
   virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override;
 };
 
 
 template <typename T>
-ValueStubSlot<T>::ValueStubSlot(Node* owner, SharedString name)
+ValueStubSlot<T>::ValueStubSlot(Node* owner, const string& name)
   : ValueSlot(owner, name)
 {}
 

@@ -170,7 +170,7 @@ void JSONSerializer::SerializeGeneralNode(
     rapidjson::Value slotsObject(rapidjson::kObjectType);
     for (const auto& slotPair : node->GetSerializableSlots()) {
       Slot* slot = slotPair.second;
-      ASSERT(slot->GetName().get() != nullptr && !slot->GetName()->empty());
+      ASSERT(!slot->mName.empty());
       rapidjson::Value slotObject(rapidjson::kObjectType);
 
       /// Save ghost flag
@@ -221,7 +221,7 @@ void JSONSerializer::SerializeGeneralNode(
           slotObject.AddMember("default", stringSlot->GetDefaultValue(), *mAllocator);
         }
       }
-      slotsObject.AddMember(rapidjson::Value(*slot->GetName(), *mAllocator),
+      slotsObject.AddMember(rapidjson::Value(slot->mName, *mAllocator),
         slotObject, *mAllocator);
     }
     nodeValue.AddMember("slots", slotsObject, *mAllocator);

@@ -54,13 +54,12 @@ bool Message::operator<(const Message& other) const {
   return false;
 }
 
-Slot::Slot(Node* owner, SharedString name, bool isMultiSlot,
-  bool isPublic, bool isSerializable, bool isTraversable)
+Slot::Slot(Node* owner, const string& name, bool isMultiSlot, bool isPublic, 
+  bool isSerializable, bool isTraversable)
   : mOwner(owner)
+  , mName(name)
   , mIsMultiSlot(isMultiSlot) {
   ASSERT(owner != nullptr);
-  mNode = nullptr;
-  mName = name;
   owner->AddSlot(this, isPublic, isSerializable, isTraversable);
 }
 
@@ -171,11 +170,6 @@ shared_ptr<Node> Slot::GetReferencedMultiNode(UINT index) const {
 
 const vector<shared_ptr<Node>>& Slot::GetDirectMultiNodes() const {
   return mMultiNodes;
-}
-
-
-SharedString Slot::GetName() {
-  return mName;
 }
 
 
@@ -423,7 +417,7 @@ void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable, bool isTraver
     mTraversableSlots.push_back(slot);
   }
   if (isSerializable) {
-    mSerializableSlotsByName[slot->GetName()] = slot;
+    mSerializableSlotsByName[slot->mName] = slot;
   }
 }
 
@@ -441,7 +435,7 @@ const std::vector<Slot*>& Node::GetTraversableSlots() {
   return mTraversableSlots;
 }
 
-const unordered_map<SharedString, Slot*>& Node::GetSerializableSlots() {
+const unordered_map<string, Slot*>& Node::GetSerializableSlots() {
   return mSerializableSlotsByName;
 }
 

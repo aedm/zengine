@@ -6,7 +6,6 @@
 class ClipNode: public Node {
 public:
   ClipNode();
-  virtual ~ClipNode();
 
   SceneSlot mSceneSlot;
   FloatSlot mStartTime;
@@ -24,7 +23,6 @@ public:
 
 protected:
   virtual void HandleMessage(Message* message) override;
-
 };
 
 typedef TypedSlot<ClipNode> ClipSlot;

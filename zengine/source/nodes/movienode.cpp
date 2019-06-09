@@ -4,17 +4,11 @@
 
 REGISTER_NODECLASS(MovieNode, "Movie");
 
-static SharedString ClipSlotName = make_shared<string>("clips");
-
 static const int MaxTrackCount = 8;
 
 MovieNode::MovieNode()
-  : mClips(this, ClipSlotName, true) {
+  : mClips(this, "clips", true) {
   mTracks.resize(MaxTrackCount);
-}
-
-MovieNode::~MovieNode() {
-
 }
 
 void MovieNode::Draw(RenderTarget* renderTarget, float time) {
@@ -99,6 +93,7 @@ void MovieNode::HandleMessage(Message* message) {
     default: break;
   }
 }
+
 
 void MovieNode::SortClips() {
   for (auto& track : mTracks) track.clear();

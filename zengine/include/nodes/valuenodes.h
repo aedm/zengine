@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../dom/node.h"
-#include "../base/types.h"
-//#include "../resources/texture.h"
 #include "../base/vectormath.h"
 #include <string>
 
@@ -57,7 +55,7 @@ const T& StaticValueNode<T>::Get() {
 template<typename T>
 class ValueSlot: public TypedSlot<ValueNode<T>> {
 public:
-  ValueSlot(Node* owner, SharedString name, bool isMultiSlot = false,
+  ValueSlot(Node* owner, const string& name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true,
             float minimum = 0.0f, float maximum = 1.0f);
 
@@ -96,7 +94,7 @@ protected:
 
 
 template<typename T>
-ValueSlot<T>::ValueSlot(Node* owner, SharedString name, bool isMultiSlot,
+ValueSlot<T>::ValueSlot(Node* owner, const string& name, bool isMultiSlot,
                         bool isPublic, bool isSerializable,
                         float minimum, float maximum)
   : TypedSlot<ValueNode<T>>(owner, name, isMultiSlot, isPublic, isSerializable)

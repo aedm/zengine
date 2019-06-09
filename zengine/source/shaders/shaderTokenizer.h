@@ -61,7 +61,6 @@ namespace Shaders {
     const char* Begin;
     UINT Length;
     string ToString() const;
-    OWNERSHIP string* ToStringPtr() const;
   };
 
   struct SourceLine {
@@ -73,5 +72,4 @@ namespace Shaders {
   };
 
   OWNERSHIP vector<SourceLine*>* SplitToWords(const char* Text);
-
 }
