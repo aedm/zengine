@@ -141,10 +141,6 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
 
 shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
-  INFO("VERTEX SOURCE\n------------");
-  INFO(vertexSource);
-  INFO("FRAGMENT SOURCE\n------------");
-  INFO(fragmentSource);
 
   ASSERT(!PleaseNoNewResources);
   CheckGLError();

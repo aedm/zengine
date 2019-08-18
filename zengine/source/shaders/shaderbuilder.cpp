@@ -295,6 +295,9 @@ void ShaderBuilder::GenerateInputInterface(ShaderStage* shaderStage) {
   stringstream& stream = shaderStage->mSourceStream;
 
   if (shaderStage->mIsVertexShader) {
+    for (const auto& var : shaderStage->mInputsMap) {
+      WARN("Unnecessary attribute definition in vertex shader: %s", var.first.c_str());
+    }
     /// The inputs of the vertex shader is a fixed layout of vertex attributes
     for (UINT i = 0; i < UINT(VertexAttributeUsage::COUNT); i++) {
       ValueType attribValue = VertexAttributeUsageToValueType(VertexAttributeUsage(i));
