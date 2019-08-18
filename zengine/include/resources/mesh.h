@@ -12,9 +12,7 @@ public:
   Mesh();
   ~Mesh();
 
-  void Render(const vector<ShaderProgram::Attribute>& usedAttributes,
-              UINT instanceCount,
-              PrimitiveTypeEnum primitive) const;
+  void Render(UINT instanceCount, PrimitiveTypeEnum primitive) const;
 
   void AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount);
   void AllocateIndices(UINT indexCount);

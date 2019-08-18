@@ -21,20 +21,6 @@ struct MappedAttributeOpenGL {
   UINT Offset;
 };
 
-
-class AttributeMapperOpenGL : public AttributeMapper {
-public:
-  AttributeMapperOpenGL();
-  virtual ~AttributeMapperOpenGL() {}
-
-  void Set() const;
-
-  GLsizei Stride;
-
-  vector<MappedAttributeOpenGL>	MappedAttributes;
-};
-
-
 struct GLVersion { GLboolean* version; const wchar_t* name; };
 static GLVersion gOpenGLVersions[] = {
   {&__GLEW_VERSION_1_1, L"1.1"},
@@ -153,16 +139,9 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
   return shader;
 }
 
-/// Array for attribute names
-const char* gVertexAttributeName[] = {
-  "aPosition",
-  "aTexCoord",
-  "aNormal",
-  "aTangent",
-};
-
 shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) {
+
   ASSERT(!PleaseNoNewResources);
   CheckGLError();
   GLuint program = glCreateProgram();
@@ -306,60 +285,6 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   }
   CheckGLError();
 
-  /// Create attributes list
-  GLint attributeCount;
-  glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &attributeCount);
-
-  vector<ShaderProgram::Attribute> attributes;
-  attributes.reserve(attributeCount);
-
-  GLint attributeNameMaxLength;
-  glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &attributeNameMaxLength);
-  vector<char> attributeName(attributeNameMaxLength);
-
-  for (int uniformIndex = 0; uniformIndex < attributeCount; uniformIndex++) {
-    /// Request info about Nth attribute
-    GLint nameLength;
-    GLsizei size;
-    GLenum type;
-
-    glGetActiveAttrib(program, uniformIndex, attributeNameMaxLength, &nameLength, &size,
-      &type, &attributeName[0]);
-
-    /// COME ON OPENGL, FUCK YOU, WHY CANT THE LOCATION JUST BE THE INDEX.
-    AttributeId location = glGetAttribLocation(program, &attributeName[0]);
-
-    /// Shader compiler reports gl_InstanceID as an attribute at -1, who knows why.
-    if (location < 0) continue;
-
-    ValueType valueType;
-    switch (type) {
-    case GL_FLOAT:		  valueType = ValueType::FLOAT;		break;
-    case GL_FLOAT_VEC2:	valueType = ValueType::VEC2;		break;
-    case GL_FLOAT_VEC3:	valueType = ValueType::VEC3;		break;
-    case GL_FLOAT_VEC4:	valueType = ValueType::VEC4;		break;
-    default: SHOULD_NOT_HAPPEN; break;
-    }
-
-    /// Map attribute name to usage
-    bool found = false;
-    VertexAttributeUsage usage = VertexAttributeUsage::NONE;
-    for (UINT o = 0; o < (UINT)VertexAttributeUsage::COUNT; o++) {
-      if (strcmp(gVertexAttributeName[o], &attributeName[0]) == 0) {
-        usage = VertexAttributeUsage(o);
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      ERR("Unrecognized vertex attribute name: %s", attributeName);
-    }
-
-    attributes.push_back(
-      ShaderProgram::Attribute(string(&attributeName[0]), valueType, location, usage));
-  }
-  CheckGLError();
-
   /// Create a uniform buffer object for the shader
   GLuint uboHandle;
   glGenBuffers(1, &uboHandle);
@@ -368,7 +293,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   CheckGLError();
 
   return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
-    uniforms, samplers, attributes, blockProps.mSize,
+    uniforms, samplers, blockProps.mSize,
     uboHandle);
 }
 
@@ -514,42 +439,6 @@ void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
 }
 
 
-AttributeMapper* OpenGLAPI::CreateAttributeMapper(
-  const vector<VertexAttribute>& bufferAttribs,
-  const vector<ShaderProgram::Attribute>& shaderAttribs, UINT stride) {
-  ASSERT(!PleaseNoNewResources);
-  AttributeMapperOpenGL* mapper = new AttributeMapperOpenGL();
-  mapper->Stride = stride;
-
-  for (const ShaderProgram::Attribute& shaderAttr : shaderAttribs) {
-    bool found = false;
-    for (const VertexAttribute& bufferAttr : bufferAttribs) {
-      if (bufferAttr.Usage == shaderAttr.mUsage) {
-        MappedAttributeOpenGL attr;
-        attr.Index = shaderAttr.mHandle;
-        switch (VertexAttributeUsageToValueType(bufferAttr.Usage)) {
-        case ValueType::FLOAT:		attr.Size = 1;	attr.Type = GL_FLOAT;	break;
-        case ValueType::VEC2:		attr.Size = 2;	attr.Type = GL_FLOAT;	break;
-        case ValueType::VEC3:		attr.Size = 3;	attr.Type = GL_FLOAT;	break;
-        case ValueType::VEC4:		attr.Size = 4;	attr.Type = GL_FLOAT;	break;
-        default:
-          ERR(L"Unhandled vertex attribute type");
-          break;
-        }
-        attr.Offset = bufferAttr.Offset;
-        mapper->MappedAttributes.push_back(attr);
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      ERR(L"Shader needs a vertex attribute that's missing from the buffer.");
-    }
-  }
-  return mapper;
-}
-
-
 GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
   switch (primitiveType) {
   case PRIMITIVE_LINES:		return GL_LINES;
@@ -558,29 +447,6 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
   }
   SHOULD_NOT_HAPPEN;
   return 0;
-}
-
-
-void OpenGLAPI::RenderIndexedMesh(IndexBufferHandle indexHandle,
-  UINT indexCount, VertexBufferHandle vertexHandle,
-  const AttributeMapper* mapper,
-  PrimitiveTypeEnum primitiveType) {
-  BindVertexBuffer(vertexHandle);
-  static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
-
-  BindIndexBuffer(indexHandle);
-  glDrawElements(GetGLPrimitive(primitiveType), indexCount, GL_UNSIGNED_INT, NULL);
-  CheckGLError();
-}
-
-
-void OpenGLAPI::RenderMesh(VertexBufferHandle vertexHandle, UINT vertexCount,
-  const AttributeMapper* mapper,
-  PrimitiveTypeEnum primitiveType) {
-  BindVertexBuffer(vertexHandle);
-  static_cast<const AttributeMapperOpenGL*>(mapper)->Set();
-  glDrawArrays(GetGLPrimitive(primitiveType), 0, vertexCount);
-  CheckGLError();
 }
 
 
@@ -1084,7 +950,8 @@ void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
 
 
 void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset,
-  UINT stride) {
+  UINT stride) 
+{
   GLint size = 0;
   GLenum type = 0;
   switch (nodeType) {
@@ -1102,31 +969,16 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
   CheckGLError();
 }
 
-
-AttributeMapperOpenGL::AttributeMapperOpenGL() {
-  Stride = 0;
-}
-
-
-void AttributeMapperOpenGL::Set() const {
-  for (const MappedAttributeOpenGL& attr : MappedAttributes) {
-    glEnableVertexAttribArray(attr.Index);
-    glVertexAttribPointer(attr.Index, attr.Size, attr.Type, GL_FALSE, Stride, (void*)size_t(attr.Offset));
-    CheckGLError();
-  }
-}
-
 ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
   ShaderHandle fragmentProgramHandle,
   vector<Uniform>& uniforms, vector<Sampler>& samplers,
-  vector<Attribute>& attributes, UINT uniformBlockSize,
+  UINT uniformBlockSize,
   ShaderHandle uniformBufferHandle)
   : mProgramHandle(shaderHandle)
   , mVertexShaderHandle(vertexProgramHandle)
   , mFragmentShaderHandle(fragmentProgramHandle)
   , mUniforms(uniforms)
   , mSamplers(samplers)
-  , mAttributes(attributes)
   , mUniformBlockSize(uniformBlockSize)
   , mUniformBufferHandle(uniformBufferHandle) {}
 
@@ -1150,10 +1002,3 @@ ShaderProgram::Uniform::Uniform(const string& name, ValueType type, UINT offset)
 ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
   : mName(name)
   , mHandle(handle) {}
-
-ShaderProgram::Attribute::Attribute(const string& name, ValueType type,
-  AttributeId handle, VertexAttributeUsage usage)
-  : mName(name)
-  , mType(type)
-  , mHandle(handle)
-  , mUsage(usage) {}

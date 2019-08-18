@@ -56,7 +56,7 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
 
     if (pass->isComplete() && mesh != nullptr) {
       pass->Set(&globals);
-      mesh->Render(pass->GetUsedAttributes(), UINT(mInstances.Get()), Primitive);
+      mesh->Render(UINT(mInstances.Get()), Primitive);
     }
   }
 

@@ -234,10 +234,6 @@ void Pass::Set(Globals* globals) {
   }
 }
 
-const vector<ShaderProgram::Attribute>& Pass::GetUsedAttributes() {
-  return mShaderProgram->mAttributes;
-}
-
 bool Pass::isComplete() {
   return (mShaderProgram != nullptr);
 }

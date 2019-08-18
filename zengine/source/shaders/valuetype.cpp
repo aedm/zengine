@@ -31,7 +31,8 @@ ValueType VertexAttributeUsageToValueType(VertexAttributeUsage usage) {
     return ValueType::VEC3;
   case VertexAttributeUsage::TANGENT:
     return ValueType::VEC3;
-  default:
+  case VertexAttributeUsage::COUNT:
+  case VertexAttributeUsage::NONE:
     SHOULD_NOT_HAPPEN;
     return ValueType(-1);
   }

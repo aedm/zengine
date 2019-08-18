@@ -63,7 +63,7 @@ void EngineShaders::ApplyDepthOfField(RenderTarget* renderTarget, Globals* globa
   globals->DepthBufferSource = renderTarget->mDepthBuffer;
 
   mPostProcess_DOF->Set(globals);
-  mFullScreenQuad->Render(mPostProcess_DOF->GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
+  mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
 
   OpenGL->BlitFrameBuffer(renderTarget->mDOFBufferId,
                           renderTarget->GetPostprocessTargetFramebufferId(),
@@ -119,7 +119,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
       glViewport(0, 0, width, height);
     }
     pass->Set(globals);
-    mFullScreenQuad->Render(pass->GetUsedAttributes(), 1, PRIMITIVE_TRIANGLES);
+    mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
     renderTarget->SwapPostprocessBuffers();
   }
 }
@@ -139,8 +139,7 @@ void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* global
   globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
   globals->GBufferSourceA = sourceColorMSAA;
   mPostProcess_GaussianBlur_Blend_MSAA->Set(globals);
-  mFullScreenQuad->Render(mPostProcess_GaussianBlur_Blend_MSAA->GetUsedAttributes(), 1,
-                          PRIMITIVE_TRIANGLES);
+  mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
 }
 
 void EngineShaders::BuildPostProcessPasses() {
