@@ -39,8 +39,8 @@ private:
   };
 
   /// Inputs and output of the shader stage
-  struct InOutVariable {
-    InOutVariable(ValueType type, const string& name, int layout = -1);
+  struct InterfaceVariable {
+    InterfaceVariable(ValueType type, const string& name, int layout = -1);
 
     /// Variable type
     ValueType mType;
@@ -75,9 +75,9 @@ private:
     stringstream mSourceStream;
 
     /// Inputs and outputs of the shader stage
-    map<string, shared_ptr<InOutVariable>> mInputsMap;
-    vector<shared_ptr<InOutVariable>> mInputs;
-    vector<shared_ptr<InOutVariable>> mOutputs;
+    map<string, shared_ptr<InterfaceVariable>> mInputsMap;
+    vector<shared_ptr<InterfaceVariable>> mInputs;
+    vector<shared_ptr<InterfaceVariable>> mOutputs;
   };
 
   /// Creates topological order of dependency tree
@@ -98,6 +98,7 @@ private:
   /// Generate source
   void GenerateSource(ShaderStage* shaderStage);
   void GenerateSourceHeader(ShaderStage* shaderStage);
+  void GenerateInputInterface(ShaderStage* shaderStage);
   void GenerateSourceFunctions(ShaderStage* shaderStage);
   void GenerateSourceMain(ShaderStage* shaderStage);
 

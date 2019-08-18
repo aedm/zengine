@@ -54,9 +54,6 @@ public:
   /// Returns true if pass can be used
   bool isComplete();
 
-  /// List of vertex attributes used by the program
-  const vector<ShaderProgram::Attribute>& GetUsedAttributes();
-
 protected:
   virtual void HandleMessage(Message* message) override;
 

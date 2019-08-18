@@ -77,21 +77,17 @@ Mesh::~Mesh() {
   SafeDelete(mRawVertexData);
 }
 
-void Mesh::Render(const vector<ShaderProgram::Attribute>& usedAttributes,
+void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
   UINT instanceCount,
   PrimitiveTypeEnum primitive) const {
   /// Set vertex buffer and attributes
   OpenGL->SetVertexBuffer(mVertexHandle);
-  for (const ShaderProgram::Attribute& desc : usedAttributes) {
-    VertexAttribute* attribute = mFormat->mAttributesArray[(UINT)desc.mUsage];
-    if (attribute != nullptr) {
-      OpenGL->EnableVertexAttribute(desc.mHandle,
-        VertexAttributeUsageToValueType(desc.mUsage),
-        attribute->Offset, mFormat->mStride);
-    }
-    else {
-      SHOULD_NOT_HAPPEN;
-    }
+
+  /// Bind all attributes to their fixed layout location
+  for (auto& attribute : mFormat->mAttributes) {
+    OpenGL->EnableVertexAttribute(UINT(attribute.Usage),
+      VertexAttributeUsageToValueType(attribute.Usage),
+      attribute.Offset, mFormat->mStride);
   }
 
   if (mIndexHandle) {

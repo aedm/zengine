@@ -21,7 +21,7 @@ shared_ptr<ShaderSource> ShaderBuilder::FromStubs(const shared_ptr<StubNode>& ve
 }
 
 
-ShaderBuilder::InOutVariable::InOutVariable(ValueType type, const string& name, 
+ShaderBuilder::InterfaceVariable::InterfaceVariable(ValueType type, const string& name, 
   int layout)
   : mName(name)
   , mType(type)
@@ -100,7 +100,7 @@ void ShaderBuilder::CollectInputsAndOutputs(
     /// TODO: check whether input types match
     if (shaderStage->mInputsMap.find(input->name) == shaderStage->mInputsMap.end()) {
       shaderStage->mInputsMap[input->name] =
-        make_shared<InOutVariable>(input->type, input->name);
+        make_shared<InterfaceVariable>(input->type, input->name);
     }
   }
 
@@ -112,7 +112,7 @@ void ShaderBuilder::CollectInputsAndOutputs(
     else if (output->name == "GBufferTargetC") layout = 2;
     else if (output->name == "GBufferTargetD") layout = 3;
     shaderStage->mOutputs.push_back(
-      make_shared<InOutVariable>(output->type, output->name, layout));
+      make_shared<InterfaceVariable>(output->type, output->name, layout));
   }
 }
 
@@ -283,6 +283,36 @@ void ShaderBuilder::GenerateSource(ShaderStage* shaderStage) {
   GenerateSourceMain(shaderStage);
 }
 
+void ShaderBuilder::GenerateInputInterface(ShaderStage* shaderStage) {
+  /// Array for attribute names
+  static const char* gVertexAttributeName[] = {
+    "aPosition",
+    "aTexCoord",
+    "aNormal",
+    "aTangent",
+  };
+  
+  stringstream& stream = shaderStage->mSourceStream;
+
+  if (shaderStage->mIsVertexShader) {
+    /// The inputs of the vertex shader is a fixed layout of vertex attributes
+    for (UINT i = 0; i < UINT(VertexAttributeUsage::COUNT); i++) {
+      ValueType attribValue = VertexAttributeUsageToValueType(VertexAttributeUsage(i));
+      stream << "layout(location = " << i << ") in " <<
+        GetValueTypeString(attribValue) << ' ' << gVertexAttributeName[i] << ';' << endl;
+    }
+    return;
+  }
+
+  /// Inputs
+  for (const auto& var : shaderStage->mInputsMap) {
+    stream << "in " << GetValueTypeString(var.second->mType) << ' ' <<
+      var.second->mName << ';' << endl;
+    shaderStage->mInputs.push_back(var.second);
+  }
+}
+
+
 void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   stringstream& stream = shaderStage->mSourceStream;
 
@@ -290,12 +320,7 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   stream << "#define " <<
     (shaderStage->mIsVertexShader ? "VERTEX_SHADER" : "FRAGMENT_SHADER") << endl;
 
-  /// Inputs
-  for (const auto& var : shaderStage->mInputsMap) {
-    stream << "in " << GetValueTypeString(var.second->mType) << ' ' << 
-      var.second->mName << ';' << endl;
-    shaderStage->mInputs.push_back(var.second);
-  }
+  GenerateInputInterface(shaderStage);
 
   /// Outputs
   for (const auto& var : shaderStage->mOutputs) {

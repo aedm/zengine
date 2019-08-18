@@ -36,16 +36,6 @@ struct RenderState {
 };
 
 
-/// Abstract class for mapping vertex buffers of a certain format to shader attributes
-class AttributeMapper {
-public:
-  ~AttributeMapper() {}
-
-protected:
-  AttributeMapper() {}
-};
-
-
 /// Output of platform-dependent shader compilation
 /// All metadata is determined by the shader compiler of the OpenGL driver.
 struct ShaderProgram {
@@ -74,20 +64,9 @@ struct ShaderProgram {
     const SamplerId mHandle;
   };
 
-  /// Vertex attributes, pipeline input
-  struct Attribute {
-    Attribute(const string& name, ValueType type, AttributeId handle,
-      VertexAttributeUsage usage);
-
-    const string mName;
-    const ValueType mType;
-    const AttributeId mHandle;
-    const VertexAttributeUsage mUsage;
-  };
-
   ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
     ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
-    vector<Sampler>& samplers, vector<Attribute>& attributes,
+    vector<Sampler>& samplers,
     UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
   ~ShaderProgram();
 
@@ -97,7 +76,6 @@ struct ShaderProgram {
   const ShaderHandle mUniformBufferHandle;
   const vector<Uniform> mUniforms;
   const vector<Sampler> mSamplers;
-  const vector<Attribute> mAttributes;
   const UINT mUniformBlockSize;
 };
 
@@ -133,9 +111,6 @@ public:
   void DestroyVertexBuffer(VertexBufferHandle Handle);
   void* MapVertexBuffer(VertexBufferHandle Handle);
   void UnMapVertexBuffer(VertexBufferHandle Handle);
-  AttributeMapper* CreateAttributeMapper(const vector<VertexAttribute>& SourceAttribs,
-    const vector<ShaderProgram::Attribute>& ShaderAttribs,
-    UINT Stride);
   void SetVertexBuffer(VertexBufferHandle Handle);
   void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
 
@@ -145,18 +120,6 @@ public:
   void* MapIndexBuffer(IndexBufferHandle Handle);
   void UnMapIndexBuffer(IndexBufferHandle Handle);
   void SetIndexBuffer(IndexBufferHandle Handle);
-
-  /// Rendering
-  void RenderIndexedMesh(IndexBufferHandle IndexHandle,
-    UINT IndexCount,
-    VertexBufferHandle VertexHandle,
-    const AttributeMapper* Mapper,
-    PrimitiveTypeEnum PrimitiveType);
-
-  void RenderMesh(VertexBufferHandle VertexHandle,
-    UINT VertexCount,
-    const AttributeMapper* Mapper,
-    PrimitiveTypeEnum PrimitiveType);
 
   void Render(IndexBufferHandle IndexBuffer,
     UINT Count,
