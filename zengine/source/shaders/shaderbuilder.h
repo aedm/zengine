@@ -5,14 +5,17 @@
 
 class ShaderBuilder {
 public:
-  static shared_ptr<ShaderSource> FromStubs(
-    const shared_ptr<StubNode>& vertexStub, const shared_ptr<StubNode>& fragmentStub);
-
-private:
-  ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
+  /// Generate a shader source
+  static shared_ptr<ShaderSource> GenerateFragmentShaderSource(
     const shared_ptr<StubNode>& fragmentStub);
 
-  shared_ptr<ShaderSource> MakeShaderSource();
+  static shared_ptr<ShaderSource> GenerateVertexShaderSource(
+    const shared_ptr<StubNode>& vertexStub);
+
+private:
+  ShaderBuilder();
+
+  shared_ptr<ShaderSource> Build();
 
   /// How to reference a certain Node dependency within GLSL code? 
   /// Stubs translate to a function call and a variable to store its return value.
@@ -52,62 +55,57 @@ private:
     int mLayout;
   };
 
-  /// Data for a single shader stage, eg. vertex or fragment shader
-  struct ShaderStage {
-    ShaderStage(bool isVertexShader);
-
-    /// Generates function and variable names for stub calls
-    void GenerateStubNames();
-
-    /// Topologic order of dependencies
-    vector<shared_ptr<Node>> mDependencies;
-
-    /// References of stub nodes
-    map<shared_ptr<Node>, shared_ptr<StubReference>> mStubMap;
-
-    /// Stader stage type
-    const bool mIsVertexShader;
-
-    /// Things that need to be #define'd at the beginning of the shader code
-    vector<string> mDefines;
-
-    /// Generated source code
-    stringstream mSourceStream;
-
-    /// Inputs and outputs of the shader stage
-    map<string, shared_ptr<InterfaceVariable>> mInputsMap;
-    vector<shared_ptr<InterfaceVariable>> mInputs;
-    vector<shared_ptr<InterfaceVariable>> mOutputs;
-  };
+  /// Generates function and variable names for stub calls
+  void GenerateStubNames();
 
   /// Creates topological order of dependency tree
-  void CollectDependencies(const shared_ptr<Node>& root, ShaderStage* shaderStage);
+  void CollectDependencies(const shared_ptr<Node>& root);
 
   /// Traverses stub graph for a shader stage, called only by CollectDependencies
-  void TraverseDependencies(const shared_ptr<Node>& root,
-    ShaderBuilder::ShaderStage* shaderStage, set<shared_ptr<Node>>& visitedNodes);
+  void TraverseDependencies(const shared_ptr<Node>& root, 
+    set<shared_ptr<Node>>& visitedNodes);
 
   /// Generates function and variable names
   void GenerateNames();
 
   /// Collect uniforms and samplers
-  void AddGlobalsToDependencies(ShaderStage* shaderStage);
-  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage);
+  void AddGlobalsToDependencies();
+  void CollectInputsAndOutputs(const shared_ptr<Node>& node);
   void AddLocalsToDependencies();
 
   /// Generate source
-  void GenerateSource(ShaderStage* shaderStage);
-  void GenerateSourceHeader(ShaderStage* shaderStage);
-  void GenerateInputInterface(ShaderStage* shaderStage);
-  void GenerateSourceFunctions(ShaderStage* shaderStage);
-  void GenerateSourceMain(ShaderStage* shaderStage);
+  void GenerateSource();
+  void GenerateSourceHeader();
+  void GenerateInputInterface();
+  void GenerateSourceFunctions();
+  void GenerateSourceMain();
 
   static const string& GetValueTypeString(ValueType type);
   static const string& GetParamTypeString(StubParameter::Type type,
     bool isMultiSampler = false, bool isShadow = false);
 
-  ShaderStage mVertexStage;
-  ShaderStage mFragmentStage;
+  /// Topologic order of dependencies
+  vector<shared_ptr<Node>> mDependencies;
+
+  /// References of stub nodes
+  map<shared_ptr<Node>, shared_ptr<StubReference>> mStubMap;
+
+  /// Stader stage type
+  ShaderType mShaderType = ShaderType::UNKNOWN;
+
+  /// Root stub node
+  shared_ptr<StubNode> mRootStubNode;
+
+  /// Generated source code
+  stringstream mSourceStream;
+
+  /// Things that need to be #define'd at the beginning of the shader code
+  vector<string> mDefines;
+
+  /// Inputs and outputs of the shader stage
+  map<string, shared_ptr<InterfaceVariable>> mInputsMap;
+  vector<shared_ptr<InterfaceVariable>> mInputs;
+  vector<shared_ptr<InterfaceVariable>> mOutputs;
 
   /// References of uniform/smapler nodes
   map<shared_ptr<Node>, shared_ptr<ValueReference>> mUniformMap;

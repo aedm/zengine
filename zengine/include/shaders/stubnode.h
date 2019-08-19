@@ -9,6 +9,14 @@
 
 using namespace std;
 
+/// Types of shaders
+enum class ShaderType {
+  VERTEX,
+  FRAGMENT,
+  COMPUTE,
+  UNKNOWN,
+};
+
 /// Macro list for global uniforms (name/usage, type)
 #define GLOBALUNIFORM_LIST \
   ITEM(Time,                          ValueType::FLOAT) \

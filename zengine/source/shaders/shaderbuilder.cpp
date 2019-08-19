@@ -3,21 +3,24 @@
 #include <include/nodes/texturenode.h>
 #include <exception>
 
-shared_ptr<ShaderSource> ShaderBuilder::FromStubs(const shared_ptr<StubNode>& vertexStub,
+shared_ptr<ShaderSource> ShaderBuilder::GenerateFragmentShaderSource(
   const shared_ptr<StubNode>& fragmentStub)
 {
-  if (vertexStub == nullptr) {
-    ERR("vertex stub is nullptr");
-    return nullptr;
-  }
-  if (fragmentStub == nullptr) {
-    ERR("fragment stub is nullptr");
-    return nullptr;
-  }
+  ASSERT(fragmentStub != nullptr);
+  ShaderBuilder shaderBuilder;
+  shaderBuilder.mRootStubNode = fragmentStub;
+  shaderBuilder.mShaderType = ShaderType::FRAGMENT;
+  return shaderBuilder.Build();
+}
 
-  ShaderBuilder shaderBuilder(vertexStub, fragmentStub);
-
-  return shaderBuilder.MakeShaderSource();
+shared_ptr<ShaderSource> ShaderBuilder::GenerateVertexShaderSource(
+  const shared_ptr<StubNode>& vertexStub)
+{
+  ASSERT(vertexStub != nullptr);
+  ShaderBuilder shaderBuilder;
+  shaderBuilder.mRootStubNode = vertexStub;
+  shaderBuilder.mShaderType = ShaderType::VERTEX;
+  return shaderBuilder.Build();
 }
 
 
@@ -28,38 +31,24 @@ ShaderBuilder::InterfaceVariable::InterfaceVariable(ValueType type, const string
   , mLayout(layout) {}
 
 
-ShaderBuilder::ShaderStage::ShaderStage(bool isVertexShader)
-  : mIsVertexShader(isVertexShader) {}
+ShaderBuilder::ShaderBuilder() {}
 
-
-ShaderBuilder::ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
-  const shared_ptr<StubNode>& fragmentStub)
-  : mVertexStage(true)
-  , mFragmentStage(false)
-{
-  StubMetadata* vertexStubMeta = vertexStub->GetStubMetadata();
-  if (vertexStubMeta == nullptr) {
-    ERR("Vertex stub has no metadata.");
-    return;
-  }
-  StubMetadata* fragmentStubMeta = fragmentStub->GetStubMetadata();
-  if (fragmentStubMeta == nullptr) {
-    ERR("Fragment stub has no metadata.");
+shared_ptr<ShaderSource> ShaderBuilder::Build() {
+  StubMetadata* stubMeta = mRootStubNode->GetStubMetadata();
+  if (stubMeta == nullptr) {
+    ERR("Stub has no metadata.");
     return;
   }
 
   /// Collects node dependencies
-  INFO("Analyzing stubs, vs: '%s', fs: '%s' ...", vertexStubMeta->name.c_str(),
-    fragmentStubMeta->name.c_str());
+  INFO("Analyzing stub: '%s'", stubMeta->name.c_str());
 
   try {
     /// Traverse the dependency tree
-    CollectDependencies(vertexStub, &mVertexStage);
-    CollectDependencies(fragmentStub, &mFragmentStage);
+    CollectDependencies(mRootStubNode);
 
     /// Add globals to uniforms and samplers
-    AddGlobalsToDependencies(&mVertexStage);
-    AddGlobalsToDependencies(&mFragmentStage);
+    AddGlobalsToDependencies();
 
     /// Generate shader varaible names for collected dependency nodes
     GenerateNames();
@@ -67,25 +56,18 @@ ShaderBuilder::ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
     /// Add locals to uniforms and samplers
     AddLocalsToDependencies();
 
-    INFO("Building vertex shader source for '%s'...", vertexStubMeta->name.c_str());
-    GenerateSource(&mVertexStage);
-
-    INFO("Building fragment shader source for '%s'...", fragmentStubMeta->name.c_str());
-    GenerateSource(&mFragmentStage);
+    INFO("Building shader source for '%s'...", stubMeta->name.c_str());
+    GenerateSource();
   }
   catch (...) {
     ERR("Shader source creation failed");
   }
-}
 
-shared_ptr<ShaderSource> ShaderBuilder::MakeShaderSource() {
-  return make_shared<ShaderSource>(mUniforms, mSamplers,
-    mVertexStage.mSourceStream.str(),
-    mFragmentStage.mSourceStream.str());
+  return make_shared<ShaderSource>(mUniforms, mSamplers, mSourceStream.str());
 }
 
 void ShaderBuilder::CollectInputsAndOutputs(
-  const shared_ptr<Node>& node, ShaderStage* shaderStage)
+  const shared_ptr<Node>& node)
 {
   shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
 
@@ -98,9 +80,8 @@ void ShaderBuilder::CollectInputsAndOutputs(
   /// Inputs
   for (auto input : stubMeta->inputs) {
     /// TODO: check whether input types match
-    if (shaderStage->mInputsMap.find(input->name) == shaderStage->mInputsMap.end()) {
-      shaderStage->mInputsMap[input->name] =
-        make_shared<InterfaceVariable>(input->type, input->name);
+    if (mInputsMap.find(input->name) == mInputsMap.end()) {
+      mInputsMap[input->name] = make_shared<InterfaceVariable>(input->type, input->name);
     }
   }
 
@@ -111,7 +92,7 @@ void ShaderBuilder::CollectInputsAndOutputs(
     else if (output->name == "GBufferTargetB") layout = 1;
     else if (output->name == "GBufferTargetC") layout = 2;
     else if (output->name == "GBufferTargetD") layout = 3;
-    shaderStage->mOutputs.push_back(
+    mOutputs.push_back(
       make_shared<InterfaceVariable>(output->type, output->name, layout));
   }
 }
@@ -128,7 +109,7 @@ StubParameter::Type NodeToParamType(const shared_ptr<Node>& node) {
 }
 
 void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
-  ShaderStage* shaderStage, set<shared_ptr<Node>>& visitedNodes)
+  set<shared_ptr<Node>>& visitedNodes)
 {
   visitedNodes.insert(root);
 
@@ -138,7 +119,7 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
     stubNode->Update();
 
     StubParameter::Type returnType = stubNode->GetStubMetadata()->returnType;
-    shaderStage->mStubMap[root] = make_shared<StubReference>(returnType);
+    mStubMap[root] = make_shared<StubReference>(returnType);
 
     for (auto& slotPair : stubNode->mParameterSlotMap) {
       shared_ptr<Node> node = slotPair.second->GetReferencedNode();
@@ -150,11 +131,11 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
         auto& textureNode = PointerCast<TextureNode>(node);
         ASSERT(textureNode);
         if (textureNode->Get() != nullptr) {
-          shaderStage->mDefines.push_back(slotPair.first->mName + "_CONNECTED");
+          mDefines.push_back(slotPair.first->mName + "_CONNECTED");
         }
       }
       if (visitedNodes.find(node) == visitedNodes.end()) {
-        TraverseDependencies(node, shaderStage, visitedNodes);
+        TraverseDependencies(node, visitedNodes);
       }
     }
   }
@@ -175,22 +156,19 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
     }
   }
 
-  shaderStage->mDependencies.push_back(root);
+  mDependencies.push_back(root);
 }
 
 
-void ShaderBuilder::CollectDependencies(const shared_ptr<Node>& root,
-  ShaderStage* shaderStage)
-{
+void ShaderBuilder::CollectDependencies(const shared_ptr<Node>& root) {
   shared_ptr<StubNode> uberShader = TheEngineStubs->GetStub("uber");
-  TraverseDependencies(uberShader, shaderStage, set<shared_ptr<Node>>());
-  TraverseDependencies(root, shaderStage, set<shared_ptr<Node>>());
+  TraverseDependencies(uberShader, set<shared_ptr<Node>>());
+  TraverseDependencies(root, set<shared_ptr<Node>>());
 }
 
 
-void ShaderBuilder::ShaderStage::GenerateStubNames() {
+void ShaderBuilder::GenerateStubNames() {
   int stubIndex = 0;
-
   for (const auto& node : mDependencies) {
     if (IsPointerOf<StubNode>(node)) {
       shared_ptr<StubReference> stubReference = mStubMap.at(node);
@@ -211,8 +189,7 @@ void ShaderBuilder::ShaderStage::GenerateStubNames() {
 
 void ShaderBuilder::GenerateNames() {
   /// Generate function and variable names for stubs
-  mVertexStage.GenerateStubNames();
-  mFragmentStage.GenerateStubNames();
+  GenerateStubNames();
 
   /// Generate names for uniforms
   int uniformIndex = 0;
@@ -232,8 +209,8 @@ void ShaderBuilder::GenerateNames() {
 }
 
 
-void ShaderBuilder::AddGlobalsToDependencies(ShaderStage* shaderStage) {
-  for (const auto& node : shaderStage->mDependencies) {
+void ShaderBuilder::AddGlobalsToDependencies() {
+  for (const auto& node : mDependencies) {
     if (!IsPointerOf<StubNode>(node)) continue;
 
     auto stub = PointerCast<StubNode>(node);
@@ -271,19 +248,19 @@ void ShaderBuilder::AddLocalsToDependencies() {
   }
 }
 
-void ShaderBuilder::GenerateSource(ShaderStage* shaderStage) {
-  for (const auto& node : shaderStage->mDependencies) {
+void ShaderBuilder::GenerateSource() {
+  for (const auto& node : mDependencies) {
     if (IsPointerOf<StubNode>(node)) {
-      CollectInputsAndOutputs(node, shaderStage);
+      CollectInputsAndOutputs(node);
     }
   }
 
-  GenerateSourceHeader(shaderStage);
-  GenerateSourceFunctions(shaderStage);
-  GenerateSourceMain(shaderStage);
+  GenerateSourceHeader();
+  GenerateSourceFunctions();
+  GenerateSourceMain();
 }
 
-void ShaderBuilder::GenerateInputInterface(ShaderStage* shaderStage) {
+void ShaderBuilder::GenerateInputInterface() {
   /// Array for attribute names
   static const char* gVertexAttributeName[] = {
     "aPosition",
@@ -292,10 +269,10 @@ void ShaderBuilder::GenerateInputInterface(ShaderStage* shaderStage) {
     "aTangent",
   };
   
-  stringstream& stream = shaderStage->mSourceStream;
+  stringstream& stream = mSourceStream;
 
-  if (shaderStage->mIsVertexShader) {
-    for (const auto& var : shaderStage->mInputsMap) {
+  if (mShaderType == ShaderType::VERTEX) {
+    for (const auto& var : mInputsMap) {
       WARN("Unnecessary attribute definition in vertex shader: %s", var.first.c_str());
     }
     /// The inputs of the vertex shader is a fixed layout of vertex attributes
@@ -308,25 +285,38 @@ void ShaderBuilder::GenerateInputInterface(ShaderStage* shaderStage) {
   }
 
   /// Inputs
-  for (const auto& var : shaderStage->mInputsMap) {
+  for (const auto& var : mInputsMap) {
     stream << "in " << GetValueTypeString(var.second->mType) << ' ' <<
       var.second->mName << ';' << endl;
-    shaderStage->mInputs.push_back(var.second);
+    mInputs.push_back(var.second);
   }
 }
 
 
-void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
-  stringstream& stream = shaderStage->mSourceStream;
+void ShaderBuilder::GenerateSourceHeader() {
+  stringstream& stream = mSourceStream;
 
-  stream << "#version 430 core" << endl;
-  stream << "#define " <<
-    (shaderStage->mIsVertexShader ? "VERTEX_SHADER" : "FRAGMENT_SHADER") << endl;
+  stream << "#version 460 core" << endl;
+  switch (mShaderType)
+  {
+  case ShaderType::VERTEX:
+    stream << "#define VERTEX_SHADER" << endl;
+    break;
+  case ShaderType::FRAGMENT:
+    stream << "#define FRAGMENT_SHADER" << endl;
+    break;
+  case ShaderType::COMPUTE:
+    stream << "#define COMPUTE_SHADER" << endl;
+    break;
+  default:
+    SHOULD_NOT_HAPPEN;
+  }
 
-  GenerateInputInterface(shaderStage);
+
+  GenerateInputInterface();
 
   /// Outputs
-  for (const auto& var : shaderStage->mOutputs) {
+  for (const auto& var : mOutputs) {
     if (var->mLayout >= 0) {
       stream << "layout (location = " << var->mLayout << ") ";
     }
@@ -335,7 +325,7 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   }
 
   /// Uniform block
-  shaderStage->mSourceStream << "layout(shared) uniform Uniforms {" << endl;
+  mSourceStream << "layout(shared) uniform Uniforms {" << endl;
   for (const auto& uniform : mUniforms) {
     stream << "  " << GetValueTypeString(uniform.mType) << " " << uniform.mName << 
       ";" << endl;
@@ -351,11 +341,11 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   }
 
   /// Stub inputs as variables
-  for (const auto& node : shaderStage->mDependencies) {
+  for (const auto& node : mDependencies) {
     if (IsPointerOf<StubNode>(node)) {
       shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
-      auto& stubReference = shaderStage->mStubMap.at(node);
+      auto& stubReference = mStubMap.at(node);
 
       if (stubReference->mType != StubParameter::Type::TVOID) {
         stream << GetParamTypeString(stubReference->mType) << ' ' <<
@@ -365,15 +355,15 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   }
 
   /// Defines
-  for (auto define : shaderStage->mDefines) {
+  for (auto define : mDefines) {
     stream << "#define " << define << endl;
   }
 }
 
-void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
-  stringstream& stream = shaderStage->mSourceStream;
+void ShaderBuilder::GenerateSourceFunctions() {
+  stringstream& stream = mSourceStream;
 
-  for (const auto& node : shaderStage->mDependencies) {
+  for (const auto& node : mDependencies) {
     if (IsPointerOf<StubNode>(node)) {
       shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
@@ -395,7 +385,7 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
         }
         else if (IsPointerOf<StubNode>(paramNode)) {
           /// Parameter is the result of a former function call
-          auto& stubReference = shaderStage->mStubMap.at(paramNode);
+          auto& stubReference = mStubMap.at(paramNode);
           stream << "#define " << param->mName << ' ' << stubReference->mVariableName <<
             endl;
         }
@@ -407,7 +397,7 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
       }
 
       /// Define SHADER function signature
-      auto stubReference = shaderStage->mStubMap.at(node);
+      auto stubReference = mStubMap.at(node);
 
       stream << "#define SHADER " << GetParamTypeString(stubMeta->returnType) <<
         ' ' << stubReference->mFunctionName << "()" << endl;
@@ -426,16 +416,16 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
 }
 
 
-void ShaderBuilder::GenerateSourceMain(ShaderStage* shaderStage) {
-  auto& stream = shaderStage->mSourceStream;
+void ShaderBuilder::GenerateSourceMain() {
+  auto& stream = mSourceStream;
 
   stream << endl;
   stream << "void main() {" << endl;
-  for (const auto& node : shaderStage->mDependencies) {
+  for (const auto& node : mDependencies) {
     if (IsPointerOf<StubNode>(node)) {
       shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
       StubMetadata* stubMeta = stub->GetStubMetadata();
-      auto& stubReference = shaderStage->mStubMap.at(node);
+      auto& stubReference = mStubMap.at(node);
 
       stream << "  ";
       if (stubReference->mType != StubParameter::Type::TVOID) {

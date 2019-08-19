@@ -4,11 +4,10 @@
 ShaderSource::ShaderSource(
   const vector<Uniform>& uniforms,
   const vector<Sampler>& samplers,
-  const string& vertexSource, const string& fragmentSource)
+  const string& source)
   : mUniforms(uniforms)
   , mSamplers(samplers)
-  , mVertexSource(vertexSource)
-  , mFragmentSource(fragmentSource)
+  , mSource(source)
 {}
 
 ShaderSource::Uniform::Uniform(const string& name, const shared_ptr<Node>& node,

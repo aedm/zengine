@@ -3,8 +3,7 @@
 #include "stubnode.h"
 #include "../dom/node.h"
 
-/// Shader sources and metadata for the entire rendering pipeline. 
-/// Includes all programmable stages, ie. vertex and fragment shaders.
+/// Shader source for a single pipeline stage
 struct ShaderSource {
 
   /// Metadata for a uniform
@@ -33,7 +32,7 @@ struct ShaderSource {
   ShaderSource(
     const vector<Uniform>& uniforms,
     const vector<Sampler>& samplers,
-    const string& vertexSource, const string& fragmentSource);
+    const string& source);
 
   /// All uniforms from all shader stages merged
   const vector<Uniform> mUniforms;
@@ -42,6 +41,5 @@ struct ShaderSource {
   const vector<Sampler> mSamplers;
 
   /// Generated source code for stages stages
-  const string mVertexSource;
-  const string mFragmentSource;
+  const string mSource;
 };

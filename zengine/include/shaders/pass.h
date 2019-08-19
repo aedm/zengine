@@ -13,7 +13,6 @@ enum class PassType {
   ZPOST,
 };
 
-
 /// A renderpass is a way to render an object. Materials consist of several
 /// render passes, eg. an opaque pass, a transparent pass, a shadow pass etc.
 /// It manages the entire render pipeline, including setting a shader program,
