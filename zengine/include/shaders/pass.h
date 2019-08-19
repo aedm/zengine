@@ -21,17 +21,17 @@ class Pass: public Node {
 
   /// Associates a uniform to a Node to take its value from
   struct UniformMapper {
-    UniformMapper(const ShaderProgram::Uniform* targetUniform, 
+    UniformMapper(const ShaderCompiledStage::Uniform* targetUniform,
                   const ShaderSource::Uniform* source);
-    const ShaderProgram::Uniform* mTarget;
+    const ShaderCompiledStage::Uniform* mTarget;
     const ShaderSource::Uniform* mSource;
   };
 
   /// Associates a sampler to a texture Node to take its value from
   struct SamplerMapper {
-    SamplerMapper(const ShaderProgram::Sampler* target, 
+    SamplerMapper(const ShaderCompiledStage::Sampler* target,
                   const ShaderSource::Sampler* source);
-    const ShaderProgram::Sampler* mTarget;
+    const ShaderCompiledStage::Sampler* mTarget;
     const ShaderSource::Sampler* mSource;
   };
 
@@ -61,8 +61,16 @@ protected:
 
   void BuildShaderSource();
 
+  /// Collect all uniform data from nodes and globals for a UBO
+  void FillUniformArray(vector<UniformMapper>& uniforms, Globals* globals, 
+    vector<char>& uniformArray);
+  void CollectUniformsAndSamplersFromShaderStage(
+    const shared_ptr<ShaderCompiledStage>& shaderStage, 
+    vector<UniformMapper>& uniforms, vector<SamplerMapper>& samplers);
+
   /// Generated shader source
-  shared_ptr<ShaderSource> mShaderSource;
+  shared_ptr<ShaderSource> mVertexShaderSource;
+  shared_ptr<ShaderSource> mFragmentShaderSource;
 
   /// Generated slots
   vector<shared_ptr<Slot>> mUniformAndSamplerSlots;
@@ -71,12 +79,15 @@ protected:
   shared_ptr<ShaderProgram> mShaderProgram;
 
   /// Mappers from nodes to used uniforms
-  vector<UniformMapper>	mUsedUniforms;
+  vector<UniformMapper>	mUsedVertexUniforms;
+  vector<UniformMapper>	mUsedFragmentUniforms;
   vector<SamplerMapper>	mUsedSamplers;
 
   /// Client-side uniform buffer. 
   /// Uniforms are assembled in this array and then uploaded to OpenGL
-  vector<char> mUniformArray;
+  vector<char> mVertexUniformArray;
+  vector<char> mFragmentUniformArray;
+  
 };
 
 typedef TypedSlot<Pass> PassSlot;

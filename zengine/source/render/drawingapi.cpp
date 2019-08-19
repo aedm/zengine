@@ -221,7 +221,7 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     reinterpret_cast<GLint*>(&blockProps));
 
   //if (numActiveUnifs > 0) continue;
-  vector<ShaderProgram::Uniform> uniforms;
+  vector<ShaderCompiledStage::Uniform> uniforms;
   uniforms.reserve(blockProps.mUniformCount);
 
   std::vector<GLint> uniformLocations(blockProps.mUniformCount);
@@ -234,6 +234,8 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 #pragma pack(push, 1)
   struct { GLint mNameLength, mType, mLocation, mOffset; } values;
 #pragma pack(pop)
+
+  NOT_IMPLEMENTED; // store uniform block binding
 
   for (int blockIndex = 0; blockIndex < blockProps.mUniformCount; ++blockIndex) {
     glGetProgramResourceiv(program, GL_UNIFORM, uniformLocations[blockIndex],
@@ -257,12 +259,12 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     }
 
     uniforms.push_back(
-      ShaderProgram::Uniform(string(&name[0]), nodeType, values.mOffset));
+      ShaderCompiledStage::Uniform(string(&name[0]), nodeType, values.mOffset));
   }
 
   /// Query samplers' list with the old OpenGL API
   /// Interface API can't handle samplers :((((
-  vector<ShaderProgram::Sampler> samplers;
+  vector<ShaderCompiledStage::Sampler> samplers;
   GLint uniformCount;
   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
 
@@ -280,62 +282,49 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE ||
       type == GL_SAMPLER_2D_SHADOW) {
       GLint location = glGetUniformLocation(program, &samplerName[0]);
-      samplers.push_back(ShaderProgram::Sampler(string(&samplerName[0]), location));
+      samplers.push_back(ShaderCompiledStage::Sampler(string(&samplerName[0]), location));
     }
   }
   CheckGLError();
 
   /// Create a uniform buffer object for the shader
-  GLuint uboHandle;
-  glGenBuffers(1, &uboHandle);
-  glBindBuffer(GL_UNIFORM_BUFFER, uboHandle);
+  GLuint uboHandle[2];
+  glGenBuffers(2, uboHandle);
+  glBindBuffer(GL_UNIFORM_BUFFER, uboHandle[0]);
+  glBufferData(GL_UNIFORM_BUFFER, blockProps.mSize, nullptr, GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_UNIFORM_BUFFER, uboHandle[1]);
   glBufferData(GL_UNIFORM_BUFFER, blockProps.mSize, nullptr, GL_DYNAMIC_DRAW);
   CheckGLError();
 
-  return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
-    uniforms, samplers, blockProps.mSize,
-    uboHandle);
+  NOT_IMPLEMENTED;
+  shared_ptr<ShaderCompiledStage> vertexStage = make_shared<ShaderCompiledStage>(
+    vertexShaderHandle, uniforms, samplers, blockProps.mSize, uboHandle[0], 42);
+  shared_ptr<ShaderCompiledStage> fragmentStage = make_shared<ShaderCompiledStage>(
+    fragmentShaderHandle, uniforms, samplers, blockProps.mSize, uboHandle[1], 42);
+
+  return make_shared<ShaderProgram>(program, vertexStage, fragmentStage);
 }
 
 
 void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
-  void* uniforms) {
+  void* vertexUniforms, void* fragmentUniforms) 
+{
   CheckGLError();
   glUseProgram(program->mProgramHandle);
   CheckGLError();
 
-  glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
-  glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_UNIFORM_BUFFER, program->mVertexStage->mUniformBufferHandle);
+  glBufferData(GL_UNIFORM_BUFFER, program->mVertexStage->mUniformBlockSize, 
+    vertexUniforms, GL_DYNAMIC_DRAW);
+  glBindBufferBase(GL_UNIFORM_BUFFER, program->mVertexStage->mUniformBinding,
+    program->mVertexStage->mUniformBufferHandle);
   CheckGLError();
 
-  glBindBufferBase(GL_UNIFORM_BUFFER, 0, program->mUniformBufferHandle);
-  CheckGLError();
-}
-
-
-void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
-  CheckGLError();
-
-  switch (type) {
-  case ValueType::FLOAT:
-    glUniform1f(id, *(const GLfloat*)values);
-    break;
-  case ValueType::VEC2:
-    glUniform2fv(id, 1, (const GLfloat*)values);
-    break;
-  case ValueType::VEC3:
-    glUniform3fv(id, 1, (const GLfloat*)values);
-    break;
-  case ValueType::VEC4:
-    glUniform4fv(id, 1, (const GLfloat*)values);
-    break;
-  case ValueType::MATRIX44:
-    glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
-    break;
-  default:
-    SHOULD_NOT_HAPPEN;
-    break;
-  }
+  glBindBuffer(GL_UNIFORM_BUFFER, program->mFragmentStage->mUniformBufferHandle);
+  glBufferData(GL_UNIFORM_BUFFER, program->mFragmentStage->mUniformBlockSize,
+    fragmentUniforms, GL_DYNAMIC_DRAW);
+  glBindBufferBase(GL_UNIFORM_BUFFER, program->mFragmentStage->mUniformBinding,
+    program->mFragmentStage->mUniformBufferHandle);
   CheckGLError();
 }
 
@@ -797,17 +786,7 @@ void OpenGLAPI::UploadTextureGPUData(const shared_ptr<Texture>& texture,
 }
 
 
-//void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
-//                                     int width, int height, TexelType type,
-//                                     void* texelData) {
-//  ASSERT(!PleaseNoNewResources);
-//  BindTexture(handle);
-//  SetTextureSubData(width, x, y, height, type, texelData);
-//  CheckGLError();
-//}
-
-
-void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler,
+void OpenGLAPI::SetTexture(const ShaderCompiledStage::Sampler& sampler,
   const shared_ptr<Texture>& texture, UINT slotIndex)
 {
   CheckGLError();
@@ -969,36 +948,43 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
   CheckGLError();
 }
 
-ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-  ShaderHandle fragmentProgramHandle,
-  vector<Uniform>& uniforms, vector<Sampler>& samplers,
-  UINT uniformBlockSize,
-  ShaderHandle uniformBufferHandle)
+ShaderProgram::ShaderProgram(ShaderHandle shaderHandle,
+  const shared_ptr<ShaderCompiledStage>& vertexStage,
+  const shared_ptr<ShaderCompiledStage>& fragmentStage)
   : mProgramHandle(shaderHandle)
-  , mVertexShaderHandle(vertexProgramHandle)
-  , mFragmentShaderHandle(fragmentProgramHandle)
-  , mUniforms(uniforms)
-  , mSamplers(samplers)
-  , mUniformBlockSize(uniformBlockSize)
-  , mUniformBufferHandle(uniformBufferHandle) {}
+  , mVertexStage(vertexStage)
+  , mFragmentStage(fragmentStage)
+{}
 
 ShaderProgram::~ShaderProgram() {
   CheckGLError();
   glDeleteProgram(mProgramHandle);
   CheckGLError();
-  glDeleteShader(mVertexShaderHandle);
-  CheckGLError();
-  glDeleteShader(mFragmentShaderHandle);
-  CheckGLError();
-  glDeleteBuffers(1, &mUniformBufferHandle);
-  CheckGLError();
 }
 
-ShaderProgram::Uniform::Uniform(const string& name, ValueType type, UINT offset)
+ShaderCompiledStage::Uniform::Uniform(const string& name, ValueType type, UINT offset)
   : mName(name)
   , mType(type)
   , mOffset(offset) {}
 
-ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
+ShaderCompiledStage::Sampler::Sampler(const string& name, SamplerId handle)
   : mName(name)
   , mHandle(handle) {}
+
+ShaderCompiledStage::ShaderCompiledStage(ShaderHandle shaderObjectHandle, 
+  vector<Uniform>& uniforms, vector<Sampler>& samplers, 
+  UINT uniformBlockSize, ShaderHandle uniformBufferHandle, UINT uniformBinding)
+  : mShaderObjectHandle(shaderObjectHandle)
+  , mUniformBufferHandle(uniformBufferHandle)
+  , mUniforms(uniforms)
+  , mSamplers(samplers)
+  , mUniformBlockSize(uniformBlockSize)
+  , mUniformBinding(uniformBinding)
+{}
+
+ShaderCompiledStage::~ShaderCompiledStage() {
+  glDeleteShader(mShaderObjectHandle);
+  CheckGLError();
+  glDeleteBuffers(1, &mUniformBufferHandle);
+  CheckGLError();
+}

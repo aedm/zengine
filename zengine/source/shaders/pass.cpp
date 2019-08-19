@@ -39,13 +39,14 @@ void Pass::HandleMessage(Message* message) {
 
 void Pass::Operate() {
   /// Clean up from previous state
-  if (!mShaderSource) return;
+  if (!mVertexShaderSource || !mFragmentShaderSource) return;
   mShaderProgram.reset();
   mUsedSamplers.clear();
-  mUsedUniforms.clear();
+  mUsedVertexUniforms.clear();
+  mUsedFragmentUniforms.clear();
 
-  const string& vertexSource = mShaderSource->mVertexSource;
-  const string& fragmentSource = mShaderSource->mFragmentSource;
+  const string& vertexSource = mVertexShaderSource->mSource;
+  const string& fragmentSource = mFragmentShaderSource->mSource;
 
   INFO("Building shader program...");
   mShaderProgram =
@@ -55,30 +56,39 @@ void Pass::Operate() {
     return;
   }
 
-  /// Collect uniforms and samplers from shader stage sources
+  CollectUniformsAndSamplersFromShaderStage(mShaderProgram->mVertexStage, 
+    mUsedVertexUniforms, mUsedSamplers);
+  CollectUniformsAndSamplersFromShaderStage(mShaderProgram->mFragmentStage,
+    mUsedFragmentUniforms, mUsedSamplers);
+
+  /// Allocate space for uniform array
+  mVertexUniformArray.resize(mShaderProgram->mVertexStage->mUniformBlockSize);
+  mFragmentUniformArray.resize(mShaderProgram->mFragmentStage->mUniformBlockSize);
+}
+
+void Pass::CollectUniformsAndSamplersFromShaderStage(
+  const shared_ptr<ShaderCompiledStage>& shaderStage, vector<UniformMapper>& uniforms, 
+  vector<SamplerMapper>& samplers)
+{
   map<string, const ShaderSource::Uniform*> uniformMap;
-  for (auto& uniform : mShaderSource->mUniforms) {
+  for (auto& uniform : mVertexShaderSource->mUniforms) {
     uniformMap[uniform.mName] = &uniform;
   }
   map<string, const ShaderSource::Sampler*> samplerMap;
-  for (auto& sampler : mShaderSource->mSamplers) {
+  for (auto& sampler : mVertexShaderSource->mSamplers) {
     samplerMap[sampler.mName] = &sampler;
   }
-
   /// Create list of used uniforms and samplers
-  for (auto& uniform : mShaderProgram->mUniforms) {
+  for (auto& uniform : shaderStage->mUniforms) {
     auto it = uniformMap.find(uniform.mName);
     ASSERT(it != uniformMap.end());
-    mUsedUniforms.push_back(UniformMapper(&uniform, it->second));
+    uniforms.push_back(UniformMapper(&uniform, it->second));
   }
-  for (auto& sampler : mShaderProgram->mSamplers) {
+  for (auto& sampler : shaderStage->mSamplers) {
     auto it = samplerMap.find(sampler.mName);
     ASSERT(it != samplerMap.end());
-    mUsedSamplers.push_back(SamplerMapper(&sampler, it->second));
+    samplers.push_back(SamplerMapper(&sampler, it->second));
   }
-
-  /// Allocate space for uniform array
-  mUniformArray.resize(mShaderProgram->mUniformBlockSize);
 }
 
 Slot* CreateValueSlot(ValueType type, Node* owner,
@@ -116,30 +126,37 @@ void Pass::BuildShaderSource()
   AddSlot(&mFaceModeSlot, true, true, true);
   AddSlot(&mBlendModeSlot, true, true, true);
 
-  /// Generate shader source
-  mShaderSource.reset();
-  mShaderSource = ShaderBuilder::FromStubs(mVertexStub.GetNode(),
-    mFragmentStub.GetNode());
-  if (!mShaderSource) return;
+  /// Generate shader sources
+  mFragmentShaderSource.reset();
+  mVertexShaderSource.reset();
+
+  auto& vertexStubNode = mVertexStub.GetNode();
+  auto& fragmentStubNode = mFragmentStub.GetNode();
+  if (!vertexStubNode || !fragmentStubNode) return;
+
+  mFragmentShaderSource = ShaderBuilder::GenerateFragmentShaderSource(fragmentStubNode);
+  if (!mFragmentShaderSource) return;
+  mVertexShaderSource = ShaderBuilder::GenerateVertexShaderSource(vertexStubNode);
+  if (!mVertexShaderSource) return;
 
   INFO("Building render pipeline...");
 
-  for (auto& sampler : mShaderSource->mSamplers) {
-    if (sampler.mNode) {
-      shared_ptr<Slot> slot =
-        make_shared<TextureSlot>(this, string(), false, false, false, false);
-      slot->Connect(sampler.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
-  for (auto& uniform : mShaderSource->mUniforms) {
-    if (uniform.mNode) {
-      shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
-        NodeToValueType(uniform.mNode), this, string(), false, false, false, false));
-      slot->Connect(uniform.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
+  //for (auto& sampler : mShaderSource->mSamplers) {
+  //  if (sampler.mNode) {
+  //    shared_ptr<Slot> slot =
+  //      make_shared<TextureSlot>(this, string(), false, false, false, false);
+  //    slot->Connect(sampler.mNode);
+  //    mUniformAndSamplerSlots.push_back(slot);
+  //  }
+  //}
+  //for (auto& uniform : mShaderSource->mUniforms) {
+  //  if (uniform.mNode) {
+  //    shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
+  //      NodeToValueType(uniform.mNode), this, string(), false, false, false, false));
+  //    slot->Connect(uniform.mNode);
+  //    mUniformAndSamplerSlots.push_back(slot);
+  //  }
+  //}
 }
 
 void Pass::Set(Globals* globals) {
@@ -160,12 +177,43 @@ void Pass::Set(Globals* globals) {
 
   OpenGL->SetRenderState(&mRenderstate);
 
+  FillUniformArray(mUsedVertexUniforms, globals, mVertexUniformArray);
+  FillUniformArray(mUsedFragmentUniforms, globals, mFragmentUniformArray);
+
+  OpenGL->SetShaderProgram(mShaderProgram, 
+    &mVertexUniformArray[0], &mFragmentUniformArray[0]);
+
+  /// Set samplers
+  UINT i = 0;
+  for (SamplerMapper& samplerMapper : mUsedSamplers) {
+    const ShaderSource::Sampler* source = samplerMapper.mSource;
+    const ShaderCompiledStage::Sampler* target = samplerMapper.mTarget;
+
+    shared_ptr<Texture> tex = nullptr;
+    if (samplerMapper.mSource->mGlobalType == GlobalSamplerUsage::LOCAL) {
+      ASSERT(samplerMapper.mSource->mNode != nullptr);
+      tex = PointerCast<TextureNode>(samplerMapper.mSource->mNode)->Get();
+    }
+    else {
+      /// Global uniform, takes value from the Globals object
+      int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
+      void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
+      tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
+    }
+    OpenGL->SetTexture(*target, tex ? tex : nullptr, i++);
+  }
+}
+
+
+void Pass::FillUniformArray(vector<UniformMapper>& uniforms, Globals* globals,
+  vector<char>& uniformArray)
+{
   /// Fill uniform array item by item, take value from Nodes and put them
   /// into the array using the uniform offset. Not particularly nice code,
   /// but fast enough.
-  for (UniformMapper& uniformMapper : mUsedUniforms) {
+  for (UniformMapper& uniformMapper : uniforms) {
     const ShaderSource::Uniform* source = uniformMapper.mSource;
-    const ShaderProgram::Uniform* target = uniformMapper.mTarget;
+    const ShaderCompiledStage::Uniform* target = uniformMapper.mTarget;
     if (source->mGlobalType == GlobalUniformUsage::LOCAL) {
       /// Local uniform, takes value from a slot
       ASSERT(source->mNode != nullptr);
@@ -177,7 +225,7 @@ void Pass::Set(Globals* globals) {
               PointerCast<ValueNode<ValueTypes<name>::Type>>(source->mNode); \
             vNode->Update(); \
             *(reinterpret_cast<ValueTypes<name>::Type*>( \
-              &mUniformArray[target->mOffset])) = vNode->Get(); \
+              &uniformArray[target->mOffset])) = vNode->Get(); \
 					  break; \
           }
         ITEM(ValueType::FLOAT);
@@ -197,7 +245,7 @@ void Pass::Set(Globals* globals) {
         case name: { \
           void* valuePointer = reinterpret_cast<char*>(globals)+offset; \
           *(reinterpret_cast<ValueTypes<name>::Type*>( \
-            &mUniformArray[target->mOffset])) = \
+            &uniformArray[target->mOffset])) = \
             *reinterpret_cast<ValueTypes<name>::Type*>(valuePointer); \
           break; \
         }
@@ -210,40 +258,19 @@ void Pass::Set(Globals* globals) {
       }
     }
   }
-
-  OpenGL->SetShaderProgram(mShaderProgram, &mUniformArray[0]);
-
-  /// Set samplers
-  UINT i = 0;
-  for (SamplerMapper& samplerMapper : mUsedSamplers) {
-    const ShaderSource::Sampler* source = samplerMapper.mSource;
-    const ShaderProgram::Sampler* target = samplerMapper.mTarget;
-
-    shared_ptr<Texture> tex = nullptr;
-    if (samplerMapper.mSource->mGlobalType == GlobalSamplerUsage::LOCAL) {
-      ASSERT(samplerMapper.mSource->mNode != nullptr);
-      tex = PointerCast<TextureNode>(samplerMapper.mSource->mNode)->Get();
-    }
-    else {
-      /// Global uniform, takes value from the Globals object
-      int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
-      void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
-      tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
-    }
-    OpenGL->SetTexture(*target, tex ? tex : nullptr, i++);
-  }
 }
+
 
 bool Pass::isComplete() {
   return (mShaderProgram != nullptr);
 }
 
-Pass::UniformMapper::UniformMapper(const ShaderProgram::Uniform* target,
+Pass::UniformMapper::UniformMapper(const ShaderCompiledStage::Uniform* target,
   const ShaderSource::Uniform* source)
   : mTarget(target)
   , mSource(source) {}
 
-Pass::SamplerMapper::SamplerMapper(const ShaderProgram::Sampler* target,
+Pass::SamplerMapper::SamplerMapper(const ShaderCompiledStage::Sampler* target,
   const ShaderSource::Sampler* source)
   : mTarget(target)
   , mSource(source) {}

@@ -37,7 +37,7 @@ shared_ptr<ShaderSource> ShaderBuilder::Build() {
   StubMetadata* stubMeta = mRootStubNode->GetStubMetadata();
   if (stubMeta == nullptr) {
     ERR("Stub has no metadata.");
-    return;
+    return nullptr;
   }
 
   /// Collects node dependencies
@@ -325,7 +325,25 @@ void ShaderBuilder::GenerateSourceHeader() {
   }
 
   /// Uniform block
-  mSourceStream << "layout(shared) uniform Uniforms {" << endl;
+  UINT binding = -1;
+  const char* uniformBlockName = nullptr;
+  switch (mShaderType)
+  {
+  case ShaderType::VERTEX:
+    binding = 0;
+    uniformBlockName = "VertexUniforms";
+    break;
+  case ShaderType::FRAGMENT:
+    binding = 1;
+    uniformBlockName = "FragmentUniforms";
+    break;
+  default:
+    binding = 0;
+    uniformBlockName = "Uniforms";
+    break;
+  }
+  mSourceStream << "layout(packed, binding=" << binding  << ") uniform " <<
+    uniformBlockName << " {" << endl;
   for (const auto& uniform : mUniforms) {
     stream << "  " << GetValueTypeString(uniform.mType) << " " << uniform.mName << 
       ";" << endl;

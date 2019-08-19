@@ -36,9 +36,8 @@ struct RenderState {
 };
 
 
-/// Output of platform-dependent shader compilation
-/// All metadata is determined by the shader compiler of the OpenGL driver.
-struct ShaderProgram {
+/// A compiled shader stage
+struct ShaderCompiledStage {
   /// Uniform properties returned by the driver
   struct Uniform {
     Uniform(const string& name, ValueType type, UINT offset);
@@ -64,19 +63,31 @@ struct ShaderProgram {
     const SamplerId mHandle;
   };
 
-  ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-    ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
-    vector<Sampler>& samplers,
-    UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
-  ~ShaderProgram();
+  ShaderCompiledStage(ShaderHandle shaderObjectHandle,
+    vector<Uniform>& uniforms, vector<Sampler>& samplers,
+    UINT uniformBlockSize, ShaderHandle uniformBufferHandle, UINT uniformBinding);
+  ~ShaderCompiledStage();
 
-  const ShaderHandle mProgramHandle;
-  const ShaderHandle mVertexShaderHandle;
-  const ShaderHandle mFragmentShaderHandle;
+  const ShaderHandle mShaderObjectHandle;
   const ShaderHandle mUniformBufferHandle;
   const vector<Uniform> mUniforms;
   const vector<Sampler> mSamplers;
   const UINT mUniformBlockSize;
+  const UINT mUniformBinding;
+};
+
+
+/// Output of platform-dependent shader compilation
+/// All metadata is determined by the shader compiler of the OpenGL driver.
+struct ShaderProgram {
+  ShaderProgram(ShaderHandle shaderHandle, 
+    const shared_ptr<ShaderCompiledStage>& vertexStage,
+    const shared_ptr<ShaderCompiledStage>& fragmentStage);
+  ~ShaderProgram();
+
+  const ShaderHandle mProgramHandle;
+  const shared_ptr<ShaderCompiledStage> mVertexStage;
+  const shared_ptr<ShaderCompiledStage> mFragmentStage;
 };
 
 
@@ -103,8 +114,8 @@ public:
   /// Shader functions
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
     const char* FragmentSource);
-  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
-  void SetUniform(UniformId Id, ValueType Type, const void* Values);
+  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
+    void* vertexUniforms, void* fragmentUniforms);
 
   /// Vertex buffer handling
   VertexBufferHandle CreateVertexBuffer(UINT Size);
@@ -135,7 +146,7 @@ public:
   void DeleteTextureGPUData(Texture::Handle handle);
   void UploadTextureGPUData(const shared_ptr<Texture>& texture, void* texelData);
 
-  void SetTexture(const ShaderProgram::Sampler& sampler, 
+  void SetTexture(const ShaderCompiledStage::Sampler& sampler,
     const shared_ptr<Texture>& texture, UINT slotIndex);
 
   /// Framebuffer operations
