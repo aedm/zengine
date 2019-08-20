@@ -79,6 +79,26 @@ struct ShaderProgram {
   const UINT mUniformBlockSize;
 };
 
+/// OpenGL general buffer object
+class Buffer {
+public:
+  /// Creates a new buffer with a specific size. -1 means no resource allocation.
+  Buffer(UINT byteSize = -1);
+  ~Buffer();
+  void Resize(int byteSize);
+  
+  /// Uploads data to the buffer
+  void UploadData(const void* data, UINT byteSize);
+  DrawingAPIHandle GetHandle();
+  int GetByteSize();
+
+private:
+  void Release();
+
+  DrawingAPIHandle mHandle = 0;
+  int mByteSize = -1;
+};
+
 
 enum PrimitiveTypeEnum {
   PRIMITIVE_TRIANGLES,
@@ -107,24 +127,23 @@ public:
   void SetUniform(UniformId Id, ValueType Type, const void* Values);
 
   /// Vertex buffer handling
-  VertexBufferHandle CreateVertexBuffer(UINT Size);
-  void DestroyVertexBuffer(VertexBufferHandle Handle);
-  void* MapVertexBuffer(VertexBufferHandle Handle);
-  void UnMapVertexBuffer(VertexBufferHandle Handle);
-  void SetVertexBuffer(VertexBufferHandle Handle);
+  //VertexBufferHandle CreateVertexBuffer(UINT Size);
+  //void DestroyVertexBuffer(VertexBufferHandle Handle);
+  //void* MapVertexBuffer(VertexBufferHandle Handle);
+  //void UnMapVertexBuffer(VertexBufferHandle Handle);
+  void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
   void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
 
   /// Index buffer handling
-  IndexBufferHandle CreateIndexBuffer(UINT IndexCount);
-  void DestroyIndexBuffer(IndexBufferHandle Handle);
-  void* MapIndexBuffer(IndexBufferHandle Handle);
-  void UnMapIndexBuffer(IndexBufferHandle Handle);
-  void SetIndexBuffer(IndexBufferHandle Handle);
+  //IndexBufferHandle CreateIndexBuffer(UINT IndexCount);
+  //void DestroyIndexBuffer(IndexBufferHandle Handle);
+  //void* MapIndexBuffer(IndexBufferHandle Handle);
+  //void UnMapIndexBuffer(IndexBufferHandle Handle);
+  void SetIndexBuffer(const shared_ptr<Buffer>& buffer);
 
-  void Render(IndexBufferHandle IndexBuffer,
-    UINT Count,
-    PrimitiveTypeEnum PrimitiveType,
-    UINT InstanceCount);
+  void Render(const shared_ptr<Buffer>& indexBuffer,
+    UINT Count, PrimitiveTypeEnum primitiveType,
+    UINT instanceCount);
 
   /// Texture and surface handling
   static UINT GetTexelByteCount(TexelType type);

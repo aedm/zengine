@@ -340,75 +340,75 @@ void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
 }
 
 
-VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
-  ASSERT(!PleaseNoNewResources);
-  VertexBufferHandle handle;
-  glGenBuffers(1, &handle);
-  CheckGLError();
-  BindVertexBuffer(handle);
-  glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
-  CheckGLError();
-  return handle;
-}
-
-
-void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
-  CheckGLError();
-  glDeleteBuffers(1, &handle);
-  CheckGLError();
-}
-
-
-void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
-  ASSERT(!PleaseNoNewResources);
-  BindVertexBuffer(handle);
-  void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-  CheckGLError();
-  return address;
-}
-
-
-void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
-  /// Please don't do anything else while a buffer is mapped
-  ASSERT(BoundVertexBufferShadow == handle);
-  glUnmapBuffer(GL_ARRAY_BUFFER);
-  CheckGLError();
-}
-
-
-IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
-  ASSERT(!PleaseNoNewResources);
-  IndexBufferHandle handle;
-  glGenBuffers(1, &handle);
-  CheckGLError();
-  BindIndexBuffer(handle);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
-  CheckGLError();
-  return handle;
-}
-
-
-void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
-  glDeleteBuffers(1, &handle);
-  CheckGLError();
-}
-
-
-void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
-  ASSERT(!PleaseNoNewResources);
-  BindIndexBuffer(handle);
-  void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-  CheckGLError();
-  return buffer;
-}
-
-
-void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
-  /// Please don't do anything else while a buffer is mapped
-  ASSERT(BoundIndexBufferShadow == handle);
-  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-  CheckGLError();
-}
+//VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
+//  ASSERT(!PleaseNoNewResources);
+//  VertexBufferHandle handle;
+//  glGenBuffers(1, &handle);
+//  CheckGLError();
+//  BindVertexBuffer(handle);
+//  glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+//  CheckGLError();
+//  return handle;
+//}
+//
+//
+//void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
+//  CheckGLError();
+//  glDeleteBuffers(1, &handle);
+//  CheckGLError();
+//}
+//
+//
+//void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
+//  ASSERT(!PleaseNoNewResources);
+//  BindVertexBuffer(handle);
+//  void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+//  CheckGLError();
+//  return address;
+//}
+//
+//
+//void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
+//  /// Please don't do anything else while a buffer is mapped
+//  ASSERT(BoundVertexBufferShadow == handle);
+//  glUnmapBuffer(GL_ARRAY_BUFFER);
+//  CheckGLError();
+//}
+//
+//
+//IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
+//  ASSERT(!PleaseNoNewResources);
+//  IndexBufferHandle handle;
+//  glGenBuffers(1, &handle);
+//  CheckGLError();
+//  BindIndexBuffer(handle);
+//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+//  CheckGLError();
+//  return handle;
+//}
+//
+//
+//void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
+//  glDeleteBuffers(1, &handle);
+//  CheckGLError();
+//}
+//
+//
+//void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
+//  ASSERT(!PleaseNoNewResources);
+//  BindIndexBuffer(handle);
+//  void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+//  CheckGLError();
+//  return buffer;
+//}
+//
+//
+//void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
+//  /// Please don't do anything else while a buffer is mapped
+//  ASSERT(BoundIndexBufferShadow == handle);
+//  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+//  CheckGLError();
+//}
 
 
 void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
@@ -450,17 +450,18 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
 }
 
 
-void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
-  PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
+void OpenGLAPI::Render(const shared_ptr<Buffer>& indexBuffer, UINT count,
+  PrimitiveTypeEnum primitiveType, UINT instanceCount) 
+{
   CheckGLError();
-  if (indexBuffer != 0) {
-    BindIndexBuffer(indexBuffer);
+  if (indexBuffer != nullptr && indexBuffer->GetHandle() > 0) {
+    BindIndexBuffer(indexBuffer->GetHandle());
     CheckGLError();
     glDrawElementsInstanced(
-      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, InstanceCount);
+      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, instanceCount);
   }
   else {
-    glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, InstanceCount);
+    glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, instanceCount);
   }
   CheckGLError();
 }
@@ -540,14 +541,14 @@ void OpenGLAPI::BindDrawFramebuffer(GLuint framebuffer) {
 }
 
 
-void OpenGLAPI::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
+void OpenGLAPI::NamedFramebufferReadBuffer(FrameBufferId framebuffer, UINT mode) {
   BindReadFramebuffer(framebuffer);
   glReadBuffer(mode);
   CheckGLError();
 }
 
 
-void OpenGLAPI::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
+void OpenGLAPI::NamedFramebufferDrawBuffer(FrameBufferId framebuffer, UINT mode) {
   BindDrawFramebuffer(framebuffer);
   glDrawBuffer(mode);
   CheckGLError();
@@ -939,13 +940,13 @@ void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
 }
 
 
-void OpenGLAPI::SetVertexBuffer(VertexBufferHandle handle) {
-  BindVertexBuffer(handle);
+void OpenGLAPI::SetVertexBuffer(const shared_ptr<Buffer>& buffer) {
+  BindVertexBuffer(buffer->GetHandle());
 }
 
 
-void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
-  BindIndexBuffer(handle);
+void OpenGLAPI::SetIndexBuffer(const shared_ptr<Buffer>& buffer) {
+  BindIndexBuffer(buffer->GetHandle());
 }
 
 
@@ -1002,3 +1003,47 @@ ShaderProgram::Uniform::Uniform(const string& name, ValueType type, UINT offset)
 ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
   : mName(name)
   , mHandle(handle) {}
+
+Buffer::Buffer(UINT byteSize) {
+  mHandle = 0;
+  mByteSize = 0;
+  if (byteSize >= 0) {
+    Resize(byteSize);
+  }
+}
+
+Buffer::~Buffer() {
+  Release();
+}
+
+void Buffer::Resize(int byteSize) {
+  if (mHandle == 0) {
+    GLuint handle;
+    glGenBuffers(1, &handle);
+  }
+  if (byteSize != mByteSize) {
+    glNamedBufferData(mHandle, byteSize, nullptr, GL_DYNAMIC_DRAW);
+  }
+}
+
+void Buffer::UploadData(const void* data, UINT byteSize) {
+  ASSERT(mHandle != 0);
+  ASSERT(byteSize >= 0);
+  glNamedBufferData(mHandle, byteSize, data, GL_DYNAMIC_DRAW);
+  mByteSize = byteSize;
+}
+
+DrawingAPIHandle Buffer::GetHandle() {
+  return mHandle;
+}
+
+int Buffer::GetByteSize() {
+  return mByteSize;
+}
+
+void Buffer::Release() {
+  if (mHandle == 0) return;
+  glDeleteBuffers(1, &mHandle);
+  mHandle = 0;
+  mByteSize = -1;
+}
