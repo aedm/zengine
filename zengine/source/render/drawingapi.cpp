@@ -299,16 +299,17 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
 
 
 void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
-  void* uniforms) {
+  const shared_ptr<Buffer>& uniformBuffer) 
+{
   CheckGLError();
   glUseProgram(program->mProgramHandle);
   CheckGLError();
 
-  glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
-  glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
-  CheckGLError();
+  //glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
+  //glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
+  //CheckGLError();
 
-  glBindBufferBase(GL_UNIFORM_BUFFER, 0, program->mUniformBufferHandle);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformBuffer->GetHandle());
   CheckGLError();
 }
 

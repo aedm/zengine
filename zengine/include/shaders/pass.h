@@ -77,7 +77,8 @@ protected:
 
   /// Client-side uniform buffer. 
   /// Uniforms are assembled in this array and then uploaded to OpenGL
-  vector<char> mUniformArray;
+  //vector<char> mUniformArray;
+  shared_ptr<Buffer> mUniformBuffer = make_shared<Buffer>();
 };
 
 typedef TypedSlot<Pass> PassSlot;

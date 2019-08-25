@@ -17,7 +17,7 @@ void DisposePainter() {
 }
 
 void ConnectToStubParameter(const shared_ptr<Pass>& pass, bool vertexShader,
-                            const char* parameterName, const shared_ptr<Node>& target) {
+  const char* parameterName, const shared_ptr<Node>& target) {
   if (pass == nullptr) {
     ERR("Missing pass.");
     return;
@@ -46,7 +46,7 @@ UiPainter::UiPainter() {
   ConnectToStubParameter(pass, false, "uColor", mColor);
   pass->mRenderstate.mDepthTest = false;
   mSolidColorMaterial->mSolidPass.Connect(pass);
-  
+
   pass = Util::LoadShader(":/transformPosUV.vs", ":/solidTexture.fs");
   ConnectToStubParameter(pass, false, "uTexture", mTextureNode);
   pass->mRenderstate.mDepthTest = false;
@@ -58,7 +58,7 @@ UiPainter::UiPainter() {
   pass->mRenderstate.mDepthTest = false;
   mTextTextureMaterial->mSolidPass.Connect(pass);
 
-  IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
+  IndexEntry boxIndices[] = { 0, 1, 2, 2, 1, 3 };
 
   /// Meshes
   mLineMeshNode = make_shared<StaticMeshNode>();
@@ -97,7 +97,10 @@ UiPainter::~UiPainter() {
 }
 
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
-  VertexPos vertices[] = {{Vec3(x1 + 0.5f, y1 + 0.5f, 0)}, {Vec3(x2 + 0.5f, y2 + 0.5f, 0)}};
+  VertexPos vertices[] = {
+    {Vec3(x1 + 0.5f, y1 + 0.5f, 0)},
+    {Vec3(x2 + 0.5f, y2 + 0.5f, 0)}
+  };
   mLineMeshNode->GetMesh()->SetVertices(vertices);
   mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
@@ -105,7 +108,7 @@ void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
 void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
   VertexPos vertices[] = {
     {Vec3(From.x + 0.5f, From.y + 0.5f, 0)},
-    {Vec3(To.x + 0.5f, To.y + 0.5f, 0)}};
+    {Vec3(To.x + 0.5f, To.y + 0.5f, 0)} };
   mLineMeshNode->GetMesh()->SetVertices(vertices);
   mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
@@ -170,18 +173,18 @@ void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
 }
 
 
-void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, 
-                              Vec2 size) {
+void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft,
+  Vec2 size) {
   OpenGL->SetViewport(0, 0, canvasWidth, canvasHeight);
   mColor->Set(Vec4(1, 1, 1, 1));
 
   mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);
-  mGlobals.RenderTargetSizeRecip = 
+  mGlobals.RenderTargetSizeRecip =
     Vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
 
   mGlobals.Camera.LoadIdentity();
   mGlobals.World.LoadIdentity();
-  mGlobals.Projection = 
+  mGlobals.Projection =
     Matrix::Ortho(topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y);
   mGlobals.Transformation = mGlobals.Projection;
 }

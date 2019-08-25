@@ -7,8 +7,9 @@
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/texturenode.h>
 
-
 REGISTER_NODECLASS(Pass, "Pass");
+
+const int MAX_UNIFORM_BUFFER_SIZE = 4096;
 
 Pass::Pass()
   : Node()
@@ -78,7 +79,9 @@ void Pass::Operate() {
   }
 
   /// Allocate space for uniform array
-  mUniformArray.resize(mShaderProgram->mUniformBlockSize);
+  //mUniformArray.resize(mShaderProgram->mUniformBlockSize);
+  ASSERT(mShaderProgram->mUniformBlockSize <= MAX_UNIFORM_BUFFER_SIZE);
+  mUniformBuffer->Allocate(mShaderProgram->mUniformBlockSize);
 }
 
 Slot* CreateValueSlot(ValueType type, Node* owner,
@@ -160,6 +163,8 @@ void Pass::Set(Globals* globals) {
 
   OpenGL->SetRenderState(&mRenderstate);
 
+  char uniformArray[MAX_UNIFORM_BUFFER_SIZE];
+
   /// Fill uniform array item by item, take value from Nodes and put them
   /// into the array using the uniform offset. Not particularly nice code,
   /// but fast enough.
@@ -177,7 +182,7 @@ void Pass::Set(Globals* globals) {
               PointerCast<ValueNode<ValueTypes<name>::Type>>(source->mNode); \
             vNode->Update(); \
             *(reinterpret_cast<ValueTypes<name>::Type*>( \
-              &mUniformArray[target->mOffset])) = vNode->Get(); \
+              &uniformArray[target->mOffset])) = vNode->Get(); \
 					  break; \
           }
         ITEM(ValueType::FLOAT);
@@ -197,7 +202,7 @@ void Pass::Set(Globals* globals) {
         case name: { \
           void* valuePointer = reinterpret_cast<char*>(globals)+offset; \
           *(reinterpret_cast<ValueTypes<name>::Type*>( \
-            &mUniformArray[target->mOffset])) = \
+            &uniformArray[target->mOffset])) = \
             *reinterpret_cast<ValueTypes<name>::Type*>(valuePointer); \
           break; \
         }
@@ -211,7 +216,8 @@ void Pass::Set(Globals* globals) {
     }
   }
 
-  OpenGL->SetShaderProgram(mShaderProgram, &mUniformArray[0]);
+  mUniformBuffer->UploadData(uniformArray, mShaderProgram->mUniformBlockSize);
+  OpenGL->SetShaderProgram(mShaderProgram, mUniformBuffer);
 
   /// Set samplers
   UINT i = 0;

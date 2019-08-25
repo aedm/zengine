@@ -126,7 +126,8 @@ public:
   /// Shader functions
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
     const char* FragmentSource);
-  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
+  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
+    const shared_ptr<Buffer>& uniformBuffer);
   void SetUniform(UniformId Id, ValueType Type, const void* Values);
 
   /// Vertex buffer handling
