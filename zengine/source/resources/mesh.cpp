@@ -90,7 +90,14 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
       attribute.Offset, mFormat->mStride);
   }
 
-  OpenGL->Render(mIndexBuffer, mIndexCount, primitive, instanceCount);
+  if (mIndexBuffer->IsEmpty()) {
+    /// Render all vertices without index buffer
+    OpenGL->Render(nullptr, mVertexCount, primitive, instanceCount);
+  }
+  else {
+    /// Render indexed mesh
+    OpenGL->Render(mIndexBuffer, mIndexCount, primitive, instanceCount);
+  }
 }
 
 void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount) {
@@ -99,7 +106,7 @@ void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexC
   UINT newBufferSize = format->mStride * vertexCount;
 
   if (mVertexBuffer->GetByteSize() != newBufferSize) {
-    mVertexBuffer->Resize(newBufferSize);
+    mVertexBuffer->Allocate(newBufferSize);
     SafeDelete(mRawVertexData);
     mRawVertexData = new char[newBufferSize];
   }
@@ -108,7 +115,7 @@ void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexC
 void Mesh::AllocateIndices(UINT indexCount) {
   if (mIndexCount != indexCount) {
     mIndexCount = indexCount;
-    mIndexBuffer->Resize(indexCount * sizeof(IndexEntry));
+    mIndexBuffer->Allocate(indexCount * sizeof(IndexEntry));
   }
 }
 

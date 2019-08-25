@@ -83,12 +83,15 @@ struct ShaderProgram {
 class Buffer {
 public:
   /// Creates a new buffer with a specific size. -1 means no resource allocation.
-  Buffer(UINT byteSize = -1);
+  Buffer(int byteSize = -1);
   ~Buffer();
-  void Resize(int byteSize);
+  void Allocate(int byteSize);
   
+  /// Returns true if there's no data in the buffer
+  bool IsEmpty();
+
   /// Uploads data to the buffer
-  void UploadData(const void* data, UINT byteSize);
+  void UploadData(const void* data, int byteSize);
   DrawingAPIHandle GetHandle();
   int GetByteSize();
 

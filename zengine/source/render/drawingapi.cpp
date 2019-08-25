@@ -61,8 +61,8 @@ OpenGLAPI::OpenGLAPI() {
     if (versionName == NULL) ERR(L"OpenGL not found at all.");
     else INFO(L"OpenGL version %s found.", versionName);
 
-    if (!GLEW_VERSION_4_3) {
-      ERR(L"Sorry, OpenGL 4.3 needed at least.");
+    if (!GLEW_VERSION_4_5) {
+      ERR(L"Sorry, OpenGL 4.5 needed at least.");
     }
     CheckGLError();
   }
@@ -1004,11 +1004,9 @@ ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
   : mName(name)
   , mHandle(handle) {}
 
-Buffer::Buffer(UINT byteSize) {
-  mHandle = 0;
-  mByteSize = 0;
+Buffer::Buffer(int byteSize) {
   if (byteSize >= 0) {
-    Resize(byteSize);
+    Allocate(byteSize);
   }
 }
 
@@ -1016,21 +1014,38 @@ Buffer::~Buffer() {
   Release();
 }
 
-void Buffer::Resize(int byteSize) {
+void Buffer::Allocate(int byteSize) {
+  CheckGLError();
   if (mHandle == 0) {
-    GLuint handle;
-    glGenBuffers(1, &handle);
+    glCreateBuffers(1, &mHandle);
+    CheckGLError();
   }
   if (byteSize != mByteSize) {
     glNamedBufferData(mHandle, byteSize, nullptr, GL_DYNAMIC_DRAW);
+    CheckGLError();
+    mByteSize = byteSize;
   }
 }
 
-void Buffer::UploadData(const void* data, UINT byteSize) {
-  ASSERT(mHandle != 0);
-  ASSERT(byteSize >= 0);
-  glNamedBufferData(mHandle, byteSize, data, GL_DYNAMIC_DRAW);
-  mByteSize = byteSize;
+bool Buffer::IsEmpty() {
+  return mHandle == 0 || mByteSize <= 0;
+}
+
+void Buffer::UploadData(const void* data, int byteSize) {
+  CheckGLError();
+  if (!mHandle) {
+    ASSERT(mByteSize == -1);
+    Allocate(-1);
+  }
+  if (mByteSize < byteSize) {
+    glNamedBufferData(mHandle, byteSize, data, GL_DYNAMIC_DRAW);
+    mByteSize = byteSize;
+  }
+  else {
+    /// Don't realloc buffers when the size is appropriate
+    glNamedBufferSubData(mHandle, 0, byteSize, data);
+  }
+  CheckGLError();
 }
 
 DrawingAPIHandle Buffer::GetHandle() {
@@ -1042,8 +1057,10 @@ int Buffer::GetByteSize() {
 }
 
 void Buffer::Release() {
+  CheckGLError();
   if (mHandle == 0) return;
   glDeleteBuffers(1, &mHandle);
   mHandle = 0;
   mByteSize = -1;
+  CheckGLError();
 }
