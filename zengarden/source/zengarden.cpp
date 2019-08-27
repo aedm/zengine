@@ -212,6 +212,9 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
       watcher =
         node->Watch<StaticValueWatcher<ValueType::VEC4>>(PointerCast<Vec4Node>(node));
     }
+    else if (IsPointerOf<Pass>(node)) {
+      watcher = node->Watch<PassSlotEditor>(node);
+    }
     else {
       watcher = node->Watch<SlotEditor>(node);
     }

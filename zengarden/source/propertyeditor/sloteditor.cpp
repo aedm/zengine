@@ -3,6 +3,7 @@
 #include "../zengarden.h"
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLabel>
+#include <QClipboard>
 
 SlotEditor::SlotEditor(const shared_ptr<Node>& node)
   : PropertyEditor(node) 
@@ -166,3 +167,28 @@ template class TypedSlotWatcher<ValueType::FLOAT>;
 template class TypedSlotWatcher<ValueType::VEC2>;
 template class TypedSlotWatcher<ValueType::VEC3>;
 template class TypedSlotWatcher<ValueType::VEC4>;
+
+PassSlotEditor::PassSlotEditor(const shared_ptr<Node>& node)
+  : SlotEditor(node)
+{}
+
+void PassSlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  SlotEditor::SetWatcherWidget(watcherWidget);
+
+  /// Recompile button
+  QPushButton* copyVSButton = new QPushButton("Copy VS source", watcherWidget);
+  watcherWidget->connect(copyVSButton, &QPushButton::pressed, [=]() {
+    shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    string source = passNode->GetVertexShaderSource();
+    QApplication::clipboard()->setText(QString::fromStdString(source));
+  });
+  mLayout->addWidget(copyVSButton);
+
+  QPushButton* copyFSButton = new QPushButton("Copy FS source", watcherWidget);
+  watcherWidget->connect(copyFSButton, &QPushButton::pressed, [=]() {
+    shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    string source = passNode->GetFragmentShaderSource();
+    QApplication::clipboard()->setText(QString::fromStdString(source));
+  });
+  mLayout->addWidget(copyFSButton);
+}

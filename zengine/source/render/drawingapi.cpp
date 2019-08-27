@@ -5,8 +5,12 @@
 #define GLEW_STATIC
 #include <glew/glew.h>
 
+bool GLDisableErrorChecks = false;
+
+
 #ifdef _DEBUG
 void CheckGLError() {
+  if (GLDisableErrorChecks) return;
   GLenum error = glGetError();
   ASSERT(error == GL_NO_ERROR);
 }
@@ -196,6 +200,14 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     glDeleteShader(fragmentShaderHandle);
     CheckGLError();
     return nullptr;
+  }
+
+  /// Query buffer bindings
+  GLint bufferCount;
+  glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES,
+    &bufferCount);
+  for (int i = 0; i < bufferCount; i++) {
+
   }
 
   /// Query uniform blocks

@@ -244,6 +244,14 @@ bool Pass::isComplete() {
   return (mShaderProgram != nullptr);
 }
 
+std::string Pass::GetVertexShaderSource() {
+  return mShaderSource ? mShaderSource->mVertexSource : "[No vertex shader]";
+}
+
+std::string Pass::GetFragmentShaderSource() {
+  return mShaderSource ? mShaderSource->mFragmentSource : "[No fragment shader]";
+}
+
 Pass::UniformMapper::UniformMapper(const ShaderProgram::Uniform* target,
   const ShaderSource::Uniform* source)
   : mTarget(target)

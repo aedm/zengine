@@ -10,6 +10,7 @@ using namespace std;
 
 class OpenGLAPI;
 extern OpenGLAPI* OpenGL;
+extern bool GLDisableErrorChecks;
 
 const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 1;
 

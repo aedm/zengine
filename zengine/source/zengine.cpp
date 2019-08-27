@@ -23,4 +23,7 @@ void CloseZengine() {
   SafeDelete(TheEngineShaders);
   SafeDelete(TheEngineStubs);
   SafeDelete(OpenGL);
+
+  /// Resources will be dropped with no GL context
+  GLDisableErrorChecks = true;
 }

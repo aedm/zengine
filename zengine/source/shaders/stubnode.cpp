@@ -2,6 +2,7 @@
 #include <include/shaders/valuestubslot.h>
 #include <include/shaders/stubnode.h>
 #include <include/nodes/texturenode.h>
+#include <include/nodes/buffernode.h>
 
 REGISTER_NODECLASS(StubNode, "Stub");
 
@@ -91,7 +92,11 @@ void StubNode::Operate() {
         canReuseSlot = IsInsanceOf<ValueStubSlot<Matrix>*>(it->second);
         break;
       case StubParameter::Type::SAMPLER2D:
+      case StubParameter::Type::IMAGE2D:
         canReuseSlot = IsInsanceOf<TextureSlot*>(it->second);
+        break;
+      case StubParameter::Type::BUFFER:
+        canReuseSlot = IsInsanceOf<BufferSlot*>(it->second);
         break;
       default:
         break;
@@ -121,7 +126,11 @@ void StubNode::Operate() {
         slot = new ValueStubSlot<Vec4>(this, param->mName);
         break;
       case StubParameter::Type::SAMPLER2D:
+      case StubParameter::Type::IMAGE2D:
         slot = new TextureSlot(this, param->mName);
+        break;
+      case StubParameter::Type::BUFFER:
+        slot = new BufferSlot(this, param->mName);
         break;
       default:
         SHOULD_NOT_HAPPEN;

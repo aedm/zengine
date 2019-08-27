@@ -93,6 +93,8 @@ struct StubParameter {
     VEC4,
     MATRIX44,
     SAMPLER2D,
+    IMAGE2D,
+    BUFFER,
     NONE,
   };
 

@@ -61,3 +61,10 @@ private:
   /// Handles value change on UI
   void HandleValueChange(QWidget* widget, const Type& value);
 };
+
+class PassSlotEditor : public SlotEditor {
+public:
+  PassSlotEditor(const shared_ptr<Node>& node);
+
+  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+};

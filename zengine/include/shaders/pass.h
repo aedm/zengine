@@ -54,6 +54,10 @@ public:
   /// Returns true if pass can be used
   bool isComplete();
 
+  /// Get shader sources
+  string GetVertexShaderSource();
+  string GetFragmentShaderSource();
+
 protected:
   virtual void HandleMessage(Message* message) override;
 

@@ -112,10 +112,12 @@ private:
   /// References of uniform/smapler nodes
   map<shared_ptr<Node>, shared_ptr<ValueReference>> mUniformMap;
   map<shared_ptr<Node>, shared_ptr<ValueReference>> mSamplerMap;
+  map<shared_ptr<Node>, shared_ptr<ValueReference>> mBufferMap;
   set<GlobalUniformUsage> mUsedGlobalUniforms;
   set<GlobalSamplerUsage> mUsedGlobalSamplers;
 
   /// Metadata
   vector<ShaderSource::Uniform> mUniforms;
   vector<ShaderSource::Sampler> mSamplers;
+  vector<ShaderSource::NamedResource> mBuffers;
 };

@@ -30,6 +30,14 @@ struct ShaderSource {
     const bool mIsShadow; // type is "sampler2DShadow"
   };
 
+  /// Metadata for a SSBOs and image2Ds
+  struct NamedResource {
+    NamedResource(const string& name, const shared_ptr<Node>& node);
+
+    const string mName;
+    const shared_ptr<Node> mNode;
+  };
+
   ShaderSource(
     const vector<Uniform>& uniforms,
     const vector<Sampler>& samplers,
@@ -40,6 +48,9 @@ struct ShaderSource {
 
   /// All samplers from all shader stages merged
   const vector<Sampler> mSamplers;
+
+  /// Buffers
+  const vector<NamedResource> mBuffers;
 
   /// Generated source code for stages stages
   const string mVertexSource;

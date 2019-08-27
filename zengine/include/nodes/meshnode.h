@@ -24,3 +24,4 @@ public:
   StaticMeshNode();
   void Set(const shared_ptr<Mesh>& mesh);
 };
+

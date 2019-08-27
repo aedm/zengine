@@ -27,3 +27,8 @@ ShaderSource::Sampler::Sampler(const string& name, const shared_ptr<Node>& node,
   , mIsMultiSampler(isMultiSampler)
   , mIsShadow(isShadow)
 {}
+
+ShaderSource::NamedResource::NamedResource(const string& name,
+  const shared_ptr<Node>& node)
+  : mName(name)
+  , mNode(node) {}
