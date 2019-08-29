@@ -143,73 +143,9 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
   return shader;
 }
 
-shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
-  const char* vertexSource, const char* fragmentSource) {
-
-  ASSERT(!PleaseNoNewResources);
-  CheckGLError();
-  GLuint program = glCreateProgram();
-  mProgramCompiledHack = true;
-
-  CheckGLError();
-  /// Compile shaders
-  ShaderHandle vertexShaderHandle =
-    CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource);
-  if (vertexShaderHandle == 0) {
-    WARN(L"Vertex shader compilation failed.");
-    glDeleteProgram(program);
-    CheckGLError();
-    return nullptr;
-  }
-  ShaderHandle fragmentShaderHandle =
-    CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource);
-  if (fragmentShaderHandle == 0) {
-    WARN(L"Fragment shader compilation failed.");
-
-    CheckGLError();
-    glDeleteProgram(program);
-    CheckGLError();
-    glDeleteShader(vertexShaderHandle);
-    CheckGLError();
-    return nullptr;
-  }
-
-  /// Link program
-  glLinkProgram(program);
-
-  GLint result, length;
-  glGetProgramiv(program, GL_LINK_STATUS, &result);
-  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-  if (length > 1) {
-    char *log = new char[length];
-    int charCount;
-    glGetProgramInfoLog(program, length, &charCount, log);
-    if (result == GL_FALSE) {
-      ERR("Can't link shader: %s", log);
-    }
-    else {
-      WARN("Shader compiler: %s", log);
-    }
-    CheckGLError();
-    delete log;
-  }
-
-  if (result == GL_FALSE) {
-    glDeleteProgram(program);
-    glDeleteShader(vertexShaderHandle);
-    glDeleteShader(fragmentShaderHandle);
-    CheckGLError();
-    return nullptr;
-  }
-
-  /// Query buffer bindings
-  GLint bufferCount;
-  glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES,
-    &bufferCount);
-  for (int i = 0; i < bufferCount; i++) {
-
-  }
-
+void CollectUniformsFromProgram(GLuint program, 
+  vector<ShaderProgram::Uniform>& uniforms, UINT* oBlockSize)
+{
   /// Query uniform blocks
   GLint uniformBlockCount;
   glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES,
@@ -232,8 +168,6 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     ElementCount(blockPropsList), nullptr,
     reinterpret_cast<GLint*>(&blockProps));
 
-  //if (numActiveUnifs > 0) continue;
-  vector<ShaderProgram::Uniform> uniforms;
   uniforms.reserve(blockProps.mUniformCount);
 
   std::vector<GLint> uniformLocations(blockProps.mUniformCount);
@@ -271,10 +205,42 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     uniforms.push_back(
       ShaderProgram::Uniform(string(&name[0]), nodeType, values.mOffset));
   }
+  *oBlockSize = blockProps.mSize;
+}
 
-  /// Query samplers' list with the old OpenGL API
-  /// Interface API can't handle samplers :((((
-  vector<ShaderProgram::Sampler> samplers;
+void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos) {
+  /// Query buffer indexes
+  GLint bufferCount, ssboCount;
+  glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES,
+    &bufferCount);
+  glGetProgramInterfaceiv(program, GL_BUFFER_VARIABLE, GL_ACTIVE_RESOURCES,
+    &ssboCount);
+  INFO("Buffer count: %d, SSBO count: %d", bufferCount, ssboCount);
+
+  /// TODO: query name length instead
+  char name[2048];
+  for (int i = 0; i < ssboCount; i++) {
+    const GLenum blockPropsList[] = { GL_REFERENCED_BY_VERTEX_SHADER,
+      GL_REFERENCED_BY_FRAGMENT_SHADER };
+    const int propCount = ElementCount(blockPropsList);
+    GLint props[propCount];
+    glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, i, propCount,
+      blockPropsList, propCount, nullptr, props);
+    GLint isReferenced = (props[0] + props[1]) > 0;
+    glGetProgramResourceName(program, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), nullptr,
+      name);
+    GLuint resouceIndex =
+      glGetProgramResourceIndex(program, GL_SHADER_STORAGE_BLOCK, name);
+    INFO("SSBO #%d name: %s, index: %d, used: %d",
+      i, name, resouceIndex, isReferenced);
+
+    if (isReferenced) {
+      ssbos.emplace_back(string(name), resouceIndex);
+    }
+  }
+}
+
+void CollectOpaqueFromProgram(GLuint program, vector<ShaderProgram::Sampler>& samplers) {
   GLint uniformCount;
   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
 
@@ -296,17 +262,79 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     }
   }
   CheckGLError();
+}
 
-  /// Create a uniform buffer object for the shader
-  GLuint uboHandle;
-  glGenBuffers(1, &uboHandle);
-  glBindBuffer(GL_UNIFORM_BUFFER, uboHandle);
-  glBufferData(GL_UNIFORM_BUFFER, blockProps.mSize, nullptr, GL_DYNAMIC_DRAW);
+bool LinkProgram(GLuint program) {
+  /// Link program
+  glLinkProgram(program);
+
+  GLint result, length;
+  glGetProgramiv(program, GL_LINK_STATUS, &result);
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+  if (length > 1) {
+    char *log = new char[length];
+    int charCount;
+    glGetProgramInfoLog(program, length, &charCount, log);
+    if (result == GL_FALSE) {
+      ERR("Can't link shader: %s", log);
+    }
+    else {
+      WARN("Shader compiler: %s", log);
+    }
+    CheckGLError();
+    delete log;
+  }
+
+  return result == GL_TRUE;
+}
+
+shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
+  const char* vertexSource, const char* fragmentSource) 
+{
+  ASSERT(!PleaseNoNewResources);
   CheckGLError();
+  GLuint program = glCreateProgram();
+  mProgramCompiledHack = true;
 
+  CheckGLError();
+  /// Compile shaders
+  ShaderHandle vertexShaderHandle =
+    CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource);
+  if (vertexShaderHandle == 0) {
+    WARN(L"Vertex shader compilation failed.");
+    glDeleteProgram(program);
+    CheckGLError();
+    return nullptr;
+  }
+  ShaderHandle fragmentShaderHandle =
+    CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource);
+  if (fragmentShaderHandle == 0) {
+    WARN(L"Fragment shader compilation failed.");
+    CheckGLError();
+    glDeleteProgram(program);
+    glDeleteShader(vertexShaderHandle);
+    CheckGLError();
+    return nullptr;
+  }
+
+  if (!LinkProgram(program)) {
+    glDeleteProgram(program);
+    glDeleteShader(vertexShaderHandle);
+    glDeleteShader(fragmentShaderHandle);
+    CheckGLError();
+    return nullptr;
+  }
+
+  UINT uniformBlockSize;
+  vector<ShaderProgram::Uniform> uniforms;
+  vector<ShaderProgram::Sampler> samplers;
+  vector<ShaderProgram::SSBO> ssbos;
+  CollectUniformsFromProgram(program, uniforms, &uniformBlockSize);
+  CollectOpaqueFromProgram(program, samplers);
+  CollectSSBOsFromProgram(program, ssbos);
+  
   return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
-    uniforms, samplers, blockProps.mSize,
-    uboHandle);
+    uniforms, samplers, ssbos, uniformBlockSize);
 }
 
 
@@ -983,18 +1011,17 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
   CheckGLError();
 }
 
-ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-  ShaderHandle fragmentProgramHandle,
-  vector<Uniform>& uniforms, vector<Sampler>& samplers,
-  UINT uniformBlockSize,
-  ShaderHandle uniformBufferHandle)
+ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, 
+  ShaderHandle vertexProgramHandle, ShaderHandle fragmentProgramHandle,
+  vector<Uniform>& uniforms, vector<Sampler>& samplers, vector<SSBO>& ssbos,
+  UINT uniformBlockSize)
   : mProgramHandle(shaderHandle)
   , mVertexShaderHandle(vertexProgramHandle)
   , mFragmentShaderHandle(fragmentProgramHandle)
   , mUniforms(uniforms)
   , mSamplers(samplers)
-  , mUniformBlockSize(uniformBlockSize)
-  , mUniformBufferHandle(uniformBufferHandle) {}
+  , mSSBOs(ssbos)
+  , mUniformBlockSize(uniformBlockSize) {}
 
 ShaderProgram::~ShaderProgram() {
   CheckGLError();
@@ -1003,8 +1030,6 @@ ShaderProgram::~ShaderProgram() {
   glDeleteShader(mVertexShaderHandle);
   CheckGLError();
   glDeleteShader(mFragmentShaderHandle);
-  CheckGLError();
-  glDeleteBuffers(1, &mUniformBufferHandle);
   CheckGLError();
 }
 
@@ -1077,3 +1102,8 @@ void Buffer::Release() {
   mByteSize = -1;
   CheckGLError();
 }
+
+ShaderProgram::SSBO::SSBO(const string& name, UINT index)
+  : mName(name)
+  , mIndex(index)
+{}

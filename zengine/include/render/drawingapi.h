@@ -65,18 +65,24 @@ struct ShaderProgram {
     const SamplerId mHandle;
   };
 
+  struct SSBO {
+    SSBO(const string& name, UINT index);
+    const string mName;
+    const UINT mIndex;
+  };
+
   ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
     ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
-    vector<Sampler>& samplers,
-    UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
+    vector<Sampler>& samplers, vector<SSBO>& ssbos,
+    UINT uniformBlockSize);
   ~ShaderProgram();
 
   const ShaderHandle mProgramHandle;
   const ShaderHandle mVertexShaderHandle;
   const ShaderHandle mFragmentShaderHandle;
-  const ShaderHandle mUniformBufferHandle;
   const vector<Uniform> mUniforms;
   const vector<Sampler> mSamplers;
+  const vector<SSBO> mSSBOs;
   const UINT mUniformBlockSize;
 };
 
