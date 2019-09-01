@@ -6,6 +6,7 @@
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/texturenode.h>
+#include <include/nodes/buffernode.h>
 
 REGISTER_NODECLASS(Pass, "Pass");
 
@@ -62,65 +63,14 @@ void Pass::Operate() {
   mUniformBuffer->Allocate(mShaderProgram->mUniformBlockSize);
 }
 
-Slot* CreateValueSlot(ValueType type, Node* owner,
-  const string& name, bool isMultiSlot = false,
-  bool isPublic = true, bool isSerializable = true,
-  float minimum = 0.0f, float maximum = 1.0f) 
-{
-  switch (type)
-  {
-  case ValueType::FLOAT:
-    return new FloatSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::VEC2:
-    return new Vec2Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::VEC3:
-    return new Vec3Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::VEC4:
-    return new Vec4Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::MATRIX44:
-    return new MatrixSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  default:
-    SHOULD_NOT_HAPPEN;
-    return nullptr;
-  }
-}
-
 void Pass::BuildShaderSource()
 {
   mIsUpToDate = false;
 
-  /// Reset slots
-  mUniformAndSamplerSlots.clear();
-  ClearSlots();
-  AddSlot(&mVertexStub, true, true, true);
-  AddSlot(&mFragmentStub, true, true, true);
-  AddSlot(&mFaceModeSlot, true, true, true);
-  AddSlot(&mBlendModeSlot, true, true, true);
-
   /// Generate shader source
   mShaderSource.reset();
-  mShaderSource = ShaderBuilder::FromStubs(mVertexStub.GetNode(),
-    mFragmentStub.GetNode());
-  if (!mShaderSource) return;
-
-  INFO("Building render pipeline...");
-
-  for (auto& sampler : mShaderSource->mSamplers) {
-    if (sampler.mNode) {
-      shared_ptr<Slot> slot =
-        make_shared<TextureSlot>(this, string(), false, false, false, false);
-      slot->Connect(sampler.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
-  for (auto& uniform : mShaderSource->mUniforms) {
-    if (uniform.mNode) {
-      shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
-        NodeToValueType(uniform.mNode), this, string(), false, false, false, false));
-      slot->Connect(uniform.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
+  mShaderSource = 
+    ShaderBuilder::FromStubs(mVertexStub.GetNode(), mFragmentStub.GetNode());
 }
 
 void Pass::Set(Globals* globals) {
@@ -218,7 +168,15 @@ void Pass::Set(Globals* globals) {
   }
 
   /// Set SSBOs
-  //NOT_IMPLEMENTED;
+  for (const auto& ssbo : mSSBOs.GetResources()) {
+    const ShaderSource::NamedResource* source = ssbo.mSource;
+    const ShaderProgram::SSBO* target = ssbo.mTarget;
+    shared_ptr<Buffer> buffer = 
+      PointerCast<BufferNode>(ssbo.mSource->mNode)->GetBuffer();
+    
+    if (!buffer) continue;
+    OpenGL->SetSSBO(target->mIndex, buffer);
+  }
 }
 
 bool Pass::isComplete() {

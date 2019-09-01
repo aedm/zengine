@@ -235,6 +235,8 @@ void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos)
       i, name, resouceIndex, isReferenced);
 
     if (isReferenced) {
+      /// Set up binding point
+      glShaderStorageBlockBinding(program, resouceIndex, resouceIndex);
       ssbos.emplace_back(string(name), resouceIndex);
     }
   }
@@ -990,6 +992,11 @@ void OpenGLAPI::SetIndexBuffer(const shared_ptr<Buffer>& buffer) {
   BindIndexBuffer(buffer->GetHandle());
 }
 
+
+void OpenGLAPI::SetSSBO(UINT index, const shared_ptr<Buffer>& buffer) {
+  if (!buffer) return;
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, buffer->GetHandle());
+}
 
 void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset,
   UINT stride) 

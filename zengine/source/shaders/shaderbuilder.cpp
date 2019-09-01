@@ -378,7 +378,8 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
   int bind = 0;
   for (auto buffer : mSSBOs) {
     stream << // "layout(std140, binding=" << (++bind) << ") " << 
-      "layout(std140) buffer " << buffer.mName << " {" << endl <<
+      "layout(std140) buffer " << 
+      buffer.mName << " {" << endl <<
       "  vec4 " << buffer.mName << "_items[];" << endl <<
       "};" << endl;
   }

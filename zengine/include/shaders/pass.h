@@ -89,10 +89,7 @@ protected:
   /// Compiled and linked shader program
   shared_ptr<ShaderProgram> mShaderProgram;
 
-  /// Generated slots
-  vector<shared_ptr<Slot>> mUniformAndSamplerSlots;
-
-  /// Mappers from nodes to used uniforms
+  /// Mapping between nodes and shader resources
   ShaderResourceMap<ShaderProgram::Uniform, ShaderSource::Uniform> mUniforms;
   ShaderResourceMap<ShaderProgram::Sampler, ShaderSource::Sampler> mSamplers;
   ShaderResourceMap<ShaderProgram::SSBO, ShaderSource::NamedResource> mSSBOs;

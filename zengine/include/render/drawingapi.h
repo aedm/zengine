@@ -136,21 +136,12 @@ public:
   void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
     const shared_ptr<Buffer>& uniformBuffer);
   void SetUniform(UniformId Id, ValueType Type, const void* Values);
-
-  /// Vertex buffer handling
-  //VertexBufferHandle CreateVertexBuffer(UINT Size);
-  //void DestroyVertexBuffer(VertexBufferHandle Handle);
-  //void* MapVertexBuffer(VertexBufferHandle Handle);
-  //void UnMapVertexBuffer(VertexBufferHandle Handle);
-  void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
   void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
 
-  /// Index buffer handling
-  //IndexBufferHandle CreateIndexBuffer(UINT IndexCount);
-  //void DestroyIndexBuffer(IndexBufferHandle Handle);
-  //void* MapIndexBuffer(IndexBufferHandle Handle);
-  //void UnMapIndexBuffer(IndexBufferHandle Handle);
+  /// Buffer functions
+  void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
   void SetIndexBuffer(const shared_ptr<Buffer>& buffer);
+  void SetSSBO(UINT index, const shared_ptr<Buffer>& buffer);
 
   void Render(const shared_ptr<Buffer>& indexBuffer,
     UINT Count, PrimitiveTypeEnum primitiveType,
