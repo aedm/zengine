@@ -4,9 +4,11 @@
 ShaderSource::ShaderSource(
   const vector<Uniform>& uniforms,
   const vector<Sampler>& samplers,
+  const vector<NamedResource>& ssbos,
   const string& vertexSource, const string& fragmentSource)
   : mUniforms(uniforms)
   , mSamplers(samplers)
+  , mSSBOs(ssbos)
   , mVertexSource(vertexSource)
   , mFragmentSource(fragmentSource)
 {}

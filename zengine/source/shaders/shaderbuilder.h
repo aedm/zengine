@@ -119,5 +119,5 @@ private:
   /// Metadata
   vector<ShaderSource::Uniform> mUniforms;
   vector<ShaderSource::Sampler> mSamplers;
-  vector<ShaderSource::NamedResource> mBuffers;
+  vector<ShaderSource::NamedResource> mSSBOs;
 };

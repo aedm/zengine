@@ -39,11 +39,8 @@ void Pass::HandleMessage(Message* message) {
 }
 
 void Pass::Operate() {
-  /// Clean up from previous state
   if (!mShaderSource) return;
   mShaderProgram.reset();
-  mUsedSamplers.clear();
-  mUsedUniforms.clear();
 
   const string& vertexSource = mShaderSource->mVertexSource;
   const string& fragmentSource = mShaderSource->mFragmentSource;
@@ -56,30 +53,11 @@ void Pass::Operate() {
     return;
   }
 
-  /// Collect uniforms and samplers from shader stage sources
-  map<string, const ShaderSource::Uniform*> uniformMap;
-  for (auto& uniform : mShaderSource->mUniforms) {
-    uniformMap[uniform.mName] = &uniform;
-  }
-  map<string, const ShaderSource::Sampler*> samplerMap;
-  for (auto& sampler : mShaderSource->mSamplers) {
-    samplerMap[sampler.mName] = &sampler;
-  }
-
-  /// Create list of used uniforms and samplers
-  for (auto& uniform : mShaderProgram->mUniforms) {
-    auto it = uniformMap.find(uniform.mName);
-    ASSERT(it != uniformMap.end());
-    mUsedUniforms.push_back(UniformMapper(&uniform, it->second));
-  }
-  for (auto& sampler : mShaderProgram->mSamplers) {
-    auto it = samplerMap.find(sampler.mName);
-    ASSERT(it != samplerMap.end());
-    mUsedSamplers.push_back(SamplerMapper(&sampler, it->second));
-  }
+  mUniforms.Collect(mShaderSource->mUniforms, mShaderProgram->mUniforms);
+  mSamplers.Collect(mShaderSource->mSamplers, mShaderProgram->mSamplers);
+  mSSBOs.Collect(mShaderSource->mSSBOs, mShaderProgram->mSSBOs);
 
   /// Allocate space for uniform array
-  //mUniformArray.resize(mShaderProgram->mUniformBlockSize);
   ASSERT(mShaderProgram->mUniformBlockSize <= MAX_UNIFORM_BUFFER_SIZE);
   mUniformBuffer->Allocate(mShaderProgram->mUniformBlockSize);
 }
@@ -168,7 +146,7 @@ void Pass::Set(Globals* globals) {
   /// Fill uniform array item by item, take value from Nodes and put them
   /// into the array using the uniform offset. Not particularly nice code,
   /// but fast enough.
-  for (UniformMapper& uniformMapper : mUsedUniforms) {
+  for (const auto& uniformMapper : mUniforms.GetResources()) {
     const ShaderSource::Uniform* source = uniformMapper.mSource;
     const ShaderProgram::Uniform* target = uniformMapper.mTarget;
     if (source->mGlobalType == GlobalUniformUsage::LOCAL) {
@@ -221,7 +199,7 @@ void Pass::Set(Globals* globals) {
 
   /// Set samplers
   UINT i = 0;
-  for (SamplerMapper& samplerMapper : mUsedSamplers) {
+  for (const auto& samplerMapper : mSamplers.GetResources()) {
     const ShaderSource::Sampler* source = samplerMapper.mSource;
     const ShaderProgram::Sampler* target = samplerMapper.mTarget;
 
@@ -238,6 +216,9 @@ void Pass::Set(Globals* globals) {
     }
     OpenGL->SetTexture(*target, tex ? tex : nullptr, i++);
   }
+
+  /// Set SSBOs
+  //NOT_IMPLEMENTED;
 }
 
 bool Pass::isComplete() {
@@ -251,13 +232,3 @@ std::string Pass::GetVertexShaderSource() {
 std::string Pass::GetFragmentShaderSource() {
   return mShaderSource ? mShaderSource->mFragmentSource : "[No fragment shader]";
 }
-
-Pass::UniformMapper::UniformMapper(const ShaderProgram::Uniform* target,
-  const ShaderSource::Uniform* source)
-  : mTarget(target)
-  , mSource(source) {}
-
-Pass::SamplerMapper::SamplerMapper(const ShaderProgram::Sampler* target,
-  const ShaderSource::Sampler* source)
-  : mTarget(target)
-  , mSource(source) {}

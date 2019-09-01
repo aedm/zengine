@@ -80,7 +80,7 @@ ShaderBuilder::ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
 }
 
 shared_ptr<ShaderSource> ShaderBuilder::MakeShaderSource() {
-  return make_shared<ShaderSource>(mUniforms, mSamplers,
+  return make_shared<ShaderSource>(mUniforms, mSamplers, mSSBOs,
     mVertexStage.mSourceStream.str(),
     mFragmentStage.mSourceStream.str());
 }
@@ -291,7 +291,7 @@ void ShaderBuilder::AddLocalsToDependencies() {
       it.second->mName, it.first, GlobalSamplerUsage::LOCAL, false, false);
   }
   for (auto& it : mBufferMap) {
-    mBuffers.emplace_back(it.second->mName, it.first);
+    mSSBOs.emplace_back(it.second->mName, it.first);
   }
 }
 
@@ -376,10 +376,10 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
 
   /// Buffers
   int bind = 0;
-  for (auto buffer : mBuffers) {
+  for (auto buffer : mSSBOs) {
     stream << // "layout(std140, binding=" << (++bind) << ") " << 
-      "layout(std140) buffer " << buffer.mName << "_buffer {" << endl <<
-      "  vec4 " << buffer.mName << "[];" << endl <<
+      "layout(std140) buffer " << buffer.mName << " {" << endl <<
+      "  vec4 " << buffer.mName << "_items[];" << endl <<
       "};" << endl;
   }
 
@@ -422,14 +422,16 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
           throw exception();
         }
         if (param->mType == StubParameter::Type::SAMPLER2D) {
-          /// Parameter is a texture or a buffer
+          /// Parameter is a texture
           auto& valueReference = mSamplerMap.at(paramNode);
           stream << "#define " << param->mName << ' ' << valueReference->mName << endl;
         }
         else if (param->mType == StubParameter::Type::BUFFER) {
-          /// Parameter is a texture or a buffer
+          /// Parameter is a buffer. The alias should refer to the inner array.
+          /// "buffer foo { vec4 foo_items[] }"
           auto& valueReference = mBufferMap.at(paramNode);
-          stream << "#define " << param->mName << ' ' << valueReference->mName << endl;
+          stream << "#define " << param->mName << ' ' << valueReference->mName << 
+            "_items" << endl;
         }
         else if (IsPointerOf<StubNode>(paramNode)) {
           /// Parameter is the result of a former function call

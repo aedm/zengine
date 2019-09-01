@@ -41,6 +41,7 @@ struct ShaderSource {
   ShaderSource(
     const vector<Uniform>& uniforms,
     const vector<Sampler>& samplers,
+    const vector<NamedResource>& ssbos,
     const string& vertexSource, const string& fragmentSource);
 
   /// All uniforms from all shader stages merged
@@ -49,8 +50,8 @@ struct ShaderSource {
   /// All samplers from all shader stages merged
   const vector<Sampler> mSamplers;
 
-  /// Buffers
-  const vector<NamedResource> mBuffers;
+  /// Shader Storage Buffer Objects
+  const vector<NamedResource> mSSBOs;
 
   /// Generated source code for stages stages
   const string mVertexSource;
