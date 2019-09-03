@@ -31,16 +31,10 @@ public:
   template<int N> void SetIndices(const IndexEntry(&staticIndices)[N]);
 
   UINT mVertexCount = 0;
-  //UINT mVertexBufferSize;
-  //VertexBufferHandle mVertexHandle;
   const shared_ptr<Buffer> mVertexBuffer = make_shared<Buffer>();
 
   UINT mIndexCount = 0;
-  //IndexBufferHandle mIndexHandle;
   const shared_ptr<Buffer> mIndexBuffer = make_shared<Buffer>();
-
-  //UINT mWireframeIndexCount;
-  //IndexBufferHandle	mWireframeIndexHandle;
 
   shared_ptr<VertexFormat> mFormat = nullptr;
 

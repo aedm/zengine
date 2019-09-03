@@ -12,7 +12,7 @@ class OpenGLAPI;
 extern OpenGLAPI* OpenGL;
 extern bool GLDisableErrorChecks;
 
-const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 1;
+const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 4;
 
 /// TODO: query OpenGL for this value
 static const int MAX_COMBINED_TEXTURE_SLOTS = 48;
