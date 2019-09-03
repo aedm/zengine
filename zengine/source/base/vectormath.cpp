@@ -184,8 +184,20 @@ Vec4 Vec4::operator-(const Vec4& v) const {
   return Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
 }
 
+Vec4 Vec4::operator+(const Vec4& v) const {
+  return Vec4(x + v.x, y + v.y, z + v.z, w + v.w);
+}
+
 bool Vec4::operator == (const Vec4& v) const {
   return x == v.x && y == v.y && z == v.z && w == v.w;
+}
+
+Vec4 Vec4::operator*(float f) const {
+  return Vec4(x * f, y * f, z * f, w * f);
+}
+
+Vec4 Vec4::operator/(float f) const {
+  return Vec4(x / f, y / f, z / f, w / f);
 }
 
 float& Vec4::operator[](int n) {

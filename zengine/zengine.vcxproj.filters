@@ -182,6 +182,7 @@
     <ClInclude Include="include\nodes\texturenode.h" />
     <ClInclude Include="include\shaders\valuetype.h" />
     <ClInclude Include="include\nodes\buffernode.h" />
+    <ClInclude Include="include\nodes\spline.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -290,6 +291,7 @@
     <ClCompile Include="source\nodes\texturenode.cpp" />
     <ClCompile Include="source\shaders\valuetype.cpp" />
     <ClCompile Include="source\nodes\buffernode.cpp" />
+    <ClCompile Include="source\nodes\spline.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

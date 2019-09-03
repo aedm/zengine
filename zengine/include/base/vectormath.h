@@ -78,6 +78,9 @@ public:
 
   float Dot(const Vec4& v) const;
   Vec4 operator - (const Vec4& v) const;
+  Vec4 operator + (const Vec4& v) const;
+  Vec4 operator * (float f) const;
+  Vec4 operator / (float f) const;
   Vec4 operator * (const Matrix& m) const;
 
   bool operator == (const Vec4& v) const;
