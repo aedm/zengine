@@ -10,8 +10,9 @@ using namespace std;
 
 class OpenGLAPI;
 extern OpenGLAPI* OpenGL;
+extern bool GLDisableErrorChecks;
 
-const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 1;
+const int ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT = 4;
 
 /// TODO: query OpenGL for this value
 static const int MAX_COMBINED_TEXTURE_SLOTS = 48;
@@ -64,19 +65,48 @@ struct ShaderProgram {
     const SamplerId mHandle;
   };
 
+  struct SSBO {
+    SSBO(const string& name, UINT index);
+    const string mName;
+    const UINT mIndex;
+  };
+
   ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
     ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
-    vector<Sampler>& samplers,
-    UINT uniformBlockSize, ShaderHandle uniformBufferHandle);
+    vector<Sampler>& samplers, vector<SSBO>& ssbos,
+    UINT uniformBlockSize);
   ~ShaderProgram();
 
   const ShaderHandle mProgramHandle;
   const ShaderHandle mVertexShaderHandle;
   const ShaderHandle mFragmentShaderHandle;
-  const ShaderHandle mUniformBufferHandle;
   const vector<Uniform> mUniforms;
   const vector<Sampler> mSamplers;
+  const vector<SSBO> mSSBOs;
   const UINT mUniformBlockSize;
+};
+
+/// OpenGL general buffer object
+class Buffer {
+public:
+  /// Creates a new buffer with a specific size. -1 means no resource allocation.
+  Buffer(int byteSize = -1);
+  ~Buffer();
+  void Allocate(int byteSize);
+  
+  /// Returns true if there's no data in the buffer
+  bool IsEmpty();
+
+  /// Uploads data to the buffer
+  void UploadData(const void* data, int byteSize);
+  DrawingAPIHandle GetHandle();
+  int GetByteSize();
+
+private:
+  void Release();
+
+  DrawingAPIHandle mHandle = 0;
+  int mByteSize = -1;
 };
 
 
@@ -103,28 +133,19 @@ public:
   /// Shader functions
   shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
     const char* FragmentSource);
-  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, void* uniforms);
+  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
+    const shared_ptr<Buffer>& uniformBuffer);
   void SetUniform(UniformId Id, ValueType Type, const void* Values);
-
-  /// Vertex buffer handling
-  VertexBufferHandle CreateVertexBuffer(UINT Size);
-  void DestroyVertexBuffer(VertexBufferHandle Handle);
-  void* MapVertexBuffer(VertexBufferHandle Handle);
-  void UnMapVertexBuffer(VertexBufferHandle Handle);
-  void SetVertexBuffer(VertexBufferHandle Handle);
   void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
 
-  /// Index buffer handling
-  IndexBufferHandle CreateIndexBuffer(UINT IndexCount);
-  void DestroyIndexBuffer(IndexBufferHandle Handle);
-  void* MapIndexBuffer(IndexBufferHandle Handle);
-  void UnMapIndexBuffer(IndexBufferHandle Handle);
-  void SetIndexBuffer(IndexBufferHandle Handle);
+  /// Buffer functions
+  void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
+  void SetIndexBuffer(const shared_ptr<Buffer>& buffer);
+  void SetSSBO(UINT index, const shared_ptr<Buffer>& buffer);
 
-  void Render(IndexBufferHandle IndexBuffer,
-    UINT Count,
-    PrimitiveTypeEnum PrimitiveType,
-    UINT InstanceCount);
+  void Render(const shared_ptr<Buffer>& indexBuffer,
+    UINT Count, PrimitiveTypeEnum primitiveType,
+    UINT instanceCount);
 
   /// Texture and surface handling
   static UINT GetTexelByteCount(TexelType type);

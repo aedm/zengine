@@ -1,6 +1,7 @@
 #include "shaderbuilder.h"
 #include <include/shaders/enginestubs.h>
 #include <include/nodes/texturenode.h>
+#include <include/nodes/buffernode.h>
 #include <exception>
 
 shared_ptr<ShaderSource> ShaderBuilder::FromStubs(const shared_ptr<StubNode>& vertexStub,
@@ -79,7 +80,7 @@ ShaderBuilder::ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
 }
 
 shared_ptr<ShaderSource> ShaderBuilder::MakeShaderSource() {
-  return make_shared<ShaderSource>(mUniforms, mSamplers,
+  return make_shared<ShaderSource>(mUniforms, mSamplers, mSSBOs,
     mVertexStage.mSourceStream.str(),
     mFragmentStage.mSourceStream.str());
 }
@@ -122,7 +123,10 @@ StubParameter::Type NodeToParamType(const shared_ptr<Node>& node) {
   if (IsPointerOf<ValueNode<Vec3>>(node)) return StubParameter::Type::VEC3;
   if (IsPointerOf<ValueNode<Vec4>>(node)) return StubParameter::Type::VEC4;
   if (IsPointerOf<ValueNode<Matrix>>(node)) return StubParameter::Type::MATRIX44;
-  if (IsPointerOf<ValueNode<shared_ptr<Texture>>>(node)) return StubParameter::Type::SAMPLER2D;
+  if (IsPointerOf<ValueNode<shared_ptr<Texture>>>(node)) {
+    return StubParameter::Type::SAMPLER2D;
+  }
+  if (IsPointerOf<BufferNode>(node)) return StubParameter::Type::BUFFER;
   SHOULD_NOT_HAPPEN;
   return StubParameter::Type::NONE;
 }
@@ -163,12 +167,22 @@ void ShaderBuilder::TraverseDependencies(const shared_ptr<Node>& root,
     StubParameter::Type type = NodeToParamType(root);
     ASSERT(type != StubParameter::Type::NONE);
     ref->mType = type;
-    if (type == StubParameter::Type::SAMPLER2D) {
+    switch (type) {
+    case StubParameter::Type::SAMPLER2D:
       if (mSamplerMap.find(root) == mSamplerMap.end()) {
         mSamplerMap[root] = ref;
       }
-    }
-    else {
+      break;
+    case StubParameter::Type::IMAGE2D:
+      NOT_IMPLEMENTED;
+      break;
+    case StubParameter::Type::BUFFER:
+      if (mBufferMap.find(root) == mBufferMap.end()) {
+        mBufferMap[root] = ref;
+      }
+      break;
+    default:
+      /// Value type, plain uniform
       if (mUniformMap.find(root) == mUniformMap.end()) {
         mUniformMap[root] = ref;
       }
@@ -229,6 +243,13 @@ void ShaderBuilder::GenerateNames() {
     samplerName << "_sampler_" << ++samplerIndex;
     it.second->mName = samplerName.str();
   }
+
+  int bufferIndex = 0;
+  for (auto& it : mBufferMap) {
+    stringstream bufferName;
+    bufferName << "_buffer_" << ++bufferIndex;
+    it.second->mName = bufferName.str();
+  }
 }
 
 
@@ -268,6 +289,9 @@ void ShaderBuilder::AddLocalsToDependencies() {
   for (auto& it : mSamplerMap) {
     mSamplers.emplace_back(
       it.second->mName, it.first, GlobalSamplerUsage::LOCAL, false, false);
+  }
+  for (auto& it : mBufferMap) {
+    mSSBOs.emplace_back(it.second->mName, it.first);
   }
 }
 
@@ -350,6 +374,14 @@ void ShaderBuilder::GenerateSourceHeader(ShaderStage* shaderStage) {
         sampler.mIsShadow) << ' ' << sampler.mName << ';' << endl;
   }
 
+  /// Buffers
+  int bind = 0;
+  for (auto buffer : mSSBOs) {
+    stream << "layout(std140) buffer " << buffer.mName << " {" << endl <<
+      "  vec4 " << buffer.mName << "_items[];" << endl <<
+      "};" << endl;
+  }
+
   /// Stub inputs as variables
   for (const auto& node : shaderStage->mDependencies) {
     if (IsPointerOf<StubNode>(node)) {
@@ -392,6 +424,13 @@ void ShaderBuilder::GenerateSourceFunctions(ShaderStage* shaderStage) {
           /// Parameter is a texture
           auto& valueReference = mSamplerMap.at(paramNode);
           stream << "#define " << param->mName << ' ' << valueReference->mName << endl;
+        }
+        else if (param->mType == StubParameter::Type::BUFFER) {
+          /// Parameter is a buffer. The alias should refer to the inner array.
+          /// "buffer foo { vec4 foo_items[] }"
+          auto& valueReference = mBufferMap.at(paramNode);
+          stream << "#define " << param->mName << ' ' << valueReference->mName << 
+            "_items" << endl;
         }
         else if (IsPointerOf<StubNode>(paramNode)) {
           /// Parameter is the result of a former function call

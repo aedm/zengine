@@ -34,6 +34,7 @@
 #include "nodes/splinenode.h"
 #include "nodes/cameranode.h"
 #include "nodes/meshgenerators.h"
+#include "nodes/buffernode.h"
 
 #include "serialize/lodepng.h"
 

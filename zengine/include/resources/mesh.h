@@ -9,14 +9,14 @@
 using namespace std;
 class Mesh {
 public:
-  Mesh();
+  //Mesh();
   ~Mesh();
 
   void Render(UINT instanceCount, PrimitiveTypeEnum primitive) const;
 
   void AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount);
   void AllocateIndices(UINT indexCount);
-  void AllocateWireframeIndices(UINT indexCount);
+  //void AllocateWireframeIndices(UINT indexCount);
 
   /// Uploads all vertices
   void UploadVertices(void* vertices);
@@ -30,17 +30,13 @@ public:
   template<typename T, int N>	void SetVertices(const T(&staticVertices)[N]);
   template<int N> void SetIndices(const IndexEntry(&staticIndices)[N]);
 
-  UINT mVertexCount;
-  UINT mVertexBufferSize;
-  VertexBufferHandle mVertexHandle;
+  UINT mVertexCount = 0;
+  const shared_ptr<Buffer> mVertexBuffer = make_shared<Buffer>();
 
-  UINT mIndexCount;
-  IndexBufferHandle mIndexHandle;
+  UINT mIndexCount = 0;
+  const shared_ptr<Buffer> mIndexBuffer = make_shared<Buffer>();
 
-  UINT mWireframeIndexCount;
-  IndexBufferHandle	mWireframeIndexHandle;
-
-  shared_ptr<VertexFormat> mFormat;
+  shared_ptr<VertexFormat> mFormat = nullptr;
 
   /// Raw mesh data for deserialization
   void* mRawVertexData = nullptr;

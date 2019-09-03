@@ -6,9 +6,11 @@
 #include <include/render/drawingapi.h>
 #include <include/nodes/valuenodes.h>
 #include <include/nodes/texturenode.h>
-
+#include <include/nodes/buffernode.h>
 
 REGISTER_NODECLASS(Pass, "Pass");
+
+const int MAX_UNIFORM_BUFFER_SIZE = 4096;
 
 Pass::Pass()
   : Node()
@@ -38,11 +40,8 @@ void Pass::HandleMessage(Message* message) {
 }
 
 void Pass::Operate() {
-  /// Clean up from previous state
   if (!mShaderSource) return;
   mShaderProgram.reset();
-  mUsedSamplers.clear();
-  mUsedUniforms.clear();
 
   const string& vertexSource = mShaderSource->mVertexSource;
   const string& fragmentSource = mShaderSource->mFragmentSource;
@@ -55,91 +54,23 @@ void Pass::Operate() {
     return;
   }
 
-  /// Collect uniforms and samplers from shader stage sources
-  map<string, const ShaderSource::Uniform*> uniformMap;
-  for (auto& uniform : mShaderSource->mUniforms) {
-    uniformMap[uniform.mName] = &uniform;
-  }
-  map<string, const ShaderSource::Sampler*> samplerMap;
-  for (auto& sampler : mShaderSource->mSamplers) {
-    samplerMap[sampler.mName] = &sampler;
-  }
-
-  /// Create list of used uniforms and samplers
-  for (auto& uniform : mShaderProgram->mUniforms) {
-    auto it = uniformMap.find(uniform.mName);
-    ASSERT(it != uniformMap.end());
-    mUsedUniforms.push_back(UniformMapper(&uniform, it->second));
-  }
-  for (auto& sampler : mShaderProgram->mSamplers) {
-    auto it = samplerMap.find(sampler.mName);
-    ASSERT(it != samplerMap.end());
-    mUsedSamplers.push_back(SamplerMapper(&sampler, it->second));
-  }
+  mUniforms.Collect(mShaderSource->mUniforms, mShaderProgram->mUniforms);
+  mSamplers.Collect(mShaderSource->mSamplers, mShaderProgram->mSamplers);
+  mSSBOs.Collect(mShaderSource->mSSBOs, mShaderProgram->mSSBOs);
 
   /// Allocate space for uniform array
-  mUniformArray.resize(mShaderProgram->mUniformBlockSize);
-}
-
-Slot* CreateValueSlot(ValueType type, Node* owner,
-  const string& name, bool isMultiSlot = false,
-  bool isPublic = true, bool isSerializable = true,
-  float minimum = 0.0f, float maximum = 1.0f) 
-{
-  switch (type)
-  {
-  case ValueType::FLOAT:
-    return new FloatSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::VEC2:
-    return new Vec2Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::VEC3:
-    return new Vec3Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::VEC4:
-    return new Vec4Slot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  case ValueType::MATRIX44:
-    return new MatrixSlot(owner, name, isMultiSlot, isPublic, isSerializable, minimum, maximum);
-  default:
-    SHOULD_NOT_HAPPEN;
-    return nullptr;
-  }
+  ASSERT(mShaderProgram->mUniformBlockSize <= MAX_UNIFORM_BUFFER_SIZE);
+  mUniformBuffer->Allocate(mShaderProgram->mUniformBlockSize);
 }
 
 void Pass::BuildShaderSource()
 {
   mIsUpToDate = false;
 
-  /// Reset slots
-  mUniformAndSamplerSlots.clear();
-  ClearSlots();
-  AddSlot(&mVertexStub, true, true, true);
-  AddSlot(&mFragmentStub, true, true, true);
-  AddSlot(&mFaceModeSlot, true, true, true);
-  AddSlot(&mBlendModeSlot, true, true, true);
-
   /// Generate shader source
   mShaderSource.reset();
-  mShaderSource = ShaderBuilder::FromStubs(mVertexStub.GetNode(),
-    mFragmentStub.GetNode());
-  if (!mShaderSource) return;
-
-  INFO("Building render pipeline...");
-
-  for (auto& sampler : mShaderSource->mSamplers) {
-    if (sampler.mNode) {
-      shared_ptr<Slot> slot =
-        make_shared<TextureSlot>(this, string(), false, false, false, false);
-      slot->Connect(sampler.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
-  for (auto& uniform : mShaderSource->mUniforms) {
-    if (uniform.mNode) {
-      shared_ptr<Slot> slot = shared_ptr<Slot>(CreateValueSlot(
-        NodeToValueType(uniform.mNode), this, string(), false, false, false, false));
-      slot->Connect(uniform.mNode);
-      mUniformAndSamplerSlots.push_back(slot);
-    }
-  }
+  mShaderSource = 
+    ShaderBuilder::FromStubs(mVertexStub.GetNode(), mFragmentStub.GetNode());
 }
 
 void Pass::Set(Globals* globals) {
@@ -160,10 +91,12 @@ void Pass::Set(Globals* globals) {
 
   OpenGL->SetRenderState(&mRenderstate);
 
+  char uniformArray[MAX_UNIFORM_BUFFER_SIZE];
+
   /// Fill uniform array item by item, take value from Nodes and put them
   /// into the array using the uniform offset. Not particularly nice code,
   /// but fast enough.
-  for (UniformMapper& uniformMapper : mUsedUniforms) {
+  for (const auto& uniformMapper : mUniforms.GetResources()) {
     const ShaderSource::Uniform* source = uniformMapper.mSource;
     const ShaderProgram::Uniform* target = uniformMapper.mTarget;
     if (source->mGlobalType == GlobalUniformUsage::LOCAL) {
@@ -177,7 +110,7 @@ void Pass::Set(Globals* globals) {
               PointerCast<ValueNode<ValueTypes<name>::Type>>(source->mNode); \
             vNode->Update(); \
             *(reinterpret_cast<ValueTypes<name>::Type*>( \
-              &mUniformArray[target->mOffset])) = vNode->Get(); \
+              &uniformArray[target->mOffset])) = vNode->Get(); \
 					  break; \
           }
         ITEM(ValueType::FLOAT);
@@ -197,7 +130,7 @@ void Pass::Set(Globals* globals) {
         case name: { \
           void* valuePointer = reinterpret_cast<char*>(globals)+offset; \
           *(reinterpret_cast<ValueTypes<name>::Type*>( \
-            &mUniformArray[target->mOffset])) = \
+            &uniformArray[target->mOffset])) = \
             *reinterpret_cast<ValueTypes<name>::Type*>(valuePointer); \
           break; \
         }
@@ -211,11 +144,12 @@ void Pass::Set(Globals* globals) {
     }
   }
 
-  OpenGL->SetShaderProgram(mShaderProgram, &mUniformArray[0]);
+  mUniformBuffer->UploadData(uniformArray, mShaderProgram->mUniformBlockSize);
+  OpenGL->SetShaderProgram(mShaderProgram, mUniformBuffer);
 
   /// Set samplers
   UINT i = 0;
-  for (SamplerMapper& samplerMapper : mUsedSamplers) {
+  for (const auto& samplerMapper : mSamplers.GetResources()) {
     const ShaderSource::Sampler* source = samplerMapper.mSource;
     const ShaderProgram::Sampler* target = samplerMapper.mTarget;
 
@@ -232,18 +166,27 @@ void Pass::Set(Globals* globals) {
     }
     OpenGL->SetTexture(*target, tex ? tex : nullptr, i++);
   }
+
+  /// Set SSBOs
+  for (const auto& ssbo : mSSBOs.GetResources()) {
+    const ShaderSource::NamedResource* source = ssbo.mSource;
+    const ShaderProgram::SSBO* target = ssbo.mTarget;
+    shared_ptr<Buffer> buffer = 
+      PointerCast<BufferNode>(ssbo.mSource->mNode)->GetBuffer();
+    
+    if (!buffer) continue;
+    OpenGL->SetSSBO(target->mIndex, buffer);
+  }
 }
 
 bool Pass::isComplete() {
   return (mShaderProgram != nullptr);
 }
 
-Pass::UniformMapper::UniformMapper(const ShaderProgram::Uniform* target,
-  const ShaderSource::Uniform* source)
-  : mTarget(target)
-  , mSource(source) {}
+std::string Pass::GetVertexShaderSource() {
+  return mShaderSource ? mShaderSource->mVertexSource : "[No vertex shader]";
+}
 
-Pass::SamplerMapper::SamplerMapper(const ShaderProgram::Sampler* target,
-  const ShaderSource::Sampler* source)
-  : mTarget(target)
-  , mSource(source) {}
+std::string Pass::GetFragmentShaderSource() {
+  return mShaderSource ? mShaderSource->mFragmentSource : "[No fragment shader]";
+}

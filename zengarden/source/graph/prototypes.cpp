@@ -35,6 +35,7 @@ Prototypes::Prototypes() {
 
   AddPrototype(registry->GetNodeClass<CubeMeshNode>());
   AddPrototype(registry->GetNodeClass<HalfCubeMeshNode>());
+  AddPrototype(registry->GetNodeClass<MeshToVertexBufferNode>());
 
   LoadStubs();
 
@@ -43,6 +44,7 @@ Prototypes::Prototypes() {
   make_shared<FloatSplineNode>()->Get();
   make_shared<FloatsToVec3Node>();
   make_shared<CubeMeshNode>();
+  make_shared<MeshToVertexBufferNode>();
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {

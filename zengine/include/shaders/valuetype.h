@@ -63,7 +63,6 @@ struct VertexAttribute {
 class VertexFormat {
 public:
   VertexFormat(UINT binaryFormat);
-  ~VertexFormat();
 
   bool HasAttribute(VertexAttributeUsage attrib);
 

@@ -185,6 +185,8 @@ StubParameter::Type StubAnalyzer::TokenToType(const SubString& subStr) {
     case TOKEN_sampler2D:       return StubParameter::Type::SAMPLER2D;
     case TOKEN_sampler2DMS:     return StubParameter::Type::SAMPLER2D;
     case TOKEN_sampler2DShadow: return StubParameter::Type::SAMPLER2D;
+    case TOKEN_image2D:         return StubParameter::Type::IMAGE2D;
+    case TOKEN_buffer:          return StubParameter::Type::BUFFER;
     default:
       ERR("line %d: Wrong type '%s'", mCurrentLineNumber, subStr.ToString().c_str());
       return StubParameter::Type::NONE;

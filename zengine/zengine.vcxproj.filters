@@ -71,9 +71,6 @@
     <ClInclude Include="include\base\helpers.h">
       <Filter>include\base</Filter>
     </ClInclude>
-    <ClInclude Include="source\render\opengl\drawingopengl.h">
-      <Filter>source\render\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="include\base\defines.h">
       <Filter>include\base</Filter>
     </ClInclude>
@@ -184,6 +181,7 @@
     <ClInclude Include="include\serialize\lodepng.h" />
     <ClInclude Include="include\nodes\texturenode.h" />
     <ClInclude Include="include\shaders\valuetype.h" />
+    <ClInclude Include="include\nodes\buffernode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -291,6 +289,7 @@
     <ClCompile Include="source\serialize\lodepng.cpp" />
     <ClCompile Include="source\nodes\texturenode.cpp" />
     <ClCompile Include="source\shaders\valuetype.cpp" />
+    <ClCompile Include="source\nodes\buffernode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

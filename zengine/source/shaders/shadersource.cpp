@@ -4,9 +4,11 @@
 ShaderSource::ShaderSource(
   const vector<Uniform>& uniforms,
   const vector<Sampler>& samplers,
+  const vector<NamedResource>& ssbos,
   const string& vertexSource, const string& fragmentSource)
   : mUniforms(uniforms)
   , mSamplers(samplers)
+  , mSSBOs(ssbos)
   , mVertexSource(vertexSource)
   , mFragmentSource(fragmentSource)
 {}
@@ -27,3 +29,8 @@ ShaderSource::Sampler::Sampler(const string& name, const shared_ptr<Node>& node,
   , mIsMultiSampler(isMultiSampler)
   , mIsShadow(isShadow)
 {}
+
+ShaderSource::NamedResource::NamedResource(const string& name,
+  const shared_ptr<Node>& node)
+  : mName(name)
+  , mNode(node) {}

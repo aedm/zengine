@@ -5,8 +5,12 @@
 #define GLEW_STATIC
 #include <glew/glew.h>
 
+bool GLDisableErrorChecks = false;
+
+
 #ifdef _DEBUG
 void CheckGLError() {
+  if (GLDisableErrorChecks) return;
   GLenum error = glGetError();
   ASSERT(error == GL_NO_ERROR);
 }
@@ -61,8 +65,8 @@ OpenGLAPI::OpenGLAPI() {
     if (versionName == NULL) ERR(L"OpenGL not found at all.");
     else INFO(L"OpenGL version %s found.", versionName);
 
-    if (!GLEW_VERSION_4_3) {
-      ERR(L"Sorry, OpenGL 4.3 needed at least.");
+    if (!GLEW_VERSION_4_5) {
+      ERR(L"Sorry, OpenGL 4.5 needed at least.");
     }
     CheckGLError();
   }
@@ -139,65 +143,9 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
   return shader;
 }
 
-shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
-  const char* vertexSource, const char* fragmentSource) {
-
-  ASSERT(!PleaseNoNewResources);
-  CheckGLError();
-  GLuint program = glCreateProgram();
-  mProgramCompiledHack = true;
-
-  CheckGLError();
-  /// Compile shaders
-  ShaderHandle vertexShaderHandle =
-    CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource);
-  if (vertexShaderHandle == 0) {
-    WARN(L"Vertex shader compilation failed.");
-    glDeleteProgram(program);
-    CheckGLError();
-    return nullptr;
-  }
-  ShaderHandle fragmentShaderHandle =
-    CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource);
-  if (fragmentShaderHandle == 0) {
-    WARN(L"Fragment shader compilation failed.");
-
-    CheckGLError();
-    glDeleteProgram(program);
-    CheckGLError();
-    glDeleteShader(vertexShaderHandle);
-    CheckGLError();
-    return nullptr;
-  }
-
-  /// Link program
-  glLinkProgram(program);
-
-  GLint result, length;
-  glGetProgramiv(program, GL_LINK_STATUS, &result);
-  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-  if (length > 1) {
-    char *log = new char[length];
-    int charCount;
-    glGetProgramInfoLog(program, length, &charCount, log);
-    if (result == GL_FALSE) {
-      ERR("Can't link shader: %s", log);
-    }
-    else {
-      WARN("Shader compiler: %s", log);
-    }
-    CheckGLError();
-    delete log;
-  }
-
-  if (result == GL_FALSE) {
-    glDeleteProgram(program);
-    glDeleteShader(vertexShaderHandle);
-    glDeleteShader(fragmentShaderHandle);
-    CheckGLError();
-    return nullptr;
-  }
-
+void CollectUniformsFromProgram(GLuint program, 
+  vector<ShaderProgram::Uniform>& uniforms, UINT* oBlockSize)
+{
   /// Query uniform blocks
   GLint uniformBlockCount;
   glGetProgramInterfaceiv(program, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES,
@@ -220,8 +168,6 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     ElementCount(blockPropsList), nullptr,
     reinterpret_cast<GLint*>(&blockProps));
 
-  //if (numActiveUnifs > 0) continue;
-  vector<ShaderProgram::Uniform> uniforms;
   uniforms.reserve(blockProps.mUniformCount);
 
   std::vector<GLint> uniformLocations(blockProps.mUniformCount);
@@ -259,10 +205,44 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     uniforms.push_back(
       ShaderProgram::Uniform(string(&name[0]), nodeType, values.mOffset));
   }
+  *oBlockSize = blockProps.mSize;
+}
 
-  /// Query samplers' list with the old OpenGL API
-  /// Interface API can't handle samplers :((((
-  vector<ShaderProgram::Sampler> samplers;
+void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos) {
+  /// Query buffer indexes
+  GLint bufferCount, ssboCount;
+  glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES,
+    &bufferCount);
+  glGetProgramInterfaceiv(program, GL_BUFFER_VARIABLE, GL_ACTIVE_RESOURCES,
+    &ssboCount);
+  INFO("Buffer count: %d, SSBO count: %d", bufferCount, ssboCount);
+
+  /// TODO: query name length instead
+  char name[2048];
+  for (int i = 0; i < ssboCount; i++) {
+    const GLenum blockPropsList[] = { GL_REFERENCED_BY_VERTEX_SHADER,
+      GL_REFERENCED_BY_FRAGMENT_SHADER };
+    const int propCount = ElementCount(blockPropsList);
+    GLint props[propCount];
+    glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, i, propCount,
+      blockPropsList, propCount, nullptr, props);
+    GLint isReferenced = (props[0] + props[1]) > 0;
+    glGetProgramResourceName(program, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), nullptr,
+      name);
+    GLuint resouceIndex =
+      glGetProgramResourceIndex(program, GL_SHADER_STORAGE_BLOCK, name);
+    INFO("SSBO #%d name: %s, index: %d, used: %d",
+      i, name, resouceIndex, isReferenced);
+
+    if (isReferenced) {
+      /// Set up binding point
+      glShaderStorageBlockBinding(program, resouceIndex, resouceIndex);
+      ssbos.emplace_back(string(name), resouceIndex);
+    }
+  }
+}
+
+void CollectOpaqueFromProgram(GLuint program, vector<ShaderProgram::Sampler>& samplers) {
   GLint uniformCount;
   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
 
@@ -284,31 +264,94 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
     }
   }
   CheckGLError();
+}
 
-  /// Create a uniform buffer object for the shader
-  GLuint uboHandle;
-  glGenBuffers(1, &uboHandle);
-  glBindBuffer(GL_UNIFORM_BUFFER, uboHandle);
-  glBufferData(GL_UNIFORM_BUFFER, blockProps.mSize, nullptr, GL_DYNAMIC_DRAW);
+bool LinkProgram(GLuint program) {
+  /// Link program
+  glLinkProgram(program);
+
+  GLint result, length;
+  glGetProgramiv(program, GL_LINK_STATUS, &result);
+  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+  if (length > 1) {
+    char *log = new char[length];
+    int charCount;
+    glGetProgramInfoLog(program, length, &charCount, log);
+    if (result == GL_FALSE) {
+      ERR("Can't link shader: %s", log);
+    }
+    else {
+      WARN("Shader compiler: %s", log);
+    }
+    CheckGLError();
+    delete log;
+  }
+
+  return result == GL_TRUE;
+}
+
+shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
+  const char* vertexSource, const char* fragmentSource) 
+{
+  ASSERT(!PleaseNoNewResources);
   CheckGLError();
+  GLuint program = glCreateProgram();
+  mProgramCompiledHack = true;
 
+  CheckGLError();
+  /// Compile shaders
+  ShaderHandle vertexShaderHandle =
+    CompileAndAttachShader(program, GL_VERTEX_SHADER, vertexSource);
+  if (vertexShaderHandle == 0) {
+    WARN(L"Vertex shader compilation failed.");
+    glDeleteProgram(program);
+    CheckGLError();
+    return nullptr;
+  }
+  ShaderHandle fragmentShaderHandle =
+    CompileAndAttachShader(program, GL_FRAGMENT_SHADER, fragmentSource);
+  if (fragmentShaderHandle == 0) {
+    WARN(L"Fragment shader compilation failed.");
+    CheckGLError();
+    glDeleteProgram(program);
+    glDeleteShader(vertexShaderHandle);
+    CheckGLError();
+    return nullptr;
+  }
+
+  if (!LinkProgram(program)) {
+    glDeleteProgram(program);
+    glDeleteShader(vertexShaderHandle);
+    glDeleteShader(fragmentShaderHandle);
+    CheckGLError();
+    return nullptr;
+  }
+
+  UINT uniformBlockSize;
+  vector<ShaderProgram::Uniform> uniforms;
+  vector<ShaderProgram::Sampler> samplers;
+  vector<ShaderProgram::SSBO> ssbos;
+  CollectUniformsFromProgram(program, uniforms, &uniformBlockSize);
+  CollectOpaqueFromProgram(program, samplers);
+  CollectSSBOsFromProgram(program, ssbos);
+  
   return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
-    uniforms, samplers, blockProps.mSize,
-    uboHandle);
+    uniforms, samplers, ssbos, uniformBlockSize);
 }
 
 
 void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
-  void* uniforms) {
+  const shared_ptr<Buffer>& uniformBuffer) 
+{
   CheckGLError();
   glUseProgram(program->mProgramHandle);
   CheckGLError();
 
-  glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
-  glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
-  CheckGLError();
+  //glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
+  //glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
+  //CheckGLError();
 
-  glBindBufferBase(GL_UNIFORM_BUFFER, 0, program->mUniformBufferHandle);
+  glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformBuffer->GetHandle());
   CheckGLError();
 }
 
@@ -340,75 +383,75 @@ void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
 }
 
 
-VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
-  ASSERT(!PleaseNoNewResources);
-  VertexBufferHandle handle;
-  glGenBuffers(1, &handle);
-  CheckGLError();
-  BindVertexBuffer(handle);
-  glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
-  CheckGLError();
-  return handle;
-}
-
-
-void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
-  CheckGLError();
-  glDeleteBuffers(1, &handle);
-  CheckGLError();
-}
-
-
-void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
-  ASSERT(!PleaseNoNewResources);
-  BindVertexBuffer(handle);
-  void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-  CheckGLError();
-  return address;
-}
-
-
-void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
-  /// Please don't do anything else while a buffer is mapped
-  ASSERT(BoundVertexBufferShadow == handle);
-  glUnmapBuffer(GL_ARRAY_BUFFER);
-  CheckGLError();
-}
-
-
-IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
-  ASSERT(!PleaseNoNewResources);
-  IndexBufferHandle handle;
-  glGenBuffers(1, &handle);
-  CheckGLError();
-  BindIndexBuffer(handle);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
-  CheckGLError();
-  return handle;
-}
-
-
-void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
-  glDeleteBuffers(1, &handle);
-  CheckGLError();
-}
-
-
-void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
-  ASSERT(!PleaseNoNewResources);
-  BindIndexBuffer(handle);
-  void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-  CheckGLError();
-  return buffer;
-}
-
-
-void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
-  /// Please don't do anything else while a buffer is mapped
-  ASSERT(BoundIndexBufferShadow == handle);
-  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-  CheckGLError();
-}
+//VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
+//  ASSERT(!PleaseNoNewResources);
+//  VertexBufferHandle handle;
+//  glGenBuffers(1, &handle);
+//  CheckGLError();
+//  BindVertexBuffer(handle);
+//  glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+//  CheckGLError();
+//  return handle;
+//}
+//
+//
+//void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
+//  CheckGLError();
+//  glDeleteBuffers(1, &handle);
+//  CheckGLError();
+//}
+//
+//
+//void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
+//  ASSERT(!PleaseNoNewResources);
+//  BindVertexBuffer(handle);
+//  void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+//  CheckGLError();
+//  return address;
+//}
+//
+//
+//void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
+//  /// Please don't do anything else while a buffer is mapped
+//  ASSERT(BoundVertexBufferShadow == handle);
+//  glUnmapBuffer(GL_ARRAY_BUFFER);
+//  CheckGLError();
+//}
+//
+//
+//IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
+//  ASSERT(!PleaseNoNewResources);
+//  IndexBufferHandle handle;
+//  glGenBuffers(1, &handle);
+//  CheckGLError();
+//  BindIndexBuffer(handle);
+//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+//  CheckGLError();
+//  return handle;
+//}
+//
+//
+//void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
+//  glDeleteBuffers(1, &handle);
+//  CheckGLError();
+//}
+//
+//
+//void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
+//  ASSERT(!PleaseNoNewResources);
+//  BindIndexBuffer(handle);
+//  void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+//  CheckGLError();
+//  return buffer;
+//}
+//
+//
+//void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
+//  /// Please don't do anything else while a buffer is mapped
+//  ASSERT(BoundIndexBufferShadow == handle);
+//  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+//  CheckGLError();
+//}
 
 
 void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
@@ -450,17 +493,18 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
 }
 
 
-void OpenGLAPI::Render(IndexBufferHandle indexBuffer, UINT count,
-  PrimitiveTypeEnum primitiveType, UINT InstanceCount) {
+void OpenGLAPI::Render(const shared_ptr<Buffer>& indexBuffer, UINT count,
+  PrimitiveTypeEnum primitiveType, UINT instanceCount) 
+{
   CheckGLError();
-  if (indexBuffer != 0) {
-    BindIndexBuffer(indexBuffer);
+  if (indexBuffer != nullptr && indexBuffer->GetHandle() > 0) {
+    BindIndexBuffer(indexBuffer->GetHandle());
     CheckGLError();
     glDrawElementsInstanced(
-      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, InstanceCount);
+      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, instanceCount);
   }
   else {
-    glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, InstanceCount);
+    glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, instanceCount);
   }
   CheckGLError();
 }
@@ -540,14 +584,14 @@ void OpenGLAPI::BindDrawFramebuffer(GLuint framebuffer) {
 }
 
 
-void OpenGLAPI::NamedFramebufferReadBuffer(GLuint framebuffer, GLenum mode) {
+void OpenGLAPI::NamedFramebufferReadBuffer(FrameBufferId framebuffer, UINT mode) {
   BindReadFramebuffer(framebuffer);
   glReadBuffer(mode);
   CheckGLError();
 }
 
 
-void OpenGLAPI::NamedFramebufferDrawBuffer(GLuint framebuffer, GLenum mode) {
+void OpenGLAPI::NamedFramebufferDrawBuffer(FrameBufferId framebuffer, UINT mode) {
   BindDrawFramebuffer(framebuffer);
   glDrawBuffer(mode);
   CheckGLError();
@@ -939,15 +983,20 @@ void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
 }
 
 
-void OpenGLAPI::SetVertexBuffer(VertexBufferHandle handle) {
-  BindVertexBuffer(handle);
+void OpenGLAPI::SetVertexBuffer(const shared_ptr<Buffer>& buffer) {
+  BindVertexBuffer(buffer->GetHandle());
 }
 
 
-void OpenGLAPI::SetIndexBuffer(IndexBufferHandle handle) {
-  BindIndexBuffer(handle);
+void OpenGLAPI::SetIndexBuffer(const shared_ptr<Buffer>& buffer) {
+  BindIndexBuffer(buffer->GetHandle());
 }
 
+
+void OpenGLAPI::SetSSBO(UINT index, const shared_ptr<Buffer>& buffer) {
+  if (!buffer) return;
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, buffer->GetHandle());
+}
 
 void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset,
   UINT stride) 
@@ -969,18 +1018,17 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
   CheckGLError();
 }
 
-ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-  ShaderHandle fragmentProgramHandle,
-  vector<Uniform>& uniforms, vector<Sampler>& samplers,
-  UINT uniformBlockSize,
-  ShaderHandle uniformBufferHandle)
+ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, 
+  ShaderHandle vertexProgramHandle, ShaderHandle fragmentProgramHandle,
+  vector<Uniform>& uniforms, vector<Sampler>& samplers, vector<SSBO>& ssbos,
+  UINT uniformBlockSize)
   : mProgramHandle(shaderHandle)
   , mVertexShaderHandle(vertexProgramHandle)
   , mFragmentShaderHandle(fragmentProgramHandle)
   , mUniforms(uniforms)
   , mSamplers(samplers)
-  , mUniformBlockSize(uniformBlockSize)
-  , mUniformBufferHandle(uniformBufferHandle) {}
+  , mSSBOs(ssbos)
+  , mUniformBlockSize(uniformBlockSize) {}
 
 ShaderProgram::~ShaderProgram() {
   CheckGLError();
@@ -989,8 +1037,6 @@ ShaderProgram::~ShaderProgram() {
   glDeleteShader(mVertexShaderHandle);
   CheckGLError();
   glDeleteShader(mFragmentShaderHandle);
-  CheckGLError();
-  glDeleteBuffers(1, &mUniformBufferHandle);
   CheckGLError();
 }
 
@@ -1002,3 +1048,69 @@ ShaderProgram::Uniform::Uniform(const string& name, ValueType type, UINT offset)
 ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
   : mName(name)
   , mHandle(handle) {}
+
+Buffer::Buffer(int byteSize) {
+  if (byteSize >= 0) {
+    Allocate(byteSize);
+  }
+}
+
+Buffer::~Buffer() {
+  Release();
+}
+
+void Buffer::Allocate(int byteSize) {
+  CheckGLError();
+  if (mHandle == 0) {
+    glCreateBuffers(1, &mHandle);
+    CheckGLError();
+  }
+  if (byteSize != mByteSize) {
+    glNamedBufferData(mHandle, byteSize, nullptr, GL_DYNAMIC_DRAW);
+    CheckGLError();
+    mByteSize = byteSize;
+  }
+}
+
+bool Buffer::IsEmpty() {
+  return mHandle == 0 || mByteSize <= 0;
+}
+
+void Buffer::UploadData(const void* data, int byteSize) {
+  CheckGLError();
+  if (!mHandle) {
+    ASSERT(mByteSize == -1);
+    Allocate(-1);
+  }
+  if (mByteSize < byteSize) {
+    glNamedBufferData(mHandle, byteSize, data, GL_DYNAMIC_DRAW);
+    mByteSize = byteSize;
+  }
+  else {
+    /// Don't realloc buffers when the size is appropriate
+    glNamedBufferSubData(mHandle, 0, byteSize, data);
+  }
+  CheckGLError();
+}
+
+DrawingAPIHandle Buffer::GetHandle() {
+  return mHandle;
+}
+
+int Buffer::GetByteSize() {
+  return mByteSize;
+}
+
+void Buffer::Release() {
+  CheckGLError();
+  if (mHandle == 0) return;
+  glDeleteBuffers(1, &mHandle);
+  mHandle = 0;
+  mByteSize = -1;
+  CheckGLError();
+}
+
+ShaderProgram::SSBO::SSBO(const string& name, UINT index)
+  : mName(name)
+  , mIndex(index)
+{}

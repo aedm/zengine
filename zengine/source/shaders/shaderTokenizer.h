@@ -18,6 +18,8 @@ namespace Shaders {
 	ITEM(sampler2D)			    \
 	ITEM(sampler2DMS)  	    \
 	ITEM(sampler2DShadow)   \
+	ITEM(image2D)           \
+	ITEM(buffer)            \
 	ITEM(void)				      \
 	ITEM(name)				      \
 	ITEM(returns)			      \

@@ -106,6 +106,7 @@
     <ClInclude Include="include\dom\graph.h" />
     <ClInclude Include="include\dom\node.h" />
     <ClInclude Include="include\dom\nodetype.h" />
+    <ClInclude Include="include\nodes\buffernode.h" />
     <ClInclude Include="include\nodes\propertiesnode.h" />
     <ClInclude Include="include\dom\watcher.h" />
     <ClInclude Include="include\nodes\cameranode.h" />
@@ -134,7 +135,6 @@
     <ClInclude Include="include\shaders\stubnode.h" />
     <ClInclude Include="include\shaders\valuestubslot.h" />
     <ClInclude Include="include\zengine.h" />
-    <ClInclude Include="source\render\opengl\drawingopengl.h" />
     <ClInclude Include="source\serialize\json\base64\base64.h" />
     <ClInclude Include="source\serialize\json\jsondeserializer.h" />
     <ClInclude Include="source\serialize\json\jsonserializer.h" />
@@ -152,6 +152,7 @@
     <ClCompile Include="source\dom\node.cpp" />
     <ClCompile Include="source\dom\nodetype.cpp" />
     <ClCompile Include="source\dom\watcher.cpp" />
+    <ClCompile Include="source\nodes\buffernode.cpp" />
     <ClCompile Include="source\nodes\cameranode.cpp" />
     <ClCompile Include="source\nodes\clipnode.cpp" />
     <ClCompile Include="source\nodes\drawable.cpp" />

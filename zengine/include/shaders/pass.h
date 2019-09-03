@@ -13,29 +13,46 @@ enum class PassType {
   ZPOST,
 };
 
+/// Stores a map between Nodes and shader program resources (eg. uniforms, buffers, etc)
+template <typename ProgramType, typename SourceType>
+class ShaderResourceMap {
+public:
+  struct Item {
+    const SourceType* mSource;
+    const ProgramType* mTarget;
+    Item(const SourceType* source, const ProgramType* target)
+      : mSource(source)
+      , mTarget(target) 
+    {}
+  };
+
+  void Collect(const vector<SourceType>& sources, const vector<ProgramType>& targets) {
+    mResources.clear();
+    map<string, const SourceType*> mapByName;
+    for (const auto& source : sources) {
+      mapByName[source.mName] = &source;
+    }
+    for (auto& target : targets) {
+      auto it = mapByName.find(target.mName);
+      ASSERT(it != mapByName.end());
+      mResources.push_back(Item(it->second, &target));
+    }
+  }
+
+  const vector<Item> GetResources() {
+    return mResources;
+  }
+
+private:
+  vector<Item> mResources;
+};
+
 
 /// A renderpass is a way to render an object. Materials consist of several
 /// render passes, eg. an opaque pass, a transparent pass, a shadow pass etc.
 /// It manages the entire render pipeline, including setting a shader program,
 /// render states, and connecting pipeline resources.
 class Pass: public Node {
-
-  /// Associates a uniform to a Node to take its value from
-  struct UniformMapper {
-    UniformMapper(const ShaderProgram::Uniform* targetUniform, 
-                  const ShaderSource::Uniform* source);
-    const ShaderProgram::Uniform* mTarget;
-    const ShaderSource::Uniform* mSource;
-  };
-
-  /// Associates a sampler to a texture Node to take its value from
-  struct SamplerMapper {
-    SamplerMapper(const ShaderProgram::Sampler* target, 
-                  const ShaderSource::Sampler* source);
-    const ShaderProgram::Sampler* mTarget;
-    const ShaderSource::Sampler* mSource;
-  };
-
 public:
   Pass();
 
@@ -54,6 +71,10 @@ public:
   /// Returns true if pass can be used
   bool isComplete();
 
+  /// Get shader sources
+  string GetVertexShaderSource();
+  string GetFragmentShaderSource();
+
 protected:
   virtual void HandleMessage(Message* message) override;
 
@@ -64,20 +85,18 @@ protected:
 
   /// Generated shader source
   shared_ptr<ShaderSource> mShaderSource;
-
-  /// Generated slots
-  vector<shared_ptr<Slot>> mUniformAndSamplerSlots;
   
   /// Compiled and linked shader program
   shared_ptr<ShaderProgram> mShaderProgram;
 
-  /// Mappers from nodes to used uniforms
-  vector<UniformMapper>	mUsedUniforms;
-  vector<SamplerMapper>	mUsedSamplers;
+  /// Mapping between nodes and shader resources
+  ShaderResourceMap<ShaderProgram::Uniform, ShaderSource::Uniform> mUniforms;
+  ShaderResourceMap<ShaderProgram::Sampler, ShaderSource::Sampler> mSamplers;
+  ShaderResourceMap<ShaderProgram::SSBO, ShaderSource::NamedResource> mSSBOs;
 
   /// Client-side uniform buffer. 
   /// Uniforms are assembled in this array and then uploaded to OpenGL
-  vector<char> mUniformArray;
+  shared_ptr<Buffer> mUniformBuffer = make_shared<Buffer>();
 };
 
 typedef TypedSlot<Pass> PassSlot;

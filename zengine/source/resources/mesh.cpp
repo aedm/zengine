@@ -44,36 +44,7 @@ VertexFormat::VertexFormat(UINT binaryFormat) {
   ASSERT(stride % 4 == 0);	/// Vertex structure size should always be mod4.
 }
 
-
-VertexFormat::~VertexFormat() {}
-
-
-bool VertexFormat::HasAttribute(VertexAttributeUsage attrib) {
-  return (mBinaryFormat & (1 << (UINT)attrib)) != 0;
-}
-
-
-Mesh::Mesh() {
-  mVertexCount = 0;
-  mVertexBufferSize = 0;
-  mVertexHandle = 0;
-
-  mIndexCount = 0;
-  mIndexHandle = 0;
-
-  mWireframeIndexCount = 0;
-  mWireframeIndexHandle = 0;
-
-  mFormat = nullptr;
-}
-
 Mesh::~Mesh() {
-  if (mVertexHandle) OpenGL->DestroyVertexBuffer(mVertexHandle);
-  mVertexHandle = 0;
-  if (mIndexHandle) OpenGL->DestroyIndexBuffer(mIndexHandle);
-  mIndexHandle = 0;
-  if (mWireframeIndexHandle) OpenGL->DestroyIndexBuffer(mWireframeIndexHandle);
-  mWireframeIndexHandle = 0;
   SafeDelete(mRawVertexData);
 }
 
@@ -81,7 +52,7 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
   UINT instanceCount,
   PrimitiveTypeEnum primitive) const {
   /// Set vertex buffer and attributes
-  OpenGL->SetVertexBuffer(mVertexHandle);
+  OpenGL->SetVertexBuffer(mVertexBuffer);
 
   /// Bind all attributes to their fixed layout location
   for (auto& attribute : mFormat->mAttributes) {
@@ -90,11 +61,13 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
       attribute.Offset, mFormat->mStride);
   }
 
-  if (mIndexHandle) {
-    OpenGL->Render(mIndexHandle, mIndexCount, primitive, instanceCount);
+  if (mIndexBuffer->IsEmpty()) {
+    /// Render all vertices without index buffer
+    OpenGL->Render(nullptr, mVertexCount, primitive, instanceCount);
   }
   else {
-    OpenGL->Render(0, mVertexCount, primitive, instanceCount);
+    /// Render indexed mesh
+    OpenGL->Render(mIndexBuffer, mIndexCount, primitive, instanceCount);
   }
 }
 
@@ -103,47 +76,28 @@ void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexC
   this->mVertexCount = vertexCount;
   UINT newBufferSize = format->mStride * vertexCount;
 
-  if (mVertexBufferSize != newBufferSize) {
-    mVertexBufferSize = newBufferSize;
-
+  if (mVertexBuffer->GetByteSize() != newBufferSize) {
+    mVertexBuffer->Allocate(newBufferSize);
     SafeDelete(mRawVertexData);
     mRawVertexData = new char[newBufferSize];
-
-    if (mVertexHandle) OpenGL->DestroyVertexBuffer(mVertexHandle);
-    mVertexHandle = OpenGL->CreateVertexBuffer(newBufferSize);
   }
 }
 
 void Mesh::AllocateIndices(UINT indexCount) {
-  if (this->mIndexCount != indexCount) {
-    this->mIndexCount = indexCount;
-    if (mIndexHandle) OpenGL->DestroyIndexBuffer(mIndexHandle);
-    mIndexHandle = indexCount ? OpenGL->CreateIndexBuffer(indexCount * sizeof(IndexEntry)) : NULL;
-  }
-}
-
-void Mesh::AllocateWireframeIndices(UINT indexCount) {
-  if (mWireframeIndexCount != indexCount) {
-    mWireframeIndexCount = indexCount;
-    if (mWireframeIndexHandle) OpenGL->DestroyIndexBuffer(mWireframeIndexHandle);
-    mWireframeIndexHandle = indexCount ? OpenGL->CreateIndexBuffer(mWireframeIndexCount) : NULL;
+  if (mIndexCount != indexCount) {
+    mIndexCount = indexCount;
+    mIndexBuffer->Allocate(indexCount * sizeof(IndexEntry));
   }
 }
 
 void Mesh::UploadIndices(const IndexEntry* indices) {
-  //TheDrawingAPI->UploadIndices(IndexHandle, IndexCount, Indices);
-  void* mappedIndices = OpenGL->MapIndexBuffer(mIndexHandle);
-  memcpy(mappedIndices, indices, mIndexCount * sizeof(IndexEntry));
-  OpenGL->UnMapIndexBuffer(mIndexHandle);
-
+  mIndexBuffer->UploadData(indices, mIndexCount * sizeof(IndexEntry));
   mIndexData.resize(mIndexCount);
   memcpy(&mIndexData[0], indices, mIndexCount * sizeof(IndexEntry));
 }
 
 void Mesh::UploadVertices(void* vertices) {
-  void* mappedMesh = OpenGL->MapVertexBuffer(mVertexHandle);
-  memcpy(mappedMesh, vertices, mVertexCount * mFormat->mStride);
-  OpenGL->UnMapVertexBuffer(mVertexHandle);
+  mVertexBuffer->UploadData(vertices, mVertexCount * mFormat->mStride);
 
   /// TODO: use unique_ptr or OWNERSHIP instead of copying twice
   memcpy(mRawVertexData, vertices, mVertexCount * mFormat->mStride);
@@ -151,9 +105,7 @@ void Mesh::UploadVertices(void* vertices) {
 
 
 void Mesh::UploadVertices(void* vertices, int vertexCount) {
-  void* mappedMesh = OpenGL->MapVertexBuffer(mVertexHandle);
-  memcpy(mappedMesh, vertices, vertexCount * mFormat->mStride);
-  OpenGL->UnMapVertexBuffer(mVertexHandle);
+  mVertexBuffer->UploadData(vertices, vertexCount * mFormat->mStride);
 
   /// TODO: use unique_ptr or OWNERSHIP instead of copying twice
   memcpy(mRawVertexData, vertices, vertexCount * mFormat->mStride);
