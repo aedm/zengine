@@ -29,12 +29,16 @@ void FloatSplineWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   UpdateRangeLabels();
   SelectPoint(SplineLayer::NONE, -1);
 
-  mUI.addBasePointButton->setFocusPolicy(Qt::NoFocus);
-  mUI.addNoisePointButton->setFocusPolicy(Qt::NoFocus);
-  mUI.removePointButton->setFocusPolicy(Qt::NoFocus);
   mUI.linearCheckBox->setFocusPolicy(Qt::NoFocus);
   mUI.autotangentCheckBox->setFocusPolicy(Qt::NoFocus);
   mUI.breakpointCheckBox->setFocusPolicy(Qt::NoFocus);
+
+  mUI.addBasePointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.addNoisePointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.removePointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.addBeatSpikeIntensityPointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.addBeatSpikeFrequencyPointButton->setFocusPolicy(Qt::NoFocus);
+  mUI.addBeatQuantizerPointButton->setFocusPolicy(Qt::NoFocus);
 
   watcherWidget->connect(mUI.addBasePointButton, &QPushButton::pressed,
                          [=]() { AddPoint(SplineLayer::BASE); });

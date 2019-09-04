@@ -2,6 +2,7 @@
 #include <ui_operatorSelector.h>
 #include <QtCore/QDir>
 #include "../util/util.h"
+#include "../zengarden.h"
 
 Prototypes* ThePrototypes = NULL;
 
@@ -32,6 +33,7 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<CameraNode>());
   AddPrototype(registry->GetNodeClass<SceneNode>());
   AddPrototype(registry->GetNodeClass<FloatSplineNode>());
+  AddPrototype(registry->GetNodeClass<ClipNode>());
 
   AddPrototype(registry->GetNodeClass<CubeMeshNode>());
   AddPrototype(registry->GetNodeClass<HalfCubeMeshNode>());
@@ -82,6 +84,9 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   shared_ptr<Node> node = prototype->mNodeClass->Manufacture();
   if (prototype->mNode != nullptr) {
     node->CopyFrom(prototype->mNode);
+  }
+  if (prototype->mNodeClass == NodeRegistry::GetInstance()->GetNodeClass<ClipNode>()) {
+    ZenGarden::GetInstance()->GetMovieNode()->mClips.Connect(node);
   }
   return node;
 }

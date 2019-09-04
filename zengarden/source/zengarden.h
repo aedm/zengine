@@ -42,13 +42,14 @@ public:
   /// Returns the movie cursor position in seconds
   float GetMovieCursor();
 
-  void SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode);
-
   /// Event that fires when the movie cursor changes
   Event<float> mOnMovieCursorChange;
 
   /// Returns the PropertiesNode associated with the current document
   shared_ptr<PropertiesNode> GetPropertiesNode();
+
+  /// Returns the PropertiesNode associated with the current document
+  shared_ptr<MovieNode> GetMovieNode();
 
 private:
   /// Closes a watcher tab

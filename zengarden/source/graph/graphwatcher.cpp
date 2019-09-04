@@ -528,15 +528,6 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
         WatcherPosition::BOTTOM_LEFT_TAB);
     }
     break;
-  case Qt::Key_Enter:
-    if (mSelectedNodeWidgets.size() == 1) {
-      shared_ptr<Node> node = (*mSelectedNodeWidgets.begin())->GetDirectNode();
-      shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(node);
-      if (sceneNode) {
-        ZenGarden::GetInstance()->SetSceneNodeForClip(sceneNode);
-      }
-    }
-    break;
   case Qt::Key_G:
   {
     if (mCurrentState != State::DEFAULT) return;
