@@ -255,19 +255,9 @@ float ZenGarden::GetMovieCursor() {
   return mMovieCursor;
 }
 
-void ZenGarden::SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode) {
-  if (!mMovieWatcherWidget || !mMovieWatcherWidget->mWatcher) return;
-  shared_ptr<TimelineEditor> editor =
-    dynamic_pointer_cast<TimelineEditor>(mMovieWatcherWidget->mWatcher);
-  if (!editor) return;
-  editor->SetSceneNodeForSelectedClip(sceneNode);
-}
-
-
 shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() {
   return mDocument->mProperties.GetNode();
 }
-
 
 std::shared_ptr<MovieNode> ZenGarden::GetMovieNode() {
   return mDocument->mMovie.GetNode();

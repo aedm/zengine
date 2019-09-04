@@ -42,8 +42,6 @@ public:
   /// Returns the movie cursor position in seconds
   float GetMovieCursor();
 
-  void SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode);
-
   /// Event that fires when the movie cursor changes
   Event<float> mOnMovieCursorChange;
 

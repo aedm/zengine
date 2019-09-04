@@ -21,9 +21,7 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
   mUI.setupUi(watcherWidget);
 
-  mUI.newClipButton->setFocusPolicy(Qt::NoFocus);
   mUI.watchMovieButton->setFocusPolicy(Qt::NoFocus);
-  mUI.deleteClipButton->setFocusPolicy(Qt::NoFocus);
   mUI.timelineWidget->setFocusPolicy(Qt::NoFocus);
 
   QVBoxLayout* timelineLayout = new QVBoxLayout(mUI.timelineWidget);
@@ -37,25 +35,9 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mTimelineCanvas->OnMouseMove += Delegate(this, &TimelineEditor::HandleMouseMove);
   mTimelineCanvas->OnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
 
-  watcherWidget->connect(mUI.newClipButton, &QPushButton::pressed, [=]() {
-    auto clipNode = make_shared<ClipNode>();
-    clipNode->mStartTime.SetDefaultValue(ZenGarden::GetInstance()->GetMovieCursor());
-    clipNode->mLength.SetDefaultValue(5.0f);
-    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
-    movieNode->mClips.Connect(clipNode);
-    ZenGarden::GetInstance()->SetNodeForPropertyEditor(clipNode);
-  });
-
   watcherWidget->connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
     shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
-  });
-
-  watcherWidget->connect(mUI.deleteClipButton, &QPushButton::pressed, [=]() {
-    if (!mSelectedClip) return;
-    set<shared_ptr<Node>> selectedNodes;
-    selectedNodes.insert(mSelectedClip);
-    Util::DisposeNodes(selectedNodes);
   });
 }
 
