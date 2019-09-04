@@ -50,6 +50,9 @@ public:
   /// Returns the PropertiesNode associated with the current document
   shared_ptr<PropertiesNode> GetPropertiesNode();
 
+  /// Returns the PropertiesNode associated with the current document
+  shared_ptr<MovieNode> GetMovieNode();
+
 private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);

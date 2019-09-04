@@ -172,10 +172,10 @@ void ZenGarden::keyPressEvent(QKeyEvent* event) {
   case Qt::Key_5:
     mUI.timelineWidget->setVisible(!mUI.timelineWidget->isVisible());
     return;
-  case Qt::Key_F12:
+  case Qt::Key_F8:
     mUI.upperRightPanel->setVisible(!mUI.upperRightPanel->isVisible());
     return;
-  case Qt::Key_F11:
+  case Qt::Key_F7:
     mUI.bottomLeftPanel->setVisible(!mUI.bottomLeftPanel->isVisible());
     return;
   }
@@ -265,9 +265,13 @@ void ZenGarden::SetSceneNodeForClip(const shared_ptr<SceneNode>& sceneNode) {
 
 
 shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() {
-  return PointerCast<PropertiesNode>(mDocument->mProperties.GetDirectNode());
+  return mDocument->mProperties.GetNode();
 }
 
+
+std::shared_ptr<MovieNode> ZenGarden::GetMovieNode() {
+  return mDocument->mMovie.GetNode();
+}
 
 void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition) {
   shared_ptr<Node> refNode = node->GetReferencedNode();
