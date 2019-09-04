@@ -1,6 +1,23 @@
 #include "textwatcher.h"
 #include <QtWidgets/QPushButton>
 
+class CustomTextEdit : public QTextEdit {
+public:
+  CustomTextEdit(QWidget* parent)
+    : QTextEdit(parent)
+  {}
+
+  void keyPressEvent(QKeyEvent *e) {
+    if (e->key() == Qt::Key_Return && (e->modifiers() & Qt::ControlModifier)) {
+      mOnRebuild();
+      return;
+    }
+    QTextEdit::keyPressEvent(e);
+  }
+
+  Event<> mOnRebuild;
+};
+
 TextWatcher::TextWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node)
 {}
@@ -16,15 +33,23 @@ void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setSpacing(4);
   mLayout->setContentsMargins(0, 0, 0, 0);
 
-  mTextEdit = new QTextEdit(watcherWidget);
+  auto textEdit = new CustomTextEdit(watcherWidget);
+  mTextEdit = textEdit;
   mTextEdit->setCurrentFont(QFont("Consolas", 9));
   mLayout->addWidget(mTextEdit);
   mTextEdit->setText(QString::fromStdString(stringNode->Get()));
 
+  textEdit->mOnRebuild += Delegate(this, &TextWatcher::HandleRebuid);
+
   /// Recompile button
   QPushButton* compileButton = new QPushButton("Rebuild", watcherWidget);
   watcherWidget->connect(compileButton, &QPushButton::pressed, [=]() {
-    stringNode->Set(mTextEdit->toPlainText().toStdString());
+    HandleRebuid();
   });
   mLayout->addWidget(compileButton);
+}
+
+void TextWatcher::HandleRebuid() {
+  shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
+  stringNode->Set(mTextEdit->toPlainText().toStdString());
 }

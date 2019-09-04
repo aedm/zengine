@@ -15,4 +15,6 @@ public:
 private:
   QBoxLayout* mLayout;
   QTextEdit* mTextEdit;
+
+  void HandleRebuid();
 };
