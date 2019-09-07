@@ -28,3 +28,18 @@ protected:
   /// Handle received messages
   virtual void HandleMessage(Message* message) override;
 };
+
+class GeosphereMeshNode : public MeshNode {
+public:
+  GeosphereMeshNode();
+
+  FloatSlot mResolution;
+  FloatSlot mSize;
+  FloatSlot mFlatten;
+
+protected:
+  virtual void Operate() override;
+
+  /// Handle received messages
+  virtual void HandleMessage(Message* message) override;
+};

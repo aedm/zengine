@@ -37,6 +37,7 @@ Prototypes::Prototypes() {
 
   AddPrototype(registry->GetNodeClass<CubeMeshNode>());
   AddPrototype(registry->GetNodeClass<HalfCubeMeshNode>());
+  AddPrototype(registry->GetNodeClass<GeosphereMeshNode>());
   AddPrototype(registry->GetNodeClass<MeshToVertexBufferNode>());
 
   LoadStubs();
