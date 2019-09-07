@@ -29,3 +29,4 @@ demoplayer/app/demo-debug64.exe
 zengine/lib/zengine-release64.lib
 app/zengarden-release64.exe
 app/demo-release64.exe
+*.jpg
