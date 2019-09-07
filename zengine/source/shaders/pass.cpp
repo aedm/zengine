@@ -40,8 +40,8 @@ void Pass::HandleMessage(Message* message) {
 }
 
 void Pass::Operate() {
-  if (!mShaderSource) return;
   mShaderProgram.reset();
+  if (!mShaderSource) return;
 
   const string& vertexSource = mShaderSource->mVertexSource;
   const string& fragmentSource = mShaderSource->mFragmentSource;
@@ -71,6 +71,9 @@ void Pass::BuildShaderSource()
   mShaderSource.reset();
   mShaderSource = 
     ShaderBuilder::FromStubs(mVertexStub.GetNode(), mFragmentStub.GetNode());
+  if (!mShaderSource) {
+    mShaderProgram.reset();
+  }
 }
 
 void Pass::Set(Globals* globals) {

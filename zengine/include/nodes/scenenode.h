@@ -21,6 +21,7 @@ public:
   FloatSlot mSkyLightAmbient;
   FloatSlot mSkyLightSpread;
   FloatSlot mSkyLightSampleSpread;
+  FloatSlot mSkyLightBias;
   FloatSlot mDOFEnabled;
   FloatSlot mDOFFocusDistance;
   FloatSlot mDOFBlur;

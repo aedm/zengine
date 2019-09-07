@@ -169,7 +169,7 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
   /// Generate vertices
   Vec3 d1 = p2 - p1;
   Vec3 d2 = p3 - p1;
-  Vec3 flatNormal = d1.Cross(d2).Normal();
+  Vec3 flatNormal = d2.Cross(d1).Normal();
   Vec3 upVector(0, 1, 0);
 
   VertexPosUVNormTangent* vertexTarget = *oVertexTarget;

@@ -11,6 +11,7 @@ SceneNode::SceneNode()
   , mSkyLightAmbient(this, "Ambient factor")
   , mSkyLightSpread(this, "Shadow spread", false, true, true, 0.0f, 30.0f)
   , mSkyLightSampleSpread(this, "Sample spread", false, true, true, 0.0f, 20.0f)
+  , mSkyLightBias(this, "Shadow bias")
   , mSceneTimes(this, string(), true, false, false, false)
   , mDOFEnabled(this, "DOF enabled")
   , mDOFFocusDistance(this, "DOF focus distance", false, true, true, 0.0f, 100.0f)
@@ -61,6 +62,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightAmbient = mSkyLightAmbient.Get();
   globals->SkylightSpread = mSkyLightSpread.Get();
   globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
+  globals->SkylightBias = mSkyLightBias.Get();
   globals->SkylightTexture = nullptr;
   globals->Time = mGlobalTimeNode->Get();
   RenderDrawables(globals, PassType::SHADOW);
@@ -75,6 +77,8 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   else {
     renderTarget->SetGBufferAsTarget(globals);
   }
+
+  globals->SkylightBias = 0;
 
   /// Pass #2: Z prepass, using the shadow pass material
   if (mZPrepassDisabled.Get() < 0.5) {

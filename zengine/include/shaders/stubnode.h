@@ -26,6 +26,7 @@ using namespace std;
   ITEM(SkylightAmbient,               ValueType::FLOAT) \
   ITEM(SkylightSpread,                ValueType::FLOAT) \
   ITEM(SkylightSampleSpread,          ValueType::FLOAT) \
+  ITEM(SkylightBias,                  ValueType::FLOAT) \
   ITEM(RenderTargetSize,              ValueType::VEC2) \
   ITEM(RenderTargetSizeRecip,         ValueType::VEC2) \
   ITEM(ViewportSize,                  ValueType::VEC2) \
