@@ -6,7 +6,6 @@
 #include <include/base/vectormath.h>
 #include <stdarg.h>
 
-
 Logger* TheLogger = new Logger();
 
 static const int LogMessageMaxLength = 30000;
@@ -63,6 +62,12 @@ namespace Convert {
 
   bool StringToFloat(const char* S, float& F) {
     return sscanf(S, "%f", &F) != 1;
+  }
+
+  std::wstring StringToWstring(const string& s) {
+    std::wstring temp(s.length(), L' ');
+    std::copy(s.begin(), s.end(), temp.begin());
+    return temp;
   }
 }
 

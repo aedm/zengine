@@ -151,7 +151,7 @@ public:
   static UINT GetTexelByteCount(TexelType type);
 
   shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
-    const shared_ptr<vector<char>>& texelData, bool gpuMemoryOnly,
+    const void* texelData, bool gpuMemoryOnly,
     bool isMultisample, bool doesRepeat, bool generateMipmaps);
   void DeleteTextureGPUData(Texture::Handle handle);
   void UploadTextureGPUData(const shared_ptr<Texture>& texture, void* texelData);
@@ -178,7 +178,7 @@ public:
   void Clear(bool ColorBuffer = true, bool DepthBuffer = true, UINT RGBColor = 0);
 
 private:
-  void SetTextureData(UINT Width, UINT Height, TexelType Type, void* TexelData,
+  void SetTextureData(UINT Width, UINT Height, TexelType Type, const void* TexelData,
     bool generateMipmap);
   void SetTextureSubData(UINT X, UINT Y, UINT Width, UINT Height, TexelType Type, void* TexelData);
 

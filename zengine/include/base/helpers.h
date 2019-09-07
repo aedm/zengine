@@ -158,6 +158,7 @@ int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper,
 namespace Convert {
   string IntToSring(int value);
   bool StringToFloat(const char* s, float& f);
+  wstring StringToWstring(const string& sourceString);
 }
 
 string ToJSON(const shared_ptr<Document>& document);

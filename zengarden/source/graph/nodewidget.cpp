@@ -132,9 +132,9 @@ void NodeWidget::UpdateTexture() {
     unsigned char* bits = mImage.bits();
     int height = mImage.height();
     int width = mImage.width();
-    shared_ptr<vector<char>> texels = make_shared<vector<char>>(height * width * 4);
+    vector<char> texels(height * width * 4);
     unsigned char* source = bits;
-    unsigned char* dest = reinterpret_cast<unsigned char*>(&(*texels)[0]);
+    unsigned char* dest = reinterpret_cast<unsigned char*>(&texels[0]);
     for (int i = 0; i < height * width; i++) {
       /// Swap RGBA and BGRA
       dest[0] = source[2];
@@ -147,11 +147,11 @@ void NodeWidget::UpdateTexture() {
 
     if (mTexture && mTexture->mWidth == mImage.width() &&
       mTexture->mHeight == mImage.height()) {
-      OpenGL->UploadTextureGPUData(mTexture, &(*texels)[0]);
+      OpenGL->UploadTextureGPUData(mTexture, &texels[0]);
     }
     else {
       DiscardTexture();
-      mTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8, texels, true,
+      mTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8, &texels[0], true,
         false, false, false);
     }
     mForceUpdate = false;
