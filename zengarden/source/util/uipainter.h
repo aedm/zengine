@@ -28,7 +28,7 @@ public:
   void DrawTextTexture(TextTexture* texture, const Vec2& position);
 
   shared_ptr<Vec4Node> mColor = make_shared<Vec4Node>();
-  shared_ptr<TextureNode> mTextureNode = make_shared<TextureNode>();
+  shared_ptr<StaticTextureNode> mTextureNode = make_shared<StaticTextureNode>();
 
   QFont mTitleFont;
 

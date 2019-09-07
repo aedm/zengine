@@ -1,6 +1,7 @@
 #include <include/base/system.h>
 #include <include/shaders/enginestubs.h>
 #include <include/shaders/engineshaders.h>
+#include <include/serialize/imageloader.h>
 
 OpenGLAPI* OpenGL = nullptr;
 EngineStubs* TheEngineStubs = nullptr;
@@ -13,6 +14,7 @@ Event<> OnZengineInitDone;
 /// Initializes Zengine. Returns true if everything went okay.
 bool InitZengine() {
   OpenGL = new OpenGLAPI();
+  Zengine::InitGDIPlus();
   TheEngineStubs = new EngineStubs();
   OnZengineInitDone();
   return true;

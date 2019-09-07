@@ -68,8 +68,8 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   else if (IsExactType<FloatSplineNode>(node)) {
     DeserializeFloatSplineNode(value, PointerCast<FloatSplineNode>(node));
   }
-  else if (IsExactType<TextureNode>(node)) {
-    DeserializeTextureNode(value, PointerCast<TextureNode>(node));
+  else if (IsExactType<StaticTextureNode>(node)) {
+    DeserializeStaticTextureNode(value, PointerCast<StaticTextureNode>(node));
   }
   else if (IsExactType<StaticMeshNode>(node)) {
     DeserializeStaticMeshNode(value, PointerCast<StaticMeshNode>(node));
@@ -190,8 +190,8 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
   }
 }
 
-void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
-  const shared_ptr<TextureNode>& node)
+void JSONDeserializer::DeserializeStaticTextureNode(const rapidjson::Value& value,
+  const shared_ptr<StaticTextureNode>& node)
 {
   int width = value["width"].GetInt();
   int height = value["height"].GetInt();
@@ -203,15 +203,15 @@ void JSONDeserializer::DeserializeTextureNode(const rapidjson::Value& value,
   }
   TexelType texelType = (TexelType)texelTypeInt;
   UINT byteSize = width * height * OpenGLAPI::GetTexelByteCount(texelType);
-  shared_ptr<vector<char>> texels = make_shared<vector<char>>(byteSize);
+  //shared_ptr<vector<char>> texels = make_shared<vector<char>>(byteSize);
 
   string texelContent = base64_decode(texelString);
-  ASSERT(byteSize == texelContent.length());
-  memcpy(&(*texels)[0], texelContent.c_str(), byteSize);
+  //ASSERT(byteSize == texelContent.length());
+  //memcpy(&(*texels)[0], texelContent.c_str(), byteSize);
 
   //Texture* texture = TheResourceManager->CreateTexture(width, height, texelType, texels);
-  shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, texels, false,
-    false, true, true);
+  shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, 
+    texelContent.c_str(), false, false, true, true);
   node->Set(texture);
 }
 

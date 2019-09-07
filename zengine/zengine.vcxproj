@@ -124,6 +124,7 @@
     <ClInclude Include="include\render\drawingapi.h" />
     <ClInclude Include="include\resources\mesh.h" />
     <ClInclude Include="include\resources\texture.h" />
+    <ClInclude Include="include\serialize\imageloader.h" />
     <ClInclude Include="include\serialize\lodepng.h" />
     <ClInclude Include="include\shaders\engineshaders.h" />
     <ClInclude Include="include\shaders\enginestubs.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="source\render\rendertarget.cpp" />
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\texture.cpp" />
+    <ClCompile Include="source\serialize\imageloader.cpp" />
     <ClCompile Include="source\serialize\json\base64\base64.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>

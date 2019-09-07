@@ -20,15 +20,23 @@ public:
 private:
   void DeserializeNode(rapidjson::Value& value);
   
-  void DeserializeFloatNode(const rapidjson::Value& value, const shared_ptr<FloatNode>& node);
-  void DeserializeVec2Node(const rapidjson::Value& value, const shared_ptr<Vec2Node>& node);
-  void DeserializeVec3Node(const rapidjson::Value& value, const shared_ptr<Vec3Node>& node);
-  void DeserializeVec4Node(const rapidjson::Value& value, const shared_ptr<Vec4Node>& node);
-  void DeserializeFloatSplineNode(const rapidjson::Value& value, const shared_ptr<FloatSplineNode>& node);
+  void DeserializeFloatNode(const rapidjson::Value& value, 
+    const shared_ptr<FloatNode>& node);
+  void DeserializeVec2Node(const rapidjson::Value& value, 
+    const shared_ptr<Vec2Node>& node);
+  void DeserializeVec3Node(const rapidjson::Value& value, 
+    const shared_ptr<Vec3Node>& node);
+  void DeserializeVec4Node(const rapidjson::Value& value, 
+    const shared_ptr<Vec4Node>& node);
+  void DeserializeFloatSplineNode(const rapidjson::Value& value, 
+    const shared_ptr<FloatSplineNode>& node);
 
-  void DeserializeTextureNode(const rapidjson::Value& value, const shared_ptr<TextureNode>& node);
-  void DeserializeStubNode(const rapidjson::Value& value, const shared_ptr<StubNode>& node);
-  void DeserializeStaticMeshNode(const rapidjson::Value& value, const shared_ptr<StaticMeshNode>& node);
+  void DeserializeStaticTextureNode(const rapidjson::Value& value, 
+    const shared_ptr<StaticTextureNode>& node);
+  void DeserializeStubNode(const rapidjson::Value& value, 
+    const shared_ptr<StubNode>& node);
+  void DeserializeStaticMeshNode(const rapidjson::Value& value, 
+    const shared_ptr<StaticMeshNode>& node);
 
   void ConnectSlots(rapidjson::Value& value);
   

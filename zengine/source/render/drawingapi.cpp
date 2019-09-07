@@ -18,13 +18,6 @@ void CheckGLError() {
 #	define CheckGLError()
 #endif
 
-struct MappedAttributeOpenGL {
-  GLuint Index;
-  GLint Size;
-  GLenum Type;
-  UINT Offset;
-};
-
 struct GLVersion { GLboolean* version; const wchar_t* name; };
 static GLVersion gOpenGLVersions[] = {
   {&__GLEW_VERSION_1_1, L"1.1"},
@@ -696,7 +689,7 @@ UINT OpenGLAPI::GetTexelByteCount(TexelType type) {
 
 
 shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type,
-  const shared_ptr<vector<char>>& texelData, bool gpuMemoryOnly, bool isMultisample,
+  const void* texelData, bool gpuMemoryOnly, bool isMultisample,
   bool doesRepeat, bool generateMipmaps)
 {
   ASSERT(!PleaseNoNewResources);
@@ -741,63 +734,23 @@ shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 
-    void* data = texelData ? &(*texelData)[0] : nullptr;
-    SetTextureData(width, height, type, data, generateMipmaps);
+    SetTextureData(width, height, type, texelData, generateMipmaps);
   }
 
   CheckGLError();
+  shared_ptr<vector<char>> texelVector = nullptr;
+  if (!gpuMemoryOnly) {
+    texelVector = make_shared<vector<char>>();
+    texelVector->resize(width * height * 4);
+    memcpy(&(*texelVector)[0], texelData, width * height * 4);
+  }
   return make_shared<Texture>(handle, width, height, type,
-    gpuMemoryOnly ? nullptr : texelData, isMultisample, doesRepeat, generateMipmaps);
+    texelVector, isMultisample, doesRepeat, generateMipmaps);
 }
 
 
-
-//TextureHandle OpenGLAPI::CreateTexture(int width, int height, TexelType type,
-//                                       bool isMultiSample, bool doesRepeat, bool mipmap) {
-//  ASSERT(!PleaseNoNewResources);
-//  CheckGLError();
-//  GLuint texture;
-//  glGenTextures(1, &texture);
-//  SetActiveTexture(0);
-//  CheckGLError();
-//
-//  if (isMultiSample) {
-//    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
-//    CheckGLError();
-//    GLint internalFormat;
-//    GLenum format, glType;
-//    GetTextureType(type, internalFormat, format, glType);
-//    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
-//                            ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT,
-//                            internalFormat, width, height, false);
-//    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-//  } else {
-//    BindTexture(texture);
-//    if (type == TexelType::DEPTH32F) {
-//      //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-//      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//    } else {
-//      if (mipmap) {
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
-//      } else {
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//      }
-//      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    }
-//    auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
-//    SetTextureData(width, height, type, NULL, mipmap);
-//  }
-//  CheckGLError();
-//  return texture;
-//}
-
-
 void OpenGLAPI::SetTextureData(UINT width, UINT height, TexelType type,
-  void* texelData, bool generateMipmap) {
+  const void* texelData, bool generateMipmap) {
   ASSERT(!PleaseNoNewResources);
   GLint internalFormat;
   GLenum format;

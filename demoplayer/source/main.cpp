@@ -35,7 +35,7 @@ void hack() {
   FORCE(StaticMeshNode);
   FORCE(GlobalTimeNode);
   FORCE(SceneTimeNode);
-  FORCE(TextureNode);
+  FORCE(StaticTextureNode);
   FORCE(SceneNode);
   FORCE(MovieNode);
   FORCE(ClipNode);

@@ -638,7 +638,9 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
   QList<QUrl> urlList = mimeData->urls();
   if (urlList.size() != 1) return;
 
-  QString fileName = urlList.at(0).toLocalFile();
+  QString absolutefileName = urlList.at(0).toLocalFile();
+  QString fileName = QDir::current().relativeFilePath(absolutefileName);
+
   QFileInfo fileInfo(fileName);
   if (fileInfo.suffix() == "obj" || fileInfo.suffix() == "3ds" ||
     fileInfo.suffix() == "fbx") {
@@ -654,17 +656,9 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
   }
 
   else if (fileInfo.suffix() == "png" || fileInfo.suffix() == "jpg") {
-    QImage image(fileName);
-    QImage rgba = image.convertToFormat(QImage::Format_ARGB32);
-    auto pixels = make_shared<vector<char>>(rgba.byteCount());
-    memcpy(&(*pixels)[0], rgba.bits(), rgba.byteCount());
-    shared_ptr<Texture> texture = OpenGL->MakeTexture(
-      rgba.width(), rgba.height(), TexelType::ARGB8, pixels, false, false, true, true);
-
-    shared_ptr<TextureNode> node = make_shared<TextureNode>();
-    node->Set(texture);
-
-    node->SetName(fileInfo.fileName().toStdString());
+    auto node = make_shared<TextureFileNode>();
+    node->mFileName.SetDefaultValue(fileName.toStdString());
+    node->SetName(fileInfo.baseName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
     Vec2 pos = CanvasToWorld(Vec2(event->pos().x(), event->pos().y()));
     TheCommandStack->Execute(new MoveNodeCommand(node, pos));
