@@ -24,7 +24,7 @@ PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
   mDrawable->mMaterial.Connect(mMaterial);
   mDrawable->mMesh.Connect(mMesh);
 
-  mDefaultScene->mDrawables.Connect(mDrawable);
+  mTheScene->mDrawables.Connect(mDrawable);
 
-  mCamera->mOrthonormal = true;
+  mTheScene->mCamera.GetNode()->mOrthonormal = true;
 }

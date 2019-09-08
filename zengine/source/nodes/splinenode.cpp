@@ -58,7 +58,8 @@ void FloatSplineNode::HandleMessage(Message* message) {
 
 const float& FloatSplineNode::Get() {
   Update();
-  return currentValue;
+  mCurrentValuePlusBaseOffset = currentValue + mBaseOffset;
+  return mCurrentValuePlusBaseOffset;
 }
 
 float FloatSplineNode::GetNoiseValue(float time) {
@@ -143,6 +144,15 @@ void FloatSplineNode::SetAutotangent(SplineLayer layer, int index, bool autotang
   }
 }
 
+void FloatSplineNode::SetBaseOffset(float baseOffset) {
+  mBaseOffset = baseOffset;
+  SendMsg(MessageType::VALUE_CHANGED);
+}
+
+void FloatSplineNode::AddBasePointWithOffset() {
+  AddPoint(SplineLayer::BASE, mTimeSlot.Get(), mCurrentValuePlusBaseOffset);
+}
+
 void SplineFloatComponent::CalculateTangent(int index) {
   if (index < 0 || index >= int(mPoints.size())) return;
   SplinePoint& point = mPoints[index];
@@ -182,6 +192,7 @@ float FloatSplineNode::EvaluateLinearSpline(vector<SplinePoint>& points, float t
 }
 
 void FloatSplineNode::InvalidateCurrentValue() {
+  mBaseOffset = 0.0f;
   if (mIsUpToDate) {
     mIsUpToDate = false;
     SendMsg(MessageType::VALUE_CHANGED);
@@ -190,7 +201,7 @@ void FloatSplineNode::InvalidateCurrentValue() {
 }
 
 void FloatSplineNode::Operate() {
-  currentValue = GetValue(mTimeSlot.Get());
+  currentValue = GetValue(mTimeSlot.Get()) + mBaseOffset;
 }
 
 float FloatSplineNode::GetValue(float time) {
