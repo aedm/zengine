@@ -61,6 +61,7 @@ void GeneralSceneWatcher::OnRedraw() {
 
 void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);
+  watcherWidget->GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
 
   GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
   GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
@@ -117,9 +118,29 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
     Vec3 orientation = camera->mOrientation.Get();
-    orientation.y = mOriginalOrientation.y + float(diff.x()) / 300.0f;
-    orientation.x = mOriginalOrientation.x + float(diff.y()) / 300.0f;
-    camera->mOrientation.SetDefaultValue(orientation);
+    float dx = float(diff.x()) / 300.0f;
+    float dy = float(diff.y()) / 300.0f;
+    orientation.y = mOriginalOrientation.y + dx;
+    orientation.x = mOriginalOrientation.x + dy;
+    if (camera->mOrientation.IsDefaulted()) {
+      camera->mOrientation.SetDefaultValue(orientation);
+      return;
+    }
+    auto node = camera->mOrientation.GetReferencedNode();
+    if (IsPointerOf<FloatsToVec3Node>(node)) {
+      auto floatsNode = PointerCast<FloatsToVec3Node>(node);
+      auto& xSlot = floatsNode->mX;
+      auto& ySlot = floatsNode->mY;
+      xSlot.SetDefaultValue(orientation.x);
+      ySlot.SetDefaultValue(orientation.y);
+      /// If it's connected to a spline, set base offset
+      if (!xSlot.IsDefaulted() && IsPointerOf<FloatSplineNode>(xSlot.GetNode())) {
+        PointerCast<FloatSplineNode>(xSlot.GetNode())->SetBaseOffset(dy);
+      }
+      if (!ySlot.IsDefaulted() && IsPointerOf<FloatSplineNode>(ySlot.GetNode())) {
+        PointerCast<FloatSplineNode>(ySlot.GetNode())->SetBaseOffset(dx);
+      }
+    }
   } else if (event->buttons() & Qt::RightButton) {
     auto diff = event->pos() - mOriginalPosition;
     float distance = camera->mDistance.Get();
@@ -149,8 +170,30 @@ void GeneralSceneWatcher::HandleMouseRightUp(QMouseEvent* event) {
 }
 
 void GeneralSceneWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
-  if (event->key() == Qt::Key_C) {
+  if (event->key() == Qt::Key_S) {
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(mTheScene);
+  }
+  if (event->key() == Qt::Key_C) {
+    auto camera = mTheScene->mCamera.GetNode();
+    if (!camera) return;
+    ZenGarden::GetInstance()->SetNodeForPropertyEditor(camera);
+  }
+  if (event->key() == Qt::Key_Return) {
+    /// Bake values to camera splines
+    shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
+    if (!camera) return;
+    auto node = camera->mOrientation.GetReferencedNode();
+    if (IsPointerOf<FloatsToVec3Node>(node)) {
+      auto floatsNode = PointerCast<FloatsToVec3Node>(node);
+      auto& xSlot = floatsNode->mX;
+      auto& ySlot = floatsNode->mY;
+      if (!xSlot.IsDefaulted() && IsPointerOf<FloatSplineNode>(xSlot.GetNode())) {
+        PointerCast<FloatSplineNode>(xSlot.GetNode())->AddBasePointWithOffset();
+      }
+      if (!ySlot.IsDefaulted() && IsPointerOf<FloatSplineNode>(ySlot.GetNode())) {
+        PointerCast<FloatSplineNode>(ySlot.GetNode())->AddBasePointWithOffset();
+      }
+    }
   }
 }
 

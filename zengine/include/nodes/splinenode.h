@@ -144,6 +144,9 @@ public:
   /// Sets whether tangents should be automatically calculated for a given point
   void SetAutotangent(SplineLayer layer, int index, bool autotangent);
 
+  void SetBaseOffset(float baseOffset);
+  void AddBasePointWithOffset();
+
   /// Returns the component in a certain layer
   SplineFloatComponent* GetComponent(SplineLayer layer);
 
@@ -171,7 +174,11 @@ protected:
   SplineFloatComponent mBeatQuantizerLayer;
 
   /// Current value
-  float currentValue;
+  float currentValue = 0.0f;
+  float mCurrentValuePlusBaseOffset = 0.0f;
+
+  /// User-set base offset. For temporary overrides, experimenting
+  float mBaseOffset = 0.0f;
 
   void InvalidateCurrentValue();
   virtual void Operate();
