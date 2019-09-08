@@ -5,5 +5,5 @@ MeshWatcher::MeshWatcher(const shared_ptr<Node>& meshNode)
 {
   mDrawable->mMaterial.Connect(mDefaultMaterial);
   mDrawable->mMesh.Connect(meshNode);
-  mDefaultScene->mDrawables.Connect(mDrawable);
+  mTheScene->mDrawables.Connect(mDrawable);
 }

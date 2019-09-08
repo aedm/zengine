@@ -6,15 +6,18 @@ shared_ptr<Material> GeneralSceneWatcher::mDefaultMaterial;
 
 GeneralSceneWatcher::GeneralSceneWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node) {
-  if (!IsPointerOf<SceneNode>(node)) {
-    mDefaultScene->mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
-    mDefaultScene->mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
-    mDefaultScene->mSkyLightAmbient.SetDefaultValue(0.2f);
-    mDefaultScene->mCamera.Connect(mCamera);
-    mScene = mDefaultScene;
-    mRenderForwarder = mDefaultScene->Watch<RenderForwarder>(mDefaultScene);
-    mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
+  if (IsPointerOf<SceneNode>(node)) {
+    mTheScene = PointerCast<SceneNode>(node);
+    return;
   }
+  auto sceneNode = make_shared<SceneNode>();
+  sceneNode->mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
+  sceneNode->mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
+  sceneNode->mSkyLightAmbient.SetDefaultValue(0.2f);
+  sceneNode->mCamera.Connect(make_shared<CameraNode>());
+  mRenderForwarder = sceneNode->Watch<RenderForwarder>(sceneNode);
+  mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
+  mTheScene = sceneNode;
 }
 
 GeneralSceneWatcher::~GeneralSceneWatcher() {
@@ -23,9 +26,9 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 
 void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   if (!mWatcherWidget) return;
-  shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(mScene->GetReferencedNode());
-  sceneNode->Update();
-  sceneNode->UpdateDependencies();
+  //shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(mScene->GetReferencedNode());
+  mTheScene->Update();
+  mTheScene->UpdateDependencies();
 
   /// Nvidia driver will fail to bind framebuffers after shader compilation.
   /// Just skip the frame if a shader was edited/updated.
@@ -46,7 +49,7 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
   mRenderTarget->SetGBufferAsTarget(&mGlobals);
   OpenGL->Clear(true, true, 0x303030);
 
-  sceneNode->Draw(mRenderTarget, &mGlobals);
+  mTheScene->Draw(mRenderTarget, &mGlobals);
 
   /// Apply post-process to scene to framebuffer
   TheEngineShaders->ApplyPostProcess(mRenderTarget, &mGlobals);
@@ -86,9 +89,12 @@ void GeneralSceneWatcher::Init() {
 }
 
 void GeneralSceneWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event) {
+  shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
+  if (!camera) return;
+
   mOriginalPosition = event->pos();
-  mOriginalOrientation = mCamera->mOrientation.Get();
-  mOriginalDistance = mCamera->mDistance.Get();
+  mOriginalOrientation = camera->mOrientation.Get();
+  mOriginalDistance = camera->mDistance.Get();
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   } else if (event->button() == Qt::RightButton) {
@@ -105,17 +111,20 @@ void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEven
 }
 
 void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) {
+  shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
+  if (!camera) return;
+
   if (event->buttons() & Qt::LeftButton) {
     auto diff = event->pos() - mOriginalPosition;
-    Vec3 orientation = mCamera->mOrientation.Get();
+    Vec3 orientation = camera->mOrientation.Get();
     orientation.y = mOriginalOrientation.y + float(diff.x()) / 300.0f;
     orientation.x = mOriginalOrientation.x + float(diff.y()) / 300.0f;
-    mCamera->mOrientation.SetDefaultValue(orientation);
+    camera->mOrientation.SetDefaultValue(orientation);
   } else if (event->buttons() & Qt::RightButton) {
     auto diff = event->pos() - mOriginalPosition;
-    float distance = mCamera->mDistance.Get();
+    float distance = camera->mDistance.Get();
     distance = mOriginalDistance - float(diff.y()) / 2.0f;
-    mCamera->mDistance.SetDefaultValue(distance);
+    camera->mDistance.SetDefaultValue(distance);
   }
 }
 
@@ -140,7 +149,9 @@ void GeneralSceneWatcher::HandleMouseRightUp(QMouseEvent* event) {
 }
 
 void GeneralSceneWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
-
+  if (event->key() == Qt::Key_C) {
+    ZenGarden::GetInstance()->SetNodeForPropertyEditor(mTheScene);
+  }
 }
 
 RenderForwarder::RenderForwarder(const shared_ptr<SceneNode>& node)

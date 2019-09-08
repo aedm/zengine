@@ -32,14 +32,11 @@ protected:
 
   RenderTarget* mRenderTarget = nullptr;
 
-  /// Scene node to be drawn.
-  shared_ptr<Node> mScene;
+  ///// Scene node to be drawn.
+  //shared_ptr<Node> mScene;
   
   /// Default scene node, might be unused
-  shared_ptr<SceneNode> mDefaultScene = make_shared<SceneNode>();
-
-  /// Default camera
-  shared_ptr<CameraNode> mCamera = make_shared<CameraNode>();
+  shared_ptr<SceneNode> mTheScene;
 
   /// Forwarder that catches render events for the default scene
   shared_ptr<RenderForwarder> mRenderForwarder;
