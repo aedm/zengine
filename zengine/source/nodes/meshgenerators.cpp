@@ -3,6 +3,7 @@
 REGISTER_NODECLASS(CubeMeshNode, "Cube");
 REGISTER_NODECLASS(HalfCubeMeshNode, "HalfCube");
 REGISTER_NODECLASS(GeosphereMeshNode, "Geosphere");
+REGISTER_NODECLASS(PlaneMeshNode, "Plane");
 
 CubeMeshNode::CubeMeshNode()
   : MeshNode()
@@ -283,6 +284,92 @@ void GeosphereMeshNode::Operate() {
 }
 
 void GeosphereMeshNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+  case MessageType::VALUE_CHANGED:
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    if (mIsUpToDate) {
+      mIsUpToDate = false;
+      SendMsg(MessageType::NEEDS_REDRAW);
+    }
+    break;
+  default: break;
+  }
+}
+
+PlaneMeshNode::PlaneMeshNode()
+  : MeshNode()
+  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
+{
+  mResolution.SetDefaultValue(1);
+  mSize.SetDefaultValue(1.0f);
+}
+
+void PlaneMeshNode::Operate() {
+  if (!mMesh) mMesh = make_shared<Mesh>();
+
+  int resolution = int(mResolution.Get());
+  float size = mSize.Get();
+
+  int segmentsPerEdge = 1 << resolution;
+  int verticesPerEdge = segmentsPerEdge + 1;
+  int quadCount = segmentsPerEdge * segmentsPerEdge;
+  int vertexCount = verticesPerEdge * verticesPerEdge;
+  int indexCount = quadCount * 6;
+
+  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<IndexEntry> indices(indexCount);
+
+  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  IndexEntry* indexTarget = &indices[0];
+
+  /// Generate vertices
+  float uvStep = 1.0f / float(segmentsPerEdge);
+  float coordStep = uvStep * 2.0f;
+  float yCoord = -1.0f;
+  float v = 0.0f;
+  for (int y = 0; y <= segmentsPerEdge; y++) {
+    float xCoord = -1.0f;
+    float u = 0.0f;
+    for (int x = 0; x <= segmentsPerEdge; x++) {
+      vertexTarget->position = Vec3(xCoord, yCoord, 0.0f);
+      vertexTarget->uv = Vec2(u, v);
+      vertexTarget->normal = Vec3(0, 1, 0);
+      vertexTarget->tangent = Vec3(1, 0, 0);
+      vertexTarget++;
+      xCoord += coordStep;
+      u += uvStep;
+    }
+    yCoord += coordStep;
+    v += uvStep;
+  }
+
+  /// Generate indices
+  for (int i = 0; i < quadCount; i++) {
+    int x = 0, y = 0;
+    for (int k = 0; k < resolution; k++) {
+      /// Chache-friendly tiling
+      x += ((i >> (k * 2)) & 1) * (1 << k);
+      y += ((i >> (k * 2 + 1)) & 1) * (1 << k);
+    }
+    int p = x + y * verticesPerEdge;;
+    indexTarget[0] = p;
+    indexTarget[1] = p + 1;
+    indexTarget[2] = p + verticesPerEdge;
+    indexTarget[3] = p + verticesPerEdge;
+    indexTarget[4] = p + 1;
+    indexTarget[5] = p + 1 + verticesPerEdge;
+    indexTarget += 6;
+  }
+
+  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateIndices(indexCount);
+
+  mMesh->UploadVertices(&vertices[0]);
+  mMesh->UploadIndices(&indices[0]);
+}
+
+void PlaneMeshNode::HandleMessage(Message* message) {
   switch (message->mType) {
   case MessageType::VALUE_CHANGED:
   case MessageType::SLOT_CONNECTION_CHANGED:
