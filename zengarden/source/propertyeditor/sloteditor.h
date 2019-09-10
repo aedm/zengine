@@ -17,6 +17,7 @@ private:
   map<Slot*, shared_ptr<SlotWatcher>> mSlotWatchers;
 
   virtual void OnSlotConnectionChanged(Slot* slot) override;
+  virtual void OnSlotStructureChanged() override;
 
   void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 
@@ -24,7 +25,14 @@ private:
   template <ValueType T>
   bool AddSlot(Slot* slot, QWidget* parent, QLayout* layout);
 
+  void RebuildSlots();
+  void RemoveAllSlots();
+
   QIcon mGhostIcon;
+
+  /// This widget holds all slot widgets
+  QWidget* mSlotsWidget = nullptr;
+  QVBoxLayout* mSlotLayout = nullptr;
 };
 
 

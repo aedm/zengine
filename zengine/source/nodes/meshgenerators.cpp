@@ -332,7 +332,7 @@ void PlaneMeshNode::Operate() {
     float xCoord = -1.0f;
     float u = 0.0f;
     for (int x = 0; x <= segmentsPerEdge; x++) {
-      vertexTarget->position = Vec3(xCoord, yCoord, 0.0f);
+      vertexTarget->position = Vec3(xCoord, 0.0, yCoord) * size;
       vertexTarget->uv = Vec2(u, v);
       vertexTarget->normal = Vec3(0, 1, 0);
       vertexTarget->tangent = Vec3(1, 0, 0);

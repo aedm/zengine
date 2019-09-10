@@ -14,12 +14,7 @@ SlotEditor::SlotEditor(const shared_ptr<Node>& node)
 
 
 SlotEditor::~SlotEditor() {
-  for (auto it : mSlotWatchers) {
-    if (it.second->GetDirectNode()) {
-      it.second->GetDirectNode()->RemoveWatcher(it.second);
-    }
-    SafeDelete(it.second->mWatcherWidget);
-  }
+  RemoveAllSlots();
 }
 
 
@@ -44,26 +39,40 @@ bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
 }
 
 
-void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  PropertyEditor::SetWatcherWidget(watcherWidget);
+void SlotEditor::RebuildSlots() {
+  RemoveAllSlots();
+
+  /// The layout object was deleted when mSlotsWidget was removed
+  SafeDelete(mSlotsWidget);
+  mSlotLayout = nullptr;
+
+  /// Add a widget that stores all slot editors
+  mSlotsWidget = new QWidget(mWatcherWidget);
+  mLayout->addWidget(mSlotsWidget);
+  mSlotsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+  QVBoxLayout* mSlotLayout = new QVBoxLayout(mSlotsWidget);
+  mSlotLayout->setSpacing(4);
+  mSlotLayout->setContentsMargins(0, 0, 0, 0);
+
   shared_ptr<Node> directNode = GetDirectNode();
 
-  /// Slots
+  /// Generate slot editors
   for (Slot* slot : directNode->GetPublicSlots()) {
     if (slot->mIsMultiSlot) continue;
 
     /// Create horizontal widget to add editor and ghost button
-    QWidget* widget = new QWidget(watcherWidget);
-    mLayout->addWidget(widget);
+    QWidget* widget = new QWidget(mSlotsWidget);
+    mSlotLayout->addWidget(widget);
+
     widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout* hLayout = new QHBoxLayout(widget);
     hLayout->setSpacing(4);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
-    if (!AddSlot<ValueType::FLOAT>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ValueType::VEC2>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ValueType::VEC3>(slot, watcherWidget, hLayout) &&
-      !AddSlot<ValueType::VEC4>(slot, watcherWidget, hLayout)) {
+    if (!AddSlot<ValueType::FLOAT>(slot, widget, hLayout) &&
+      !AddSlot<ValueType::VEC2>(slot, widget, hLayout) &&
+      !AddSlot<ValueType::VEC3>(slot, widget, hLayout) &&
+      !AddSlot<ValueType::VEC4>(slot, widget, hLayout)) {
       QLabel* label = new QLabel(QString::fromStdString(slot->mName), widget);
       hLayout->addWidget(label);
     }
@@ -76,7 +85,7 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
     ghostButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     ghostButton->setIcon(mGhostIcon);
     hLayout->addWidget(ghostButton);
-    
+
     ghostButton->connect(ghostButton, &QPushButton::toggled, [=]() {
       slot->SetGhost(!slot->IsGhost());
     });
@@ -85,32 +94,39 @@ void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   /// Source editor button
   if (IsExactType<StubNode>(directNode)) {
     auto stub = PointerCast<StubNode>(directNode);
-    QPushButton* sourceButton = new QPushButton("Edit source", watcherWidget);
-    watcherWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
+    QPushButton* sourceButton = new QPushButton("Edit source", mSlotsWidget);
+    mSlotsWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
       ZenGarden::GetInstance()->Watch(
         stub->mSource.GetReferencedNode(), WatcherPosition::RIGHT_TAB);
     });
-    mLayout->addWidget(sourceButton);
+    mSlotLayout->addWidget(sourceButton);
   }
+}
+
+void SlotEditor::RemoveAllSlots() {
+  for (auto it : mSlotWatchers) {
+    if (it.second->GetDirectNode()) {
+      it.second->GetDirectNode()->RemoveWatcher(it.second);
+    }
+    SafeDelete(it.second->mWatcherWidget);
+  }
+  mSlotWatchers.clear();
+}
+
+void SlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
+  PropertyEditor::SetWatcherWidget(watcherWidget);
+  RebuildSlots();
 }
 
 
 void SlotEditor::OnSlotConnectionChanged(Slot* slot) {
-  auto it = mSlotWatchers.find(slot);
-  if (it != mSlotWatchers.end()) {
-    shared_ptr<SlotWatcher> watcher = it->second;
-    shared_ptr<Node> node = slot->GetReferencedNode();
-    if (IsPointerOf<StubNode>(node)) {
-      node->RemoveWatcher(watcher);
-    }
-    else {
-      slot->GetReferencedNode()->AssignWatcher(watcher);
-      SlotWatcher* watcherPtr = watcher.get();
-      watcherPtr->UpdateReadOnly();
-    }
-  }
+  RebuildSlots();
 }
 
+
+void SlotEditor::OnSlotStructureChanged() {
+  RebuildSlots();
+}
 
 void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
   delete watcherWidget;
@@ -118,7 +134,8 @@ void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
 
 
 SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
-  : WatcherUI(node) {}
+  : WatcherUI(node) 
+{}
 
 
 template <ValueType T>
