@@ -3,8 +3,8 @@
 REGISTER_NODECLASS(CameraNode, "Camera");
 
 CameraNode::CameraNode()
-  : mTarget(this, "Target", false, true, true, 0.0f, 150.0f)
-  , mDistance(this, "Distance", false, true, true, 0.0f, 150.0f)
+  : mTarget(this, "Target", false, true, true, 0.0f, 10.0f)
+  , mDistance(this, "Distance", false, true, true, 0.0f, 10.0f)
   , mOrientation(this, "Orientation", false, true, true, -Pi, Pi)
   , mFovY(this, "Field of view")
   , mZNear(this, "Near Z")
@@ -13,10 +13,10 @@ CameraNode::CameraNode()
   , mShakeTime(this, "ShakeTime")
   , mShakeSpeed(this, "ShakeSpeed") {
   mFovY.SetDefaultValue(60.0f * (Pi / 180.0f));
-  mZNear.SetDefaultValue(1.0f);
-  mZFar.SetDefaultValue(1000.0f);
+  mZNear.SetDefaultValue(0.1f);
+  mZFar.SetDefaultValue(200.0f);
   mTarget.SetDefaultValue(Vec3(0, 0, 0));
-  mDistance.SetDefaultValue(50.0f);
+  mDistance.SetDefaultValue(5.0f);
   mOrientation.SetDefaultValue(Vec3(0, 0, 0));
 }
 

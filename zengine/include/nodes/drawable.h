@@ -20,11 +20,15 @@ public:
   Vec3Slot mRotate;
   FloatSlot mScale;
   FloatSlot mInstances;
+  FloatSlot mIsShadowCenter;
 
   void Draw(Globals* globals, PassType passType, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
+  void ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter);
 
 protected:
   /// Handle received messages
   virtual void HandleMessage(Message* message) override;
+
+  void ApplyTransformation(Globals& globals);
 };
 

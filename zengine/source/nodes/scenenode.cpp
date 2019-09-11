@@ -49,16 +49,22 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   OpenGL->Clear(true, true, 0xff00ff80);
   Vec3 s = mShadowMapSize.Get();
   Vec3 lightDir = mSkyLightDirection.Get().Normal();
-
-  //Vec3 target = camera->mTarget.Get();
+  
   Matrix lookat = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
   Matrix target = Matrix::Translate(-camera->mTarget.Get());
-  //Matrix distance = Matrix::Translate(Vec3(0, 0, -camera->mDistance.Get()));
   globals->Camera = lookat * target;
-  //globals->Camera = Matrix::LookAt(target-lightDir, target, Vec3(0, 1, 0));
-
+ 
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
   globals->World.LoadIdentity();
+    /// Calculate shadow center
+  Vec3 shadowCenter(0, 0, 0);
+  for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
+    auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
+    drawable->ComputeForcedShadowCenter(globals, shadowCenter);
+  }
+  Matrix shadowCenterTarget = Matrix::Translate(-shadowCenter);
+  globals->Camera = shadowCenterTarget * globals->Camera;
+
   globals->SkylightProjection = globals->Projection;
   globals->SkylightCamera = globals->Camera;
   globals->SkylightDirection = mSkyLightDirection.Get();
@@ -87,6 +93,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   /// Pass #2: Z prepass, using the shadow pass material
   if (mZPrepassDisabled.Get() < 0.5) {
     globals->SkylightTexture = renderTarget->mShadowTexture;
+
     camera->SetupGlobals(globals);
     RenderDrawables(globals, PassType::SHADOW);
   }

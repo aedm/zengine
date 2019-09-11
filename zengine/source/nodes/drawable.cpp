@@ -5,11 +5,12 @@ REGISTER_NODECLASS(Drawable, "Drawable");
 Drawable::Drawable()
   : mMesh(this, "Mesh")
   , mMaterial(this, "Material")
-  , mMove(this, "Move", false, true, true, -100.0f, 100.0f)
+  , mMove(this, "Move", false, true, true, -10.0f, 10.0f)
   , mRotate(this, "Rotate", false, true, true, -Pi, Pi)
   , mChildren(this, "Children", true)
   , mScale(this, "Scale")
   , mInstances(this, "Instances")
+  , mIsShadowCenter(this, "Force shadow center")
 {
   mInstances.SetDefaultValue(1);
 }
@@ -19,10 +20,46 @@ Drawable::~Drawable() {}
 void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Primitive) {
   auto& material = mMaterial.GetNode();
   auto& meshNode = mMesh.GetNode();
-  Globals globals = *oldGlobals;
 
   if (mChildren.GetMultiNodeCount() == 0 && !(material && meshNode)) return;
+  Globals globals = *oldGlobals;
+  ApplyTransformation(globals);
 
+  if (material && meshNode) {
+    meshNode->Update();
+    const shared_ptr<Mesh>& mesh = meshNode->GetMesh();
+
+    /// Set pass (pipeline state)
+    auto& pass = material->GetPass(passType);
+    if (!pass) return;
+    pass->Update();
+
+    if (pass->isComplete() && mesh != nullptr) {
+      pass->Set(&globals);
+      mesh->Render(UINT(mInstances.Get()), Primitive);
+    }
+  }
+
+  for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
+    PointerCast<Drawable>(mChildren.GetReferencedMultiNode(i))->Draw(&globals, passType);
+  }
+}
+
+
+void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) {
+  Globals currentGlobals = *globals;
+  ApplyTransformation(currentGlobals);
+  if (mIsShadowCenter.Get() > 0.5f) {
+    Vec4 s = Vec4(0, 0, 0, 1) * currentGlobals.View;
+    oShadowCenter = Vec3(s.x, s.y, s.z);
+  }
+  for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
+    PointerCast<Drawable>(mChildren.GetReferencedMultiNode(i))->ComputeForcedShadowCenter(
+      &currentGlobals, oShadowCenter);
+  }
+}
+
+void Drawable::ApplyTransformation(Globals& globals) {
   Vec3 movv = mMove.Get();
   if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
     Matrix move = Matrix::Translate(mMove.Get());
@@ -44,26 +81,8 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
   globals.Transformation = globals.Projection * globals.View;
   globals.SkylightTransformation =
     globals.SkylightProjection * (globals.SkylightCamera * globals.World);
-
-  if (material && meshNode) {
-    meshNode->Update();
-    const shared_ptr<Mesh>& mesh = meshNode->GetMesh();
-
-    /// Set pass (pipeline state)
-    auto& pass = material->GetPass(passType);
-    if (!pass) return;
-    pass->Update();
-
-    if (pass->isComplete() && mesh != nullptr) {
-      pass->Set(&globals);
-      mesh->Render(UINT(mInstances.Get()), Primitive);
-    }
-  }
-
-  for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
-    PointerCast<Drawable>(mChildren.GetReferencedMultiNode(i))->Draw(&globals, passType);
-  }
 }
+
 
 void Drawable::HandleMessage(Message* message) {
   switch (message->mType) {
