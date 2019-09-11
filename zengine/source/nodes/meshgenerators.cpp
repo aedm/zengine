@@ -4,6 +4,7 @@ REGISTER_NODECLASS(CubeMeshNode, "Cube");
 REGISTER_NODECLASS(HalfCubeMeshNode, "HalfCube");
 REGISTER_NODECLASS(GeosphereMeshNode, "Geosphere");
 REGISTER_NODECLASS(PlaneMeshNode, "Plane");
+REGISTER_NODECLASS(PolarSphereMeshNode, "PolarSphere");
 
 CubeMeshNode::CubeMeshNode()
   : MeshNode()
@@ -381,3 +382,95 @@ void PlaneMeshNode::HandleMessage(Message* message) {
   default: break;
   }
 }
+
+
+PolarSphereMeshNode::PolarSphereMeshNode()
+  : MeshNode()
+  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
+{
+  mResolution.SetDefaultValue(5);
+  mSize.SetDefaultValue(1.0f);
+}
+
+void PolarSphereMeshNode::Operate() {
+  if (!mMesh) mMesh = make_shared<Mesh>();
+
+  int resolution = int(mResolution.Get());
+  if (resolution < 3) resolution = 3;
+  float size = mSize.Get();
+
+  int longAxisVertices = resolution * 2;
+  int shortAxisVertices = resolution;
+  int vertexCount = longAxisVertices * shortAxisVertices;
+  int quadCount = (longAxisVertices - 1)* (shortAxisVertices - 1);
+  int indexCount = quadCount * 6;
+
+  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<IndexEntry> indices(indexCount);
+
+  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  IndexEntry* indexTarget = &indices[0];
+
+  /// Generate vertices
+  float yStep = Pi / float(shortAxisVertices - 1);
+  float xStep = 2.0f * Pi / float(longAxisVertices - 1);
+  float uStep = 1.0f / float(longAxisVertices - 1);
+  float vStep = 1.0f / float(shortAxisVertices - 1);
+  float yCoord = 0.0f;
+  float v = 0.0f;
+  for (int y = 0; y < shortAxisVertices; y++) {
+    float xCoord = 0.0f;
+    float u = 0.0f;
+    for (int x = 0; x < longAxisVertices; x++) {
+      float radius = sinf(yCoord);
+      float yc = cosf(yCoord);
+      float xc = sinf(xCoord) * radius;
+      float zc = cosf(xCoord) * radius;
+      Vec3 spherical(xc, yc, zc);
+      vertexTarget->position = spherical * size;
+      vertexTarget->uv = Vec2(u, v);
+      vertexTarget->normal = spherical;
+      vertexTarget->tangent = Vec3(0, 1, 0).Cross(spherical).Normal();
+      vertexTarget++;
+      xCoord += xStep;
+      u += uStep;
+    }
+    yCoord += yStep;
+    v += vStep;
+  }
+
+  /// Generate indices
+  for (int y = 0; y < shortAxisVertices-1; y++) {
+    for (int x = 0; x < longAxisVertices-1; x++) {
+      int p = y * longAxisVertices + x;
+      indexTarget[0] = p;
+      indexTarget[1] = p + 1;
+      indexTarget[2] = p + longAxisVertices;
+      indexTarget[3] = p + longAxisVertices;
+      indexTarget[4] = p + 1;
+      indexTarget[5] = p + 1 + longAxisVertices;
+      indexTarget += 6;
+    }
+  }
+
+  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateIndices(indexCount);
+
+  mMesh->UploadVertices(&vertices[0]);
+  mMesh->UploadIndices(&indices[0]);
+}
+
+void PolarSphereMeshNode::HandleMessage(Message* message) {
+  switch (message->mType) {
+  case MessageType::VALUE_CHANGED:
+  case MessageType::SLOT_CONNECTION_CHANGED:
+    if (mIsUpToDate) {
+      mIsUpToDate = false;
+      SendMsg(MessageType::NEEDS_REDRAW);
+    }
+    break;
+  default: break;
+  }
+}
+

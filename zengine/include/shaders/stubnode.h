@@ -40,6 +40,8 @@ using namespace std;
   ITEM(PPDofEnabled,                  ValueType::FLOAT) \
   ITEM(PPDofFocusDistance,            ValueType::FLOAT) \
   ITEM(PPDofBlur,                     ValueType::FLOAT) \
+  ITEM(PPDofScale,                    ValueType::FLOAT) \
+  ITEM(PPDofBleed,                    ValueType::FLOAT) \
   ITEM(DirectToScreen,                ValueType::FLOAT) \
   ITEM(DirectToSquare,                ValueType::FLOAT) \
 

@@ -8,6 +8,8 @@
 :global float gPPDofFocusDistance
 :global float gPPDofBlur
 :global mat4 gProjection
+:global float gPPDofScale
+:global float gPPDofBleed
 :global float gTime
 
 :output vec4 FragColor
@@ -42,7 +44,8 @@ SHADER
   
   int sampleCount = DOFSampleCount;
   for (int poissonIndex = 0; poissonIndex < sampleCount; poissonIndex++) {
-    vec3 poissonPoint = poissonDisk[poissonIndex];
+    //vec3 poissonPoint = poissonDisk[poissonIndex];
+    vec3 poissonPoint = samplingDisk[poissonIndex];
 
     vec2 pVec = poissonPoint.xy * rotrand;
     vec2 uv = vTexCoord + pVec * blurUVCorrect;
@@ -55,8 +58,8 @@ SHADER
     if (sampleDepth >= maxDepth) continue;
 
     const float p = 0.2;
-    float coc = min(abs(sampleDepth - focusDepth) * 100, 1.0);
-    float cocAlpha = coc - poissonPoint.z * 0.08;
+    float coc = min(abs(sampleDepth - focusDepth) * gPPDofScale, 1.0);
+    float cocAlpha = coc - poissonPoint.z * gPPDofBleed;
     
     if (cocAlpha <= 0.0) continue;
     float zAlpha = max((maxDepth - sampleDepth) / depthTolerance, 0);

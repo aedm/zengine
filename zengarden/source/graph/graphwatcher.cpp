@@ -368,6 +368,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) 
       shared_ptr<Node> originalNode = mHoveredWidget->GetDirectNode();
       shared_ptr<Ghost> ghost = make_shared<Ghost>();
       ghost->mOriginalNode.Connect(originalNode);
+      ghost->SetName(originalNode->GetName());
       Vec2 position = mOriginalWidgetPositions[mHoveredWidget] + mouseDiff;
       ghost->SetPosition(position);
       TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
@@ -537,6 +538,7 @@ void GraphWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) {
     shared_ptr<Ghost> ghost = make_shared<Ghost>();
     ghost->mOriginalNode.Connect(originalNode);
     ghost->SetPosition(mCurrentMousePos);
+    ghost->SetName(originalNode->GetName());
     TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
     /// Adding new nodes to a graph resets watcher state, but we want to move the ghost
     shared_ptr<NodeWidget> ghostWidget = mWidgetMap.at(ghost);

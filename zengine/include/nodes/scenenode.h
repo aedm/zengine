@@ -25,6 +25,8 @@ public:
   FloatSlot mDOFEnabled;
   FloatSlot mDOFFocusDistance;
   FloatSlot mDOFBlur;
+  FloatSlot mDOFScale;
+  FloatSlot mDOFBleed;
   FloatSlot mZPrepassDisabled;
 
   void Draw(RenderTarget* renderTarget, Globals* globals);

@@ -57,3 +57,18 @@ protected:
   /// Handle received messages
   virtual void HandleMessage(Message* message) override;
 };
+
+class PolarSphereMeshNode : public MeshNode {
+public:
+  PolarSphereMeshNode();
+
+  FloatSlot mResolution;
+  FloatSlot mSize;
+
+protected:
+  virtual void Operate() override;
+
+  /// Handle received messages
+  virtual void HandleMessage(Message* message) override;
+};
+

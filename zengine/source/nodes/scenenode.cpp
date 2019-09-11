@@ -14,8 +14,10 @@ SceneNode::SceneNode()
   , mSkyLightBias(this, "Shadow bias")
   , mSceneTimes(this, string(), true, false, false, false)
   , mDOFEnabled(this, "DOF enabled")
-  , mDOFFocusDistance(this, "DOF focus distance", false, true, true, 0.0f, 100.0f)
+  , mDOFFocusDistance(this, "DOF focus distance", false, true, true, 0.0f, 20.0f)
   , mDOFBlur(this, "DOF blur", false, true, true, 0.0f, 30.0f)
+  , mDOFScale(this, "DOF scale", false, true, true, 0.0f, 10.0f)
+  , mDOFBleed(this, "DOF bleed", false, true, true, 0.0f, 0.1f)
   , mZPrepassDisabled(this, "Disable Z prepass")
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
@@ -27,6 +29,8 @@ SceneNode::SceneNode()
   mDOFEnabled.SetDefaultValue(0.0f);
   mDOFFocusDistance.SetDefaultValue(50.0f);
   mDOFBlur.SetDefaultValue(10.0f);
+  mDOFScale.SetDefaultValue(3.0f);
+  mDOFBleed.SetDefaultValue(0.04f);
 }
 
 SceneNode::~SceneNode() {
@@ -103,6 +107,8 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
     globals->PPDofEnabled = mDOFEnabled.Get();
     globals->PPDofFocusDistance = mDOFFocusDistance.Get();
     globals->PPDofBlur = mDOFBlur.Get();
+    globals->PPDofScale = mDOFScale.Get();
+    globals->PPDofBleed= mDOFBleed.Get();
   }
 }
 
