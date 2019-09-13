@@ -183,6 +183,7 @@
     <ClInclude Include="include\shaders\valuetype.h" />
     <ClInclude Include="include\nodes\buffernode.h" />
     <ClInclude Include="include\serialize\imageloader.h" />
+    <ClInclude Include="include\nodes\fluidnode.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -292,6 +293,7 @@
     <ClCompile Include="source\shaders\valuetype.cpp" />
     <ClCompile Include="source\nodes\buffernode.cpp" />
     <ClCompile Include="source\serialize\imageloader.cpp" />
+    <ClCompile Include="source\nodes\fluidnode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

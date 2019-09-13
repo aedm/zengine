@@ -28,6 +28,7 @@ public:
   FloatSlot mDOFScale;
   FloatSlot mDOFBleed;
   FloatSlot mZPrepassDisabled;
+  FluidSlot mFluidsSlot;
 
   void Draw(RenderTarget* renderTarget, Globals* globals);
 
@@ -52,6 +53,7 @@ private:
   vector<shared_ptr<Node>> mTransitiveClosure;
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
+  float mLastRenderTime;
 
   shared_ptr<GlobalTimeNode> mGlobalTimeNode = make_shared<GlobalTimeNode>();
 

@@ -8,6 +8,7 @@ Material::Material()
   : mSolidPass(this, "Solid Pass")
   , mShadowPass(this, "Shadow Pass")
   , mZPostPass(this, "Z Postpass")
+  , mFluidPaintPass(this, "Fluid Pass")
 {}
 
 void Material::HandleMessage(Message* message) {
@@ -24,6 +25,7 @@ const shared_ptr<Pass> Material::GetPass(PassType passType) {
     case PassType::SHADOW: return mShadowPass.GetNode();
     case PassType::SOLID: return mSolidPass.GetNode();
     case PassType::ZPOST: return mZPostPass.GetNode();
+    case PassType::FLUID_PAINT: return mFluidPaintPass.GetNode();
   }
   SHOULD_NOT_HAPPEN;
   return nullptr;

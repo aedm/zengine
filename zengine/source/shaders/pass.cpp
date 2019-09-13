@@ -18,7 +18,11 @@ Pass::Pass()
   , mFragmentStub(this, "Fragment shader")
   , mFaceModeSlot(this, "Face mode")
   , mBlendModeSlot(this, "Blending")
-  , mUberShader(this, "Uber Shader", false, false, false) {
+  , mFluidSourceSlot(this, "Fluid source", true)
+  , mFluidColorTargetSlot(this, "Fluid color target", true)
+  , mFluidVelocityTargetSlot(this, "Fluid velo target", true)
+  , mUberShader(this, "Uber Shader", false, false, false)
+{
   mRenderstate.mDepthTest = true;
   mRenderstate.mFaceMode = RenderState::FaceMode::FRONT;
   mRenderstate.mBlendMode = RenderState::BlendMode::ALPHA;
@@ -93,6 +97,19 @@ void Pass::Set(Globals* globals) {
   mRenderstate.mBlendMode = blendMode;
 
   OpenGL->SetRenderState(&mRenderstate);
+
+  if (mFluidSourceSlot.GetMultiNodeCount() > 0) {
+    auto& fluidSource = PointerCast<FluidNode>(mFluidSourceSlot.GetReferencedMultiNode(0));
+    fluidSource->SetGlobalFluidTextures(globals);
+  }
+  if (mFluidColorTargetSlot.GetMultiNodeCount() > 0) {
+    auto& fluid = PointerCast<FluidNode>(mFluidColorTargetSlot.GetReferencedMultiNode(0));
+    fluid->SetColorRenderTarget();
+  }
+  if (mFluidVelocityTargetSlot.GetMultiNodeCount() > 0) {
+    auto& fluid = PointerCast<FluidNode>(mFluidVelocityTargetSlot.GetReferencedMultiNode(0));
+    fluid->SetVelocityRenderTarget();
+  }
 
   char uniformArray[MAX_UNIFORM_BUFFER_SIZE];
 

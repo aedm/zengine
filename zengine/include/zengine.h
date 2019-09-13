@@ -35,6 +35,7 @@
 #include "nodes/cameranode.h"
 #include "nodes/meshgenerators.h"
 #include "nodes/buffernode.h"
+#include "nodes/fluidnode.h"
 
 #include "serialize/lodepng.h"
 

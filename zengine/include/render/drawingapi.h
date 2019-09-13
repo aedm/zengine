@@ -198,17 +198,8 @@ private:
   void SetBlending(bool Enable);
   void SetBlendMode(RenderState::BlendMode blendMode);
 
-  /// Same as glNamedFramebufferXXXBuffer in OpenGL 4.5, but Intel doesn't fckn support that
-  void BindReadFramebuffer(FrameBufferId framebuffer);
-  void BindDrawFramebuffer(FrameBufferId framebuffer);
-  void NamedFramebufferReadBuffer(FrameBufferId framebuffer, UINT mode);
-  void NamedFramebufferDrawBuffer(FrameBufferId framebuffer, UINT mode);
-
   /// Shadow values
-  FrameBufferId BoundFrameBufferReadBuffer;
-  FrameBufferId BoundFrameBufferDrawBuffer;
   FrameBufferId BoundFrameBufferShadow;
-
   VertexBufferHandle BoundVertexBufferShadow;
   IndexBufferHandle BoundIndexBufferShadow;
 

@@ -44,6 +44,16 @@ private:
   shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA = make_shared<Pass>();
   shared_ptr<Pass> mPostProcess_DOF = make_shared<Pass>();
 
+public:
+
+  shared_ptr<Pass> mFluid_CurlPass = make_shared<Pass>();
+  shared_ptr<Pass> mFluid_VorticityPass = make_shared<Pass>();
+  shared_ptr<Pass> mFluid_DivergencePass = make_shared<Pass>();
+  shared_ptr<Pass> mFluid_FadeOutPass = make_shared<Pass>();
+  shared_ptr<Pass> mFluid_PressurePass = make_shared<Pass>();
+  shared_ptr<Pass> mFluid_GradientSubtractPass = make_shared<Pass>();
+  shared_ptr<Pass> mFluid_AdvectionPass = make_shared<Pass>();
+    
   shared_ptr<Mesh> mFullScreenQuad;
 };
 

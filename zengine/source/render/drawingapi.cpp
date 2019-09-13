@@ -95,8 +95,6 @@ void OpenGLAPI::OnContextSwitch() {
   BoundVertexBufferShadow = -1;
   BoundIndexBufferShadow = -1;
   BoundFrameBufferShadow = -1;
-  BoundFrameBufferReadBuffer = -1;
-  BoundFrameBufferDrawBuffer = -1;
   for (int i = 0; i < MAX_COMBINED_TEXTURE_SLOTS; i++) {
     BoundTextureShadow[i] = (GLuint)-1;
     BoundMultisampleTextureShadow[i] = (GLuint)-1;
@@ -339,11 +337,6 @@ void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
   CheckGLError();
   glUseProgram(program->mProgramHandle);
   CheckGLError();
-
-  //glBindBuffer(GL_UNIFORM_BUFFER, program->mUniformBufferHandle);
-  //glBufferData(GL_UNIFORM_BUFFER, program->mUniformBlockSize, uniforms, GL_DYNAMIC_DRAW);
-  //CheckGLError();
-
   glBindBufferBase(GL_UNIFORM_BUFFER, 0, uniformBuffer->GetHandle());
   CheckGLError();
 }
@@ -376,78 +369,7 @@ void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
 }
 
 
-//VertexBufferHandle OpenGLAPI::CreateVertexBuffer(UINT size) {
-//  ASSERT(!PleaseNoNewResources);
-//  VertexBufferHandle handle;
-//  glGenBuffers(1, &handle);
-//  CheckGLError();
-//  BindVertexBuffer(handle);
-//  glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
-//  CheckGLError();
-//  return handle;
-//}
-//
-//
-//void OpenGLAPI::DestroyVertexBuffer(VertexBufferHandle handle) {
-//  CheckGLError();
-//  glDeleteBuffers(1, &handle);
-//  CheckGLError();
-//}
-//
-//
-//void* OpenGLAPI::MapVertexBuffer(VertexBufferHandle handle) {
-//  ASSERT(!PleaseNoNewResources);
-//  BindVertexBuffer(handle);
-//  void* address = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-//  CheckGLError();
-//  return address;
-//}
-//
-//
-//void OpenGLAPI::UnMapVertexBuffer(VertexBufferHandle handle) {
-//  /// Please don't do anything else while a buffer is mapped
-//  ASSERT(BoundVertexBufferShadow == handle);
-//  glUnmapBuffer(GL_ARRAY_BUFFER);
-//  CheckGLError();
-//}
-//
-//
-//IndexBufferHandle OpenGLAPI::CreateIndexBuffer(UINT size) {
-//  ASSERT(!PleaseNoNewResources);
-//  IndexBufferHandle handle;
-//  glGenBuffers(1, &handle);
-//  CheckGLError();
-//  BindIndexBuffer(handle);
-//  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
-//  CheckGLError();
-//  return handle;
-//}
-//
-//
-//void OpenGLAPI::DestroyIndexBuffer(IndexBufferHandle handle) {
-//  glDeleteBuffers(1, &handle);
-//  CheckGLError();
-//}
-//
-//
-//void* OpenGLAPI::MapIndexBuffer(IndexBufferHandle handle) {
-//  ASSERT(!PleaseNoNewResources);
-//  BindIndexBuffer(handle);
-//  void* buffer = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-//  CheckGLError();
-//  return buffer;
-//}
-//
-//
-//void OpenGLAPI::UnMapIndexBuffer(IndexBufferHandle handle) {
-//  /// Please don't do anything else while a buffer is mapped
-//  ASSERT(BoundIndexBufferShadow == handle);
-//  glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-//  CheckGLError();
-//}
-
-
-void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
+void OpenGLAPI::BindVertexBuffer(VertexBufferHandle bufferID) {
   if (bufferID != BoundVertexBufferShadow) {
     glBindBuffer(GL_ARRAY_BUFFER, bufferID);
     CheckGLError();
@@ -456,7 +378,7 @@ void OpenGLAPI::BindVertexBuffer(GLuint bufferID) {
 }
 
 
-void OpenGLAPI::BindIndexBuffer(GLuint bufferID) {
+void OpenGLAPI::BindIndexBuffer(IndexBufferHandle bufferID) {
   if (bufferID != BoundIndexBufferShadow) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
     CheckGLError();
@@ -555,38 +477,6 @@ void OpenGLAPI::SetBlendMode(RenderState::BlendMode blendMode) {
     break;
   }
   mBlendMode = blendMode;
-  CheckGLError();
-}
-
-
-void OpenGLAPI::BindReadFramebuffer(GLuint framebuffer) {
-  if (BoundFrameBufferReadBuffer == framebuffer) return;
-  BoundFrameBufferReadBuffer = framebuffer;
-  CheckGLError();
-  ASSERT(glIsFramebuffer(framebuffer));
-  glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-  CheckGLError();
-}
-
-
-void OpenGLAPI::BindDrawFramebuffer(GLuint framebuffer) {
-  if (BoundFrameBufferDrawBuffer == framebuffer) return;
-  BoundFrameBufferDrawBuffer = framebuffer;
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
-  CheckGLError();
-}
-
-
-void OpenGLAPI::NamedFramebufferReadBuffer(FrameBufferId framebuffer, UINT mode) {
-  BindReadFramebuffer(framebuffer);
-  glReadBuffer(mode);
-  CheckGLError();
-}
-
-
-void OpenGLAPI::NamedFramebufferDrawBuffer(FrameBufferId framebuffer, UINT mode) {
-  BindDrawFramebuffer(framebuffer);
-  glDrawBuffer(mode);
   CheckGLError();
 }
 
@@ -794,16 +684,6 @@ void OpenGLAPI::UploadTextureGPUData(const shared_ptr<Texture>& texture,
 }
 
 
-//void OpenGLAPI::UploadTextureSubData(TextureHandle handle, UINT x, UINT y,
-//                                     int width, int height, TexelType type,
-//                                     void* texelData) {
-//  ASSERT(!PleaseNoNewResources);
-//  BindTexture(handle);
-//  SetTextureSubData(width, x, y, height, type, texelData);
-//  CheckGLError();
-//}
-
-
 void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler,
   const shared_ptr<Texture>& texture, UINT slotIndex)
 {
@@ -830,16 +710,15 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
     depthBuffer->mIsMultisample == targetBufferA->mIsMultisample);
   CheckGLError();
   GLuint bufferId;
-  glGenFramebuffers(1, &bufferId);
-  BindFrameBuffer(bufferId);
+  glCreateFramebuffers(1, &bufferId);
+  //BindFrameBuffer(bufferId);
   CheckGLError();
 
   bool isMultisample = (depthBuffer ? depthBuffer : targetBufferA)->mIsMultisample;
   GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
   if (depthBuffer) {
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, target,
-      depthBuffer->mHandle, 0);
+    glNamedFramebufferTexture(bufferId, GL_DEPTH_ATTACHMENT, depthBuffer->mHandle, 0);
   }
 
   if (!targetBufferA) {
@@ -847,28 +726,25 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   }
   else if (!targetBufferB) {
     CheckGLError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
-      targetBufferA->mHandle, 0);
+    glNamedFramebufferTexture(bufferId, GL_COLOR_ATTACHMENT0, targetBufferA->mHandle, 0);
     GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
     CheckGLError();
-    glDrawBuffers(1, attachments);
+    glNamedFramebufferDrawBuffers(bufferId, 1, attachments);
     CheckGLError();
   }
   else {
     CheckGLError();
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, target,
-      targetBufferA->mHandle, 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, target,
-      targetBufferB->mHandle, 0);
+    glNamedFramebufferTexture(bufferId, GL_COLOR_ATTACHMENT0, targetBufferA->mHandle, 0);
+    glNamedFramebufferTexture(bufferId, GL_COLOR_ATTACHMENT1, targetBufferB->mHandle, 0);
     GLuint attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     CheckGLError();
-    glDrawBuffers(2, attachments);
+    glNamedFramebufferDrawBuffers(bufferId, 2, attachments);
     CheckGLError();
   }
   CheckGLError();
 
   if (targetBufferA) {
-    NamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
+    glNamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
   }
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -895,19 +771,13 @@ void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
 
 void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
   int srcX0, int srcY0, int srcX1, int srcY1,
-  int dstX0, int dstY0, int dstX1, int dstY1) {
-
+  int dstX0, int dstY0, int dstX1, int dstY1) 
+{
   CheckGLError();
-  BindReadFramebuffer(source);
-  BindDrawFramebuffer(target);
-  glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1,
-    dstX0, dstY0, dstX1, dstY1,
-    GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-  //glBlitNamedFramebuffer(source, target, 
-  //                       srcX0, srcY0, srcX1, srcY1,
-  //                       dstX0, dstY0, dstX1, dstY1,
-  //                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
+  glBlitNamedFramebuffer(source, target, 
+                         srcX0, srcY0, srcX1, srcY1,
+                         dstX0, dstY0, dstX1, dstY1,
+                         GL_COLOR_BUFFER_BIT, GL_LINEAR);
   CheckGLError();
 }
 

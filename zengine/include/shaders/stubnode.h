@@ -44,6 +44,11 @@ using namespace std;
   ITEM(PPDofBleed,                    ValueType::FLOAT) \
   ITEM(DirectToScreen,                ValueType::FLOAT) \
   ITEM(DirectToSquare,                ValueType::FLOAT) \
+  ITEM(FluidCurlAmount,               ValueType::FLOAT) \
+  ITEM(FluidForceDamp,                ValueType::FLOAT) \
+  ITEM(FluidDeltaTime,                ValueType::FLOAT) \
+  ITEM(FluidPressureFade,             ValueType::FLOAT) \
+  ITEM(FluidDissipation,              ValueType::FLOAT) \
 
 #define GLOBALSAMPLER_LIST \
   ITEM(SkylightTexture) \
@@ -53,6 +58,13 @@ using namespace std;
   ITEM(PPGauss) \
   ITEM(SquareTexture1) \
   ITEM(SquareTexture2) \
+  ITEM(FluidVelocity1) \
+  ITEM(FluidVelocity2) \
+  ITEM(FluidVelocity3) \
+  ITEM(FluidColor) \
+  ITEM(FluidCurl) \
+  ITEM(FluidDivergence) \
+  ITEM(FluidPressure) \
 
 enum class GlobalUniformUsage {
 #undef ITEM

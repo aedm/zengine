@@ -19,6 +19,7 @@ SceneNode::SceneNode()
   , mDOFScale(this, "DOF scale", false, true, true, 0.0f, 10.0f)
   , mDOFBleed(this, "DOF bleed", false, true, true, 0.0f, 0.1f)
   , mZPrepassDisabled(this, "Disable Z prepass")
+  , mFluidsSlot(this, "Fluids", true)
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
@@ -37,6 +38,21 @@ SceneNode::~SceneNode() {
 }
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
+  float globalTime = mGlobalTimeNode->Get();
+  float passedTime = globalTime - mLastRenderTime;
+  mLastRenderTime = globalTime;
+  
+  float fluidAdvanceTime = passedTime > 0.1f ? 0.1f : passedTime;
+
+  /// Paint Fluids
+  RenderDrawables(globals, PassType::FLUID_PAINT);
+
+  /// Simulate Fluids
+  for (UINT i = 0; i < mFluidsSlot.GetMultiNodeCount(); i++) {
+    auto& fluid = PointerCast<FluidNode>(mFluidsSlot.GetReferencedMultiNode(i));
+    fluid->Render(fluidAdvanceTime);
+  }
+
   bool directToScreen = globals->DirectToScreen > 0.5f;
   bool directToSquare = globals->DirectToSquare > 0.5f;
 
@@ -74,7 +90,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   globals->SkylightSampleSpread = mSkyLightSampleSpread.Get();
   globals->SkylightBias = mSkyLightBias.Get();
   globals->SkylightTexture = nullptr;
-  globals->Time = mGlobalTimeNode->Get();
+  globals->Time = globalTime;
   RenderDrawables(globals, PassType::SHADOW);
 
   /// Set up render target

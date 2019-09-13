@@ -42,6 +42,8 @@ Prototypes::Prototypes() {
   AddPrototype(registry->GetNodeClass<PolarSphereMeshNode>());
   AddPrototype(registry->GetNodeClass<MeshToVertexBufferNode>());
 
+  AddPrototype(registry->GetNodeClass<FluidNode>());
+
   LoadStubs();
 
   /// Hack to force linking
@@ -50,6 +52,7 @@ Prototypes::Prototypes() {
   make_shared<FloatsToVec3Node>();
   make_shared<CubeMeshNode>();
   make_shared<MeshToVertexBufferNode>();
+  make_shared<FluidNode>();
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {

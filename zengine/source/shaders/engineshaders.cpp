@@ -142,6 +142,17 @@ void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* global
   mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
 }
 
+void ConnectQuadPass(shared_ptr<Pass>& pass, shared_ptr<StubNode>& vertexStub,
+  shared_ptr<StubNode>& fragmentStub)
+{
+  pass->mVertexStub.Connect(vertexStub);
+  pass->mFragmentStub.Connect(fragmentStub);
+  pass->mRenderstate.mDepthTest = false;
+  pass->mBlendModeSlot.SetDefaultValue(1.0f); // normal
+  pass->mFaceModeSlot.SetDefaultValue(0.5f); // front & back
+  pass->Update();
+}
+
 void EngineShaders::BuildPostProcessPasses() {
   shared_ptr<StubNode> fullscreenVertex =
     TheEngineStubs->GetStub("postprocess/fullscreen-vertex");
@@ -156,42 +167,41 @@ void EngineShaders::BuildPostProcessPasses() {
   shared_ptr<StubNode> dofFragment =
     TheEngineStubs->GetStub("postprocess/depth-of-field");
 
+  ConnectQuadPass(mPostProcess_GaussianBlurHorizontal, 
+    fullscreenVertex, gaussianHorizontal);
+  ConnectQuadPass(mPostProcess_GaussianBlurHorizontal_First,
+    fullscreenVertex, gaussianHorizontalFirst);
+  ConnectQuadPass(mPostProcess_GaussianBlurVertical,
+    fullscreenVertex, gaussianVertical);
+  ConnectQuadPass(mPostProcess_GaussianBlur_Blend_MSAA,
+    fullscreenVertex, gaussianBlendMSAA);
+  ConnectQuadPass(mPostProcess_DOF,
+    fullscreenVertex, dofFragment);
 
-  mPostProcess_GaussianBlurHorizontal->mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlurHorizontal->mFragmentStub.Connect(gaussianHorizontal);
-  mPostProcess_GaussianBlurHorizontal->mRenderstate.mDepthTest = false;
-  mPostProcess_GaussianBlurHorizontal->mBlendModeSlot.SetDefaultValue(1.0f); // normal
-  mPostProcess_GaussianBlurHorizontal->mFaceModeSlot.SetDefaultValue(0.5f); // f&b
-  mPostProcess_GaussianBlurHorizontal->Update();
+  shared_ptr<StubNode> fluidVertexShader =
+    TheEngineStubs->GetStub("fluid/vertex");
+  shared_ptr<StubNode> curlFS = 
+    TheEngineStubs->GetStub("fluid/curl-fragment");
+  shared_ptr<StubNode> vorticityFS = 
+    TheEngineStubs->GetStub("fluid/vorticity-fragment");
+  shared_ptr<StubNode> divergenceFS = 
+    TheEngineStubs->GetStub("fluid/divergence-fragment");
+  shared_ptr<StubNode> fadeoutFS = 
+    TheEngineStubs->GetStub("fluid/fadeout-fragment");
+  shared_ptr<StubNode> pressureFS = 
+    TheEngineStubs->GetStub("fluid/pressure-fragment");
+  shared_ptr<StubNode> gradientFS = 
+    TheEngineStubs->GetStub("fluid/gradientSubtract-fragment");
+  shared_ptr<StubNode> advectionFS = 
+    TheEngineStubs->GetStub("fluid/advection-fragment");
 
-  mPostProcess_GaussianBlurHorizontal_First->mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlurHorizontal_First->mFragmentStub.Connect(
-    gaussianHorizontalFirst);
-  mPostProcess_GaussianBlurHorizontal_First->mRenderstate.mDepthTest = false;
-  mPostProcess_GaussianBlurHorizontal_First->mBlendModeSlot.SetDefaultValue(1.0f);
-  mPostProcess_GaussianBlurHorizontal_First->mFaceModeSlot.SetDefaultValue(0.5f);
-  mPostProcess_GaussianBlurHorizontal_First->Update();
-
-  mPostProcess_GaussianBlurVertical->mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlurVertical->mFragmentStub.Connect(gaussianVertical);
-  mPostProcess_GaussianBlurVertical->mRenderstate.mDepthTest = false;
-  mPostProcess_GaussianBlurVertical->mBlendModeSlot.SetDefaultValue(1.0f);
-  mPostProcess_GaussianBlurVertical->mFaceModeSlot.SetDefaultValue(0.5f);
-  mPostProcess_GaussianBlurVertical->Update();
-
-  mPostProcess_GaussianBlur_Blend_MSAA->mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_GaussianBlur_Blend_MSAA->mFragmentStub.Connect(gaussianBlendMSAA);
-  mPostProcess_GaussianBlur_Blend_MSAA->mRenderstate.mDepthTest = false;
-  mPostProcess_GaussianBlur_Blend_MSAA->mBlendModeSlot.SetDefaultValue(1.0f);
-  mPostProcess_GaussianBlur_Blend_MSAA->mFaceModeSlot.SetDefaultValue(0.5f);
-  mPostProcess_GaussianBlur_Blend_MSAA->Update();
-
-  mPostProcess_DOF->mVertexStub.Connect(fullscreenVertex);
-  mPostProcess_DOF->mFragmentStub.Connect(dofFragment);
-  mPostProcess_DOF->mRenderstate.mDepthTest = false;
-  mPostProcess_DOF->mBlendModeSlot.SetDefaultValue(1.0f);
-  mPostProcess_DOF->mFaceModeSlot.SetDefaultValue(0.5f);
-  mPostProcess_DOF->Update();
+  ConnectQuadPass(mFluid_CurlPass, fluidVertexShader, curlFS);
+  ConnectQuadPass(mFluid_VorticityPass, fluidVertexShader, vorticityFS);
+  ConnectQuadPass(mFluid_DivergencePass, fluidVertexShader, divergenceFS);
+  ConnectQuadPass(mFluid_FadeOutPass, fluidVertexShader, fadeoutFS);
+  ConnectQuadPass(mFluid_PressurePass, fluidVertexShader, pressureFS);
+  ConnectQuadPass(mFluid_GradientSubtractPass, fluidVertexShader, gradientFS);
+  ConnectQuadPass(mFluid_AdvectionPass, fluidVertexShader, advectionFS);
 
   /// Fullscreen quad
   IndexEntry quadIndices[] = {0, 1, 2, 2, 1, 3};

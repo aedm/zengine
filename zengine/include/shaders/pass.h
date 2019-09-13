@@ -3,11 +3,13 @@
 #include "shadersource.h"
 #include "../dom/node.h"
 #include "../render/drawingapi.h"
+#include "../nodes/fluidnode.h"
 #include <map>
 
 using namespace std;
 
 enum class PassType {
+  FLUID_PAINT,
   SHADOW,
   SOLID,
   ZPOST,
@@ -64,6 +66,10 @@ public:
   /// Pipeline state
   FloatSlot mFaceModeSlot;
   FloatSlot mBlendModeSlot;
+  FluidSlot mFluidSourceSlot;
+  FluidSlot mFluidColorTargetSlot;
+  FluidSlot mFluidVelocityTargetSlot;
+
   RenderState mRenderstate;
 
   void Set(Globals* globals);
