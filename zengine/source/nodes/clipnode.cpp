@@ -12,7 +12,10 @@ ClipNode::ClipNode()
   , mCopyToSecondaryBuffer(this, "Copy to secondary buffer")
   , mTargetSquareBuffer(this, "Target square buffer")
   , mApplyPostprocessBefore(this, "After postprocess")
-{}
+  , mFakeStartTime(this, "Fake start time")
+{
+  mFakeStartTime.SetDefaultValue(-1);
+}
 
 void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime) {
   if (mCopyToSecondaryBuffer.Get() >= 0.5f) {
@@ -44,7 +47,14 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   auto& scene = mSceneSlot.GetNode();
   if (!scene) return;
 
-  scene->SetSceneTime(clipTime);
+  float fakeClipTime = clipTime;
+  float fakeStartTime = mFakeStartTime.Get();
+  if (fakeStartTime >= 0) {
+    float startTime = mStartTime.Get();
+    fakeClipTime += startTime - fakeStartTime;
+  }
+
+  scene->SetSceneTime(fakeClipTime);
   scene->Draw(renderTarget, globals);
 }
 

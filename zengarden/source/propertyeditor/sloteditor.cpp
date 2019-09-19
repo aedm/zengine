@@ -58,8 +58,6 @@ void SlotEditor::RebuildSlots() {
 
   /// Generate slot editors
   for (Slot* slot : directNode->GetPublicSlots()) {
-    if (slot->mIsMultiSlot) continue;
-
     /// Create horizontal widget to add editor and ghost button
     QWidget* widget = new QWidget(mSlotsWidget);
     mSlotLayout->addWidget(widget);
@@ -69,10 +67,11 @@ void SlotEditor::RebuildSlots() {
     hLayout->setSpacing(4);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
-    if (!AddSlot<ValueType::FLOAT>(slot, widget, hLayout) &&
+    if (slot->mIsMultiSlot ||
+      (!AddSlot<ValueType::FLOAT>(slot, widget, hLayout) &&
       !AddSlot<ValueType::VEC2>(slot, widget, hLayout) &&
       !AddSlot<ValueType::VEC3>(slot, widget, hLayout) &&
-      !AddSlot<ValueType::VEC4>(slot, widget, hLayout)) {
+      !AddSlot<ValueType::VEC4>(slot, widget, hLayout))) {
       QLabel* label = new QLabel(QString::fromStdString(slot->mName), widget);
       hLayout->addWidget(label);
     }

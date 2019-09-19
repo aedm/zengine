@@ -86,7 +86,8 @@ bool Slot::Connect(const shared_ptr<Node>& target) {
     ASSERT(target != nullptr);
     for (shared_ptr<Node>& node : mMultiNodes) {
       if (node == target) {
-        DEBUGBREAK("Node already connected to slot.");
+        // TODO: this needs to be fixed
+        //DEBUGBREAK("Node already connected to slot.");
         return false;
       }
     }

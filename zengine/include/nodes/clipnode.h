@@ -11,6 +11,7 @@ public:
   FloatSlot mStartTime;
   FloatSlot mLength;
   FloatSlot mTrackNumber;
+  FloatSlot mFakeStartTime;
 
   FloatSlot mClearColorBuffer;
   FloatSlot mClearDepthBuffer;
