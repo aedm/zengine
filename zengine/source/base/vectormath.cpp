@@ -1,7 +1,7 @@
 #include <include/base/vectormath.h>
 #include <math.h>
 
-Vec2::Vec2() {}
+Vec2::Vec2() = default;
 
 Vec2::Vec2(float x, float y) {
   this->x = x;
@@ -72,7 +72,7 @@ Vec2 Vec2::Dot(const Vec2& op) const {
   return Vec2(x * op.x, y * op.y);
 }
 
-Vec3::Vec3() {}
+Vec3::Vec3() = default;
 
 Vec3::Vec3(float x, float y, float z) {
   this->x = x;
@@ -160,7 +160,7 @@ Vec3& Vec3::operator+=(const Vec3& op) {
   return *this;
 }
 
-Vec4::Vec4() {}
+Vec4::Vec4() = default;
 
 Vec4::Vec4(float x, float y, float z, float w) {
   this->x = x;
@@ -212,7 +212,7 @@ Vec4 Vec4::operator*(const Matrix& m) const {
   );
 }
 
-Matrix::Matrix() {}
+Matrix::Matrix() = default;
 
 float& Matrix::operator() (UINT y, UINT x) {
   return m[y * 4 + x];
@@ -457,7 +457,7 @@ Quaternion::Quaternion(Quaternion& q1, Quaternion& q2, float ratio) {
   vz = q1.vz * sclp + q2.vz * sclq;
 }
 
-Quaternion::Quaternion() {}
+Quaternion::Quaternion() = default;
 
 Quaternion::Quaternion(float _S, float _Vx, float _Vy, float _Vz)
   : s(_S), vx(_Vx), vy(_Vy), vz(_Vz) {}
@@ -484,13 +484,7 @@ Quaternion Quaternion::operator *(const Quaternion &q) const
   return Quaternion(bs, bx, by, bz);
 }
 
-Quaternion& Quaternion::operator = (const Quaternion& q) {
-  s = q.s;
-  vx = q.vx;
-  vy = q.vy;
-  vz = q.vz;
-  return *this;
-}
+Quaternion& Quaternion::operator = (const Quaternion& q) = default;
 
 Quaternion Quaternion::Conjugate() const
 {

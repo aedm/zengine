@@ -31,7 +31,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Destorys the watcher and its UI elements
-  virtual void OnRemovedFromNode() override;
+  void OnRemovedFromNode() override;
 
   FastDelegate<void(WatcherWidget*)> deleteWatcherWidgetCallback;
 
@@ -48,5 +48,5 @@ protected:
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;
 
-  virtual void OnNameChange() override;
+  void OnNameChange() override;
 };

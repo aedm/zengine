@@ -10,8 +10,8 @@ public:
   TimelineEditor(const shared_ptr<MovieNode>& movieNode);
   virtual ~TimelineEditor();
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
-  virtual void OnRedraw() override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void OnRedraw() override;
   virtual void OnChildNameChange();
   void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const;
 
@@ -49,6 +49,6 @@ private:
 
   int TimeToScreen(float time) const;
   int TimeRangeToPixels(float timeRange) const;
-  float ScreenToTime(int xPos);
+  float ScreenToTime(int xPos) const;
   float PixelsToTimeRange(int pixelCount) const;
 };

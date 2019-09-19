@@ -15,7 +15,7 @@ Drawable::Drawable()
   mInstances.SetDefaultValue(1);
 }
 
-Drawable::~Drawable() {}
+Drawable::~Drawable() = default;
 
 void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Primitive) {
   auto& material = mMaterial.GetNode();
@@ -46,7 +46,8 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
 }
 
 
-void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) {
+void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) const
+{
   Globals currentGlobals = *globals;
   ApplyTransformation(currentGlobals);
   if (mIsShadowCenter.Get() > 0.5f) {

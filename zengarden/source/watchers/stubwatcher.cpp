@@ -5,6 +5,4 @@ StubWatcher::StubWatcher(const shared_ptr<StubNode>& Stub)
 {}
 
 StubWatcher::~StubWatcher()
-{
-
-}
+= default;

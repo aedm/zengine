@@ -9,7 +9,7 @@ public:
   virtual const shared_ptr<Buffer> GetBuffer() = 0;
   
 protected:
-  BufferNode() {}
+  BufferNode() = default;
 };
 
 typedef TypedSlot<BufferNode> BufferSlot;
@@ -18,7 +18,7 @@ typedef TypedSlot<BufferNode> BufferSlot;
 class MeshToVertexBufferNode : public BufferNode {
 public:
   MeshToVertexBufferNode();
-  virtual const shared_ptr<Buffer> GetBuffer() override;
+  const shared_ptr<Buffer> GetBuffer() override;
 
   MeshSlot mMeshSlot;
 };

@@ -37,14 +37,14 @@ class SplineComponent {
 
 public:
   /// Having a virtual destructor makes sure the class has RTTI information
-  virtual ~SplineComponent() {}
+  virtual ~SplineComponent() = default;
 
   /// Returns the points of the spline
   const vector<SplinePoint>& GetPoints() const;
 
 protected:
   /// Disallow direct instantiation
-  SplineComponent() {}
+  SplineComponent() = default;
 
   /// Finds the last spline point which's time is not greater than the argument
   /// Returns -1 if there are no points before (or exactly at) the argument
@@ -67,8 +67,8 @@ class SplineFloatComponent: public SplineComponent {
   friend class FloatSplineNode;
 
 public:
-  SplineFloatComponent() {}
-  virtual ~SplineFloatComponent() {}
+  SplineFloatComponent() = default;
+  virtual ~SplineFloatComponent() = default;
 
   float Get(float time);
 
@@ -80,7 +80,7 @@ protected:
   void SetPointValue(int index, float time, float value);
 
   /// Calculates tangents of the Nth control point
-  virtual void CalculateTangent(int index) override;
+  void CalculateTangent(int index) override;
 };
 
 
@@ -110,7 +110,7 @@ public:
   virtual ~FloatSplineNode();
 
   /// Returns spline value at current scene time
-  virtual const float& Get() override;
+  const float& Get() override;
 
   /// Returns spline components value at a given time
   float GetValue(float time);
@@ -157,7 +157,7 @@ public:
   FloatSlot mTimeSlot;
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
   /// Computer layer values
   float GetNoiseValue(float time);

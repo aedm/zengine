@@ -20,7 +20,7 @@ public:
   StaticValueNode();
 
   /// Returns value of node. Reevaluates if necessary
-  virtual const T& Get() override;
+  const T& Get() override;
 
   /// Sets value of node.
   void Set(const T& newValue);
@@ -75,15 +75,15 @@ public:
 
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
-  virtual bool Connect(const shared_ptr<Node>& node) override;
+  bool Connect(const shared_ptr<Node>& node) override;
 
   /// Disconnects a node from this slot, and connects it
   /// to the built-in node.
-  virtual void Disconnect(const shared_ptr<Node>&) override;
-  virtual void DisconnectAll(bool notifyOwner) override;
+  void Disconnect(const shared_ptr<Node>&) override;
+  void DisconnectAll(bool notifyOwner) override;
 
   /// Returns true if slot is connected to its own default node
-  virtual bool IsDefaulted() override;
+  bool IsDefaulted() override;
 
 protected:
   /// Default value

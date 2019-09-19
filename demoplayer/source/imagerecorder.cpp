@@ -46,7 +46,7 @@ ImageRecorder::ImageRecorder()
 }
 
 ImageRecorder::~ImageRecorder()
-{}
+= default;
 
 void ImageRecorder::RecordImage(unsigned char* pixels, int width, int height, 
   int frameNumber) const

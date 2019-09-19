@@ -22,7 +22,7 @@ TextWatcher::TextWatcher(const shared_ptr<Node>& node)
   : WatcherUI(node)
 {}
 
-TextWatcher::~TextWatcher() {}
+TextWatcher::~TextWatcher() = default;
 
 void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUI::SetWatcherWidget(watcherWidget);

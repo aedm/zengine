@@ -97,7 +97,7 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
 
 
 void StubAnalyzer::AnalyzeVariable(SourceLine* line, 
-  vector<StubInOutVariable*>& Storage) 
+  vector<StubInOutVariable*>& Storage) const
 {
   if (line->SubStrings.size() < 4) {
     ERR("line %d: Wrong syntax", mCurrentLineNumber);

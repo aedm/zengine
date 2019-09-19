@@ -203,14 +203,14 @@ public:
   StringSlot mSource;
 
   /// Copies shader source from another StubNode
-  virtual void CopyFrom(const shared_ptr<Node>& node) override;
+  void CopyFrom(const shared_ptr<Node>& node) override;
 
 protected:
   /// Performs metadata analysis on the new stub source.
-  virtual void Operate() override;
+  void Operate() override;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
   /// Metadata
   StubMetadata* mMetadata;

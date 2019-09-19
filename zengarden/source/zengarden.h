@@ -98,7 +98,7 @@ private:
   QDir mEngineShadersDir;
   QFileSystemWatcher mEngineShadersFolderWatcher;
 
-  virtual void keyPressEvent(QKeyEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
 
   /// Music related
   DWORD mBassMusicChannel = -1;

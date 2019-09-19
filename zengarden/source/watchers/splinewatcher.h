@@ -13,15 +13,15 @@ public:
   FloatSplineWatcher(const shared_ptr<Node>& node);
   virtual ~FloatSplineWatcher();
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   
 protected:
   Ui::SplineEditor mUI;
   EventForwarderWidget* mSplineWidget;
 
-  virtual void OnRedraw() override;
-  virtual void OnSplineControlPointsChanged() override;
-  virtual void OnTimeEdited(float time) override;
+  void OnRedraw() override;
+  void OnSplineControlPointsChanged() override;
+  void OnTimeEdited(float time) override;
 
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);
@@ -30,7 +30,7 @@ protected:
   void HandleMouseMove(QMouseEvent* event);
   void HandleMouseWheel(QWheelEvent* event);
 
-  QPointF ToScreenCoord(float time, float value);
+  QPointF ToScreenCoord(float time, float value) const;
   float ScreenToTime(int xPos) const;
   Vec2 ScreenToPoint(QPoint& pos) const;
 

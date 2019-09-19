@@ -6,7 +6,7 @@ CreateNodeCommand::CreateNodeCommand(
   : mNode(node)
   , mGraph(graph) {}
 
-CreateNodeCommand::~CreateNodeCommand() {}
+CreateNodeCommand::~CreateNodeCommand() = default;
 
 bool CreateNodeCommand::Do() {
   mGraph->mNodes.Connect(mNode);

@@ -57,7 +57,7 @@ GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher,
   layout->addWidget(mGLWidget);
 }
 
-GLWatcherWidget::~GLWatcherWidget() {}
+GLWatcherWidget::~GLWatcherWidget() = default;
 
 EventForwarderGLWidget* GLWatcherWidget::GetGLWidget() {
   return mGLWidget;
@@ -69,7 +69,7 @@ EventForwarderGLWidget::EventForwarderGLWidget(QWidget* Parent, QGLWidget* Share
   setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
-EventForwarderGLWidget::~EventForwarderGLWidget() {}
+EventForwarderGLWidget::~EventForwarderGLWidget() = default;
 
 void EventForwarderGLWidget::mouseMoveEvent(QMouseEvent* event) {
   OnMouseMove(this, event);

@@ -44,6 +44,7 @@ void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
   movieNode->Draw(mRenderTarget, ZenGarden::GetInstance()->GetMovieCursor());
 }
 
-void MovieWatcher::HandleMovieCursorChange(float movieCursor) {
+void MovieWatcher::HandleMovieCursorChange(float movieCursor) const
+{
   GetGLWidget()->update();
 }

@@ -23,11 +23,11 @@ public:
   FloatSlot mIsShadowCenter;
 
   void Draw(Globals* globals, PassType passType, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
-  void ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter);
+  void ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) const;
 
 protected:
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
   void ApplyTransformation(Globals& globals) const;
 };

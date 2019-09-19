@@ -63,8 +63,7 @@ void Prototypes::AddPrototype(NodeClass* nodeClass) {
   mMainCategory.mPrototypes.push_back(prototype);
 }
 
-Prototypes::~Prototypes() {
-}
+Prototypes::~Prototypes() = default;
 
 shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   QDialog dialog(Parent, Qt::FramelessWindowHint);

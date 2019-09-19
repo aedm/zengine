@@ -15,9 +15,9 @@ public:
   TextureFileNode();
   StringSlot mFileName;
 
-  virtual const shared_ptr<Texture>& Get() override;
+  const shared_ptr<Texture>& Get() override;
 
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 private:
   shared_ptr<Texture> mTexture;

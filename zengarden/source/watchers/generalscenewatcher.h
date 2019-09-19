@@ -9,7 +9,7 @@ class SceneNode;
 class RenderForwarder: public Watcher {
 public:
   RenderForwarder(const shared_ptr<SceneNode>& node);
-  virtual ~RenderForwarder() {}
+  virtual ~RenderForwarder() = default;
   virtual void OnRedraw();
   FastDelegate<void()> mOnRedraw;
 };
@@ -23,9 +23,9 @@ public:
   static void Init();
 
   /// Called when the watcher needs to be rerendered
-  virtual void OnRedraw() override;
+  void OnRedraw() override;
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
   void Paint(EventForwarderGLWidget* widget);

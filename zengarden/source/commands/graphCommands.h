@@ -8,8 +8,8 @@ public:
   CreateNodeCommand(const shared_ptr<Node>& node, const shared_ptr<Graph>& graph);
   ~CreateNodeCommand();
 
-  virtual bool Do() override;
-  virtual bool Undo() override;
+  bool Do() override;
+  bool Undo() override;
 
 private:
   shared_ptr<Node> mNode;
@@ -23,8 +23,8 @@ public:
   MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position, 
     const Vec2& oldPosition);
 
-  virtual bool Do() override;
-  virtual bool Undo() override;
+  bool Do() override;
+  bool Undo() override;
 
 private:
   shared_ptr<Node> mNode;
@@ -37,8 +37,8 @@ class ConnectNodeToSlotCommand: public Command {
 public:
   ConnectNodeToSlotCommand(const shared_ptr<Node>& fromNode, Slot* toSlot);
 
-  virtual bool Do() override;
-  virtual bool Undo() override;
+  bool Do() override;
+  bool Undo() override;
 
 private:
   shared_ptr<Node> mNewNode;
@@ -51,8 +51,8 @@ class DisposeNodesCommand: public Command {
 public:
   DisposeNodesCommand(vector<shared_ptr<Node>>& nodes);
 
-  virtual bool Do() override;
-  virtual bool Undo() override;
+  bool Do() override;
+  bool Undo() override;
 
 private:
   vector<shared_ptr<Node>> mNodes;

@@ -82,10 +82,10 @@ public:
   string GetFragmentShaderSource() const;
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
   /// Creates the shader program
-  virtual void Operate() override;
+  void Operate() override;
 
   void BuildShaderSource();
 

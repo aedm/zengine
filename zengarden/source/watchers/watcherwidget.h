@@ -56,13 +56,13 @@ public:
   Event<EventForwarderGLWidget*> OnPaint;
 
 protected:
-  virtual void mouseMoveEvent(QMouseEvent* event) override;
-  virtual void mousePressEvent(QMouseEvent* event) override;
-  virtual void mouseReleaseEvent(QMouseEvent* event) override;
-  virtual void keyPressEvent(QKeyEvent* event) override;
-  virtual void keyReleaseEvent(QKeyEvent* event) override;
-  virtual void wheelEvent(QWheelEvent * event) override;
-  virtual void paintGL() override;
+  void mouseMoveEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
+  void wheelEvent(QWheelEvent * event) override;
+  void paintGL() override;
 };
 
 
@@ -80,13 +80,13 @@ public:
   Event<QWheelEvent*> OnMouseWheel;
 
 protected:
-  virtual void paintEvent(QPaintEvent* ev) override;
-  virtual void mouseMoveEvent(QMouseEvent* event) override;
-  virtual void mousePressEvent(QMouseEvent* event) override;
-  virtual void mouseReleaseEvent(QMouseEvent* event) override;
-  virtual void keyPressEvent(QKeyEvent* event) override;
-  virtual void keyReleaseEvent(QKeyEvent* event) override;
-  virtual void wheelEvent(QWheelEvent * event) override;
+  void paintEvent(QPaintEvent* ev) override;
+  void mouseMoveEvent(QMouseEvent* event) override;
+  void mousePressEvent(QMouseEvent* event) override;
+  void mouseReleaseEvent(QMouseEvent* event) override;
+  void keyPressEvent(QKeyEvent* event) override;
+  void keyReleaseEvent(QKeyEvent* event) override;
+  void wheelEvent(QWheelEvent * event) override;
 };
 
 
@@ -97,7 +97,7 @@ public:
                   WatcherPosition Position, QTabWidget* tabWidget = nullptr);
   virtual ~GLWatcherWidget();
 
-  virtual EventForwarderGLWidget* GetGLWidget() override;
+  EventForwarderGLWidget* GetGLWidget() override;
   QGLWidget* mShareWidget;
 
 protected:

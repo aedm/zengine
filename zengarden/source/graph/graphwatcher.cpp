@@ -109,7 +109,8 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
 }
 
 
-void GraphWatcher::Update() {
+void GraphWatcher::Update() const
+{
   GetGLWidget()->update();
 }
 
@@ -610,7 +611,8 @@ Vec2 GraphWatcher::MouseToWorld(QMouseEvent* event) {
   return CanvasToWorld(mouseCoord);
 }
 
-void GraphWatcher::GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) {
+void GraphWatcher::GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) const
+{
   oCanvasSize = Vec2(GetGLWidget()->width(), GetGLWidget()->height()) * mZoomFactor;
   oTopLeft = mCenter - oCanvasSize / 2.0f;
 

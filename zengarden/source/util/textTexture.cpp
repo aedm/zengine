@@ -4,10 +4,9 @@
 #include <QPainter>
 #include <QGLWidget>
 
-TextTexture::TextTexture() {}
+TextTexture::TextTexture() = default;
 
-
-/// Returns the smallest value thats divisible by N and not smaller than A
+/// Returns the smallest value divisible by N and not smaller than A
 template<int N>
 int NextDivisibleBy(int A)
 {
@@ -25,16 +24,16 @@ void TextTexture::SetText(const QString& Text, const QFont& Font)
   mHeight = NextDivisibleBy<16>(mTextSize.height());
 
   /// Let Qt draw the text
-  QPixmap pixmap(mWidth, mHeight);
-  pixmap.fill(QColor(0, 0, 0, 0));
+  QPixmap pixMap(mWidth, mHeight);
+  pixMap.fill(QColor(0, 0, 0, 0));
   QPainter painter;
-  painter.begin(&pixmap);
+  painter.begin(&pixMap);
   painter.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing);
   painter.setFont(Font);
   painter.setPen(Qt::white);
   painter.drawText(0, 0, mWidth, mHeight, Qt::AlignTop | Qt::AlignLeft, text);
   painter.end();
-  mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));
+  mImage = QGLWidget::convertToGLFormat(pixMap.toImage().mirrored(false, true));
   mUptodate = false;
 }
 

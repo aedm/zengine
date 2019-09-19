@@ -70,7 +70,7 @@ OpenGLAPI::OpenGLAPI() {
 }
 
 
-OpenGLAPI::~OpenGLAPI() {}
+OpenGLAPI::~OpenGLAPI() = default;
 
 
 void OpenGLAPI::OnContextSwitch() {

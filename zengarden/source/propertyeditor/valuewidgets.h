@@ -17,7 +17,7 @@ class Slider : public QWidget {
 
 public:
   Slider(QWidget* parent, QString text, float value, float minimum, float maximum);
-  virtual ~Slider() {}
+  virtual ~Slider() = default;
 
   Event<float> onValueChange;
 
@@ -31,8 +31,8 @@ public:
 
 private:
   void paintEvent(QPaintEvent *e);
-  virtual void mousePressEvent(QMouseEvent * event) override;
-  virtual void mouseMoveEvent(QMouseEvent * event) override;
+  void mousePressEvent(QMouseEvent * event) override;
+  void mouseMoveEvent(QMouseEvent * event) override;
 
   void HandleMouse(QMouseEvent * event);
 

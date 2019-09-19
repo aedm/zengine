@@ -22,7 +22,7 @@ private:
   void AnalyzeParam(SourceLine* line);
   void AnalyzeGlobal(SourceLine* line);
   void AnalyzeVariable(SourceLine* line,
-                       vector<StubInOutVariable*>& storage);
+                       vector<StubInOutVariable*>& storage) const;
 
   StubParameter::Type TokenToType(const SubString& subStr) const;
 

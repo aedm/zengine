@@ -2,13 +2,13 @@
 
 CommandStack* TheCommandStack = new CommandStack();
 
-Command::~Command() {}
+Command::~Command() = default;
 
 Command::Command() {
   mIsActive = false;
 }
 
-CommandStack::CommandStack() {}
+CommandStack::CommandStack() = default;
 
 CommandStack::~CommandStack() {
   for (int i = mCommandList.size(); i > 0;) {

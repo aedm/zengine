@@ -14,7 +14,7 @@ public:
   const shared_ptr<Pass> GetPass(PassType passType);
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 typedef TypedSlot<Material> MaterialSlot;
@@ -24,10 +24,10 @@ public:
   SolidMaterial();
   virtual ~SolidMaterial();
 
-  virtual shared_ptr<Node> GetReferencedNode() override;
+  shared_ptr<Node> GetReferencedNode() override;
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 private:
   void SetupSlots();

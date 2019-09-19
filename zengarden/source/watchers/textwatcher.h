@@ -10,7 +10,7 @@ public:
   TextWatcher(const shared_ptr<Node>& node);
   virtual ~TextWatcher();
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   QBoxLayout* mLayout;

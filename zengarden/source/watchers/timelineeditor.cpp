@@ -251,7 +251,8 @@ int TimelineEditor::TimeRangeToPixels(float timeRange) const
   return pixelsPerSecond * timeRange;
 }
 
-float TimelineEditor::ScreenToTime(int xPos) {
+float TimelineEditor::ScreenToTime(int xPos) const
+{
   return PixelsToTimeRange(xPos) + mTimelineStartTime;
 }
 

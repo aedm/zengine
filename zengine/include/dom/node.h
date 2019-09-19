@@ -245,9 +245,9 @@ private:
 public:
   virtual void SetName(const string& name);
   virtual const string& GetName() const;
-  virtual void SetPosition(const Vec2 position);
+  virtual void SetPosition(Vec2 position);
   virtual const Vec2 GetPosition() const;
-  virtual void SetSize(const Vec2 size);
+  virtual void SetSize(Vec2 size);
   virtual const Vec2 GetSize() const;
 
   /// Returns the list of publicly editable slots
@@ -290,7 +290,7 @@ private:
   /// --------------------------------------------------------
 public:
   template <typename T, typename ...P>
-  inline shared_ptr<T> Watch(P... args) {
+  shared_ptr<T> Watch(P... args) {
     static_assert(std::is_base_of<Watcher, T>::value, "T must be a Watcher");
     shared_ptr<T> watcher = make_shared<T>(args...);
     mWatchers.insert(watcher);
@@ -306,7 +306,7 @@ public:
 
 protected:
   template <class ...B>
-  inline void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
+  void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
     for (auto watcher : mWatchers) ((watcher.get())->*M)(args...);
   }
 
@@ -327,7 +327,7 @@ public:
     return PointerCast<N>(GetReferencedNode());
   }
 
-  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
+  bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
     return IsPointerOf<N>(node->GetReferencedNode());
   }
 };

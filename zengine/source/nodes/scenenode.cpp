@@ -34,8 +34,7 @@ SceneNode::SceneNode()
   mDOFBleed.SetDefaultValue(0.04f);
 }
 
-SceneNode::~SceneNode() {
-}
+SceneNode::~SceneNode() = default;
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   const float globalTime = mGlobalTimeNode->Get();

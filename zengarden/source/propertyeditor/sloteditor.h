@@ -11,15 +11,15 @@ public:
   SlotEditor(const shared_ptr<Node>& node);
   virtual ~SlotEditor();
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   map<Slot*, shared_ptr<SlotWatcher>> mSlotWatchers;
 
-  virtual void OnSlotConnectionChanged(Slot* slot) override;
-  virtual void OnSlotStructureChanged() override;
+  void OnSlotConnectionChanged(Slot* slot) override;
+  void OnSlotStructureChanged() override;
 
-  void RemoveWatcherWidget(WatcherWidget* watcherWidget);
+  static void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Adds a slot to the UI. Returns false on type mismatch
   template <ValueType T>
@@ -56,9 +56,9 @@ public:
   TypedSlotWatcher(ValueSlot<Type>* slot);
 
   /// Enable/disable editing
-  virtual void UpdateReadOnly() override;
+  void UpdateReadOnly() override;
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   ValueEditor<T>* mEditor = nullptr;
@@ -74,5 +74,5 @@ class PassSlotEditor : public SlotEditor {
 public:
   PassSlotEditor(const shared_ptr<Node>& node);
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 };

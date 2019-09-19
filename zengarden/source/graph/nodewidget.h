@@ -52,10 +52,10 @@ public:
   const vector<WidgetSlot*>& GetWidgetSlots() const;
 
 private:
-  virtual void OnSlotStructureChanged() override;
-  virtual void OnNameChange() override;
-  virtual void OnGraphPositionChanged() override;
-  virtual void OnSlotConnectionChanged(Slot* slot) override;
+  void OnSlotStructureChanged() override;
+  void OnNameChange() override;
+  void OnGraphPositionChanged() override;
+  void OnSlotConnectionChanged(Slot* slot) override;
     
   /* -------- drawing parameters ---------- */
 

@@ -1,10 +1,6 @@
 #include <include/shaders/enginestubs.h>
 #include <include/shaders/engineshaders.h>
 
-EngineStubs::EngineStubs() {
-
-}
-
 EngineStubs::~EngineStubs() {
   for (auto& stub : mStubs) {
     stub.second->Dispose();

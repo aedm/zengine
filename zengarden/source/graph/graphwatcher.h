@@ -20,7 +20,7 @@ public:
 
   shared_ptr<NodeWidget> GetNodeWidget(const shared_ptr<Node>& node);
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   /// Qt widget event handlers
@@ -38,7 +38,7 @@ private:
   virtual void OnSlotConnectionChanged(Slot* slot);
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.
-  void Update();
+  void Update() const;
 
   /// Draws the graph
   void Paint(EventForwarderGLWidget*);
@@ -47,8 +47,8 @@ private:
   shared_ptr<Graph> GetGraph() const;
 
   /// Handle drag events
-  virtual void HandleDragEnterEvent(QDragEnterEvent* event) override;
-  virtual void HandleDropEvent(QDropEvent* event) override;
+  void HandleDragEnterEvent(QDragEnterEvent* event) override;
+  void HandleDropEvent(QDropEvent* event) override;
 
   /// Mapping from node to widget
   map<shared_ptr<Node>, shared_ptr<NodeWidget>> mWidgetMap;
@@ -75,7 +75,7 @@ private:
   /// Convertes pixel coordinates (eg. mouse) to world coordinates
   Vec2 MouseToWorld(QMouseEvent* event);
   Vec2 CanvasToWorld(const Vec2& canvasCoord);
-  void GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft);
+  void GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) const;
 
   /// True if mouse movement was made during STATE_MOVE_NODES
   bool mAreNodesMoved;

@@ -10,7 +10,7 @@ using namespace std;
 
 class EngineStubs {
 public: 
-  EngineStubs();
+  EngineStubs() = default;
   ~EngineStubs();
 
   /// Sets the stub source (normally tool does this)
@@ -20,7 +20,7 @@ public:
   shared_ptr<StubNode> GetStub(const string& name);
   string GetSource(const string& name);
 
-  /// Engine stutbs loaded, create built-in material passes and shaders
+  /// Engine stubs loaded, create built-in material passes and shaders
   void OnLoadFinished();
 
 private:

@@ -42,12 +42,12 @@ public:
   void UpdateDependencies();
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   void RenderDrawables(Globals* globals, PassType passType) const;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 private:
   vector<shared_ptr<Node>> mTransitiveClosure;

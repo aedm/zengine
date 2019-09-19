@@ -93,8 +93,7 @@ UiPainter::UiPainter() {
   mTextBox->mMesh.Connect(mTexturedBoxMeshNode);
 }
 
-UiPainter::~UiPainter() {
-}
+UiPainter::~UiPainter() = default;
 
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
   VertexPos vertices[] = {

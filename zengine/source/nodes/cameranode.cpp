@@ -65,7 +65,7 @@ void CameraNode::SetupGlobals(Globals* globals) const
   }
 }
 
-CameraNode::~CameraNode() {}
+CameraNode::~CameraNode() = default;
 
 void CameraNode::HandleMessage(Message* message) {
   switch (message->mType) {

@@ -53,9 +53,7 @@ FluidNode::FluidNode()
 }
 
 
-FluidNode::~FluidNode() {
-
-}
+FluidNode::~FluidNode() = default;
 
 void FluidNode::Render(float deltaTime) const
 {

@@ -7,7 +7,7 @@ template <typename T>
 class ValueStubSlot: public ValueSlot<T> {
 public:
   ValueStubSlot(Node* owner, const string& name);
-  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override;
+  bool DoesAcceptNode(const shared_ptr<Node>& node) const override;
 };
 
 

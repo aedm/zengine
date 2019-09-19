@@ -319,7 +319,8 @@ void FloatSplineWatcher::UpdateRangeLabels() const
 }
 
 
-QPointF FloatSplineWatcher::ToScreenCoord(float time, float value) {
+QPointF FloatSplineWatcher::ToScreenCoord(float time, float value) const
+{
   const QPointF pps = GetPixelsPerStep();
   const float x = (time - mLeftCenterPoint.x) * pps.x();
   const float y = 0.5f * float(mSplineWidget->height()) -

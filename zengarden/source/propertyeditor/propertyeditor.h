@@ -11,9 +11,9 @@
 class PropertyEditor: public WatcherUI {
 public:
   PropertyEditor(const shared_ptr<Node>& node);
-  virtual ~PropertyEditor() {}
+  virtual ~PropertyEditor() = default;
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
   void HandleNameTexBoxChanged() const;
@@ -30,7 +30,7 @@ public:
   typedef typename ValueTypes<T>::Type VectorType;
   StaticValueWatcher(const shared_ptr<StaticValueNode<VectorType>>& node);
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   ValueEditor<T>* mVectorEditor = nullptr;
