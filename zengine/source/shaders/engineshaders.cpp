@@ -37,9 +37,9 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
 
 void EngineShaders::BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget, 
                                                     Globals* globals) {
-  Vec2 size = renderTarget->GetSize();
-  UINT width = UINT(size.x);
-  UINT height = UINT(size.y);
+  const Vec2 size = renderTarget->GetSize();
+  const UINT width = UINT(size.x);
+  const UINT height = UINT(size.y);
 
   /// Blit G-Buffer into postprocess ping-pong buffers 
   OpenGL->BlitFrameBuffer(renderTarget->mGBufferId,
@@ -49,13 +49,14 @@ void EngineShaders::BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget,
 }
 
 
-void EngineShaders::ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals) {
+void EngineShaders::ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals) const
+{
   mPostProcess_DOF->Update();
   if (!mPostProcess_DOF->isComplete()) return;
-  
-  Vec2 size = renderTarget->GetSize();
-  UINT width = UINT(size.x);
-  UINT height = UINT(size.y);
+
+  const Vec2 size = renderTarget->GetSize();
+  const UINT width = UINT(size.x);
+  const UINT height = UINT(size.y);
 
   OpenGL->SetFrameBuffer(renderTarget->mDOFBufferId);
   glViewport(0, 0, width, height);
@@ -82,10 +83,10 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
   Vec2 size = renderTarget->GetSize();
   UINT width = UINT(size.x);
   UINT height = UINT(size.y);
-  UINT originalWidth = width;
-  UINT originalHeight = height;
+  const UINT originalWidth = width;
+  const UINT originalHeight = height;
 
-  UINT downsampleCount = UINT(ceilf(log2f(size.x / float(BloomEffectMaxResolution))));
+  const UINT downsampleCount = UINT(ceilf(log2f(size.x / float(BloomEffectMaxResolution))));
 
   /// Decrease resolution
   for (UINT i = 0; i < downsampleCount; i++) {
@@ -103,7 +104,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
                                       float(height) / float(originalHeight));
   globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
 
-  UINT gaussIterationCount = 1;
+  const UINT gaussIterationCount = 1;
 
   for (UINT i = 0; i < gaussIterationCount * 2; i++) {
     OpenGL->SetFrameBuffer(renderTarget->GetPostprocessTargetFramebufferId());
@@ -126,14 +127,15 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
 
 
 void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* globals,
-  const shared_ptr<Texture>& sourceColorMSAA) {
+  const shared_ptr<Texture>& sourceColorMSAA) const
+{
   mPostProcess_GaussianBlur_Blend_MSAA->Update();
   if (!mPostProcess_GaussianBlur_Blend_MSAA->isComplete()) return;
 
   /// Additively blend bloom to Gbuffer, and perform HDR multisampling correction
-  Vec2 size = renderTarget->GetSize();
-  UINT width = UINT(size.x);
-  UINT height = UINT(size.y);
+  const Vec2 size = renderTarget->GetSize();
+  const UINT width = UINT(size.x);
+  const UINT height = UINT(size.y);
   OpenGL->SetFrameBuffer(renderTarget->mColorBufferId);
   glViewport(0, 0, width, height);
   globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
@@ -217,7 +219,8 @@ void EngineShaders::BuildPostProcessPasses() {
   mFullScreenQuad->SetVertices(quadVertices);
 }
 
-void EngineShaders::BuildMaterialPasses() {
+void EngineShaders::BuildMaterialPasses() const
+{
   mSolidShadowPass->mVertexStub.Connect(
     TheEngineStubs->GetStub("material/solid/shadowPass-vertex"));
   mSolidShadowPass->mFragmentStub.Connect(

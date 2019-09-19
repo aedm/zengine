@@ -11,7 +11,7 @@ public:
 
   void Draw(RenderTarget* renderTarget, float time);
 
-  int GetTrackCount();
+  int GetTrackCount() const;
   const std::vector<shared_ptr<ClipNode>>& GetTrack(int trackIndex);
 
   /// Returns the end of the last clip

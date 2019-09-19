@@ -19,16 +19,16 @@ ClipNode::ClipNode()
 
 void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime) {
   if (mCopyToSecondaryBuffer.Get() >= 0.5f) {
-    int width = int(globals->RenderTargetSize.x);
-    int height = int(globals->RenderTargetSize.y);
+    const int width = int(globals->RenderTargetSize.x);
+    const int height = int(globals->RenderTargetSize.y);
     OpenGL->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer,
       0, 0, width, height, 0, 0, width, height);
     OpenGL->SetFrameBuffer(renderTarget->mSecondaryFramebuffer);
     OpenGL->SetFrameBuffer(renderTarget->mGBufferId);
   }
 
-  bool clearColor = mClearColorBuffer.Get() >= 0.5f;
-  bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
+  const bool clearColor = mClearColorBuffer.Get() >= 0.5f;
+  const bool clearDepth = mClearDepthBuffer.Get() >= 0.5f;
 
   if (clearDepth || clearColor) {
     globals->DirectToSquare = mTargetSquareBuffer.Get();
@@ -48,9 +48,9 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   if (!scene) return;
 
   float fakeClipTime = clipTime;
-  float fakeStartTime = mFakeStartTime.Get();
+  const float fakeStartTime = mFakeStartTime.Get();
   if (fakeStartTime >= 0) {
-    float startTime = mStartTime.Get();
+    const float startTime = mStartTime.Get();
     fakeClipTime += startTime - fakeStartTime;
   }
 

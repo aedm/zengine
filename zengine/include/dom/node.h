@@ -95,8 +95,8 @@ public:
     bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
-  shared_ptr<Node> GetOwner();
-  bool IsOwnerExpired();
+  shared_ptr<Node> GetOwner() const;
+  bool IsOwnerExpired() const;
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
@@ -150,7 +150,7 @@ public:
 
   /// Set ghost bit
   void SetGhost(bool isGhostSlot);
-  bool IsGhost();
+  bool IsGhost() const;
 
 protected:
   /// The operator which this slot is a member of
@@ -251,13 +251,13 @@ public:
   virtual const Vec2 GetSize() const;
 
   /// Returns the list of publicly editable slots
-  const vector<Slot*>& GetPublicSlots();
+  const vector<Slot*>& GetPublicSlots() const;
 
   /// Returns the list of all slots
-  const vector<Slot*>& GetTraversableSlots();
+  const vector<Slot*>& GetTraversableSlots() const;
 
   /// Returns the slots that need to be serialized when saving / loading
-  const unordered_map<string, Slot*>& GetSerializableSlots();
+  const unordered_map<string, Slot*>& GetSerializableSlots() const;
 
 protected:
   /// Registers a new slot

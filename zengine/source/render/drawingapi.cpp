@@ -11,7 +11,7 @@ bool GLDisableErrorChecks = false;
 #ifdef _DEBUG
 void CheckGLError() {
   if (GLDisableErrorChecks) return;
-  GLenum error = glGetError();
+  const GLenum error = glGetError();
   ASSERT(error == GL_NO_ERROR);
 }
 #else
@@ -39,23 +39,23 @@ static GLVersion gOpenGLVersions[] = {
   {&__GLEW_VERSION_4_3, L"4.3"},
   {&__GLEW_VERSION_4_4, L"4.4"},
   {&__GLEW_VERSION_4_5, L"4.5"},
-  {NULL, NULL}
+  {nullptr, nullptr}
 };
 
 OpenGLAPI::OpenGLAPI() {
-  GLenum err = glewInit();
+  const GLenum err = glewInit();
   ASSERT(err == GLEW_OK);
   if (err != GLEW_OK) {
     ERR(L"Cannot initialize OpenGL.");
     SHOULD_NOT_HAPPEN;
   }
   else {
-    const wchar_t* versionName = NULL;
-    for (GLVersion* version = gOpenGLVersions; version->version != NULL; version++) {
+    const wchar_t* versionName = nullptr;
+    for (GLVersion* version = gOpenGLVersions; version->version != nullptr; version++) {
       if (*version->version) versionName = version->name;
     }
 
-    if (versionName == NULL) ERR(L"OpenGL not found at all.");
+    if (versionName == nullptr) ERR(L"OpenGL not found at all.");
     else INFO(L"OpenGL version %s found.", versionName);
 
     if (!GLEW_VERSION_4_5) {
@@ -108,7 +108,7 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
 
   CheckGLError();
   /// Create shader object, set the source, and compile
-  GLuint shader = glCreateShader(shaderType);
+  const GLuint shader = glCreateShader(shaderType);
   GLint length = GLint(strlen(source));
   glShaderSource(shader, 1, (const char **)&source, &length);
   glCompileShader(shader);
@@ -145,7 +145,7 @@ void CollectUniformsFromProgram(GLuint program,
   ASSERT(uniformBlockCount == 1);
 
   /// And it should be at index 0
-  int uniformBlockIndex = glGetUniformBlockIndex(program, "Uniforms");
+  const int uniformBlockIndex = glGetUniformBlockIndex(program, "Uniforms");
   ASSERT(uniformBlockIndex == 0);
 
   /// This is how OpenGL interface API works. Beautiful like a megmikrózott kefir.
@@ -217,7 +217,7 @@ void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos)
     GLint props[propCount];
     glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, i, propCount,
       blockPropsList, propCount, nullptr, props);
-    GLint isReferenced = (props[0] + props[1]) > 0;
+    const GLint isReferenced = (props[0] + props[1]) > 0;
     glGetProgramResourceName(program, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), nullptr,
       name);
     GLuint resouceIndex =
@@ -250,7 +250,7 @@ void CollectOpaqueFromProgram(GLuint program, vector<ShaderProgram::Sampler>& sa
       &type, &samplerName[0]);
     if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE ||
       type == GL_SAMPLER_2D_SHADOW) {
-      GLint location = glGetUniformLocation(program, &samplerName[0]);
+      const GLint location = glGetUniformLocation(program, &samplerName[0]);
       samplers.push_back(ShaderProgram::Sampler(string(&samplerName[0]), location));
     }
   }
@@ -416,7 +416,7 @@ void OpenGLAPI::Render(const shared_ptr<Buffer>& indexBuffer, UINT count,
     BindIndexBuffer(indexBuffer->GetHandle());
     CheckGLError();
     glDrawElementsInstanced(
-      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, instanceCount);
+      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, nullptr, instanceCount);
   }
   else {
     glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, instanceCount);
@@ -620,7 +620,7 @@ shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type
       }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
-    auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    const auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 
@@ -714,7 +714,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   //BindFrameBuffer(bufferId);
   CheckGLError();
 
-  bool isMultisample = (depthBuffer ? depthBuffer : targetBufferA)->mIsMultisample;
+  const bool isMultisample = (depthBuffer ? depthBuffer : targetBufferA)->mIsMultisample;
   GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 
   if (depthBuffer) {
@@ -747,7 +747,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
     glNamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
   }
 
-  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE) {
     ERR("Framebuffer incomplete, status: 0x%x\n", status);
   }
@@ -895,7 +895,8 @@ void Buffer::Allocate(int byteSize) {
   }
 }
 
-bool Buffer::IsEmpty() {
+bool Buffer::IsEmpty() const
+{
   return mHandle == 0 || mByteSize <= 0;
 }
 
@@ -916,11 +917,13 @@ void Buffer::UploadData(const void* data, int byteSize) {
   CheckGLError();
 }
 
-DrawingAPIHandle Buffer::GetHandle() {
+DrawingAPIHandle Buffer::GetHandle() const
+{
   return mHandle;
 }
 
-int Buffer::GetByteSize() {
+int Buffer::GetByteSize() const
+{
   return mByteSize;
 }
 

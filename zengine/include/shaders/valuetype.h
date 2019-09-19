@@ -64,7 +64,7 @@ class VertexFormat {
 public:
   VertexFormat(UINT binaryFormat);
 
-  bool HasAttribute(VertexAttributeUsage attrib);
+  bool HasAttribute(VertexAttributeUsage attrib) const;
 
   /// Size of all data of a single vertex in bytes
   int mStride;

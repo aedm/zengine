@@ -12,14 +12,14 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
   UINT num = 0;          // number of image encoders
   UINT size = 0;         // size of the image encoder array in bytes
 
-  ImageCodecInfo* pImageCodecInfo = NULL;
+  ImageCodecInfo* pImageCodecInfo = nullptr;
 
   GetImageEncodersSize(&num, &size);
   if (size == 0)
     return -1;  // Failure
 
   pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-  if (pImageCodecInfo == NULL)
+  if (pImageCodecInfo == nullptr)
     return -1;  // Failure
 
   GetImageEncoders(num, size, pImageCodecInfo);
@@ -40,7 +40,7 @@ ImageRecorder::ImageRecorder()
 {
   GdiplusStartupInput gdiplusStartupInput;
   ULONG_PTR gdiplusToken;
-  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
   GetEncoderClsid(L"image/jpeg", &mImageCLSID);
 }
@@ -49,7 +49,7 @@ ImageRecorder::~ImageRecorder()
 {}
 
 void ImageRecorder::RecordImage(unsigned char* pixels, int width, int height, 
-  int frameNumber) 
+  int frameNumber) const
 {
   GpBitmap* pBitmap;
   GdipCreateBitmapFromScan0(width, height, width * 4, PixelFormat32bppARGB, 

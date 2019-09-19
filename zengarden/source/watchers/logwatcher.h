@@ -12,7 +12,7 @@ public:
 	~LogWatcher();
 
 private:
-	void						Log(LogMessage Message);
+	void						Log(LogMessage Message) const;
 
 	QTextEdit*					TextEdit;
 };

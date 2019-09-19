@@ -106,12 +106,12 @@ int CALLBACK WinMain(
   LPWSTR *args;
   int argsCount;
   args = CommandLineToArgvW(GetCommandLineW(), &argsCount);
-  bool recordVideo = argsCount == 2 && wcscmp(args[1], L"--video") == 0;
-  bool windowed = argsCount == 2 && wcscmp(args[1], L"--window") == 0;
+  const bool recordVideo = argsCount == 2 && wcscmp(args[1], L"--video") == 0;
+  const bool windowed = argsCount == 2 && wcscmp(args[1], L"--window") == 0;
   LocalFree(args);
 
-  WNDCLASS wc = { 0, gdi01_WindowProc, 0, 0, hInstance, LoadIcon(NULL, IDI_APPLICATION),
-    LoadCursor(NULL, IDC_ARROW), (HBRUSH)(COLOR_WINDOW + 1), NULL, L"GDI01" };
+  WNDCLASS wc = { 0, gdi01_WindowProc, 0, 0, hInstance, LoadIcon(nullptr, IDI_APPLICATION),
+    LoadCursor(nullptr, IDC_ARROW), (HBRUSH)(COLOR_WINDOW + 1), nullptr, L"GDI01" };
   RegisterClass(&wc);
 
   int windowWidth = 1280, windowHeight = 720;
@@ -121,27 +121,27 @@ int CALLBACK WinMain(
   }
 
   /// Create window
-  HWND hwnd = 0;
+  HWND hwnd = nullptr;
   if (windowed || recordVideo) {
     hwnd = CreateWindowEx(0, L"GDI01", L"teszkos demo", WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
-      HWND_DESKTOP, NULL, hInstance, NULL);
+      HWND_DESKTOP, nullptr, hInstance, nullptr);
     ShowWindow(hwnd, nCmdShow);
     UpdateWindow(hwnd);
   }
   else {
     hwnd = CreateWindowW(L"static", NULL, WS_POPUP | WS_VISIBLE, 0, 0,
-      windowWidth, windowHeight, NULL, NULL, NULL, 0);
+      windowWidth, windowHeight, NULL, NULL, NULL, nullptr);
     ShowCursor(FALSE);
   }
 
   /// Create device context
-  HDC hDC = GetDC(hwnd);
+  const HDC hDC = GetDC(hwnd);
   SetPixelFormat(hDC, ChoosePixelFormat(hDC, &pfd), &pfd);
   wglMakeCurrent(hDC, wglCreateContext(hDC));
 
   /// Set up image recorder
-  ImageRecorder imageRecorder;
+  const ImageRecorder imageRecorder;
 
   /// Initialize BASS
   DWORD bassChannel = 0;
@@ -152,7 +152,7 @@ int CALLBACK WinMain(
       if (di.flags & BASS_DEVICE_ENABLED) // enabled output device
         INFO("dev %d: %s\n", a, di.name);
     }
-    if (!BASS_Init(1, 44100, 0, 0, NULL)) ERR("Can't initialize BASS");
+    if (!BASS_Init(1, 44100, 0, nullptr, nullptr)) ERR("Can't initialize BASS");
     bassChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_AUTOFREE);
     pos = BASS_ChannelGetLength(bassChannel, BASS_POS_BYTE);
   }
@@ -162,7 +162,7 @@ int CALLBACK WinMain(
   OpenGL->OnContextSwitch();
 
   LoadEngineShaders();
-  Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
+  const Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
   RenderTarget* renderTarget = new RenderTarget(windowSize, recordVideo);
 
   /// Load precalc project file
@@ -191,8 +191,8 @@ int CALLBACK WinMain(
 
   /// Calculate demo length
   shared_ptr<MovieNode> movieNode = doc->mMovie.GetNode();
-  float movieLength = movieNode->CalculateMovieLength();
-  float beatsPerSecond = doc->mProperties.GetNode()->mBPM.Get() / 60.0f;;
+  const float movieLength = movieNode->CalculateMovieLength();
+  const float beatsPerSecond = doc->mProperties.GetNode()->mBPM.Get() / 60.0f;;
 
   /// Start music
   if (!recordVideo) {
@@ -200,19 +200,19 @@ int CALLBACK WinMain(
     BASS_ChannelPlay(bassChannel, FALSE);
   }
 
-  int videoWidth = int(renderTarget->mSize.x);
-  int videoHeight = int(renderTarget->mSize.y);
+  const int videoWidth = int(renderTarget->mSize.x);
+  const int videoHeight = int(renderTarget->mSize.y);
   vector<unsigned char> pixels(videoWidth * videoHeight * 4);
   vector<unsigned char> pixelsFlip(videoWidth * videoHeight * 4);
 
   /// Play demo
-  DWORD startTime = timeGetTime();
+  const DWORD startTime = timeGetTime();
   UINT frameNumber = 0;
   while (running) {
     /// Handle Win32 events
     MSG msg;
     if (PeekMessage(&msg, hwnd, 0, 0, PM_NOREMOVE)) {
-      GetMessage(&msg, 0, 0, 0);
+      GetMessage(&msg, nullptr, 0, 0);
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }

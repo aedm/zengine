@@ -22,7 +22,7 @@ void Logger::Log2(LogSeverity severity, const wchar_t* logString, ...) {
 
 void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
                       const wchar_t* logString, ...) {
-  int funlen = swprintf(TempStringW, LogMessageMaxLength, function);
+  const int funlen = swprintf(TempStringW, LogMessageMaxLength, function);
 
   va_list args;
   va_start(args, logString);
@@ -41,7 +41,7 @@ void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
   va_end(args);
 
   string tmp_string(TempStringA);
-  wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
+  const wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
 
   swprintf(TempStringW, LogMessageMaxLength, L"%s%s", function, tmp_wstring.c_str());
 
@@ -54,14 +54,14 @@ LogMessage::LogMessage(LogSeverity severity, const wchar_t* message) {
 }
 
 namespace Convert {
-  string IntToSring(int Value) {
+  string IntToString(int value) {
     char tmp[64];
-    sprintf_s(tmp, 64, "%d", Value);
+    sprintf_s(tmp, 64, "%d", value);
     return string(tmp);
   }
 
-  bool StringToFloat(const char* S, float& F) {
-    return sscanf(S, "%f", &F) != 1;
+  bool StringToFloat(const char* s, float& f) {
+    return sscanf(s, "%f", &f) != 1;
   }
 
   std::wstring StringToWstring(const string& s) {
@@ -72,11 +72,11 @@ namespace Convert {
 }
 
 string ToJSON(const shared_ptr<Document>& document) {
-  JSONSerializer serialzer(document);
+  const JSONSerializer serialzer(document);
   return serialzer.GetJSON();
 }
 
 shared_ptr<Document> FromJSON(string& json) {
-  JSONDeserializer deserialzer(json);
+  const JSONDeserializer deserialzer(json);
   return deserialzer.GetDocument();
 }

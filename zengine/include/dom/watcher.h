@@ -13,10 +13,10 @@ public:
   virtual ~Watcher();
 
   /// Returns the live node being watched
-  shared_ptr<Node> GetNode();
+  shared_ptr<Node> GetNode() const;
 
   /// Returns the direct node being watched
-  shared_ptr<Node> GetDirectNode();
+  shared_ptr<Node> GetDirectNode() const;
 
   /// Destroys the watcher and its UI elements
   virtual void OnRemovedFromNode();

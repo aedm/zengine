@@ -85,13 +85,13 @@ void Pass::Set(Globals* globals) {
   if (!mShaderProgram) return;
 
   RenderState::FaceMode faceMode = RenderState::FaceMode::FRONT;
-  float faceVal = mFaceModeSlot.Get();
+  const float faceVal = mFaceModeSlot.Get();
   if (faceVal > 0.666f) faceMode = RenderState::FaceMode::BACK;
   else if (faceVal > 0.333f) faceMode = RenderState::FaceMode::FRONT_AND_BACK;
   mRenderstate.mFaceMode = faceMode;
 
   RenderState::BlendMode blendMode = RenderState::BlendMode::ALPHA;
-  float blendVal = mBlendModeSlot.Get();
+  const float blendVal = mBlendModeSlot.Get();
   if (blendVal > 0.666f) blendMode = RenderState::BlendMode::NORMAL;
   else if (blendVal > 0.333f) blendMode = RenderState::BlendMode::ADDITIVE;
   mRenderstate.mBlendMode = blendMode;
@@ -143,7 +143,7 @@ void Pass::Set(Globals* globals) {
     }
     else {
       /// Global uniform, takes value from the Globals object
-      int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
+      const int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
       switch (source->mType) {
 #undef ITEM
 #define ITEM(name) \
@@ -180,7 +180,7 @@ void Pass::Set(Globals* globals) {
     }
     else {
       /// Global uniform, takes value from the Globals object
-      int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
+      const int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
       void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
       tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
     }
@@ -199,14 +199,17 @@ void Pass::Set(Globals* globals) {
   }
 }
 
-bool Pass::isComplete() {
+bool Pass::isComplete() const
+{
   return (mShaderProgram != nullptr);
 }
 
-std::string Pass::GetVertexShaderSource() {
+std::string Pass::GetVertexShaderSource() const
+{
   return mShaderSource ? mShaderSource->mVertexSource : "[No vertex shader]";
 }
 
-std::string Pass::GetFragmentShaderSource() {
+std::string Pass::GetFragmentShaderSource() const
+{
   return mShaderSource ? mShaderSource->mFragmentSource : "[No fragment shader]";
 }

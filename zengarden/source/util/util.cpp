@@ -19,10 +19,10 @@ namespace Util {
     QFile file(FileName);
     if (!file.open(QFile::ReadOnly)) {
       ERR("Can't open file/resource: %s", FileName);
-      return NULL;
+      return nullptr;
     }
     QByteArray byteArray = file.readAll();
-    int len = byteArray.length();
+    const int len = byteArray.length();
     char* content = new char[len + 1];
     memcpy(content, byteArray.data(), len);
     content[len] = 0;
@@ -31,8 +31,8 @@ namespace Util {
 
 
   shared_ptr<Pass> LoadShader(const char* VertexFile, const char* FragmentFile) {
-    unique_ptr<char> vertexContent(ReadFileQt(VertexFile));
-    unique_ptr<char> fragmentContent(ReadFileQt(FragmentFile));
+    const unique_ptr<char> vertexContent(ReadFileQt(VertexFile));
+    const unique_ptr<char> fragmentContent(ReadFileQt(FragmentFile));
 
     if (!vertexContent || !fragmentContent) {
       ERR("Missing content.");
@@ -121,7 +121,7 @@ namespace Util {
     vector<VertexPosUVNormTangent> vertices(mesh->mNumVertices);
     for (UINT i = 0; i < mesh->mNumVertices; i++) {
       vertices[i].position = ToVec3(mesh->mVertices[i]);
-      Vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
+      const Vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
       vertices[i].uv = Vec2(uv.x, uv.y);
       vertices[i].normal = ToVec3(mesh->mNormals[i]);
       vertices[i].tangent = ToVec3(mesh->mTangents[i]);
@@ -137,7 +137,7 @@ namespace Util {
   }
 
   shared_ptr<StubNode> LoadStub(const QString& fileName) {
-    unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
+    const unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
     /// TODO: register this as an engine node
     shared_ptr<StubNode> stub = make_shared<StubNode>();
     stub->mSource.SetDefaultValue(stubSource.get());
@@ -148,7 +148,7 @@ namespace Util {
   {
     vector<shared_ptr<Node>> nodeList(nodes.begin(), nodes.end());
     for (UINT i = 0; i < nodeList.size(); i++) {
-      shared_ptr<Node> node = nodeList[i];
+      const shared_ptr<Node> node = nodeList[i];
       for (Slot* slot : node->GetDependants()) {
         shared_ptr<Node> refNode = slot->GetOwner();
         if (!refNode->IsGhostNode()) continue;
@@ -159,7 +159,7 @@ namespace Util {
       }
     }
     if (nodeList.size() > nodes.size()) {
-      auto button = QMessageBox::question(nullptr, "Delete nodes",
+      const auto button = QMessageBox::question(nullptr, "Delete nodes",
         "Ghost nodes found. Do you really want to delete?");
       if (button == QMessageBox::NoButton) return;
     }

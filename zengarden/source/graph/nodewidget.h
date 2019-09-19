@@ -34,12 +34,12 @@ public:
   void SetSlotColor(int slotIndex, ColorState slotColorState);
 
   void SetSelected(bool isSelected);
-  bool IsSelected();
+  bool IsSelected() const;
 
-  bool NeedsRepaint();
+  bool NeedsRepaint() const;
   void Paint();
 
-  Vec2 GetOutputPosition();
+  Vec2 GetOutputPosition() const;
   Vec2 GetInputPosition(int slotIndex);
 
   /// Slot paint data
@@ -49,7 +49,7 @@ public:
     Vec2 mSpotPos;
     Slot* mSlot;
   };
-  const vector<WidgetSlot*>& GetWidgetSlots();
+  const vector<WidgetSlot*>& GetWidgetSlots() const;
 
 private:
   virtual void OnSlotStructureChanged() override;

@@ -67,5 +67,5 @@ private:
                                vector<const Prototype*>& allPrototypes);
 
   private slots:
-  void HandleItemSelected(QTreeWidgetItem* Item, int Column);
+  void HandleItemSelected(QTreeWidgetItem* Item, int Column) const;
 };

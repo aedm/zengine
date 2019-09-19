@@ -84,7 +84,7 @@ public:
   float& operator[] (int n);
   float operator[] (int n) const;
 
-  Vec3 XYZ();
+  Vec3 XYZ() const;
 };
 
 class Matrix {
@@ -130,11 +130,11 @@ public:
   float s, vx, vy, vz;
 
   static Quaternion FromEuler(float roll, float pitch, float yaw);
-  void ToEuler(float& oRoll, float& oPitch, float& oYaw);
+  void ToEuler(float& oRoll, float& oPitch, float& oYaw) const;
 
-  Quaternion Conjugate();
+  Quaternion Conjugate() const;
 
   Quaternion& operator *= (Quaternion& q);
-  Quaternion operator * (const Quaternion& q);
+  Quaternion operator * (const Quaternion& q) const;
   Quaternion& operator = (const Quaternion& q);
 };

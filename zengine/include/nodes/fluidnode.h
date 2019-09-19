@@ -29,10 +29,10 @@ public:
   /// - color blitback (color2 -> color1)
 
   /// Render a fluid step
-  void Render(float deltaTime);
-  void SetGlobalFluidTextures(Globals* globals);
-  void SetColorRenderTarget();
-  void SetVelocityRenderTarget();
+  void Render(float deltaTime) const;
+  void SetGlobalFluidTextures(Globals* globals) const;
+  void SetColorRenderTarget() const;
+  void SetVelocityRenderTarget() const;
 
 private:
   FrameBufferId mColor1FBID = 0;

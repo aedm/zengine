@@ -1,7 +1,7 @@
 #include "stubanalyzer.h"
 
 OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
-  StubAnalyzer analyzer(stubSource);
+  const StubAnalyzer analyzer(stubSource);
 
   if (analyzer.mName.empty()) {
     ERR("Shader stub has no name.");
@@ -104,7 +104,7 @@ void StubAnalyzer::AnalyzeVariable(SourceLine* line,
     return;
   }
 
-  StubParameter::Type variableType = TokenToType(line->SubStrings[2]);
+  const StubParameter::Type variableType = TokenToType(line->SubStrings[2]);
   if (!StubParameter::IsValidValueType(variableType)) {
     ERR("line %d: Invalid type");
     return;
@@ -123,7 +123,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  StubParameter::Type declaredType = TokenToType(line->SubStrings[2]);
+  const StubParameter::Type declaredType = TokenToType(line->SubStrings[2]);
   SubString& name = line->SubStrings[3];
  
   /// Global sampler
@@ -158,8 +158,8 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  ValueType shaderType = StubParameter::ToValueType(declaredType);
-  ValueType expectedType = GlobalUniformTypes[usage];
+  const ValueType shaderType = StubParameter::ToValueType(declaredType);
+  const ValueType expectedType = GlobalUniformTypes[usage];
   if (shaderType != expectedType) {
     ERR("line %d: wrong type for global uniform '%s'.", mCurrentLineNumber,
         name.ToString().c_str());
@@ -174,7 +174,8 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
 }
 
 
-StubParameter::Type StubAnalyzer::TokenToType(const SubString& subStr) {
+StubParameter::Type StubAnalyzer::TokenToType(const SubString& subStr) const
+{
   switch (subStr.Token) {
     case TOKEN_void:            return StubParameter::Type::TVOID;
     case TOKEN_float:           return StubParameter::Type::FLOAT;

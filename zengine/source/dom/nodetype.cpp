@@ -12,7 +12,7 @@ NodeRegistry* NodeRegistry::GetInstance() {
 
 
 NodeClass* NodeRegistry::GetNodeClass(const string& name) {
-  auto it = mNodeClassesByName.find(name);
+  const auto it = mNodeClassesByName.find(name);
   return it == mNodeClassesByName.end() ? nullptr : it->second;
 }
 

@@ -40,7 +40,7 @@ public:
   virtual ~SplineComponent() {}
 
   /// Returns the points of the spline
-  const vector<SplinePoint>& GetPoints();
+  const vector<SplinePoint>& GetPoints() const;
 
 protected:
   /// Disallow direct instantiation

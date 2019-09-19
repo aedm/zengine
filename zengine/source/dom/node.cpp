@@ -8,7 +8,7 @@ MessageQueue TheMessageQueue;
 
 void MessageQueue::Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target,
   MessageType type, Slot* slot) {
-  Message message = { source, target, slot, type };
+  const Message message = { source, target, slot, type };
   if (mMessageSet.find(message) != mMessageSet.end()) return;
   mMessageQueue.push_back(message);
   mMessageSet.insert(message);
@@ -31,7 +31,7 @@ void MessageQueue::ProcessAllMessages() {
 
 void MessageQueue::RemoveNode(Node* node) {
 start:
-  for (auto it = mMessageQueue.begin(); it != mMessageQueue.end(); it++) {
+  for (auto it = mMessageQueue.begin(); it != mMessageQueue.end(); ++it) {
     Message message = *it;
     if (message.mTarget == nullptr || message.mTarget.get() != node) continue;
     mMessageQueue.erase(it);
@@ -69,11 +69,13 @@ Slot::~Slot() {
 }
 
 
-std::shared_ptr<Node> Slot::GetOwner() {
+std::shared_ptr<Node> Slot::GetOwner() const
+{
   return mOwner->shared_from_this();
 }
 
-bool Slot::IsOwnerExpired() {
+bool Slot::IsOwnerExpired() const
+{
   return mOwner->weak_from_this().expired();
 }
 
@@ -109,7 +111,7 @@ bool Slot::Connect(const shared_ptr<Node>& target) {
 
 void Slot::Disconnect(const shared_ptr<Node>& target) {
   if (mIsMultiSlot) {
-    for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
+    for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); ++it) {
       if (*it == target) {
         target->DisconnectFromSlot(this);
         mMultiNodes.erase(it);
@@ -128,7 +130,7 @@ void Slot::Disconnect(const shared_ptr<Node>& target) {
 
 void Slot::DisconnectAll(bool notifyOwner) {
   if (mIsMultiSlot) {
-    for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); it++) {
+    for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); ++it) {
       (*it)->DisconnectFromSlot(this);
     }
     mMultiNodes.clear();
@@ -178,11 +180,11 @@ void Slot::ChangeNodeIndex(const shared_ptr<Node>& node, UINT targetIndex) {
   ASSERT(mIsMultiSlot);
   ASSERT(targetIndex < mMultiNodes.size());
 
-  auto it = std::find(mMultiNodes.begin(), mMultiNodes.end(), node);
+  const auto it = std::find(mMultiNodes.begin(), mMultiNodes.end(), node);
   ASSERT(it != mMultiNodes.end());
-  UINT index = UINT(it - mMultiNodes.begin());
+  const UINT index = UINT(it - mMultiNodes.begin());
 
-  shared_ptr<Node> tempNode = mMultiNodes[index];
+  const shared_ptr<Node> tempNode = mMultiNodes[index];
   if (index < targetIndex) {
     for (UINT i = index; i < targetIndex; i++) {
       mMultiNodes[i] = mMultiNodes[i + 1];
@@ -217,7 +219,8 @@ void Slot::SetGhost(bool isGhost) {
   mOwner->EnqueueMessage(MessageType::SLOT_GHOST_FLAG_CHANGED, this);
 }
 
-bool Slot::IsGhost() {
+bool Slot::IsGhost() const
+{
   return mGhostSlot;
 }
 
@@ -316,7 +319,7 @@ void Node::ReceiveMessage(Message* message) {
 void Node::CheckConnections() {
   for (Slot* slot : mPublicSlots) {
     /// TODO: handle multislots
-    if (!slot->mIsMultiSlot && slot->GetReferencedNode() == NULL) {
+    if (!slot->mIsMultiSlot && slot->GetReferencedNode() == nullptr) {
       mIsProperlyConnected = false;
       return;
     }
@@ -364,7 +367,7 @@ Node::~Node() {
 
     /// If a ghost is made of this node, delete it.
     if (owner->IsGhostNode()) {
-      shared_ptr<Ghost> ghost = PointerCast<Ghost>(owner);
+      const shared_ptr<Ghost> ghost = PointerCast<Ghost>(owner);
       if (ghost->mOriginalNode.GetDirectNode().get() == this) {
         //delete ghost;
         NOT_IMPLEMENTED;
@@ -428,20 +431,23 @@ void Node::ClearSlots() {
   mTraversableSlots.clear();
 }
 
-const vector<Slot*>& Node::GetPublicSlots() {
+const vector<Slot*>& Node::GetPublicSlots() const
+{
   return mPublicSlots;
 }
 
-const std::vector<Slot*>& Node::GetTraversableSlots() {
+const std::vector<Slot*>& Node::GetTraversableSlots() const
+{
   return mTraversableSlots;
 }
 
-const unordered_map<string, Slot*>& Node::GetSerializableSlots() {
+const unordered_map<string, Slot*>& Node::GetSerializableSlots() const
+{
   return mSerializableSlotsByName;
 }
 
 void Node::RemoveWatcher(shared_ptr<Watcher> watcher) {
-  auto it = std::find(mWatchers.begin(), mWatchers.end(), watcher);
+  const auto it = std::find(mWatchers.begin(), mWatchers.end(), watcher);
   if (it == mWatchers.end()) return;
   ASSERT(watcher->mNode.get() == this);
   watcher->OnRemovedFromNode();

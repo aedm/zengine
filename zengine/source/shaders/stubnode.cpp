@@ -169,7 +169,7 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
 
 void StubNode::CopyFrom(const shared_ptr<Node>& node)
 {
-  shared_ptr<StubNode> original = PointerCast<StubNode>(node);
+  const shared_ptr<StubNode> original = PointerCast<StubNode>(node);
   mSource.SetDefaultValue(original->mSource.Get());
   mIsUpToDate = false;
   if (original->mMetadata) {

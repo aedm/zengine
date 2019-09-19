@@ -23,7 +23,7 @@ Slider::Slider(QWidget* Parent, QString text, float value, float minimum, float 
 
 void Slider::paintEvent(QPaintEvent *e) {
   QPainter painter(this);
-  QSize widgetSize = size();
+  const QSize widgetSize = size();
   painter.setPen(palette().dark().color().darker());
   painter.setBrush(palette().alternateBase().color());
   painter.drawRect(0, 0, widgetSize.width() - 1, widgetSize.height() - 1);
@@ -33,7 +33,7 @@ void Slider::paintEvent(QPaintEvent *e) {
     if (mIsReadOnly) painter.setBrush(palette().highlight().color().darker());
     else painter.setBrush(palette().highlight().color());
 
-    int widthPx = widgetSize.width() - 2;
+    const int widthPx = widgetSize.width() - 2;
     int full = float(widthPx) * (mValue - mMinimum) / (mMaximum - mMinimum);
     if (full > widthPx) full = widthPx;
     else if (full < 0) full = 0;
@@ -58,7 +58,7 @@ void Slider::mouseMoveEvent(QMouseEvent * event) {
 
 void Slider::HandleMouse(QMouseEvent * event) {
   if (mMaximum > mMinimum) {
-    float newValue = 
+    const float newValue = 
       mMinimum + float(event->x() + 1) * (mMaximum - mMinimum) / float(width());
     if (mValue != newValue) {
       onValueChange(newValue);
@@ -66,7 +66,8 @@ void Slider::HandleMouse(QMouseEvent * event) {
   }
 }
 
-float Slider::Get() {
+float Slider::Get() const
+{
   return mValue;
 }
 
@@ -129,7 +130,8 @@ ValueEditor<ValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float 
 }
 
 
-void ValueEditor<ValueType::FLOAT>::SetTextBoxValue(float value) {
+void ValueEditor<ValueType::FLOAT>::SetTextBoxValue(float value) const
+{
   if (mAllowTextboxValueChanges) {
     mTextBox->setText(QString::number(value, 'g', 3));
   }
@@ -147,7 +149,7 @@ void ValueEditor<ValueType::FLOAT>::SliderValueChanged(float value) {
 
 
 void ValueEditor<ValueType::FLOAT>::SpinBoxValueChanged() {
-  float value = mTextBox->text().toFloat();
+  const float value = mTextBox->text().toFloat();
   if (mIsReadOnly || value == mValue) return;
   /// TODO: slider should set and repaint itself
   mSlider->Set(value);
@@ -164,7 +166,8 @@ void ValueEditor<ValueType::FLOAT>::Set(float value) {
   mSlider->Set(value);
 }
 
-void ValueEditor<ValueType::FLOAT>::SetRange(float minimum, float maximum) {
+void ValueEditor<ValueType::FLOAT>::SetRange(float minimum, float maximum) const
+{
   mSlider->SetRange(minimum, maximum);
 }
 

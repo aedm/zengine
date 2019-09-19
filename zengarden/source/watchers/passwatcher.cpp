@@ -6,8 +6,8 @@ PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
   mMaterial->mSolidPass.Connect(pass);
 
   /// Mesh
-  Vec2 Position(3.5f, 3.5f);
-  float w = 512, h = 512, u = 1, v = 1;
+  const Vec2 Position(3.5f, 3.5f);
+  const float w = 512, h = 512, u = 1, v = 1;
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
   VertexPosUV vertices[] = {
     {Vec3(Position.x, Position.y, 0), Vec2(0, 0)},

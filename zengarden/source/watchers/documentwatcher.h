@@ -19,7 +19,7 @@ protected:
   virtual void OnSlotConnectionChanged(Slot* slot) override;
   virtual void OnChildNameChange() override;
 
-  void RefreshGraphList();
+  void RefreshGraphList() const;
 
   QStandardItemModel* mModel = nullptr;
 };

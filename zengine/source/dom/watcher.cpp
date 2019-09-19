@@ -9,11 +9,12 @@ Watcher::~Watcher() {
   ASSERT(mNode == nullptr);
 }
 
-shared_ptr<Node> Watcher::GetNode() {
+shared_ptr<Node> Watcher::GetNode() const
+{
   return mNode->GetReferencedNode();
 }
 
-std::shared_ptr<Node> Watcher::GetDirectNode()
+std::shared_ptr<Node> Watcher::GetDirectNode() const
 {
   return mNode;
 }

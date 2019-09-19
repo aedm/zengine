@@ -54,7 +54,7 @@ void SlotEditor::RebuildSlots() {
   mSlotLayout->setSpacing(4);
   mSlotLayout->setContentsMargins(0, 0, 0, 0);
 
-  shared_ptr<Node> directNode = GetDirectNode();
+  const shared_ptr<Node> directNode = GetDirectNode();
 
   /// Generate slot editors
   for (Slot* slot : directNode->GetPublicSlots()) {
@@ -92,7 +92,7 @@ void SlotEditor::RebuildSlots() {
 
   /// Source editor button
   if (IsExactType<StubNode>(directNode)) {
-    auto stub = PointerCast<StubNode>(directNode);
+    const auto stub = PointerCast<StubNode>(directNode);
     QPushButton* sourceButton = new QPushButton("Edit source", mSlotsWidget);
     mSlotsWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
       ZenGarden::GetInstance()->Watch(
@@ -194,16 +194,16 @@ void PassSlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   /// Recompile button
   QPushButton* copyVSButton = new QPushButton("Copy VS source", watcherWidget);
   watcherWidget->connect(copyVSButton, &QPushButton::pressed, [=]() {
-    shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
-    string source = passNode->GetVertexShaderSource();
+    const shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    const string source = passNode->GetVertexShaderSource();
     QApplication::clipboard()->setText(QString::fromStdString(source));
   });
   mLayout->addWidget(copyVSButton);
 
   QPushButton* copyFSButton = new QPushButton("Copy FS source", watcherWidget);
   watcherWidget->connect(copyFSButton, &QPushButton::pressed, [=]() {
-    shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
-    string source = passNode->GetFragmentShaderSource();
+    const shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    const string source = passNode->GetFragmentShaderSource();
     QApplication::clipboard()->setText(QString::fromStdString(source));
   });
   mLayout->addWidget(copyFSButton);

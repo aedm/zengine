@@ -36,7 +36,8 @@ JSONSerializer::JSONSerializer(const shared_ptr<Node>& root) {
   DumpNodes();
 }
 
-string JSONSerializer::GetJSON() {
+string JSONSerializer::GetJSON() const
+{
   rapidjson::StringBuffer buffer;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
   writer.SetIndent(' ', 1);
@@ -49,7 +50,7 @@ void JSONSerializer::Traverse(const shared_ptr<Node>& root) {
   mNodes[root] = ++mNodeCount;
 
   /// Traverse slots
-  for (auto slotPair : root->GetSerializableSlots()) {
+  for (const auto slotPair : root->GetSerializableSlots()) {
     Slot* slot = slotPair.second;
     if (slot->mIsMultiSlot) {
       for (auto& node : slot->GetDirectMultiNodes()) {
@@ -94,7 +95,7 @@ rapidjson::Value JSONSerializer::Serialize(const shared_ptr<Node>& node) {
   }
 
   /// Save node ID
-  int nodeID = mNodes.at(node);
+  const int nodeID = mNodes.at(node);
   v.AddMember("id", nodeID, *mAllocator);
 
   /// Save node name
@@ -137,14 +138,16 @@ rapidjson::Value JSONSerializer::Serialize(const shared_ptr<Node>& node) {
   return v;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec) {
+rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec) const
+{
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
   jsonObject.AddMember("y", vec.y, *mAllocator);
   return jsonObject;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec3(const Vec3& vec) {
+rapidjson::Value JSONSerializer::SerializeVec3(const Vec3& vec) const
+{
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
   jsonObject.AddMember("y", vec.y, *mAllocator);
@@ -152,7 +155,8 @@ rapidjson::Value JSONSerializer::SerializeVec3(const Vec3& vec) {
   return jsonObject;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) {
+rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) const
+{
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
   jsonObject.AddMember("y", vec.y, *mAllocator);
@@ -182,7 +186,7 @@ void JSONSerializer::SerializeGeneralNode(
         /// Save connections
         rapidjson::Value connections(rapidjson::kArrayType);
         for (const auto& connectedNode : slot->GetDirectMultiNodes()) {
-          int connectedID = mNodes.at(connectedNode);
+          const int connectedID = mNodes.at(connectedNode);
           connections.PushBack(connectedID, *mAllocator);
         }
         slotObject.AddMember("connect", connections, *mAllocator);
@@ -191,7 +195,7 @@ void JSONSerializer::SerializeGeneralNode(
         /// Save connection
         const auto& connectedNode = slot->GetDirectNode();
         if (connectedNode != nullptr && !slot->IsDefaulted()) {
-          int connectedID = mNodes.at(connectedNode);
+          const int connectedID = mNodes.at(connectedNode);
           slotObject.AddMember("connect", connectedID, *mAllocator);
         }
 
@@ -230,31 +234,31 @@ void JSONSerializer::SerializeGeneralNode(
 
 
 void JSONSerializer::SerializeFloatNode(
-  rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node)
+  rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node) const
 {
   nodeValue.AddMember("value", node->Get(), *mAllocator);
 }
 
 void JSONSerializer::SerializeVec2Node(
-  rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node)
+  rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node) const
 {
   nodeValue.AddMember("value", SerializeVec2(node->Get()), *mAllocator);
 }
 
 void JSONSerializer::SerializeVec3Node(
-  rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node)
+  rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node) const
 {
   nodeValue.AddMember("value", SerializeVec3(node->Get()), *mAllocator);
 }
 
 void JSONSerializer::SerializeVec4Node(
-  rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node)
+  rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node) const
 {
   nodeValue.AddMember("value", SerializeVec4(node->Get()), *mAllocator);
 }
 
 void JSONSerializer::SerializeFloatSplineNode(
-  rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node)
+  rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node) const
 {
   for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT); layer++) {
     SplineFloatComponent* component = node->GetComponent(SplineLayer(layer));
@@ -277,11 +281,11 @@ void JSONSerializer::SerializeFloatSplineNode(
 }
 
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
-  const shared_ptr<TextureNode>& node)
+  const shared_ptr<TextureNode>& node) const
 {
   shared_ptr<Texture> texture = node->Get();
   ASSERT(texture->mTexelData);
-  string b64 = base64_encode((UCHAR*)&(*texture->mTexelData)[0], 
+  const string b64 = base64_encode((UCHAR*)&(*texture->mTexelData)[0], 
       UINT((*texture->mTexelData).size()));
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
@@ -292,7 +296,7 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
 }
 
 void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
-  const shared_ptr<StaticMeshNode>& node)
+  const shared_ptr<StaticMeshNode>& node) const
 {
   const shared_ptr<Mesh>& mesh = node->GetMesh();
   ASSERT(mesh->mRawVertexData != nullptr);
@@ -300,7 +304,7 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
   nodeValue.AddMember("vertexcount", mesh->mVertexCount, *mAllocator);
   nodeValue.AddMember("indexcount", mesh->mIndexCount, *mAllocator);
 
-  UINT floatCount = mesh->mVertexCount * mesh->mFormat->mStride / sizeof(float);
+  const UINT floatCount = mesh->mVertexCount * mesh->mFormat->mStride / sizeof(float);
   float* attribs = reinterpret_cast<float*>(mesh->mRawVertexData);
   rapidjson::Value attribArray(rapidjson::kArrayType);
   for (UINT i = 0; i < floatCount; i++) {
@@ -318,7 +322,7 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
 }
 
 void JSONSerializer::SerializeStubNode(
-  rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node)
+  rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node) const
 {
   const string& f = node->mSource.Get();
   rapidjson::Value slotValue(rapidjson::kObjectType);

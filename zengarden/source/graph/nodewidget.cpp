@@ -75,11 +75,13 @@ void NodeWidget::SetSelected(bool isSelected) {
   mNextPaintState.mIsSelected = isSelected;
 }
 
-bool NodeWidget::IsSelected() {
+bool NodeWidget::IsSelected() const
+{
   return mNextPaintState.mIsSelected;
 }
 
-bool NodeWidget::NeedsRepaint() {
+bool NodeWidget::NeedsRepaint() const
+{
   return mForceUpdate ||
     mCurrentPaintState.mFrameColorState != mNextPaintState.mFrameColorState ||
     mCurrentPaintState.mSlotColorState != mNextPaintState.mSlotColorState ||
@@ -104,7 +106,7 @@ void NodeWidget::CreateWidgetSlots() {
 
 void NodeWidget::CalculateLayout() {
   const QFont& font = mPainter.font();
-  double dpi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
+  const double dpi = QGuiApplication::primaryScreen()->physicalDotsPerInch();
   const double fontHeightPoints = font.pointSizeF();
   const int fontHeight = int(fontHeightPoints / 72.0 * dpi);
 
@@ -117,7 +119,7 @@ void NodeWidget::CalculateLayout() {
     sw->mSpotPos = Vec2(ConnectionSpotPadding, slotY + sw->mSize.y / 2.0f);
     slotY += sw->mSize.y + SlotSpacing;
   }
-  Vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
+  const Vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
   mOutputPosition = Vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
   GetDirectNode()->SetSize(size);
 
@@ -130,8 +132,8 @@ void NodeWidget::UpdateTexture() {
     PaintToImage();
     /// This makes a copy of the array
     unsigned char* bits = mImage.bits();
-    int height = mImage.height();
-    int width = mImage.width();
+    const int height = mImage.height();
+    const int width = mImage.width();
     vector<char> texels(height * width * 4);
     unsigned char* source = bits;
     unsigned char* dest = reinterpret_cast<unsigned char*>(&texels[0]);
@@ -167,13 +169,13 @@ static Vec4 ReferenceHeaderColor = Vec4(0.4, 0.0, 0.2, Opacity);
 void NodeWidget::Paint() {
   UpdateTexture();
 
-  shared_ptr<Node> node = GetDirectNode();
-  Vec2 position = node->GetPosition();
+  const shared_ptr<Node> node = GetDirectNode();
+  const Vec2 position = node->GetPosition();
   ThePainter->DrawTexture(mTexture, position.x, position.y);
 }
 
 
-Vec2 NodeWidget::GetOutputPosition()
+Vec2 NodeWidget::GetOutputPosition() const
 {
   return GetDirectNode()->GetPosition() + mOutputPosition;
 }
@@ -186,7 +188,8 @@ Vec2 NodeWidget::GetInputPosition(int SlotIndex)
 }
 
 
-const std::vector<NodeWidget::WidgetSlot*>& NodeWidget::GetWidgetSlots() {
+const std::vector<NodeWidget::WidgetSlot*>& NodeWidget::GetWidgetSlots() const
+{
   return mWidgetSlots;
 }
 
@@ -198,7 +201,7 @@ void NodeWidget::OnSlotStructureChanged() {
 
 void NodeWidget::OnNameChange() {
   static const QString stubLabel(" [stub]");
-  shared_ptr<Node> directNode = GetDirectNode();
+  const shared_ptr<Node> directNode = GetDirectNode();
 
   QString text;
   if (!directNode->GetName().empty()) {
@@ -206,7 +209,7 @@ void NodeWidget::OnNameChange() {
     text = QString::fromStdString(directNode->GetName());
   }
   else {
-    shared_ptr<Node> node = GetNode();
+    const shared_ptr<Node> node = GetNode();
     if (!node->GetName().empty()) {
       /// Live node has a name, use that.
       text = QString::fromStdString(directNode->GetName());
@@ -216,7 +219,7 @@ void NodeWidget::OnNameChange() {
       text = QString::fromStdString(
         NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName);
       if (IsPointerOf<StubNode>(node)) {
-        shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
+        const shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
         StubMetadata* metaData = stub->GetStubMetadata();
         if (metaData != nullptr && !metaData->name.empty()) {
           /// For shader stubs, use the stub name by default

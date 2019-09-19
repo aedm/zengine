@@ -36,7 +36,7 @@ public:
   void SetSceneTime(float seconds);
 
   /// Gets the currect time cursor
-  float GetSceneTime();
+  float GetSceneTime() const;
 
   /// hack
   void UpdateDependencies();
@@ -44,7 +44,7 @@ public:
 protected:
   virtual void Operate() override;
 
-  void RenderDrawables(Globals* globals, PassType passType);
+  void RenderDrawables(Globals* globals, PassType passType) const;
 
   /// Handle received messages
   virtual void HandleMessage(Message* message) override;

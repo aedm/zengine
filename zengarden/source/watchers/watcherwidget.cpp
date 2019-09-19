@@ -31,7 +31,7 @@ EventForwarderGLWidget* WatcherWidget::GetGLWidget() {
 
 void WatcherWidget::SetTabLabel(const QString& text) {
   if (mTabWidget != nullptr) {
-    int index = mTabWidget->indexOf(this);
+    const int index = mTabWidget->indexOf(this);
     if (index >= 0) mTabWidget->setTabText(index, text);
   }
 }

@@ -20,7 +20,7 @@ extern const EnumMapperA SplineLayerMapper[];
 class JSONSerializer {
 public:
   JSONSerializer(const shared_ptr<Node>& root);
-  string GetJSON();
+  string GetJSON() const;
 
 private:
   /// Collect nodes in the transitive close of root
@@ -34,28 +34,28 @@ private:
 
   /// Node serializers
   void SerializeFloatNode(
-    rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node) const;
   void SerializeVec2Node(
-    rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node) const;
   void SerializeVec3Node(
-    rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node) const;
   void SerializeVec4Node(
-    rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node) const;
   void SerializeFloatSplineNode(
-    rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node) const;
   void SerializeTextureNode(
-    rapidjson::Value& nodeValue, const shared_ptr<TextureNode>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<TextureNode>& node) const;
   void SerializeStubNode(
-    rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node) const;
   void SerializeStaticMeshNode(
-    rapidjson::Value& nodeValue, const shared_ptr<StaticMeshNode>& node);
+    rapidjson::Value& nodeValue, const shared_ptr<StaticMeshNode>& node) const;
   void SerializeGeneralNode(
     rapidjson::Value& nodeValue, const shared_ptr<Node>& node);
 
   /// Helpers
-  rapidjson::Value SerializeVec2(const Vec2& vec);
-  rapidjson::Value SerializeVec3(const Vec3& vec);
-  rapidjson::Value SerializeVec4(const Vec4& vec);
+  rapidjson::Value SerializeVec2(const Vec2& vec) const;
+  rapidjson::Value SerializeVec3(const Vec3& vec) const;
+  rapidjson::Value SerializeVec4(const Vec4& vec) const;
 
   /// Number of nodes to save
   int mNodeCount;

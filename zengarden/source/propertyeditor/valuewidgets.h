@@ -27,7 +27,7 @@ public:
   void Set(float value);
   void SetRange(float minimum, float maximum);
 
-  float Get();
+  float Get() const;
 
 private:
   void paintEvent(QPaintEvent *e);
@@ -71,7 +71,7 @@ public:
 
   /// Set the value of the editor
   void Set(float value);
-  void SetRange(float minimum, float maximum);
+  void SetRange(float minimum, float maximum) const;
 
   /// Subscribe to get value updates
   Event<QWidget*, const float&> onValueChange;
@@ -80,7 +80,7 @@ public:
   void SetReadOnly(bool readOnly);
 
 protected:
-  void SetTextBoxValue(float value);
+  void SetTextBoxValue(float value) const;
   void SliderValueChanged(float value);
   void SpinBoxValueChanged();
 

@@ -92,7 +92,7 @@ private:
 
   /// Collect uniforms and samplers
   void AddGlobalsToDependencies(ShaderStage* shaderStage);
-  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage);
+  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage) const;
   void AddLocalsToDependencies();
 
   /// Generate source
@@ -100,7 +100,7 @@ private:
   void GenerateSourceHeader(ShaderStage* shaderStage);
   void GenerateInputInterface(ShaderStage* shaderStage);
   void GenerateSourceFunctions(ShaderStage* shaderStage);
-  void GenerateSourceMain(ShaderStage* shaderStage);
+  void GenerateSourceMain(ShaderStage* shaderStage) const;
 
   static const string& GetValueTypeString(ValueType type);
   static const string& GetParamTypeString(StubParameter::Type type,

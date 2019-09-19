@@ -13,7 +13,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   virtual void OnRedraw() override;
   virtual void OnChildNameChange();
-  void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode);
+  void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const;
 
 private:
   Ui::MovieEditor mUI;
@@ -39,7 +39,7 @@ private:
   shared_ptr<ClipNode> mHoveredClip;
   shared_ptr<ClipNode> mSelectedClip;
 
-  void HandleMovieCursorChange(float seconds);
+  void HandleMovieCursorChange(float seconds) const;
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
@@ -47,8 +47,8 @@ private:
   void HandleMouseMove(QMouseEvent* event);
   void HandleMouseWheel(QWheelEvent* event);
 
-  int TimeToScreen(float time);
-  int TimeRangeToPixels(float timeRange);
+  int TimeToScreen(float time) const;
+  int TimeRangeToPixels(float timeRange) const;
   float ScreenToTime(int xPos);
-  float PixelsToTimeRange(int pixelCount);
+  float PixelsToTimeRange(int pixelCount) const;
 };

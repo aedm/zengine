@@ -19,10 +19,10 @@ public:
   //void AllocateWireframeIndices(UINT indexCount);
 
   /// Uploads all vertices
-  void UploadVertices(void* vertices);
+  void UploadVertices(void* vertices) const;
 
   /// Uploads only the first VertexCount vertices, doessn't reallocate
-  void UploadVertices(void* vertices, int vertexCount);
+  void UploadVertices(void* vertices, int vertexCount) const;
 
   /// Uploads all indices
   void UploadIndices(const IndexEntry* indices);

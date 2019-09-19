@@ -15,7 +15,7 @@ public:
 
 private:
   void BuildPostProcessPasses();
-  void BuildMaterialPasses();
+  void BuildMaterialPasses() const;
 
   /// Copies resolved color to a postprocess buffer
   /// in: Gbuffer (MSAA)
@@ -25,7 +25,7 @@ private:
   /// Generates depth of field effect
   /// in: Gbuffer (MSAA)
   /// out: DOF buffer (MSAA) + postprocess source buffer (no MSAA)
-  void ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals);
+  void ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals) const;
 
   /// Shrinks postprocess texture and applies Gaussian blur to it
   /// in: postprocess source buffer
@@ -36,7 +36,7 @@ private:
   /// in: Gbuffer (MSAA) + postprocess source buffer
   /// out: screen
   void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
-    const shared_ptr<Texture>& sourceColorMSAA);
+    const shared_ptr<Texture>& sourceColorMSAA) const;
 
   shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First = make_shared<Pass>();
   shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal = make_shared<Pass>();

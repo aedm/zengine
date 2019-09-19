@@ -16,5 +16,5 @@ private:
   QBoxLayout* mLayout;
   QTextEdit* mTextEdit;
 
-  void HandleRebuid();
+  void HandleRebuid() const;
 };

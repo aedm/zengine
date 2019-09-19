@@ -11,13 +11,13 @@ using namespace Gdiplus::DllExports;
 void Zengine::InitGDIPlus() {
   GdiplusStartupInput gdiplusStartupInput;
   ULONG_PTR gdiplusToken;
-  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 }
 
 shared_ptr<Texture> Zengine::LoadTextureFromFile(const wstring& fileName) {
   Gdiplus::Bitmap bitmap(fileName.c_str());
-  UINT width = bitmap.GetWidth();
-  UINT height = bitmap.GetHeight();
+  const UINT width = bitmap.GetWidth();
+  const UINT height = bitmap.GetHeight();
 
   /// Lock entire region to get the pixels
   Gdiplus::Rect rect(0, 0, width, height);

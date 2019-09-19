@@ -20,7 +20,7 @@ LogWatcher::~LogWatcher()
 	TheLogger->onLog -= Delegate(this, &LogWatcher::Log);
 }
 
-void LogWatcher::Log(LogMessage Message)
+void LogWatcher::Log(LogMessage Message) const
 {
 	switch (Message.severity)
 	{

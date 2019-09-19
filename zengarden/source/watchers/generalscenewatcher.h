@@ -44,13 +44,13 @@ protected:
   /// Qt widget event handlers
   void HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event);
   void HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event);
-  void HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event);
+  void HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) const;
   void HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
   void HandleMouseLeftUp(QMouseEvent* event);
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseRightUp(QMouseEvent* event);
-  void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event);
+  void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) const;
 
   /// Mouse position at pressing
   QPoint mOriginalPosition;

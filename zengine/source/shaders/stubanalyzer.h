@@ -24,7 +24,7 @@ private:
   void AnalyzeVariable(SourceLine* line,
                        vector<StubInOutVariable*>& storage);
 
-  StubParameter::Type TokenToType(const SubString& subStr);
+  StubParameter::Type TokenToType(const SubString& subStr) const;
 
   int mCurrentLineNumber;
 

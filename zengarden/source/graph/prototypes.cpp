@@ -4,7 +4,7 @@
 #include "../util/util.h"
 #include "../zengarden.h"
 
-Prototypes* ThePrototypes = NULL;
+Prototypes* ThePrototypes = nullptr;
 
 Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label,
   int prototypeIndex)
@@ -82,7 +82,7 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
     this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
   //dialog.connect(SIGNAL(itemClicked()), this, SLOT(OnItemSelected()));
 
-  int ret = dialog.exec();
+  const int ret = dialog.exec();
   if (ret <= 0) return nullptr;
   const Prototype* prototype = allPrototypes[ret - 1];
 
@@ -98,7 +98,8 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
 }
 
 
-void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int) {
+void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int) const
+{
   SelectorItem* item = static_cast<SelectorItem*>(Item);
   if (item->mPrototypeIndex >= 0) mDialog->done(item->mPrototypeIndex);
 }
@@ -118,7 +119,7 @@ void Prototypes::LoadStubs() {
 void Prototypes::LoadStubFolder(QString folder, Category* category) {
   static const QString shaderSuffix("shader");
 
-  QDir dir(folder);
+  const QDir dir(folder);
   for (QFileInfo& fileInfo : dir.entryInfoList()) {
     if (fileInfo.isDir()) {
       if (fileInfo.fileName().startsWith(".")) continue;

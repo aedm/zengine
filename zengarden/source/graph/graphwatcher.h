@@ -44,7 +44,7 @@ private:
   void Paint(EventForwarderGLWidget*);
 
   /// All wigdets on the graph
-  shared_ptr<Graph> GetGraph();
+  shared_ptr<Graph> GetGraph() const;
 
   /// Handle drag events
   virtual void HandleDragEnterEvent(QDragEnterEvent* event) override;

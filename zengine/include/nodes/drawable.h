@@ -29,6 +29,6 @@ protected:
   /// Handle received messages
   virtual void HandleMessage(Message* message) override;
 
-  void ApplyTransformation(Globals& globals);
+  void ApplyTransformation(Globals& globals) const;
 };
 

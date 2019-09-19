@@ -38,7 +38,7 @@ void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
       new RenderTarget(Vec2(float(mWatcherWidget->width()), float(mWatcherWidget->height())));
   }
 
-  Vec2 size = Vec2(widget->width(), widget->height());
+  const Vec2 size = Vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
 
   movieNode->Draw(mRenderTarget, ZenGarden::GetInstance()->GetMovieCursor());

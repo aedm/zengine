@@ -38,11 +38,11 @@ SceneNode::~SceneNode() {
 }
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
-  float globalTime = mGlobalTimeNode->Get();
-  float passedTime = globalTime - mLastRenderTime;
+  const float globalTime = mGlobalTimeNode->Get();
+  const float passedTime = globalTime - mLastRenderTime;
   mLastRenderTime = globalTime;
-  
-  float fluidAdvanceTime = passedTime > 0.1f ? 0.1f : passedTime;
+
+  const float fluidAdvanceTime = passedTime > 0.1f ? 0.1f : passedTime;
 
   /// Paint Fluids
   RenderDrawables(globals, PassType::FLUID_PAINT);
@@ -53,8 +53,8 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
     fluid->Render(fluidAdvanceTime);
   }
 
-  bool directToScreen = globals->DirectToScreen > 0.5f;
-  bool directToSquare = globals->DirectToSquare > 0.5f;
+  const bool directToScreen = globals->DirectToScreen > 0.5f;
+  const bool directToSquare = globals->DirectToSquare > 0.5f;
 
   /// Get camera
   auto& camera = mCamera.GetNode();
@@ -63,11 +63,11 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   /// Pass #1: skylight shadow
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
-  Vec3 s = mShadowMapSize.Get();
-  Vec3 lightDir = mSkyLightDirection.Get().Normal();
-  
-  Matrix lookat = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
-  Matrix target = Matrix::Translate(-camera->mTarget.Get());
+  const Vec3 s = mShadowMapSize.Get();
+  const Vec3 lightDir = mSkyLightDirection.Get().Normal();
+
+  const Matrix lookat = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
+  const Matrix target = Matrix::Translate(-camera->mTarget.Get());
   globals->Camera = lookat * target;
  
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
@@ -78,7 +78,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
     auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->ComputeForcedShadowCenter(globals, shadowCenter);
   }
-  Matrix shadowCenterTarget = Matrix::Translate(-shadowCenter);
+  const Matrix shadowCenterTarget = Matrix::Translate(-shadowCenter);
   globals->Camera = shadowCenterTarget * globals->Camera;
 
   globals->SkylightProjection = globals->Projection;
@@ -139,7 +139,8 @@ void SceneNode::Operate() {
   CalculateRenderDependencies();
 }
 
-void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
+void SceneNode::RenderDrawables(Globals* globals, PassType passType) const
+{
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
     auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->Draw(globals, passType);
@@ -191,7 +192,8 @@ void SceneNode::SetSceneTime(float time) {
   }
 }
 
-float SceneNode::GetSceneTime() {
+float SceneNode::GetSceneTime() const
+{
   return mSceneTime;
 }
 

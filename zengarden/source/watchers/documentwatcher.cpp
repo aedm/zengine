@@ -33,22 +33,22 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   watcherWidget->connect(mUI.graphList, &QListView::clicked,
     [=](const QModelIndex &index) {
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
+    const shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(graph);
   });
 
   RefreshGraphList();
 
   watcherWidget->connect(mUI.openButton, &QPushButton::pressed, [=]() {
-    QModelIndex index = mUI.graphList->currentIndex();
+    const QModelIndex index = mUI.graphList->currentIndex();
     if (!index.isValid()) return;
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
+    const shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
     ZenGarden::GetInstance()->Watch(graph, WatcherPosition::RIGHT_TAB);
   });
 
   watcherWidget->connect(mUI.newGraphButton, &QPushButton::pressed, [=]() {
-    shared_ptr<Graph> graph = make_shared<Graph>();
+    const shared_ptr<Graph> graph = make_shared<Graph>();
     shared_ptr<Document> document = PointerCast<Document>(GetNode());
     document->mGraphs.Connect(graph);
   });
@@ -62,8 +62,9 @@ void DocumentWatcher::OnChildNameChange() {
   RefreshGraphList();
 }
 
-void DocumentWatcher::RefreshGraphList() {
-  shared_ptr<Document> doc = PointerCast<Document>(GetNode());
+void DocumentWatcher::RefreshGraphList() const
+{
+  const shared_ptr<Document> doc = PointerCast<Document>(GetNode());
   mModel->clear();
   for (const auto& node : doc->mGraphs.GetDirectMultiNodes()) {
     shared_ptr<Graph> graph = PointerCast<Graph>(node);

@@ -49,7 +49,8 @@ void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->addWidget(compileButton);
 }
 
-void TextWatcher::HandleRebuid() {
+void TextWatcher::HandleRebuid() const
+{
   shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
   stringNode->Set(mTextEdit->toPlainText().toStdString());
 }

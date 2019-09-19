@@ -18,10 +18,10 @@ public:
   virtual ~WatcherUI();
 
   /// Get the OpenGL widget, if any
-  EventForwarderGLWidget* GetGLWidget();
+  EventForwarderGLWidget* GetGLWidget() const;
 
   /// Get displayed name
-  const QString& GetDisplayedName();
+  const QString& GetDisplayedName() const;
 
   /// Handle drag events
   virtual void HandleDragEnterEvent(QDragEnterEvent* event) {}

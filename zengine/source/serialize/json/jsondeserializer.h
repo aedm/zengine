@@ -15,7 +15,7 @@ using namespace std;
 class JSONDeserializer {
 public:
   JSONDeserializer(const string& json);
-  shared_ptr<Document> GetDocument();
+  shared_ptr<Document> GetDocument() const;
 
 private:
   void DeserializeNode(rapidjson::Value& value);
@@ -32,11 +32,11 @@ private:
     const shared_ptr<FloatSplineNode>& node);
 
   void DeserializeStaticTextureNode(const rapidjson::Value& value, 
-    const shared_ptr<StaticTextureNode>& node);
+    const shared_ptr<StaticTextureNode>& node) const;
   void DeserializeStubNode(const rapidjson::Value& value, 
     const shared_ptr<StubNode>& node);
   void DeserializeStaticMeshNode(const rapidjson::Value& value, 
-    const shared_ptr<StaticMeshNode>& node);
+    const shared_ptr<StaticMeshNode>& node) const;
 
   void ConnectSlots(rapidjson::Value& value);
   

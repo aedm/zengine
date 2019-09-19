@@ -16,11 +16,12 @@ RenderTarget::~RenderTarget() {
   if (mColorBufferId) OpenGL->DeleteFrameBuffer(mColorBufferId);
 }
 
-void RenderTarget::SetGBufferAsTarget(Globals* globals) {
+void RenderTarget::SetGBufferAsTarget(Globals* globals) const
+{
   globals->RenderTargetSize = mSize;
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
-  globals->DepthBufferSource = 0;
-  globals->GBufferSourceA = 0;
+  globals->DepthBufferSource = nullptr;
+  globals->GBufferSourceA = nullptr;
   globals->SquareTexture1 = mSquareTexture1;
   globals->SquareTexture2 = mSquareTexture2;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
@@ -30,11 +31,12 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) {
   OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
-void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) {
+void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) const
+{
   globals->RenderTargetSize = mSize;
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = mDepthBuffer;
-  globals->GBufferSourceA = 0;
+  globals->GBufferSourceA = nullptr;
   globals->SquareTexture1 = mSquareTexture1;
   globals->SquareTexture2 = mSquareTexture2;
   globals->GBufferSampleCount = ZENGINE_RENDERTARGET_MULTISAMPLE_COUNT;
@@ -44,7 +46,8 @@ void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) {
   OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
-void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
+void RenderTarget::SetColorBufferAsTarget(Globals* globals) const
+{
   OpenGL->SetFrameBuffer(mColorBufferId);
   globals->RenderTargetSize = mSize;
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
@@ -55,14 +58,15 @@ void RenderTarget::SetColorBufferAsTarget(Globals* globals) {
   OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
-void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
+void RenderTarget::SetShadowBufferAsTarget(Globals* globals) const
+{
   globals->RenderTargetSize = Vec2(float(ShadowMapSize), float(ShadowMapSize));
   globals->RenderTargetSizeRecip =
     Vec2(1.0f / float(ShadowMapSize), 1.0f / float(ShadowMapSize));
-  globals->DepthBufferSource = 0;
-  globals->GBufferSourceA = 0;
+  globals->DepthBufferSource = nullptr;
+  globals->GBufferSourceA = nullptr;
   globals->GBufferSampleCount = 1;
-  globals->SecondaryTexture = 0;
+  globals->SecondaryTexture = nullptr;
   globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
   globals->SquareTexture1 = mSquareTexture1;
   globals->SquareTexture2 = mSquareTexture2;
@@ -70,7 +74,8 @@ void RenderTarget::SetShadowBufferAsTarget(Globals* globals) {
   OpenGL->SetViewport(0, 0, ShadowMapSize, ShadowMapSize);
 }
 
-void RenderTarget::SetSquareBufferAsTarget(Globals* globals) {
+void RenderTarget::SetSquareBufferAsTarget(Globals* globals) const
+{
   globals->RenderTargetSize = Vec2(float(SquareBufferSize), float(SquareBufferSize));
   globals->RenderTargetSizeRecip =
     Vec2(1.0f / float(SquareBufferSize), 1.0f / float(SquareBufferSize));
@@ -90,8 +95,8 @@ void RenderTarget::Resize(Vec2 size) {
   DropResources();
 
   mSize = size;
-  UINT width = UINT(size.x);
-  UINT height = UINT(size.y);
+  const UINT width = UINT(size.x);
+  const UINT height = UINT(size.y);
 
   /// Create G-Buffer
   mDepthBuffer = OpenGL->MakeTexture(width, height, TexelType::DEPTH32F, nullptr, true,
@@ -99,17 +104,17 @@ void RenderTarget::Resize(Vec2 size) {
   mGBufferA = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
     true, false, false);
   mGBufferId = OpenGL->CreateFrameBuffer(mDepthBuffer, mGBufferA, nullptr);
-  mGBufferForZPostPassId = OpenGL->CreateFrameBuffer(0, mGBufferA, nullptr);
+  mGBufferForZPostPassId = OpenGL->CreateFrameBuffer(nullptr, mGBufferA, nullptr);
 
   /// Create framebuffer for DOF result
   mDOFColorTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
     true, false, false);
-  mDOFBufferId = OpenGL->CreateFrameBuffer(0, mDOFColorTexture, nullptr);
+  mDOFBufferId = OpenGL->CreateFrameBuffer(nullptr, mDOFColorTexture, nullptr);
 
   /// Create secondary framebuffer, no MSAA
   mSecondaryTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
     false, false, false);
-  mSecondaryFramebuffer = OpenGL->CreateFrameBuffer(0, mSecondaryTexture, nullptr);
+  mSecondaryFramebuffer = OpenGL->CreateFrameBuffer(nullptr, mSecondaryTexture, nullptr);
 
   /// Create square framebuffer, no MSAA
   mSquareDepthTexture = OpenGL->MakeTexture(SquareBufferSize, SquareBufferSize, 
@@ -125,14 +130,14 @@ void RenderTarget::Resize(Vec2 size) {
   if (mShadowBufferId == 0) {
     mShadowTexture = OpenGL->MakeTexture(ShadowMapSize, ShadowMapSize, 
       TexelType::DEPTH32F, nullptr, true, false, false, false);
-    mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture, 0, 0);
+    mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture, nullptr, nullptr);
   }
 
   /// Video output framebuffer
   if (mForFrameGrabbing && mColorBufferId == 0) {
     mShadowTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8,
       nullptr, true, false, false, false);
-    mColorBufferId = OpenGL->CreateFrameBuffer(0, mColorTexture, 0);
+    mColorBufferId = OpenGL->CreateFrameBuffer(nullptr, mColorTexture, nullptr);
   }
 
   /// Create gaussian ping-pong textures
@@ -141,11 +146,12 @@ void RenderTarget::Resize(Vec2 size) {
     mPostprocessTextures[i] = OpenGL->MakeTexture(width, height, TexelType::ARGB16F,
       nullptr, true, false, false, false);
     mPostprocessFramebuffers[i] = 
-      OpenGL->CreateFrameBuffer(0, mPostprocessTextures[i], 0);
+      OpenGL->CreateFrameBuffer(nullptr, mPostprocessTextures[i], nullptr);
   }
 }
 
-Vec2 RenderTarget::GetSize() {
+Vec2 RenderTarget::GetSize() const
+{
   return mSize;
 }
 
@@ -165,7 +171,7 @@ void RenderTarget::SwapPostprocessBuffers() {
   mPostprocessTargetBufferIndex = 1 - mPostprocessTargetBufferIndex;
 }
 
-void RenderTarget::FinishFrame()
+void RenderTarget::FinishFrame() const
 {
   if (mForFrameGrabbing) {
     OpenGL->BlitFrameBuffer(mColorBufferId, 0,

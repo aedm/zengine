@@ -12,7 +12,7 @@ private:
   /// Returns true if a ghost slots was found in the subtree
   bool Traverse(const shared_ptr<Node>& node) {
     if (mVisited.find(node) != mVisited.end()) {
-      bool hadGhostSlot = mHadGhostSlot.find(node) != mHadGhostSlot.end();
+      const bool hadGhostSlot = mHadGhostSlot.find(node) != mHadGhostSlot.end();
       return hadGhostSlot;
     }
     mVisited.insert(node);
@@ -63,7 +63,8 @@ bool Ghost::IsGhostNode() {
   return true;
 }
 
-bool Ghost::IsDirectReference() {
+bool Ghost::IsDirectReference() const
+{
   return mMainInternalNode.GetDirectNode() == mOriginalNode.GetDirectNode();
 }
 
@@ -90,7 +91,7 @@ shared_ptr<Node> Ghost::GetReferencedNode() {
 }
 
 void Ghost::Regenerate() {
-  shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
+  const shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
   vector<shared_ptr<Node>> topologicalOrder;
   if (root != nullptr) GhostTransitiveClosure(root, topologicalOrder);
 
@@ -121,7 +122,7 @@ void Ghost::Regenerate() {
       /// Connect slots
       const auto& originalSlots = node->GetPublicSlots();
       const auto& internalNodeSlots = internalNode->GetPublicSlots();
-      size_t slotCount = originalSlots.size();
+      const size_t slotCount = originalSlots.size();
       ASSERT(slotCount == internalNode->GetPublicSlots().size());
       for (UINT i = 0; i < slotCount; i++) {
         Slot* originalSlot = originalSlots[i];

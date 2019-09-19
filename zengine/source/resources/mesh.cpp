@@ -74,7 +74,7 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
 void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount) {
   this->mFormat = format;
   this->mVertexCount = vertexCount;
-  UINT newBufferSize = format->mStride * vertexCount;
+  const UINT newBufferSize = format->mStride * vertexCount;
 
   if (mVertexBuffer->GetByteSize() != newBufferSize) {
     mVertexBuffer->Allocate(newBufferSize);
@@ -96,7 +96,8 @@ void Mesh::UploadIndices(const IndexEntry* indices) {
   memcpy(&mIndexData[0], indices, mIndexCount * sizeof(IndexEntry));
 }
 
-void Mesh::UploadVertices(void* vertices) {
+void Mesh::UploadVertices(void* vertices) const
+{
   mVertexBuffer->UploadData(vertices, mVertexCount * mFormat->mStride);
 
   /// TODO: use unique_ptr or OWNERSHIP instead of copying twice
@@ -104,7 +105,8 @@ void Mesh::UploadVertices(void* vertices) {
 }
 
 
-void Mesh::UploadVertices(void* vertices, int vertexCount) {
+void Mesh::UploadVertices(void* vertices, int vertexCount) const
+{
   mVertexBuffer->UploadData(vertices, vertexCount * mFormat->mStride);
 
   /// TODO: use unique_ptr or OWNERSHIP instead of copying twice

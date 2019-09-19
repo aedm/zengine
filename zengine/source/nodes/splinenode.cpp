@@ -64,36 +64,36 @@ const float& FloatSplineNode::Get() {
 
 float FloatSplineNode::GetNoiseValue(float time) {
   if (mNoiseEnabled.Get() < 0.5f) return 0.0f;
-  float noiseVelocity = mNoiseVelocity.Get();
-  float noiseRatio = mNoiseLayer.Get(time) * 0.33f;
-  float t = time * noiseVelocity;
+  const float noiseVelocity = mNoiseVelocity.Get();
+  const float noiseRatio = mNoiseLayer.Get(time) * 0.33f;
+  const float t = time * noiseVelocity;
   return noiseRatio * (sinf(t * 0.67f) + cosf(t * 2.43f) + cosf(t * 3.81f + 0.5f));
 }
 
 float FloatSplineNode::GetBeatSpikeValue(float time) {
   if (mBeatSpikeEnabled.Get() < 0.5f) return 0.0f;
 
-  float freq = mBeatSpikeFrequencyLayer.Get(time);
+  const float freq = mBeatSpikeFrequencyLayer.Get(time);
   if (freq < Epsilon) return 0.0f;
 
-  float length = mBeatSpikeLength.Get();
+  const float length = mBeatSpikeLength.Get();
   if (length < Epsilon) return 0.0f;
 
-  float subBeat = time - freq * floorf(time / freq);
+  const float subBeat = time - freq * floorf(time / freq);
   if (subBeat > length) return 0.0f;
 
-  float intensity = mBeatSpikeIntensityLayer.Get(time);
-  float easing = mBeatSpikeEasing.Get();
+  const float intensity = mBeatSpikeIntensityLayer.Get(time);
+  const float easing = mBeatSpikeEasing.Get();
 
-  float t = 1.0f - subBeat / length;
+  const float t = 1.0f - subBeat / length;
   return intensity * powf(t, easing);
 }
 
 float FloatSplineNode::GetBeatQuantizerValue(float time) {
-  float freq = mBeatQuantizerFrequency.Get();
+  const float freq = mBeatQuantizerFrequency.Get();
   if (freq < Epsilon) return 0.0f;
-  
-  float t = freq * floorf(time / freq);
+
+  const float t = freq * floorf(time / freq);
   return mBeatQuantizerLayer.Get(t);
 }
 
@@ -161,7 +161,7 @@ void SplineFloatComponent::CalculateTangent(int index) {
     if (index > 0 && index < mPoints.size() - 1) {
       SplinePoint& prev = mPoints[index - 1];
       SplinePoint& next = mPoints[index + 1];
-      float xm = next.mTime - prev.mTime;
+      const float xm = next.mTime - prev.mTime;
       ym = next.mValue - prev.mValue;
       if (xm > Epsilon) ym /= xm;
     }
@@ -177,7 +177,7 @@ float FloatSplineNode::EvaluateLinearSpline(vector<SplinePoint>& points, float t
   UINT i1 = 0;
   UINT i2 = UINT(points.size() - 1);
   while (i1 < i2) {
-    UINT center = (i1 + i2 + 1) / 2;
+    const UINT center = (i1 + i2 + 1) / 2;
     if (points[center].mTime > time) {
       i2 = center - 1;
     } else {
@@ -210,7 +210,8 @@ float FloatSplineNode::GetValue(float time) {
 }
 
 
-const std::vector<SplinePoint>& SplineComponent::GetPoints() {
+const std::vector<SplinePoint>& SplineComponent::GetPoints() const
+{
   return mPoints;
 }
 
@@ -224,26 +225,26 @@ int SplineComponent::FindPointIndexBefore(float time) {
 }
 
 float SplineFloatComponent::Get(float time) {
-  int index = FindPointIndexBefore(time);
+  const int index = FindPointIndexBefore(time);
 
   SplinePoint* before = index >= 0 ? &mPoints[index] : nullptr;
   SplinePoint* after = index < int(mPoints.size()) - 1 ? &mPoints[index + 1] : nullptr;
 
   if (before && after)
     if (before->mIsLinear) {
-      float dt = after->mTime - before->mTime;
+      const float dt = after->mTime - before->mTime;
       if (dt <= Epsilon) return before->mValue;
       return (after->mValue * (time - before->mTime) + 
               before->mValue * (after->mTime - time)) / dt;
     } else {
-      float dt = after->mTime - before->mTime;
-      float ft = (time - before->mTime) / dt;
+      const float dt = after->mTime - before->mTime;
+      const float ft = (time - before->mTime) / dt;
 
-      float ea = before->mValue;
-      float eb = dt * before->mTangentAfter;
-      float ec = 3.0f * (after->mValue - before->mValue) - 
+      const float ea = before->mValue;
+      const float eb = dt * before->mTangentAfter;
+      const float ec = 3.0f * (after->mValue - before->mValue) - 
         dt * (2.0f * before->mTangentAfter + after->mTangentBefore);
-      float ed = -2.0f * (after->mValue - before->mValue) + 
+      const float ed = -2.0f * (after->mValue - before->mValue) + 
         dt * (before->mTangentAfter + after->mTangentBefore);
 
       return ea + ft*eb + ft*ft*ec + ft*ft*ft*ed;
@@ -272,7 +273,7 @@ SplineFloatComponent* FloatSplineNode::GetComponent(SplineLayer layer) {
 }
 
 int FloatSplineNode::AddPoint(SplineLayer layer, float time, float value) {
-  int index = GetComponent(layer)->AddPoint(time, value);
+  const int index = GetComponent(layer)->AddPoint(time, value);
   InvalidateCurrentValue();
   return index;
 }

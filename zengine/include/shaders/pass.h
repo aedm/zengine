@@ -75,11 +75,11 @@ public:
   void Set(Globals* globals);
 
   /// Returns true if pass can be used
-  bool isComplete();
+  bool isComplete() const;
 
   /// Get shader sources
-  string GetVertexShaderSource();
-  string GetFragmentShaderSource();
+  string GetVertexShaderSource() const;
+  string GetFragmentShaderSource() const;
 
 protected:
   virtual void HandleMessage(Message* message) override;

@@ -57,7 +57,8 @@ FluidNode::~FluidNode() {
 
 }
 
-void FluidNode::Render(float deltaTime) {
+void FluidNode::Render(float deltaTime) const
+{
   Globals globals;
   globals.FluidVelocity1 = mVelocity1Texture;
   globals.FluidVelocity2 = mVelocity2Texture;
@@ -97,7 +98,7 @@ void FluidNode::Render(float deltaTime) {
   /// Pressure iteration
   OpenGL->SetFrameBuffer(mPressure2FBID);
   TheEngineShaders->mFluid_PressurePass->Set(&globals);
-  int iterations = int(mIterationCount.Get());
+  const int iterations = int(mIterationCount.Get());
   for (int i = 0; i < iterations; i++) {
     OpenGL->BlitFrameBuffer(mPressure2FBID, mPressure1FBID,
       0, 0, VELOCITY_RESOLUTION, VELOCITY_RESOLUTION,
@@ -135,7 +136,8 @@ void FluidNode::Render(float deltaTime) {
     0, 0, COLOR_RESOLUTION, COLOR_RESOLUTION);
 }
 
-void FluidNode::SetGlobalFluidTextures(Globals* globals) {
+void FluidNode::SetGlobalFluidTextures(Globals* globals) const
+{
   globals->FluidColor = mColor1Texture;
   globals->FluidVelocity1 = mVelocity1Texture;
   globals->FluidVelocity2 = mVelocity2Texture;
@@ -145,12 +147,14 @@ void FluidNode::SetGlobalFluidTextures(Globals* globals) {
   globals->FluidPressure = mPressureTexture1;
 }
 
-void FluidNode::SetColorRenderTarget() {
+void FluidNode::SetColorRenderTarget() const
+{
   OpenGL->SetFrameBuffer(mColor1FBID);
   OpenGL->SetViewport(0, 0, COLOR_RESOLUTION, COLOR_RESOLUTION);
 }
 
-void FluidNode::SetVelocityRenderTarget() {
+void FluidNode::SetVelocityRenderTarget() const
+{
   OpenGL->SetFrameBuffer(mVelocity1FBID);
   OpenGL->SetViewport(0, 0, VELOCITY_RESOLUTION, VELOCITY_RESOLUTION);
 }

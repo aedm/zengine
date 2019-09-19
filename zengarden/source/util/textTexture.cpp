@@ -17,9 +17,9 @@ int NextDivisibleBy(int A)
 void TextTexture::SetText(const QString& Text, const QFont& Font)
 {
   /// Calculate image size for the text
-  QString text = Text == "" ? " " : Text;
-  QFontMetrics fm(Font);
-  QRect rect = fm.boundingRect(text);
+  const QString text = Text == "" ? " " : Text;
+  const QFontMetrics fm(Font);
+  const QRect rect = fm.boundingRect(text);
   mTextSize = rect.size() + QSize(1, 1);
   mWidth = NextDivisibleBy<16>(mTextSize.width());
   mHeight = NextDivisibleBy<16>(mTextSize.height());

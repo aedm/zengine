@@ -16,7 +16,7 @@ public:
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void HandleNameTexBoxChanged();
+  void HandleNameTexBoxChanged() const;
 
   QBoxLayout*	mLayout = nullptr;
   TextBox* mNameTextBox = nullptr;

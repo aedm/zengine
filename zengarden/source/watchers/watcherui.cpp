@@ -22,7 +22,8 @@ WatcherUI::~WatcherUI() {
 }
 
 
-EventForwarderGLWidget* WatcherUI::GetGLWidget() {
+EventForwarderGLWidget* WatcherUI::GetGLWidget() const
+{
   return mWatcherWidget->GetGLWidget();
 }
 
@@ -33,13 +34,13 @@ QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
   if (!node->GetName().empty()) {
     /// Node has a name, use that.
     return QString::fromStdString(node->GetName());
-  } 
+  }
 
-  shared_ptr<Node> referencedNode = node->GetReferencedNode();
+  const shared_ptr<Node> referencedNode = node->GetReferencedNode();
   if (referencedNode.use_count() == 0) return "Empty ghost";
 
   if (IsPointerOf<StubNode>(referencedNode)) {
-    shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);
+    const shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);
     StubMetadata* metaData = stub->GetStubMetadata();
     if (metaData != nullptr && !metaData->name.empty()) {
       /// For shader stubs, use the stub name by default
@@ -53,7 +54,8 @@ QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
 }
 
 
-const QString& WatcherUI::GetDisplayedName() {
+const QString& WatcherUI::GetDisplayedName() const
+{
   return mDisplayedName;
 }
 

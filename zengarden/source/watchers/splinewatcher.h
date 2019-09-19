@@ -31,11 +31,11 @@ protected:
   void HandleMouseWheel(QWheelEvent* event);
 
   QPointF ToScreenCoord(float time, float value);
-  float ScreenToTime(int xPos);
-  Vec2 ScreenToPoint(QPoint& pos);
+  float ScreenToTime(int xPos) const;
+  Vec2 ScreenToPoint(QPoint& pos) const;
 
-  Vec2 GetStepsPerPixel();
-  QPointF GetPixelsPerStep();
+  Vec2 GetStepsPerPixel() const;
+  QPointF GetPixelsPerStep() const;
 
   enum class State {
     DEFAULT,
@@ -57,13 +57,13 @@ protected:
 
   QPoint mOriginalMousePos;
 
-  void UpdateRangeLabels();
-  void UpdateTimeEdit();
-  void UpdateValueEdit();
+  void UpdateRangeLabels() const;
+  void UpdateTimeEdit() const;
+  void UpdateValueEdit() const;
 
   void SelectPoint(SplineLayer layer, int index);
 
-  shared_ptr<FloatSplineNode> GetSpline();
+  shared_ptr<FloatSplineNode> GetSpline() const;
 
 private slots:
   void DrawSpline(QPaintEvent* ev);
@@ -71,9 +71,9 @@ private slots:
 
   void RemovePoint();
   void AddPoint(SplineLayer layer);
-  void ToggleLinear();
+  void ToggleLinear() const;
 
-  void HandleTimeEdited();
-  void HandleValueEdited();
+  void HandleTimeEdited() const;
+  void HandleValueEdited() const;
 };
 

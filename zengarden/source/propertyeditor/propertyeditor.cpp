@@ -21,7 +21,7 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   /// Node type
-  shared_ptr<Node> referencedNode = node->GetReferencedNode();
+  const shared_ptr<Node> referencedNode = node->GetReferencedNode();
   string typeString;
   if (referencedNode.use_count() > 0) {
     typeString =
@@ -52,7 +52,8 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-void PropertyEditor::HandleNameTexBoxChanged() {
+void PropertyEditor::HandleNameTexBoxChanged() const
+{
   shared_ptr<Node> node = GetDirectNode();
   if (node) {
     node->SetName(mNameTextBox->text().toStdString());

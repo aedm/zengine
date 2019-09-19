@@ -108,7 +108,7 @@ vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
 	int lineNumber = 1;
 	const char* pos = Source;
 	vector<SourceLine*>* lines = new vector<SourceLine*>();
-	SourceLine* line = NULL;
+	SourceLine* line = nullptr;
 	while (*pos != 0)
 	{
 		const char* beforeWhitespaces = pos; /// Position before skipping whitespaces
@@ -123,7 +123,7 @@ vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
 			{
 				line->EntireLine.Length = UINT(beforeLineEndings - line->EntireLine.Begin);
 				lines->push_back(line);
-				line = NULL;
+				line = nullptr;
 			}
 			for (; pos != nextLine; pos++)
 			{
@@ -132,7 +132,7 @@ vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
 			continue;
 		}
 
-		if (line == NULL) line = new SourceLine(lineNumber, beforeWhitespaces);
+		if (line == nullptr) line = new SourceLine(lineNumber, beforeWhitespaces);
 
 		/// Process next work
 		SubString subString = GetNextWord(pos, lineNumber);

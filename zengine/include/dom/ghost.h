@@ -16,7 +16,7 @@ public:
   
   /// Returns true if ghost node is simply a reference without any
   /// internal nodes.
-  bool IsDirectReference();
+  bool IsDirectReference() const;
 
 protected:
   set<shared_ptr<Node>> mInternalNodes;

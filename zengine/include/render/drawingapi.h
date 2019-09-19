@@ -95,12 +95,12 @@ public:
   void Allocate(int byteSize);
   
   /// Returns true if there's no data in the buffer
-  bool IsEmpty();
+  bool IsEmpty() const;
 
   /// Uploads data to the buffer
   void UploadData(const void* data, int byteSize);
-  DrawingAPIHandle GetHandle();
-  int GetByteSize();
+  DrawingAPIHandle GetHandle() const;
+  int GetByteSize() const;
 
 private:
   void Release();

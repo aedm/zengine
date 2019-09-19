@@ -50,7 +50,7 @@ void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) 
   Globals currentGlobals = *globals;
   ApplyTransformation(currentGlobals);
   if (mIsShadowCenter.Get() > 0.5f) {
-    Vec4 s = Vec4(0, 0, 0, 1) * currentGlobals.View;
+    const Vec4 s = Vec4(0, 0, 0, 1) * currentGlobals.View;
     oShadowCenter = Vec3(s.x, s.y, s.z);
   }
   for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
@@ -59,21 +59,22 @@ void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) 
   }
 }
 
-void Drawable::ApplyTransformation(Globals& globals) {
-  Vec3 movv = mMove.Get();
+void Drawable::ApplyTransformation(Globals& globals) const
+{
+  const Vec3 movv = mMove.Get();
   if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
-    Matrix move = Matrix::Translate(mMove.Get());
+    const Matrix move = Matrix::Translate(mMove.Get());
     globals.World = globals.World * move;
   }
-  Vec3 rotv = mRotate.Get();
+  const Vec3 rotv = mRotate.Get();
   if (rotv.x != 0 || rotv.y != 0 || rotv.z != 0) {
-    Matrix rotate = Matrix::Rotate(Quaternion::FromEuler(rotv.x, rotv.y, rotv.z));
+    const Matrix rotate = Matrix::Rotate(Quaternion::FromEuler(rotv.x, rotv.y, rotv.z));
     globals.World = globals.World * rotate;
   }
-  float scalev = mScale.Get();
+  const float scalev = mScale.Get();
   if (scalev != 0.0f) {
-    float s = powf(2.0f, scalev);
-    Matrix scale = Matrix::Scale(Vec3(s, s, s));
+    const float s = powf(2.0f, scalev);
+    const Matrix scale = Matrix::Scale(Vec3(s, s, s));
     globals.World = globals.World * scale;
   }
 

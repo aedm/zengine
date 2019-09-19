@@ -37,6 +37,7 @@ ValueType VertexAttributeUsageToValueType(VertexAttributeUsage usage) {
   }
 }
 
-bool VertexFormat::HasAttribute(VertexAttributeUsage attrib) {
+bool VertexFormat::HasAttribute(VertexAttributeUsage attrib) const
+{
   return (mBinaryFormat & (1 << (UINT)attrib)) != 0;
 }

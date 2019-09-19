@@ -6,7 +6,7 @@
 #include <QString>
 #include <QByteArray>
 
-UiPainter* ThePainter = NULL;
+UiPainter* ThePainter = nullptr;
 
 void InitPainter() {
   ThePainter = new UiPainter();
@@ -114,7 +114,7 @@ void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
 }
 
 void UiPainter::DrawRect(const Vec2& TopLeft, const Vec2& Size) {
-  Vec3 pos(TopLeft.x + 0.5f, TopLeft.y + 0.5f, 0);
+  const Vec3 pos(TopLeft.x + 0.5f, TopLeft.y + 0.5f, 0);
   VertexPos vertices[] = {
     {pos},
     {pos + Vec3(Size.x - 1, 0, 0)},
@@ -139,8 +139,8 @@ void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
 }
 
 void UiPainter::DrawTexture(const shared_ptr<Texture>& texture, float x, float y) {
-  float w(texture->mWidth);
-  float h(texture->mHeight);
+  const float w(texture->mWidth);
+  const float h(texture->mHeight);
   VertexPosUV vertices[] = {
     {Vec3(x, y, 0), Vec2(0, 0)},
     {Vec3(x + w, y, 0), Vec2(1, 0)},
@@ -155,11 +155,11 @@ void UiPainter::DrawTexture(const shared_ptr<Texture>& texture, float x, float y
 
 
 void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
-  float w = Tex->mTextSize.width();
-  float h = Tex->mTextSize.height();
-  shared_ptr<Texture> texture = Tex->GetTexture();
-  float u = w / float(texture->mWidth);
-  float v = h / float(texture->mHeight);
+  const float w = Tex->mTextSize.width();
+  const float h = Tex->mTextSize.height();
+  const shared_ptr<Texture> texture = Tex->GetTexture();
+  const float u = w / float(texture->mWidth);
+  const float v = h / float(texture->mHeight);
   VertexPosUV vertices[] = {
     {Vec3(Position.x, Position.y, 0), Vec2(0, 0)},
     {Vec3(Position.x + w, Position.y, 0), Vec2(u, 0)},
