@@ -19,7 +19,7 @@ private:
   void OnSlotConnectionChanged(Slot* slot) override;
   void OnSlotStructureChanged() override;
 
-  static void RemoveWatcherWidget(WatcherWidget* watcherWidget);
+  void RemoveWatcherWidget(WatcherWidget* watcherWidget);
 
   /// Adds a slot to the UI. Returns false on type mismatch
   template <ValueType T>
