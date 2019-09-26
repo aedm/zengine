@@ -12,7 +12,7 @@ public:
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   void OnRedraw() override;
-  virtual void OnChildNameChange();
+  void OnChildNameChange() override;
   void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const;
 
 private:

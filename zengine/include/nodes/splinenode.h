@@ -142,7 +142,7 @@ public:
   void SetLinear(SplineLayer layer, int index, bool linear);
 
   /// Sets whether tangents should be automatically calculated for a given point
-  void SetAutotangent(SplineLayer layer, int index, bool autotangent);
+  void SetAutoTangent(SplineLayer layer, int index, bool autoTangent);
 
   void SetBaseOffset(float baseOffset);
   void AddBasePointWithOffset();
@@ -181,7 +181,7 @@ protected:
   float mBaseOffset = 0.0f;
 
   void InvalidateCurrentValue();
-  virtual void Operate();
+  void Operate() override;
 };
 
 

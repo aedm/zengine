@@ -102,7 +102,7 @@ void MovieNode::SortClips() {
     auto& clipNode = PointerCast<ClipNode>(mClips.GetReferencedMultiNode(i));
     int trackNumber = int(clipNode->mTrackNumber.Get());
     if (trackNumber < 0) trackNumber = 0;
-    if (trackNumber >= mTracks.size()) trackNumber = int(mTracks.size() - 1);
+    if (trackNumber >= int(mTracks.size())) trackNumber = int(mTracks.size() - 1);
     mTracks[trackNumber].push_back(clipNode);
   }
 

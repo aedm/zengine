@@ -179,7 +179,7 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
       for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT);
            layer++) {
         auto& points = spline->GetComponent(SplineLayer(layer))->GetPoints();
-        for (int i = 0; i < points.size(); i++) {
+        for (UINT i = 0; i < points.size(); i++) {
           const SplinePoint& p = points[i];
           QPointF pt = ToScreenCoord(p.mTime, p.mValue);
           if (abs(pt.x() - mouse.x()) <= 4.0f && abs(pt.y() - mouse.y()) <= 4.0f) {
@@ -463,9 +463,9 @@ void FloatSplineWatcher::DrawSplineComponentControl(
   /// Draw control points
   painter.setPen(QColor(255, 255, 255));
   for (UINT i = 0; i < points.size(); i++) {
-    painter.setBrush((i == mSelectedPointIndex && layer == mSelectedLayer)
+    painter.setBrush((int(i) == mSelectedPointIndex && layer == mSelectedLayer)
                      ? QBrush(QColor(0, 255, 255))
-                     : (i == mHoveredPointIndex && layer == mHoveredLayer)
+                     : (int(i) == mHoveredPointIndex && layer == mHoveredLayer)
                      ? QBrush(QColor(255, 255, 0)) : Qt::NoBrush);
     const SplinePoint& point = points[i];
     QPointF p = ToScreenCoord(point.mTime, point.mValue);

@@ -2,7 +2,7 @@
 #include "nodewidget.h"
 #include "../util/uipainter.h"
 #include "../util/util.h"
-#include "../commands/graphcommands.h"
+#include "../commands/graphCommands.h"
 #include "prototypes.h"
 #include "../zengarden.h"
 #include <zengine.h>
@@ -49,12 +49,12 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
   for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     shared_ptr<NodeWidget> nodeWidget = mWidgetMap.at(node);
     auto& widgetSlots = nodeWidget->GetWidgetSlots();
-    for (int i = 0; i < widgetSlots.size(); i++) {
+    for (UINT i = 0; i < widgetSlots.size(); i++) {
       Slot* slot = widgetSlots[i]->mSlot;
       if (slot->mIsMultiSlot) {
         for (const auto& connectedNode : slot->GetDirectMultiNodes()) {
           shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
-          if (connectedNodeWidget != NULL) {
+          if (connectedNodeWidget != nullptr) {
             /// Draw connection
             const Vec2 p1 = connectedNodeWidget->GetOutputPosition();
             const Vec2 p2 = nodeWidget->GetInputPosition(i);
@@ -64,10 +64,10 @@ void GraphWatcher::Paint(EventForwarderGLWidget* glWidget) {
       }
       else {
         /// TODO: remove code duplication
-        auto& connectedNode = slot->GetDirectNode();
+        const auto& connectedNode = slot->GetDirectNode();
         if (connectedNode) {
           shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
-          if (connectedNodeWidget != NULL) {
+          if (connectedNodeWidget) {
             /// Draw connection
             const Vec2 p1 = connectedNodeWidget->GetOutputPosition();
             const Vec2 p2 = nodeWidget->GetInputPosition(i);
@@ -468,7 +468,7 @@ void GraphWatcher::FindHoveredWidget(Vec2 mousePos,
     if (IsInsideRect(mousePos, node->GetPosition(), node->GetSize())) {
       *oHoveredWidget = widget;
       auto& widgetSlots = widget->GetWidgetSlots();
-      for (int o = 0; o < widgetSlots.size(); o++) {
+      for (UINT o = 0; o < widgetSlots.size(); o++) {
         NodeWidget::WidgetSlot* sw = widgetSlots[o];
         if (IsInsideRect(mousePos, node->GetPosition() + sw->mPosition, sw->mSize)) {
           *oSlotIndex = o;

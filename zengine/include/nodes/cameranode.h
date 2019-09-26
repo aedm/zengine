@@ -11,12 +11,12 @@ public:
   void SetupGlobals(Globals* globals) const;
 
   /// Camera setup
-  FloatSlot mFovY;
-  FloatSlot mZFar;
-  FloatSlot mZNear;
-  FloatSlot mDistance;
   Vec3Slot mTarget;
+  FloatSlot mDistance;
   Vec3Slot mOrientation;
+  FloatSlot mFovY;
+  FloatSlot mZNear;
+  FloatSlot mZFar;
 
   FloatSlot mShake;
   FloatSlot mShakeTime;

@@ -75,7 +75,7 @@ public:
 
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
-  bool Connect(const shared_ptr<Node>& node) override;
+  bool Connect(const shared_ptr<Node>& target) override;
 
   /// Disconnects a node from this slot, and connects it
   /// to the built-in node.
@@ -108,7 +108,7 @@ ValueSlot<T>::ValueSlot(Node* owner, const string& name, bool isMultiSlot,
 
 template<typename T>
 const T& ValueSlot<T>::Get() const {
-  return PointerCast<ValueNode<T>>(GetReferencedNode())->Get();
+  return PointerCast<ValueNode<T>>(this->GetReferencedNode())->Get();
 }
 
 

@@ -141,7 +141,7 @@ public:
   /// Buffer functions
   void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
   void SetIndexBuffer(const shared_ptr<Buffer>& buffer);
-  void SetSSBO(UINT index, const shared_ptr<Buffer>& buffer);
+  void SetSsbo(UINT index, const shared_ptr<Buffer>& buffer);
 
   void Render(const shared_ptr<Buffer>& indexBuffer,
     UINT Count, PrimitiveTypeEnum primitiveType,
@@ -153,8 +153,8 @@ public:
   shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
     const void* texelData, bool gpuMemoryOnly,
     bool isMultisample, bool doesRepeat, bool generateMipmaps);
-  void DeleteTextureGPUData(Texture::Handle handle);
-  void UploadTextureGPUData(const shared_ptr<Texture>& texture, void* texelData);
+  void DeleteTextureGpuData(Texture::Handle handle);
+  void UploadTextureGpuData(const shared_ptr<Texture>& texture, void* texelData);
 
   void SetTexture(const ShaderProgram::Sampler& sampler, 
     const shared_ptr<Texture>& texture, UINT slotIndex);
@@ -164,54 +164,53 @@ public:
     const shared_ptr<Texture>& targetBufferA,
     const shared_ptr<Texture>& targetBufferB);
   void DeleteFrameBuffer(FrameBufferId frameBufferId);
-  void SetFrameBuffer(FrameBufferId frameBufferid);
+  void SetFrameBuffer(FrameBufferId frameBufferId);
   void BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
     int srcX0, int srcY0, int srcX1, int srcY1,
     int dstX0, int dstY0, int dstX1, int dstY1);
 
   /// Render parameters
-  void SetViewport(int X, int Y, int Width, int Height, float DepthMin = 0.0f,
-    float DepthMax = 1.0f);
+  void SetViewport(int x, int y, int width, int height, float depthMin = 0.0f,
+    float depthMax = 1.0f);
   void SetRenderState(const RenderState* State);
 
   /// Drawing
-  void Clear(bool ColorBuffer = true, bool DepthBuffer = true, UINT RGBColor = 0);
+  void Clear(bool colorBuffer = true, bool depthBuffer = true, UINT rgbColor = 0);
 
 private:
-  void SetTextureData(UINT Width, UINT Height, TexelType Type, const void* TexelData,
+  void SetTextureData(UINT width, UINT height, TexelType type, const void* texelData,
     bool generateMipmap);
-  void SetTextureSubData(UINT X, UINT Y, UINT Width, UINT Height, TexelType Type, void* TexelData);
+  void SetTextureSubData(UINT x, UINT y, UINT width, UINT height, TexelType type, 
+    void* texelData);
 
   /// Shadowed buffer binds
-  void BindVertexBuffer(VertexBufferHandle BufferID);
-  void BindIndexBuffer(IndexBufferHandle BufferID);
-  void BindTexture(Texture::Handle TextureID);
-  void BindMultisampleTexture(Texture::Handle TextureID);
-  void BindFrameBuffer(FrameBufferId frameBufferID);
+  void BindVertexBuffer(VertexBufferHandle bufferId);
+  void BindIndexBuffer(IndexBufferHandle bufferId);
+  void BindTexture(Texture::Handle textureId);
+  void BindMultisampleTexture(Texture::Handle textureId);
+  void BindFrameBuffer(FrameBufferId frameBufferId);
 
-  void SetActiveTexture(UINT ActiveTextureIndex); // silly OpenGL.
+  void SetActiveTexture(UINT activeTextureIndex); // silly OpenGL.
 
-  void SetDepthTest(bool Enable);
+  void SetDepthTest(bool enable);
   void SetFaceMode(RenderState::FaceMode faceMode);
-  void SetClearColor(UINT ClearColor);
+  void SetClearColor(UINT clearColor);
 
   void SetBlending(bool Enable);
   void SetBlendMode(RenderState::BlendMode blendMode);
 
   /// Shadow values
-  FrameBufferId BoundFrameBufferShadow;
-  VertexBufferHandle BoundVertexBufferShadow;
-  IndexBufferHandle BoundIndexBufferShadow;
+  FrameBufferId mBoundFrameBufferShadow;
+  VertexBufferHandle mBoundVertexBufferShadow;
+  IndexBufferHandle mBoundIndexBufferShadow;
 
-  Texture::Handle BoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
-  Texture::Handle BoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
-  Texture::Handle ActiveTextureShadow;
+  Texture::Handle mBoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
+  Texture::Handle mBoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
+  Texture::Handle mActiveTextureShadow;
 
-  bool DepthTestEnabledShadow;
+  bool mDepthTestEnabledShadow;
   RenderState::FaceMode mFaceMode;
   RenderState::BlendMode mBlendMode;
   bool mBlendEnabled;
-  UINT ClearColorShadow;
-
-  RenderState* DefaultRenderState;
+  UINT mClearColorShadow;
 };

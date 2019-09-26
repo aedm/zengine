@@ -61,7 +61,6 @@ public:
   /// Shader stages and sources
   StubSlot mVertexStub;
   StubSlot mFragmentStub;
-  StubSlot mUberShader;
 
   /// Pipeline state
   FloatSlot mFaceModeSlot;
@@ -70,7 +69,10 @@ public:
   FluidSlot mFluidColorTargetSlot;
   FluidSlot mFluidVelocityTargetSlot;
 
-  RenderState mRenderstate;
+  /// Uber shader
+  StubSlot mUberShader;
+  
+  RenderState mRenderstate{};
 
   void Set(Globals* globals);
 

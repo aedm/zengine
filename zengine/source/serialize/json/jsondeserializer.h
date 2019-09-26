@@ -48,7 +48,6 @@ private:
   Vec4 DeserializeVec4(const rapidjson::Value& value);
 
   unordered_map<int, shared_ptr<Node>> mNodes;
-  int mNodeCount = 0;
 
   shared_ptr<Document> mDocument;
 };

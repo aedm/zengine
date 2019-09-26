@@ -12,7 +12,6 @@ SceneNode::SceneNode()
   , mSkyLightSpread(this, "Shadow spread", false, true, true, 0.0f, 30.0f)
   , mSkyLightSampleSpread(this, "Sample spread", false, true, true, 0.0f, 20.0f)
   , mSkyLightBias(this, "Shadow bias")
-  , mSceneTimes(this, string(), true, false, false, false)
   , mDOFEnabled(this, "DOF enabled")
   , mDOFFocusDistance(this, "DOF focus distance", false, true, true, 0.0f, 20.0f)
   , mDOFBlur(this, "DOF blur", false, true, true, 0.0f, 30.0f)
@@ -20,6 +19,7 @@ SceneNode::SceneNode()
   , mDOFBleed(this, "DOF bleed", false, true, true, 0.0f, 0.1f)
   , mZPrepassDisabled(this, "Disable Z prepass")
   , mFluidsSlot(this, "Fluids", true)
+  , mSceneTimes(this, string(), true, false, false, false)
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);

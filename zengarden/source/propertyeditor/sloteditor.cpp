@@ -129,6 +129,7 @@ void SlotEditor::OnSlotStructureChanged() {
   RebuildSlots();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
   delete watcherWidget;
 }

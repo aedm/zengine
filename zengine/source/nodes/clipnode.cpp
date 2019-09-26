@@ -7,12 +7,12 @@ ClipNode::ClipNode()
   , mStartTime(this, "Start time")
   , mLength(this, "Clip Length")
   , mTrackNumber(this, "Track")
+  , mFakeStartTime(this, "Fake start time")
   , mClearColorBuffer(this, "Clear color buffer")
   , mClearDepthBuffer(this, "Clear depth buffer")
   , mCopyToSecondaryBuffer(this, "Copy to secondary buffer")
   , mTargetSquareBuffer(this, "Target square buffer")
   , mApplyPostprocessBefore(this, "After postprocess")
-  , mFakeStartTime(this, "Fake start time")
 {
   mFakeStartTime.SetDefaultValue(-1);
 }

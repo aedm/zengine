@@ -74,7 +74,7 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
 void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount) {
   this->mFormat = format;
   this->mVertexCount = vertexCount;
-  const UINT newBufferSize = format->mStride * vertexCount;
+  const int newBufferSize = format->mStride * vertexCount;
 
   if (mVertexBuffer->GetByteSize() != newBufferSize) {
     mVertexBuffer->Allocate(newBufferSize);

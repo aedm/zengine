@@ -4,7 +4,7 @@
 #include "../serialize/json/jsondeserializer.h"
 #include <include/base/helpers.h>
 #include <include/base/vectormath.h>
-#include <stdarg.h>
+#include <cstdarg>
 
 Logger* TheLogger = new Logger();
 

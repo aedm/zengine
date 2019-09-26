@@ -31,9 +31,8 @@ T SafeCast(K object) {
 }
 
 template<typename T, typename K>
-// ReSharper disable CppConstValueFunctionReturnType
+// ReSharper disable once CppConstValueFunctionReturnType
 const shared_ptr<T> PointerCast(const shared_ptr<K>& object) {
-  // ReSharper restore CppConstValueFunctionReturnType
 #ifdef _DEBUG
   const shared_ptr<T> cast = dynamic_pointer_cast<T>(object);
   ASSERT(object == nullptr || cast != nullptr);

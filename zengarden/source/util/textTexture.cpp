@@ -44,7 +44,7 @@ shared_ptr<Texture> TextTexture::GetTexture() {
       mTexture = OpenGL->MakeTexture(mWidth, mHeight, TexelType::ARGB8, nullptr, true,
         false, false, false);
     }
-    OpenGL->UploadTextureGPUData(mTexture, mImage.bits());
+    OpenGL->UploadTextureGpuData(mTexture, mImage.bits());
     mUptodate = true;
   }
 

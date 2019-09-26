@@ -20,6 +20,6 @@ NodeClass* NodeRegistry::GetNodeClass(const string& name) {
 NodeClass* NodeRegistry::GetNodeClass(const shared_ptr<Node>& node) {
   /// If this breaks, you forgot to REGISTER_NODECLASS.
   ASSERT(node.use_count() > 0);
-  return mNodeIndexMap.at(type_index(typeid(*node)));
+  return mNodeIndexMap.at(type_index(typeid(node.get())));
 }
 

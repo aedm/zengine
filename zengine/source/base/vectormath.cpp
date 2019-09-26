@@ -1,5 +1,5 @@
 #include <include/base/vectormath.h>
-#include <math.h>
+#include <cmath>
 
 Vec2::Vec2() = default;
 
@@ -9,23 +9,23 @@ Vec2::Vec2(float x, float y) {
 }
 
 Vec2 Vec2::operator- (const Vec2& op) const {
-  return Vec2(x - op.x, y - op.y);
+  return {x - op.x, y - op.y};
 }
 
 Vec2 Vec2::operator+ (const Vec2& op) const {
-  return Vec2(x + op.x, y + op.y);
+  return {x + op.x, y + op.y};
 }
 
 Vec2 Vec2::operator/ (const Vec2& op) const {
-  return Vec2(x / op.x, y / op.y);
+  return {x / op.x, y / op.y};
 }
 
 Vec2 Vec2::operator* (const Vec2& op) const {
-  return Vec2(x * op.x, y * op.y);
+  return {x * op.x, y * op.y};
 }
 
 Vec2 Vec2::operator* (float f) const {
-  return Vec2(x * f, y * f);
+  return {x * f, y * f};
 }
 
 Vec2 Vec2::operator/ (float f) const {
@@ -69,7 +69,7 @@ float Vec2::Length() const {
 }
 
 Vec2 Vec2::Dot(const Vec2& op) const {
-  return Vec2(x * op.x, y * op.y);
+  return {x * op.x, y * op.y};
 }
 
 Vec3::Vec3() = default;
@@ -85,23 +85,23 @@ float Vec3::Dot(const Vec3& op) const {
 }
 
 Vec3 Vec3::operator* (float f) const {
-  return Vec3(x * f, y * f, z * f);
+  return {x * f, y * f, z * f};
 }
 
 Vec3 Vec3::operator- (const Vec3& op) const {
-  return Vec3(x - op.x, y - op.y, z - op.z);
+  return {x - op.x, y - op.y, z - op.z};
 }
 
 Vec3 Vec3::operator+ (const Vec3& op) const {
-  return Vec3(x + op.x, y + op.y, z + op.z);
+  return {x + op.x, y + op.y, z + op.z};
 }
 
 Vec3 Vec3::operator- () const {
-  return Vec3(-x, -y, -z);
+  return {-x, -y, -z};
 }
 
 Vec3 Vec3::operator/(float f) const {
-  return Vec3(x / f, y / f, z / f);
+  return {x / f, y / f, z / f};
 }
 
 bool Vec3::operator==(const Vec3& op) const {
@@ -119,7 +119,7 @@ float Vec3::operator[](int n) const {
 }
 
 Vec3 Vec3::Cross(const Vec3& op) const {
-  return Vec3(y * op.z - z * op.y, z * op.x - x * op.z, x * op.y - y * op.x);
+  return {y * op.z - z * op.y, z * op.x - x * op.z, x * op.y - y * op.x};
 }
 
 float Vec3::LengthSquared() const {
@@ -181,7 +181,7 @@ float Vec4::Dot(const Vec4& v) const {
 }
 
 Vec4 Vec4::operator-(const Vec4& v) const {
-  return Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
+  return {x - v.x, y - v.y, z - v.z, w - v.w};
 }
 
 bool Vec4::operator == (const Vec4& v) const {
@@ -200,16 +200,16 @@ float Vec4::operator[](int n) const {
 
 Vec3 Vec4::XYZ() const
 {
-  return Vec3(x, y, z);
+  return {x, y, z};
 }
 
 Vec4 Vec4::operator*(const Matrix& m) const {
-  return Vec4(
+  return {
     x*m.m[0] + y*m.m[1] + z*m.m[2] + w*m.m[3],
     x*m.m[4] + y*m.m[5] + z*m.m[6] + w*m.m[7],
     x*m.m[8] + y*m.m[9] + z*m.m[10] + w*m.m[11],
     x*m.m[12] + y*m.m[13] + z*m.m[14] + w*m.m[15]
-  );
+  };
 }
 
 Matrix::Matrix() = default;

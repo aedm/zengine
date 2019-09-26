@@ -24,8 +24,8 @@ shared_ptr<ShaderSource> ShaderBuilder::FromStubs(const shared_ptr<StubNode>& ve
 
 ShaderBuilder::InterfaceVariable::InterfaceVariable(ValueType type, const string& name, 
   int layout)
-  : mName(name)
-  , mType(type)
+  : mType(type)
+  , mName(name)
   , mLayout(layout) {}
 
 

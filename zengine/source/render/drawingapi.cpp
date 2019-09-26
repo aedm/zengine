@@ -83,21 +83,21 @@ void OpenGLAPI::OnContextSwitch() {
   mBlendEnabled = true;
   SetBlendMode(RenderState::BlendMode::NORMAL);
 
-  DepthTestEnabledShadow = true;
+  mDepthTestEnabledShadow = true;
   SetDepthTest(false);
 
-  ClearColorShadow = 1;
+  mClearColorShadow = 1;
   SetClearColor(0);
 
   glDepthMask(true);
 
-  ActiveTextureShadow = -1;
-  BoundVertexBufferShadow = -1;
-  BoundIndexBufferShadow = -1;
-  BoundFrameBufferShadow = -1;
+  mActiveTextureShadow = -1;
+  mBoundVertexBufferShadow = -1;
+  mBoundIndexBufferShadow = -1;
+  mBoundFrameBufferShadow = -1;
   for (int i = 0; i < MAX_COMBINED_TEXTURE_SLOTS; i++) {
-    BoundTextureShadow[i] = (GLuint)-1;
-    BoundMultisampleTextureShadow[i] = (GLuint)-1;
+    mBoundTextureShadow[i] = (GLuint)-1;
+    mBoundMultisampleTextureShadow[i] = (GLuint)-1;
   }
   CheckGLError();
 }
@@ -275,7 +275,7 @@ bool LinkProgram(GLuint program) {
       WARN("Shader compiler: %s", log);
     }
     CheckGLError();
-    delete log;
+    delete[] log;
   }
 
   return result == GL_TRUE;
@@ -369,30 +369,30 @@ void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
 }
 
 
-void OpenGLAPI::BindVertexBuffer(VertexBufferHandle bufferID) {
-  if (bufferID != BoundVertexBufferShadow) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+void OpenGLAPI::BindVertexBuffer(VertexBufferHandle bufferId) {
+  if (bufferId != mBoundVertexBufferShadow) {
+    glBindBuffer(GL_ARRAY_BUFFER, bufferId);
     CheckGLError();
-    BoundVertexBufferShadow = bufferID;
+    mBoundVertexBufferShadow = bufferId;
   }
 }
 
 
-void OpenGLAPI::BindIndexBuffer(IndexBufferHandle bufferID) {
-  if (bufferID != BoundIndexBufferShadow) {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+void OpenGLAPI::BindIndexBuffer(IndexBufferHandle bufferId) {
+  if (bufferId != mBoundIndexBufferShadow) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId);
     CheckGLError();
-    BoundIndexBufferShadow = bufferID;
+    mBoundIndexBufferShadow = bufferId;
   }
 }
 
 
-void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
-  if (frameBufferID != BoundFrameBufferShadow) {
+void OpenGLAPI::BindFrameBuffer(FrameBufferId frameBufferId) {
+  if (frameBufferId != mBoundFrameBufferShadow) {
     CheckGLError();
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
     CheckGLError();
-    BoundFrameBufferShadow = frameBufferID;
+    mBoundFrameBufferShadow = frameBufferId;
   }
 }
 
@@ -451,13 +451,13 @@ void OpenGLAPI::SetRenderState(const RenderState* state) {
 
 
 void OpenGLAPI::SetDepthTest(bool enable) {
-  if (enable == DepthTestEnabledShadow) return;
+  if (enable == mDepthTestEnabledShadow) return;
   if (enable) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
   }
   else glDisable(GL_DEPTH_TEST);
-  DepthTestEnabledShadow = enable;
+  mDepthTestEnabledShadow = enable;
 }
 
 
@@ -516,13 +516,13 @@ inline float IntColorToFloat(UINT color) {
 
 
 void OpenGLAPI::SetClearColor(UINT clearColor) {
-  if (clearColor == ClearColorShadow) return;
+  if (clearColor == mClearColorShadow) return;
   glClearColor(
     IntColorToFloat((clearColor >> 16) & 0xff),
     IntColorToFloat((clearColor >> 8) & 0xff),
     IntColorToFloat((clearColor) & 0xff),
     1.0f);
-  ClearColorShadow = clearColor;
+  mClearColorShadow = clearColor;
   CheckGLError();
 }
 
@@ -666,13 +666,13 @@ void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
 }
 
 
-void OpenGLAPI::DeleteTextureGPUData(Texture::Handle handle) {
+void OpenGLAPI::DeleteTextureGpuData(Texture::Handle handle) {
   glDeleteTextures(1, &handle);
   CheckGLError();
 }
 
 
-void OpenGLAPI::UploadTextureGPUData(const shared_ptr<Texture>& texture,
+void OpenGLAPI::UploadTextureGpuData(const shared_ptr<Texture>& texture,
   void* texelData) {
   ASSERT(!PleaseNoNewResources);
   ASSERT(!texture->mTexelData);
@@ -763,8 +763,8 @@ void OpenGLAPI::DeleteFrameBuffer(FrameBufferId frameBufferId) {
 }
 
 
-void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
-  BindFrameBuffer(frameBufferid);
+void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferId) {
+  BindFrameBuffer(frameBufferId);
   CheckGLError();
 }
 
@@ -782,26 +782,26 @@ void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
 }
 
 
-void OpenGLAPI::SetActiveTexture(GLuint activeTextureIndex) {
-  if (ActiveTextureShadow == activeTextureIndex) return;
+void OpenGLAPI::SetActiveTexture(UINT activeTextureIndex) {
+  if (mActiveTextureShadow == activeTextureIndex) return;
   glActiveTexture(GL_TEXTURE0 + activeTextureIndex);
-  ActiveTextureShadow = activeTextureIndex;
+  mActiveTextureShadow = activeTextureIndex;
   CheckGLError();
 }
 
 
-void OpenGLAPI::BindTexture(GLuint textureID) {
-  if (BoundTextureShadow[ActiveTextureShadow] == textureID) return;
-  glBindTexture(GL_TEXTURE_2D, textureID);
-  BoundTextureShadow[ActiveTextureShadow] = textureID;
+void OpenGLAPI::BindTexture(Texture::Handle textureId) {
+  if (mBoundTextureShadow[mActiveTextureShadow] == textureId) return;
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  mBoundTextureShadow[mActiveTextureShadow] = textureId;
   CheckGLError();
 }
 
 
-void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
-  if (BoundMultisampleTextureShadow[ActiveTextureShadow] == textureID) return;
-  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
-  BoundMultisampleTextureShadow[ActiveTextureShadow] = textureID;
+void OpenGLAPI::BindMultisampleTexture(Texture::Handle textureId) {
+  if (mBoundMultisampleTextureShadow[mActiveTextureShadow] == textureId) return;
+  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+  mBoundMultisampleTextureShadow[mActiveTextureShadow] = textureId;
   CheckGLError();
 }
 
@@ -816,7 +816,7 @@ void OpenGLAPI::SetIndexBuffer(const shared_ptr<Buffer>& buffer) {
 }
 
 
-void OpenGLAPI::SetSSBO(UINT index, const shared_ptr<Buffer>& buffer) {
+void OpenGLAPI::SetSsbo(UINT index, const shared_ptr<Buffer>& buffer) {
   if (!buffer) return;
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, buffer->GetHandle());
 }

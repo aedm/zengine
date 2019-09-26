@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <gdiplus.h>
-#include <GdiPlusFlat.h>
+#include <gdiplusflat.h>
 #pragma comment (lib,"Gdiplus.lib")
 #include "imagerecorder.h"
 

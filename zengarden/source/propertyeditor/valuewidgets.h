@@ -30,7 +30,7 @@ public:
   float Get() const;
 
 private:
-  void paintEvent(QPaintEvent *e);
+  void paintEvent(QPaintEvent *e) override;
   void mousePressEvent(QMouseEvent * event) override;
   void mouseMoveEvent(QMouseEvent * event) override;
 
@@ -40,7 +40,7 @@ private:
   float mMinimum;
   float	mMaximum;
   float mValue;
-  bool mIsReadOnly;
+  bool mIsReadOnly = false;
 };
 
 
@@ -106,7 +106,7 @@ public:
   //typename ValueTypes<T>::Type;
   typedef typename ValueTypes<T>::Type VectorType;
 
-  ValueEditor(QWidget* parent, QString name, const VectorType& value);
+  ValueEditor(QWidget* parent, const QString& name, const VectorType& value);
 
   /// Set the value of the editor
   void Set(const VectorType& value);

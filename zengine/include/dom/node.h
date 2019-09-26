@@ -91,7 +91,7 @@ private:
 /// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
-  Slot(Node* owner, const string& name, bool isMultiSlot = false, bool isPublic = true,
+  Slot(Node* owner, string name, bool isMultiSlot = false, bool isPublic = true,
     bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 

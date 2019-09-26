@@ -13,8 +13,7 @@ REGISTER_NODECLASS(Pass, "Pass");
 const int MAX_UNIFORM_BUFFER_SIZE = 4096;
 
 Pass::Pass()
-  : Node()
-  , mVertexStub(this, "Vertex shader")
+  : mVertexStub(this, "Vertex shader")
   , mFragmentStub(this, "Fragment shader")
   , mFaceModeSlot(this, "Face mode")
   , mBlendModeSlot(this, "Blending")
@@ -195,7 +194,7 @@ void Pass::Set(Globals* globals) {
       PointerCast<BufferNode>(ssbo.mSource->mNode)->GetBuffer();
     
     if (!buffer) continue;
-    OpenGL->SetSSBO(target->mIndex, buffer);
+    OpenGL->SetSsbo(target->mIndex, buffer);
   }
 }
 

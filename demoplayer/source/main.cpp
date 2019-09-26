@@ -2,12 +2,12 @@
 //#define WIN32_EXTRA_LEAN
 #define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
-#include <Mmsystem.h>
-#include <time.h>
+#include <mmsystem.h>
+#include <ctime>
 
 #define GLEW_STATIC
 #include <glew/glew.h>
-#include <GL/gl.h>
+#include <gl/GL.h>
 
 #include <zengine.h>
 #include <bass/bass.h>
@@ -48,7 +48,7 @@ static PIXELFORMATDESCRIPTOR pfd = {
   sizeof(PIXELFORMATDESCRIPTOR),
   1, PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
   PFD_TYPE_RGBA, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  32, 0, 0, PFD_MAIN_PLANE, 0, 0, 0, 0
+  32, 0, 0, PFD_MAIN_PLANE, 0, 0, 0, 0, 0
 };
 
 bool running = true;
@@ -80,7 +80,7 @@ void LoadEngineShaderFolder(const wstring& folder) {
       TheEngineStubs->SetStubSource(stubName, source);;
     }
     else {
-      LoadEngineShaderFolder((fileName + L"/").c_str());
+      LoadEngineShaderFolder(fileName + L"/");
     }
   }
 }
@@ -102,16 +102,14 @@ int CALLBACK WinMain(
 ) {
   TheLogger->onLog += Log;
 
-  /// Check the command line
-  LPWSTR *args;
   int argsCount;
-  args = CommandLineToArgvW(GetCommandLineW(), &argsCount);
+  LPWSTR* args = CommandLineToArgvW(GetCommandLineW(), &argsCount);
   const bool recordVideo = argsCount == 2 && wcscmp(args[1], L"--video") == 0;
   const bool windowed = argsCount == 2 && wcscmp(args[1], L"--window") == 0;
   LocalFree(args);
 
   WNDCLASS wc = { 0, gdi01_WindowProc, 0, 0, hInstance, LoadIcon(nullptr, IDI_APPLICATION),
-    LoadCursor(nullptr, IDC_ARROW), (HBRUSH)(COLOR_WINDOW + 1), nullptr, L"GDI01" };
+    LoadCursor(nullptr, IDC_ARROW), HBRUSH(COLOR_WINDOW + 1), nullptr, L"GDI01" };
   RegisterClass(&wc);
 
   int windowWidth = 1280, windowHeight = 720;
@@ -146,7 +144,6 @@ int CALLBACK WinMain(
   /// Initialize BASS
   DWORD bassChannel = 0;
   if (!recordVideo) {
-    QWORD pos;
     BASS_DEVICEINFO di;
     for (int a = 1; BASS_GetDeviceInfo(a, &di); a++) {
       if (di.flags & BASS_DEVICE_ENABLED) // enabled output device
@@ -154,7 +151,7 @@ int CALLBACK WinMain(
     }
     if (!BASS_Init(1, 44100, 0, nullptr, nullptr)) ERR("Can't initialize BASS");
     bassChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_AUTOFREE);
-    pos = BASS_ChannelGetLength(bassChannel, BASS_POS_BYTE);
+    QWORD pos = BASS_ChannelGetLength(bassChannel, BASS_POS_BYTE);
   }
 
   /// Initialize Zengine

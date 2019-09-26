@@ -35,7 +35,7 @@ private:
   void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event);
 
   /// Watcher callbacks
-  virtual void OnSlotConnectionChanged(Slot* slot);
+  void OnSlotConnectionChanged(Slot* slot) override;
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.
   void Update() const;

@@ -2,7 +2,7 @@
 
 #include <include/nodes/splinenode.h>
 #include <include/nodes/scenenode.h>
-#include <math.h>
+#include <cmath>
 
 REGISTER_NODECLASS(FloatSplineNode, "Float Spline");
 
@@ -23,15 +23,14 @@ void SplinePoint::SetValue(float time, float value) {
 
 
 FloatSplineNode::FloatSplineNode()
-  : ValueNode<float>()
-  , mTimeSlot(this, "Time", false, false, false)
-  , mNoiseEnabled(this, "Noise enabled")
+  : mNoiseEnabled(this, "Noise enabled")
   , mNoiseVelocity(this, "Noise velocity", false, true, true, 0.0f, 30.0f)
   , mBeatSpikeEnabled(this, "Beat spike enabled")
   , mBeatSpikeLength(this, "Beat spike length")
   , mBeatSpikeEasing(this, "Beat spike easing")
   , mBeatQuantizerFrequency(this, "Quantizer freq")
   , mSceneTimeNode(make_shared<SceneTimeNode>())
+  , mTimeSlot(this, "Time", false, false, false)
 {
   mTimeSlot.Connect(mSceneTimeNode);
   mNoiseVelocity.SetDefaultValue(20.0f);
@@ -99,7 +98,7 @@ float FloatSplineNode::GetBeatQuantizerValue(float time) {
 
 int SplineFloatComponent::AddPoint(float time, float value) {
   int i = 0;
-  while (i < mPoints.size() && mPoints[i].mTime <= time) i++;
+  while (i < int(mPoints.size()) && mPoints[i].mTime <= time) i++;
 
   SplinePoint tmp;
   tmp.mTime = time;
@@ -122,7 +121,7 @@ void SplineFloatComponent::SetPointValue(int index, float time, float value) {
   SplinePoint& point = mPoints[index];
 
   if (index > 0 && mPoints[index - 1].mTime > time) time = mPoints[index - 1].mTime;
-  if (index < mPoints.size() - 1 && mPoints[index + 1].mTime < time) {
+  if (index < int(mPoints.size()) - 1 && mPoints[index + 1].mTime < time) {
     time = mPoints[index + 1].mTime;
   }
 
@@ -133,12 +132,12 @@ void SplineFloatComponent::SetPointValue(int index, float time, float value) {
   CalculateTangent(index + 1);
 }
 
-void FloatSplineNode::SetAutotangent(SplineLayer layer, int index, bool autotangent) {
+void FloatSplineNode::SetAutoTangent(SplineLayer layer, int index, bool autoTangent) {
   SplineFloatComponent* component = GetComponent(layer);
   auto& points = component->mPoints;
   if (index >= 0 && index < int(points.size())) {
     SplinePoint& point = points[index];
-    point.mIsAutoangent = autotangent;
+    point.mIsAutoangent = autoTangent;
     component->CalculateTangent(index);
     InvalidateCurrentValue();
   }
@@ -158,7 +157,7 @@ void SplineFloatComponent::CalculateTangent(int index) {
   SplinePoint& point = mPoints[index];
   if (point.mIsAutoangent) {
     float ym = 0.0f;
-    if (index > 0 && index < mPoints.size() - 1) {
+    if (index > 0 && index < int(mPoints.size()) - 1) {
       SplinePoint& prev = mPoints[index - 1];
       SplinePoint& next = mPoints[index + 1];
       const float xm = next.mTime - prev.mTime;
@@ -231,24 +230,25 @@ float SplineFloatComponent::Get(float time) {
   SplinePoint* after = index < int(mPoints.size()) - 1 ? &mPoints[index + 1] : nullptr;
 
   if (before && after)
+  {
     if (before->mIsLinear) {
       const float dt = after->mTime - before->mTime;
       if (dt <= Epsilon) return before->mValue;
       return (after->mValue * (time - before->mTime) + 
-              before->mValue * (after->mTime - time)) / dt;
-    } else {
-      const float dt = after->mTime - before->mTime;
-      const float ft = (time - before->mTime) / dt;
-
-      const float ea = before->mValue;
-      const float eb = dt * before->mTangentAfter;
-      const float ec = 3.0f * (after->mValue - before->mValue) - 
-        dt * (2.0f * before->mTangentAfter + after->mTangentBefore);
-      const float ed = -2.0f * (after->mValue - before->mValue) + 
-        dt * (before->mTangentAfter + after->mTangentBefore);
-
-      return ea + ft*eb + ft*ft*ec + ft*ft*ft*ed;
+        before->mValue * (after->mTime - time)) / dt;
     }
+    const float dt = after->mTime - before->mTime;
+    const float ft = (time - before->mTime) / dt;
+
+    const float ea = before->mValue;
+    const float eb = dt * before->mTangentAfter;
+    const float ec = 3.0f * (after->mValue - before->mValue) - 
+      dt * (2.0f * before->mTangentAfter + after->mTangentBefore);
+    const float ed = -2.0f * (after->mValue - before->mValue) + 
+      dt * (before->mTangentAfter + after->mTangentBefore);
+
+    return ea + ft*eb + ft*ft*ec + ft*ft*ft*ed;
+  }
   return before ? before->mValue : after ? after->mValue : 0.0f;
 }
 

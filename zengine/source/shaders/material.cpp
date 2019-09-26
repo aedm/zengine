@@ -34,11 +34,11 @@ const shared_ptr<Pass> Material::GetPass(PassType passType) {
 REGISTER_NODECLASS(SolidMaterial, "Solid Material");
 
 SolidMaterial::SolidMaterial()
-  : mGhostSlot(this, "", false, false, false, true)
-  , mMaterial(make_shared<Material>())
+  : mMaterial(make_shared<Material>())
   , mSolidPass(make_shared<Pass>())
   , mSolidVertexStub(make_shared<StubNode>())
   , mSolidFragmentStub(make_shared<StubNode>())
+  , mGhostSlot(this, "", false, false, false, true)
 {
   mMaterial->mShadowPass.Connect(TheEngineShaders->mSolidShadowPass);
 

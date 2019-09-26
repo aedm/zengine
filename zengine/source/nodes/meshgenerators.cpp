@@ -21,35 +21,35 @@ void CubeMeshNode::Operate() {
   const float z = mSizeZ.Get();
 
   VertexPosUVNormTangent vertices[] = {
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0)},
-    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0)},
-    {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
 
-    {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0)},
-    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0)},
+    {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
 
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0)},
-    {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0), Vec3(0, 0, 0)},
 
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0)},
-    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0)},
+    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0), Vec3(0, 0, 0)},
 
-    {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1)},
-    {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1)},
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1)},
+    {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1), Vec3(0, 0, 0)},
 
-    {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1)},
-    {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1)},
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, 0, -1)},
+    {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, 0, -1), Vec3(0, 0, 0)},
   };
 
   Vec3 tangents[] = {

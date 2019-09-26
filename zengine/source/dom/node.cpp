@@ -3,6 +3,7 @@
 #include <include/dom/watcher.h>
 #include <include/base/helpers.h>
 #include <algorithm>
+#include <utility>
 
 MessageQueue TheMessageQueue;
 
@@ -54,11 +55,12 @@ bool Message::operator<(const Message& other) const {
   return false;
 }
 
-Slot::Slot(Node* owner, const string& name, bool isMultiSlot, bool isPublic, 
+Slot::Slot(Node* owner, string name, bool isMultiSlot, bool isPublic, 
   bool isSerializable, bool isTraversable)
-  : mOwner(owner)
-  , mName(name)
-  , mIsMultiSlot(isMultiSlot) {
+  : mName(std::move(name))
+  , mIsMultiSlot(isMultiSlot) 
+  , mOwner(owner)
+{
   ASSERT(owner != nullptr);
   owner->AddSlot(this, isPublic, isSerializable, isTraversable);
 }

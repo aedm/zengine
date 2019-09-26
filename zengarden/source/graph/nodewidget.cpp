@@ -149,7 +149,7 @@ void NodeWidget::UpdateTexture() {
 
     if (mTexture && mTexture->mWidth == mImage.width() &&
       mTexture->mHeight == mImage.height()) {
-      OpenGL->UploadTextureGPUData(mTexture, &texels[0]);
+      OpenGL->UploadTextureGpuData(mTexture, &texels[0]);
     }
     else {
       DiscardTexture();
@@ -290,7 +290,7 @@ void NodeWidget::PaintToImage()
     Qt::AlignVCenter | Qt::AlignCenter, mNodeTitle);
 
   /// Paint slots
-  for (int i = 0; i < mWidgetSlots.size(); i++) {
+  for (UINT i = 0; i < mWidgetSlots.size(); i++) {
     WidgetSlot* sw = mWidgetSlots[i];
 
     QColor slotColor = Colors.mSlotDefault;

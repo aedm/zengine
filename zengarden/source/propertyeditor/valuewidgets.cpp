@@ -11,15 +11,16 @@
 #include <QtCore/QEvent>
 #include <QtGui/QMouseEvent>
 #include <QtCore/QTime>
+#include <utility>
 
 
-Slider::Slider(QWidget* Parent, QString text, float value, float minimum, float maximum)
-  : QWidget(Parent)
-  , mValue(value)
+Slider::Slider(QWidget* parent, QString text, float value, float minimum, float maximum)
+  : QWidget(parent)
+  , mText(std::move(text))
   , mMinimum(minimum)
   , mMaximum(maximum)
-  , mText(text)
-  , mIsReadOnly(false) {}
+  , mValue(value)
+{}
 
 void Slider::paintEvent(QPaintEvent *e) {
   QPainter painter(this);
@@ -111,7 +112,7 @@ ValueEditor<ValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float 
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mSlider = new Slider(this, name, mValue, 0, 1);
+  mSlider = new Slider(this, std::move(name), mValue, 0, 1);
   mSlider->setMinimumHeight(20);
   mSlider->setMinimumWidth(70);
   mSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -180,7 +181,7 @@ void ValueEditor<ValueType::FLOAT>::SetReadOnly(bool readOnly) {
 
 
 template <ValueType T>
-ValueEditor<T>::ValueEditor(QWidget* parent, QString name, const VectorType& value) {
+ValueEditor<T>::ValueEditor(QWidget* parent, const QString& name, const VectorType& value) {
   static const char* suffixes[] = { ".x", ".y", ".z", ".w" };
   mValue = value;
   QVBoxLayout* layout = new QVBoxLayout(this);
