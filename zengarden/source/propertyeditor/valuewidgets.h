@@ -2,7 +2,6 @@
 
 #include <zengine.h>
 #include "../watchers/watcherui.h"
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/qlineedit.h>
 
@@ -125,7 +124,7 @@ protected:
   VectorType mValue;
 
   /// Float editors for each dimension
-  FloatEditor* mFloatEditors[VectorType::Dimensions];
+  FloatEditor* mFloatEditors[VectorType::Dimensions]{};
 
   /// Handles value change from float editors
   void HandleFloatValueChange(QWidget* floatEditor, const float& value);

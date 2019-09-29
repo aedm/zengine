@@ -1,5 +1,4 @@
 #include <include/render/rendertarget.h>
-#include <include/base/helpers.h>
 #include <include/render/drawingapi.h>
 
 static const int ShadowMapSize = 2048;
@@ -13,7 +12,7 @@ RenderTarget::RenderTarget(Vec2 size, bool forFrameGrabbing)
 
 RenderTarget::~RenderTarget() {
   DropResources();
-  if (mColorBufferId) OpenGL->DeleteFrameBuffer(mColorBufferId);
+  if (mColorBufferId) OpenGLAPI::DeleteFrameBuffer(mColorBufferId);
 }
 
 void RenderTarget::SetGBufferAsTarget(Globals* globals) const
@@ -28,7 +27,7 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) const
   globals->SecondaryTexture = mSecondaryTexture;
   globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
   OpenGL->SetFrameBuffer(mGBufferId);
-  OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
+  OpenGLAPI::SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
 void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) const
@@ -43,7 +42,7 @@ void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) const
   globals->SecondaryTexture = mSecondaryTexture;
   globals->SkylightTextureSizeRecip = 1.0f / float(ShadowMapSize);
   OpenGL->SetFrameBuffer(mGBufferForZPostPassId);
-  OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
+  OpenGLAPI::SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
 void RenderTarget::SetColorBufferAsTarget(Globals* globals) const
@@ -55,7 +54,7 @@ void RenderTarget::SetColorBufferAsTarget(Globals* globals) const
   globals->GBufferSourceA = mGBufferA;
   globals->SquareTexture1 = mSquareTexture1;
   globals->SquareTexture2 = mSquareTexture2;
-  OpenGL->SetViewport(0, 0, int(mSize.x), int(mSize.y));
+  OpenGLAPI::SetViewport(0, 0, int(mSize.x), int(mSize.y));
 }
 
 void RenderTarget::SetShadowBufferAsTarget(Globals* globals) const
@@ -71,7 +70,7 @@ void RenderTarget::SetShadowBufferAsTarget(Globals* globals) const
   globals->SquareTexture1 = mSquareTexture1;
   globals->SquareTexture2 = mSquareTexture2;
   OpenGL->SetFrameBuffer(mShadowBufferId);
-  OpenGL->SetViewport(0, 0, ShadowMapSize, ShadowMapSize);
+  OpenGLAPI::SetViewport(0, 0, ShadowMapSize, ShadowMapSize);
 }
 
 void RenderTarget::SetSquareBufferAsTarget(Globals* globals) const
@@ -82,7 +81,7 @@ void RenderTarget::SetSquareBufferAsTarget(Globals* globals) const
   globals->DepthBufferSource = nullptr;
   globals->GBufferSourceA = nullptr;
   OpenGL->SetFrameBuffer(mSquareFramebuffer);
-  OpenGL->SetViewport(0, 0, SquareBufferSize, SquareBufferSize);
+  OpenGLAPI::SetViewport(0, 0, SquareBufferSize, SquareBufferSize);
 }
 
 void RenderTarget::Resize(Vec2 size) {
@@ -103,18 +102,18 @@ void RenderTarget::Resize(Vec2 size) {
     true, false, false);
   mGBufferA = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
     true, false, false);
-  mGBufferId = OpenGL->CreateFrameBuffer(mDepthBuffer, mGBufferA, nullptr);
-  mGBufferForZPostPassId = OpenGL->CreateFrameBuffer(nullptr, mGBufferA, nullptr);
+  mGBufferId = OpenGLAPI::CreateFrameBuffer(mDepthBuffer, mGBufferA, nullptr);
+  mGBufferForZPostPassId = OpenGLAPI::CreateFrameBuffer(nullptr, mGBufferA, nullptr);
 
   /// Create framebuffer for DOF result
   mDOFColorTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
     true, false, false);
-  mDOFBufferId = OpenGL->CreateFrameBuffer(nullptr, mDOFColorTexture, nullptr);
+  mDOFBufferId = OpenGLAPI::CreateFrameBuffer(nullptr, mDOFColorTexture, nullptr);
 
   /// Create secondary framebuffer, no MSAA
   mSecondaryTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB16F, nullptr, true,
     false, false, false);
-  mSecondaryFramebuffer = OpenGL->CreateFrameBuffer(nullptr, mSecondaryTexture, nullptr);
+  mSecondaryFramebuffer = OpenGLAPI::CreateFrameBuffer(nullptr, mSecondaryTexture, nullptr);
 
   /// Create square framebuffer, no MSAA
   mSquareDepthTexture = OpenGL->MakeTexture(SquareBufferSize, SquareBufferSize, 
@@ -123,21 +122,21 @@ void RenderTarget::Resize(Vec2 size) {
     TexelType::ARGB16F, nullptr, true, false, false, false);
   mSquareTexture2 = OpenGL->MakeTexture(SquareBufferSize, SquareBufferSize,
     TexelType::ARGB16F, nullptr, true, false, false, false);
-  mSquareFramebuffer = OpenGL->CreateFrameBuffer(mSquareDepthTexture,
+  mSquareFramebuffer = OpenGLAPI::CreateFrameBuffer(mSquareDepthTexture,
     mSquareTexture1, mSquareTexture2);
 
   /// Create shadow map
   if (mShadowBufferId == 0) {
     mShadowTexture = OpenGL->MakeTexture(ShadowMapSize, ShadowMapSize, 
       TexelType::DEPTH32F, nullptr, true, false, false, false);
-    mShadowBufferId = OpenGL->CreateFrameBuffer(mShadowTexture, nullptr, nullptr);
+    mShadowBufferId = OpenGLAPI::CreateFrameBuffer(mShadowTexture, nullptr, nullptr);
   }
 
   /// Video output framebuffer
   if (mForFrameGrabbing && mColorBufferId == 0) {
     mShadowTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8,
       nullptr, true, false, false, false);
-    mColorBufferId = OpenGL->CreateFrameBuffer(nullptr, mColorTexture, nullptr);
+    mColorBufferId = OpenGLAPI::CreateFrameBuffer(nullptr, mColorTexture, nullptr);
   }
 
   /// Create gaussian ping-pong textures
@@ -145,8 +144,8 @@ void RenderTarget::Resize(Vec2 size) {
     // Don't multisample these
     mPostprocessTextures[i] = OpenGL->MakeTexture(width, height, TexelType::ARGB16F,
       nullptr, true, false, false, false);
-    mPostprocessFramebuffers[i] = 
-      OpenGL->CreateFrameBuffer(nullptr, mPostprocessTextures[i], nullptr);
+    mPostprocessFramebuffers[i] =
+      OpenGLAPI::CreateFrameBuffer(nullptr, mPostprocessTextures[i], nullptr);
   }
 }
 
@@ -174,15 +173,15 @@ void RenderTarget::SwapPostprocessBuffers() {
 void RenderTarget::FinishFrame() const
 {
   if (mForFrameGrabbing) {
-    OpenGL->BlitFrameBuffer(mColorBufferId, 0,
+    OpenGLAPI::BlitFrameBuffer(mColorBufferId, 0,
       0, 0, int(mFrameGrabberSize.x), int(mFrameGrabberSize.y),
       0, 0, int(mScreenSize.x), int(mScreenSize.y));
   }
 }
 
 void RenderTarget::DropResources() {
-  OpenGL->DeleteFrameBuffer(mGBufferId);
+  OpenGLAPI::DeleteFrameBuffer(mGBufferId);
   for (UINT i = 0; i < ElementCount(mPostprocessTextures); i++) {
-    OpenGL->DeleteFrameBuffer(mPostprocessFramebuffers[i]);
+    OpenGLAPI::DeleteFrameBuffer(mPostprocessFramebuffers[i]);
   }
 }

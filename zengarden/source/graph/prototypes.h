@@ -3,7 +3,6 @@
 #include <zengine.h>
 #include <QDialog>
 #include <QTreeWidgetItem>
-#include <unordered_map>
 #include <typeindex>
 #include <QtCore/QString>
 
@@ -33,7 +32,7 @@ public:
 private:
   /// A single prototype node
   struct Prototype {
-    NodeClass* mNodeClass;
+    NodeClass* mNodeClass = nullptr;
     shared_ptr<Node> mNode;
     QString mName;
   };
@@ -51,18 +50,18 @@ private:
   /// An item in the tree view
   class SelectorItem: public QTreeWidgetItem {
   public:
-    SelectorItem(SelectorItem* Parent, QString Label, int prototypeIndex);
+    SelectorItem(SelectorItem* parent, const QString& label, int prototypeIndex);
     int mPrototypeIndex;
   };
   
   /// Dialog window displaying the prototype selector
-  QDialog* mDialog;
+  QDialog* mDialog = nullptr;
 
   /// Loads a stub folder
-  void LoadStubFolder(QString folder, Category* category);
+  static void LoadStubFolder(const QString& folder, Category* category);
 
   /// Adds a category to the Qt tree widget
-  void AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget,
+  static void AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget,
                                QTreeWidgetItem* parentItem, 
                                vector<const Prototype*>& allPrototypes);
 

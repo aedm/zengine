@@ -52,15 +52,6 @@ namespace Util {
     return pass;
   }
 
-  static Vec3 ObjLineToVec3(const QString& line) {
-    QStringList v = line.split(' ', QString::SkipEmptyParts);
-    if (v.size() != 4) {
-      ERR("Syntax error in .obj line: %s", line.toLatin1());
-      return Vec3(0, 0, 0);
-    }
-    return Vec3(v[1].toFloat(), v[2].toFloat(), v[3].toFloat());
-  }
-
   static Vec3 ToVec3(const aiVector3D& v) {
     return Vec3(v.x, v.y, v.z);
   }
@@ -118,17 +109,17 @@ namespace Util {
       }
     }
 
-    vector<VertexPosUVNormTangent> vertices(mesh->mNumVertices);
+    vector<VertexPosUvNormTangent> vertices(mesh->mNumVertices);
     for (UINT i = 0; i < mesh->mNumVertices; i++) {
-      vertices[i].position = ToVec3(mesh->mVertices[i]);
+      vertices[i].mPosition = ToVec3(mesh->mVertices[i]);
       const Vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
-      vertices[i].uv = Vec2(uv.x, uv.y);
-      vertices[i].normal = ToVec3(mesh->mNormals[i]);
-      vertices[i].tangent = ToVec3(mesh->mTangents[i]);
+      vertices[i].mUv = Vec2(uv.x, uv.y);
+      vertices[i].mNormal = ToVec3(mesh->mNormals[i]);
+      vertices[i].mTangent = ToVec3(mesh->mTangents[i]);
     }
 
     shared_ptr<Mesh> zenmesh = make_shared<Mesh>();
-    zenmesh->AllocateVertices(VertexPosUVNormTangent::format, vertices.size());
+    zenmesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertices.size());
     zenmesh->UploadVertices(&vertices[0]);
     zenmesh->AllocateIndices(indices.size());
     zenmesh->UploadIndices(&indices[0]);

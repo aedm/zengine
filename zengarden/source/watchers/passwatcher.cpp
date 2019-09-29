@@ -9,7 +9,7 @@ PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
   const Vec2 position(3.5f, 3.5f);
   const float w = 512, h = 512, u = 1, v = 1;
   IndexEntry boxIndices[] = {0, 1, 2, 2, 1, 3};
-  VertexPosUV vertices[] = {
+  VertexPosUv vertices[] = {
     {Vec3(position.x, position.y, 0), Vec2(0, 0)},
     {Vec3(position.x + w, position.y, 0), Vec2(u, 0)},
     {Vec3(position.x, position.y + h, 0), Vec2(0, v)},

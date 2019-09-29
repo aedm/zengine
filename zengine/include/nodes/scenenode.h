@@ -33,9 +33,9 @@ public:
   void Draw(RenderTarget* renderTarget, Globals* globals);
 
   /// Sets the clip-relative time to all SceneTimeNode dependencies
-  void SetSceneTime(float seconds);
+  void SetSceneTime(float beats);
 
-  /// Gets the currect time cursor
+  /// Gets the current time cursor
   float GetSceneTime() const;
 
   /// hack
@@ -53,7 +53,7 @@ private:
   vector<shared_ptr<Node>> mTransitiveClosure;
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
-  float mLastRenderTime;
+  float mLastRenderTime{};
 
   shared_ptr<GlobalTimeNode> mGlobalTimeNode = make_shared<GlobalTimeNode>();
 

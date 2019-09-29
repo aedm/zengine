@@ -11,7 +11,7 @@ public:
   PassSlot mZPostPass;
   PassSlot mFluidPaintPass;
 
-  const shared_ptr<Pass> GetPass(PassType passType);
+  shared_ptr<Pass> GetPass(PassType passType);
 
 protected:
   void HandleMessage(Message* message) override;

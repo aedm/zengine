@@ -134,7 +134,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
 
       /// Find slot
       string slotName(itr->name.GetString());
-      auto& it = std::find_if(slots.begin(), slots.end(),
+      const auto& it = std::find_if(slots.begin(), slots.end(),
         [&](const auto& m) -> bool { return slotName == m.first; });
       if (it == slots.end()) {
         ERR("No such slot: %s", slotName.c_str());
@@ -202,15 +202,8 @@ void JSONDeserializer::DeserializeStaticTextureNode(const rapidjson::Value& valu
   if (texelTypeInt < 0) {
     ERR("Unknown texture type: %s", typeString);
   }
-  const TexelType texelType = (TexelType)texelTypeInt;
-  UINT byteSize = width * height * OpenGLAPI::GetTexelByteCount(texelType);
-  //shared_ptr<vector<char>> texels = make_shared<vector<char>>(byteSize);
-
+  const TexelType texelType = TexelType(texelTypeInt);
   const string texelContent = base64_decode(texelString);
-  //ASSERT(byteSize == texelContent.length());
-  //memcpy(&(*texels)[0], texelContent.c_str(), byteSize);
-
-  //Texture* texture = TheResourceManager->CreateTexture(width, height, texelType, texels);
   const shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, 
     texelContent.c_str(), false, false, true, true);
   node->Set(texture);
@@ -260,8 +253,8 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
     for (UINT i = 0; i < jsonPoints.Size(); i++) {
       auto& jsonPoint = jsonPoints[i];
       const float time(jsonPoint["time"].GetDouble());
-      const float value(jsonPoint["value"].GetDouble());
-      const int pIndex = node->AddPoint(layer, time, value);
+      const float floatValue(jsonPoint["value"].GetDouble());
+      const int pIndex = node->AddPoint(layer, time, floatValue);
       node->SetAutoTangent(layer, pIndex, jsonPoint["autotangent"].GetBool());
       node->SetBreakpoint(layer, pIndex, jsonPoint["breakpoint"].GetBool());
       node->SetLinear(layer, pIndex, jsonPoint["linear"].GetBool());

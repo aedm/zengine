@@ -17,13 +17,13 @@ struct SplinePoint
 	float	mTangentBefore, mTangentAfter;
 
   // Is next section is linear or curved
-  bool mIsLinear;
+  bool mIsLinear{};
 
   // If true, tangents are automatically calculated
-	bool mIsAutoangent;					
+	bool mIsAutoangent{};					
 
   // Indicates breakpoint (tangents are not continuous)
-	bool mIsBreakpoint;						
+	bool mIsBreakpoint{};						
 
 	void SetValue(float time, float value);
 };
@@ -164,7 +164,7 @@ protected:
   float GetBeatSpikeValue(float time);
   float GetBeatQuantizerValue(float time);
 
-  float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
+  static float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
 
   /// Control points of spline
   SplineFloatComponent mBaseLayer;

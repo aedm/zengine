@@ -1,7 +1,6 @@
 #include "shaderTokenizer.h"
 #include <include/base/system.h>
 #include <include/base/helpers.h>
-#include <string.h>
 
 namespace Shaders
 {
@@ -30,7 +29,8 @@ static const char* SkipWhiteSpace(const char* Position)
 static const char* SkipUntil(const char* Position, const char* SkipCharacters)
 {
 	const char* pos = Position;
-	for (char c=*pos; c!=0 && !strchr(SkipCharacters, c); c=*++pos);
+  // ReSharper disable once CppPossiblyErroneousEmptyStatements
+  for (char c=*pos; c!=0 && !strchr(SkipCharacters, c); c=*++pos);
 	return pos;
 }
 
@@ -39,7 +39,8 @@ static const char* SkipUntil(const char* Position, const char* SkipCharacters)
 static const char* SkipAll(const char* Position, const char* SkipCharacters)
 {
 	const char* pos = Position;
-	for (char c=*pos; c!=0 && strchr(SkipCharacters, c); c=*++pos);
+  // ReSharper disable once CppPossiblyErroneousEmptyStatements
+  for (char c=*pos; c!=0 && strchr(SkipCharacters, c); c=*++pos);
 	return pos;
 }
 
@@ -54,7 +55,7 @@ SubString GetNextQuote(const char* Position, int LineNumber)
 		pos = SkipUntil(pos, "\"\\\n\r");
 		if (pos[0] == '\\' && pos[1] != 0 && !strchr("\r\n", pos[1]))
 		{
-			/// Skip escapings
+			/// Skip escaping
 			pos += 2;
 		} else break;
 	}
@@ -90,7 +91,8 @@ SubString GetNextWord(const char* Position, int LineNumber)
 		{
 			/// Comment here, return rest of the line
 			pos += 2;
-			for (char c=*pos; c!=0 && !strchr("\n\r", c); c=*++pos);
+      // ReSharper disable once CppPossiblyErroneousEmptyStatements
+      for (char c=*pos; c!=0 && !strchr("\n\r", c); c=*++pos);
 			return SubString(begin, UINT(pos - begin), TOKEN_COMMENT_LINE);
 		}
 
@@ -103,10 +105,10 @@ SubString GetNextWord(const char* Position, int LineNumber)
 
 
 /// Splits the while source code into words
-vector<SourceLine*>* Shaders::SplitToWords( const char* Source )
+vector<SourceLine*>* Shaders::SplitToWords( const char* source )
 {
 	int lineNumber = 1;
-	const char* pos = Source;
+	const char* pos = source;
 	vector<SourceLine*>* lines = new vector<SourceLine*>();
 	SourceLine* line = nullptr;
 	while (*pos != 0)
@@ -149,13 +151,13 @@ SubString::SubString( const char* _Begin, UINT _Length )
 	, Length(_Length)
 {
 	int token = EnumMapperA::GetEnumFromString(ShaderTokenMapper, Begin, Length);
-	Token = (token == -1) ? TOKEN_UNKNOWN : (ShaderTokenEnum)token;
+	Token = (token == -1) ? TOKEN_UNKNOWN : ShaderTokenEnum(token);
 }
 
 SubString::SubString( const char* _Begin, UINT _Length, ShaderTokenEnum _Token )
-	: Begin(_Begin)
-	, Length(_Length)
-	, Token(_Token)
+  : Token(_Token)
+  , Begin(_Begin)
+  , Length(_Length)
 {}
 
 string SubString::ToString() const

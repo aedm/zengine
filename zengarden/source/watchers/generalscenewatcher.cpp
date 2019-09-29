@@ -5,7 +5,7 @@
 shared_ptr<Material> GeneralSceneWatcher::mDefaultMaterial;
 
 GeneralSceneWatcher::GeneralSceneWatcher(const shared_ptr<Node>& node)
-  : WatcherUI(node) {
+  : WatcherUi(node) {
   if (IsPointerOf<SceneNode>(node)) {
     mTheScene = PointerCast<SceneNode>(node);
     return;
@@ -24,7 +24,7 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
   if (mRenderForwarder) mRenderForwarder->mOnRedraw.clear();
 }
 
-void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
+void GeneralSceneWatcher::Paint(EventForwarderGlWidget* widget) {
   if (!mWatcherWidget) return;
   //shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(mScene->GetReferencedNode());
   mTheScene->Update();
@@ -56,20 +56,20 @@ void GeneralSceneWatcher::Paint(EventForwarderGLWidget* widget) {
 }
 
 void GeneralSceneWatcher::OnRedraw() {
-  if (mWatcherWidget) GetGLWidget()->update();
+  if (mWatcherWidget) GetGlWidget()->update();
 }
 
 void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
   watcherWidget->GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
 
-  GetGLWidget()->OnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
-  GetGLWidget()->OnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
-  GetGLWidget()->OnMouseRelease += 
+  GetGlWidget()->mOnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
+  GetGlWidget()->mOnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);
+  GetGlWidget()->mOnMouseRelease += 
     Delegate(this, &GeneralSceneWatcher::HandleMouseRelease);
-  GetGLWidget()->OnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
-  GetGLWidget()->OnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
-  GetGLWidget()->OnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
+  GetGlWidget()->mOnMouseMove += Delegate(this, &GeneralSceneWatcher::HandleMouseMove);
+  GetGlWidget()->mOnKeyPress += Delegate(this, &GeneralSceneWatcher::HandleKeyPress);
+  GetGlWidget()->mOnMouseWheel += Delegate(this, &GeneralSceneWatcher::HandleMouseWheel);
 }
 
 void GeneralSceneWatcher::Init() {
@@ -89,7 +89,7 @@ void GeneralSceneWatcher::Init() {
   mDefaultMaterial->mSolidPass.Connect(defaultPass);
 }
 
-void GeneralSceneWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event) {
+void GeneralSceneWatcher::HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event) {
   const shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
   if (!camera) return;
 
@@ -103,7 +103,7 @@ void GeneralSceneWatcher::HandleMousePress(EventForwarderGLWidget*, QMouseEvent*
   }
 }
 
-void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event) {
+void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGlWidget*, QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftUp(event);
   } else if (event->button() == Qt::RightButton) {
@@ -111,7 +111,7 @@ void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGLWidget*, QMouseEven
   }
 }
 
-void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) const
+void GeneralSceneWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) const
 {
   shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
   if (!camera) return;
@@ -144,33 +144,37 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* 
     }
   } else if (event->buttons() & Qt::RightButton) {
     const auto diff = event->pos() - mOriginalPosition;
-    float distance = camera->mDistance.Get();
-    distance = mOriginalDistance - float(diff.y()) / 2.0f;
+    const float distance = mOriginalDistance - float(diff.y()) / 2.0f;
     camera->mDistance.SetDefaultValue(distance);
   }
 }
 
-void GeneralSceneWatcher::HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event) {
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void GeneralSceneWatcher::HandleMouseWheel(EventForwarderGlWidget*, QWheelEvent* event) {
 
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GeneralSceneWatcher::HandleMouseLeftDown(QMouseEvent* event) {
 
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GeneralSceneWatcher::HandleMouseLeftUp(QMouseEvent* event) {
 
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GeneralSceneWatcher::HandleMouseRightDown(QMouseEvent* event) {
 
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void GeneralSceneWatcher::HandleMouseRightUp(QMouseEvent* event) {
 
 }
 
-void GeneralSceneWatcher::HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) const
+void GeneralSceneWatcher::HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* event) const
 {
   if (event->key() == Qt::Key_S) {
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(mTheScene);

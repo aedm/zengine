@@ -1,34 +1,33 @@
 #include "watcherui.h"
 #include "watcherwidget.h"
 #include "../graph/prototypes.h"
-#include "../zengarden.h"
 
-WatcherUI::WatcherUI(const shared_ptr<Node>& node)
+WatcherUi::WatcherUi(const shared_ptr<Node>& node)
     : Watcher(node)
 {
   mDisplayedName = CreateDisplayedName(GetDirectNode());
 }
 
 
-void WatcherUI::OnNameChange() {
+void WatcherUi::OnNameChange() {
   mDisplayedName = CreateDisplayedName(GetDirectNode());
   if (mWatcherWidget) mWatcherWidget->SetTabLabel(mDisplayedName);
 }
 
 
-WatcherUI::~WatcherUI() {
+WatcherUi::~WatcherUi() {
   ASSERT(mWatcherWidget == nullptr);
   ASSERT(GetDirectNode() == nullptr);
 }
 
 
-EventForwarderGLWidget* WatcherUI::GetGLWidget() const
+EventForwarderGlWidget* WatcherUi::GetGlWidget() const
 {
   return mWatcherWidget->GetGLWidget();
 }
 
 
-QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
+QString WatcherUi::CreateDisplayedName(const shared_ptr<Node>& node) {
   ASSERT(node != nullptr);
 
   if (!node->GetName().empty()) {
@@ -42,9 +41,9 @@ QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
   if (IsPointerOf<StubNode>(referencedNode)) {
     const shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);
     StubMetadata* metaData = stub->GetStubMetadata();
-    if (metaData != nullptr && !metaData->name.empty()) {
+    if (metaData != nullptr && !metaData->mName.empty()) {
       /// For shader stubs, use the stub name by default
-      return QString::fromStdString(metaData->name);
+      return QString::fromStdString(metaData->mName);
     }
   }
 
@@ -54,18 +53,18 @@ QString WatcherUI::CreateDisplayedName(const shared_ptr<Node>& node) {
 }
 
 
-const QString& WatcherUI::GetDisplayedName() const
+const QString& WatcherUi::GetDisplayedName() const
 {
   return mDisplayedName;
 }
 
-void WatcherUI::SetWatcherWidget(WatcherWidget* watcherWidget) {
+void WatcherUi::SetWatcherWidget(WatcherWidget* watcherWidget) {
   /// This can only be set once
   ASSERT(!mWatcherWidget);
   mWatcherWidget = watcherWidget;
 }
 
-void WatcherUI::OnRemovedFromNode() {
+void WatcherUi::OnRemovedFromNode() {
   Watcher::OnRemovedFromNode();
 
   if (mWatcherWidget == nullptr) return;
@@ -74,7 +73,7 @@ void WatcherUI::OnRemovedFromNode() {
   /// Qt handles tab widgets differently.
   WatcherWidget* tmp = mWatcherWidget;
   mWatcherWidget = nullptr;
-  if (!deleteWatcherWidgetCallback.empty()) deleteWatcherWidgetCallback(tmp);
+  if (!mDeleteWatcherWidgetCallback.empty()) mDeleteWatcherWidgetCallback(tmp);
 
   /// point-of-no-return: the watcher widget destorys the last reference to this watcher
 }

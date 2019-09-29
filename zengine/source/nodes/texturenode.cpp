@@ -17,8 +17,7 @@ void StaticValueNode<shared_ptr<Texture>>::Set(const shared_ptr<Texture>& newVal
 template class StaticValueNode<shared_ptr<Texture>>;
 
 TextureFileNode::TextureFileNode()
-  : TextureNode()
-  , mFileName(this, "FileName", false, false, true)
+  : mFileName(this, "FileName", false, false, true)
 {}
 
 const std::shared_ptr<Texture>& TextureFileNode::Get() {

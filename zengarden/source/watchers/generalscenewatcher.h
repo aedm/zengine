@@ -10,11 +10,11 @@ class RenderForwarder: public Watcher {
 public:
   RenderForwarder(const shared_ptr<SceneNode>& node);
   virtual ~RenderForwarder() = default;
-  virtual void OnRedraw();
+  void OnRedraw() override;
   FastDelegate<void()> mOnRedraw;
 };
 
-class GeneralSceneWatcher: public WatcherUI {
+class GeneralSceneWatcher: public WatcherUi {
 public:
   GeneralSceneWatcher(const shared_ptr<Node>& node);
   virtual ~GeneralSceneWatcher();
@@ -28,7 +28,7 @@ public:
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void Paint(EventForwarderGLWidget* widget);
+  void Paint(EventForwarderGlWidget* widget);
 
   RenderTarget* mRenderTarget = nullptr;
 
@@ -42,20 +42,20 @@ protected:
   shared_ptr<RenderForwarder> mRenderForwarder;
 
   /// Qt widget event handlers
-  void HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event);
-  void HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event);
-  void HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event) const;
-  void HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event);
+  void HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event);
+  void HandleMouseRelease(EventForwarderGlWidget*, QMouseEvent* event);
+  void HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) const;
+  void HandleMouseWheel(EventForwarderGlWidget*, QWheelEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
   void HandleMouseLeftUp(QMouseEvent* event);
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseRightUp(QMouseEvent* event);
-  void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event) const;
+  void HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* event) const;
 
   /// Mouse position at pressing
   QPoint mOriginalPosition;
   Vec3 mOriginalOrientation;
-  float mOriginalDistance;
+  float mOriginalDistance = 0.0f;
 
   /// Static resources initializes by Init()
   static shared_ptr<Material> mDefaultMaterial;

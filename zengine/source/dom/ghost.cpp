@@ -27,8 +27,8 @@ private:
       }
 
       if (slot->mIsMultiSlot) {
-        for (const shared_ptr<Node>& node : slot->GetDirectMultiNodes()) {
-          foundGhostSlot |= Traverse(node);
+        for (const shared_ptr<Node>& refNodes : slot->GetDirectMultiNodes()) {
+          foundGhostSlot |= Traverse(refNodes);
         }
       }
       else if (!slot->IsDefaulted()) {
@@ -52,8 +52,7 @@ private:
 };
 
 Ghost::Ghost()
-  : Node()
-  , mOriginalNode(this, "Original", false, false, true, true)
+  : mOriginalNode(this, "Original", false, false, true, true)
   , mMainInternalNode(this, string(), false, false, false, false)
 {
   Regenerate();
@@ -100,7 +99,7 @@ void Ghost::Regenerate() {
   ClearSlots();
   AddSlot(&mOriginalNode, false, true, true);
 
-  if (topologicalOrder.size() == 0) {
+  if (topologicalOrder.empty()) {
     /// No ghost slots, just reference the original node
     mMainInternalNode.Connect(mOriginalNode.GetReferencedNode());
   }
@@ -139,17 +138,17 @@ void Ghost::Regenerate() {
         else {
           if (originalSlot->mIsMultiSlot) {
             for (const auto& connectedNode : originalSlot->GetDirectMultiNodes()) {
-              auto it = newNodeMapping.find(connectedNode);
-              shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
-                ? connectedNode : it->second;
+              auto it2 = newNodeMapping.find(connectedNode);
+              shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
+                ? connectedNode : it2->second;
               internalSlot->Connect(nodeToConnect);
             }
           }
           else {
             shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
-            auto it = newNodeMapping.find(connectedNode);
-            shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
-              ? connectedNode : it->second;
+            auto it2 = newNodeMapping.find(connectedNode);
+            shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
+              ? connectedNode : it2->second;
             internalSlot->Connect(nodeToConnect);
           }
         }

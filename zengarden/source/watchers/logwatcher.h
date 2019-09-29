@@ -1,6 +1,5 @@
 #pragma once
 
-#include "watcherwidget.h"
 #include <zengine.h>
 #include <QtWidgets/QTextEdit>
 

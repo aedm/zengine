@@ -7,18 +7,16 @@
 using namespace Gdiplus;
 using namespace Gdiplus::DllExports;
 
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+int GetEncoderClsId(const WCHAR* format, CLSID* pClsId)
 {
   UINT num = 0;          // number of image encoders
   UINT size = 0;         // size of the image encoder array in bytes
-
-  ImageCodecInfo* pImageCodecInfo = nullptr;
 
   GetImageEncodersSize(&num, &size);
   if (size == 0)
     return -1;  // Failure
 
-  pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
+  ImageCodecInfo* pImageCodecInfo = static_cast<ImageCodecInfo*>(malloc(size));
   if (pImageCodecInfo == nullptr)
     return -1;  // Failure
 
@@ -26,7 +24,7 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
   for (UINT j = 0; j < num; ++j) {
     if (wcscmp(pImageCodecInfo[j].MimeType, format) == 0) {
-      *pClsid = pImageCodecInfo[j].Clsid;
+      *pClsId = pImageCodecInfo[j].Clsid;
       free(pImageCodecInfo);
       return j;  // Success
     }
@@ -38,11 +36,11 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 
 ImageRecorder::ImageRecorder()
 {
-  GdiplusStartupInput gdiplusStartupInput;
-  ULONG_PTR gdiplusToken;
-  GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
+  GdiplusStartupInput gdiPlusStartupInput;
+  ULONG_PTR gdiPlusToken;
+  GdiplusStartup(&gdiPlusToken, &gdiPlusStartupInput, nullptr);
 
-  GetEncoderClsid(L"image/jpeg", &mImageCLSID);
+  GetEncoderClsId(L"image/jpeg", &mImageClsId);
 }
 
 ImageRecorder::~ImageRecorder()
@@ -56,7 +54,7 @@ void ImageRecorder::RecordImage(unsigned char* pixels, int width, int height,
     pixels, &pBitmap);
 
   ULONG uQuality = 99;
-  EncoderParameters encoderParams;
+  EncoderParameters encoderParams{};
   encoderParams.Count = 1;
   encoderParams.Parameter[0].NumberOfValues = 1;
   encoderParams.Parameter[0].Guid = EncoderQuality;
@@ -66,6 +64,6 @@ void ImageRecorder::RecordImage(unsigned char* pixels, int width, int height,
   wchar_t filename[100];
   wsprintf(filename, L"videodump-%08d.jpeg", frameNumber);
 
-  GdipSaveImageToFile(pBitmap, filename, &mImageCLSID, &encoderParams);
+  GdipSaveImageToFile(pBitmap, filename, &mImageClsId, &encoderParams);
   GdipDisposeImage(pBitmap);
 }

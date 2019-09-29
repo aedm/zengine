@@ -5,10 +5,9 @@
 #include "valuewidgets.h"
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QBoxLayout>
-#include <map>
 
 /// General node editor, displays name and type of the Node
-class PropertyEditor: public WatcherUI {
+class PropertyEditor: public WatcherUi {
 public:
   PropertyEditor(const shared_ptr<Node>& node);
   virtual ~PropertyEditor() = default;

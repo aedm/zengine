@@ -2,7 +2,6 @@
 
 #include "../dom/node.h"
 #include "../resources/mesh.h"
-#include "../nodes/valuenodes.h"
 
 /// Abstract Mesh node.
 class MeshNode: public Node {

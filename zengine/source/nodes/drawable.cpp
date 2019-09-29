@@ -18,8 +18,8 @@ Drawable::Drawable()
 Drawable::~Drawable() = default;
 
 void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Primitive) {
-  auto& material = mMaterial.GetNode();
-  auto& meshNode = mMesh.GetNode();
+  const auto& material = mMaterial.GetNode();
+  const auto& meshNode = mMesh.GetNode();
 
   if (mChildren.GetMultiNodeCount() == 0 && !(material && meshNode)) return;
   Globals globals = *oldGlobals;
@@ -30,7 +30,7 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
     const shared_ptr<Mesh>& mesh = meshNode->GetMesh();
 
     /// Set pass (pipeline state)
-    auto& pass = material->GetPass(passType);
+    const auto& pass = material->GetPass(passType);
     if (!pass) return;
     pass->Update();
 

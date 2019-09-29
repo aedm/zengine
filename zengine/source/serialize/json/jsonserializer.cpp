@@ -2,7 +2,6 @@
 #include <include/dom/graph.h>
 #include <include/base/helpers.h>
 #include <include/nodes/valuenodes.h>
-#include <include/shaders/valuestubslot.h>
 #include "base64/base64.h"
 #include <rapidjson/include/rapidjson/writer.h>
 #include <rapidjson/include/rapidjson/prettywriter.h>
@@ -50,7 +49,7 @@ void JSONSerializer::Traverse(const shared_ptr<Node>& root) {
   mNodes[root] = ++mNodeCount;
 
   /// Traverse slots
-  for (const auto slotPair : root->GetSerializableSlots()) {
+  for (const auto& slotPair : root->GetSerializableSlots()) {
     Slot* slot = slotPair.second;
     if (slot->mIsMultiSlot) {
       for (auto& node : slot->GetDirectMultiNodes()) {
@@ -170,7 +169,7 @@ void JSONSerializer::SerializeGeneralNode(
   rapidjson::Value& nodeValue, const shared_ptr<Node>& node)
 {
   /// Save slots
-  if (node->GetSerializableSlots().size() > 0) {
+  if (!node->GetSerializableSlots().empty()) {
     rapidjson::Value slotsObject(rapidjson::kObjectType);
     for (const auto& slotPair : node->GetSerializableSlots()) {
       Slot* slot = slotPair.second;
@@ -264,8 +263,8 @@ void JSONSerializer::SerializeFloatSplineNode(
     SplineFloatComponent* component = node->GetComponent(SplineLayer(layer));
     auto& points = component->GetPoints();
     rapidjson::Value pointArray(rapidjson::kArrayType);
-    for (UINT i = 0; i < points.size(); i++) {
-      const SplinePoint& point = points[i];
+    for (const auto& point : points)
+    {
       rapidjson::Value p(rapidjson::kObjectType);
       p.AddMember("time", point.mTime, *mAllocator);
       p.AddMember("value", point.mValue, *mAllocator);
@@ -285,7 +284,7 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
 {
   shared_ptr<Texture> texture = node->Get();
   ASSERT(texture->mTexelData);
-  const string b64 = base64_encode((UCHAR*)&(*texture->mTexelData)[0], 
+  const string b64 = base64_encode(reinterpret_cast<UCHAR*>(&(*texture->mTexelData)[0]), 
       UINT((*texture->mTexelData).size()));
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
@@ -305,12 +304,12 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
   nodeValue.AddMember("indexcount", mesh->mIndexCount, *mAllocator);
 
   const UINT floatCount = mesh->mVertexCount * mesh->mFormat->mStride / sizeof(float);
-  float* attribs = reinterpret_cast<float*>(mesh->mRawVertexData);
-  rapidjson::Value attribArray(rapidjson::kArrayType);
+  float* attributes = reinterpret_cast<float*>(mesh->mRawVertexData);
+  rapidjson::Value attributeArray(rapidjson::kArrayType);
   for (UINT i = 0; i < floatCount; i++) {
-    attribArray.PushBack(double(attribs[i]), *mAllocator);
+    attributeArray.PushBack(double(attributes[i]), *mAllocator);
   }
-  nodeValue.AddMember("vertices", attribArray, *mAllocator);
+  nodeValue.AddMember("vertices", attributeArray, *mAllocator);
 
   if (mesh->mIndexCount > 0) {
     rapidjson::Value indexArray(rapidjson::kArrayType);

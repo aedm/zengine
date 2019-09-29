@@ -7,8 +7,7 @@ REGISTER_NODECLASS(PlaneMeshNode, "Plane");
 REGISTER_NODECLASS(PolarSphereMeshNode, "PolarSphere");
 
 CubeMeshNode::CubeMeshNode()
-  : MeshNode()
-  , mSizeX(this, "SizeX")
+  : mSizeX(this, "SizeX")
   , mSizeY(this, "SizeY")
   , mSizeZ(this, "SizeZ")
 {}
@@ -20,7 +19,7 @@ void CubeMeshNode::Operate() {
   const float y = mSizeY.Get();
   const float z = mSizeZ.Get();
 
-  VertexPosUVNormTangent vertices[] = {
+  VertexPosUvNormTangent vertices[] = {
     {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
     {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
     {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
@@ -63,7 +62,7 @@ void CubeMeshNode::Operate() {
 
   for (int i = 0; i < 6; i++) {
     for (int o = 0; o < 4; o++) {
-      vertices[i * 4 + o].tangent = tangents[i];
+      vertices[i * 4 + o].mTangent = tangents[i];
     }
   }
 
@@ -95,10 +94,6 @@ void CubeMeshNode::HandleMessage(Message* message) {
   default: break;
   }
 }
-
-HalfCubeMeshNode::HalfCubeMeshNode()
-  : MeshNode()
-{}
 
 void HalfCubeMeshNode::Operate() {
   if (!mMesh) mMesh = make_shared<Mesh>();
@@ -153,8 +148,7 @@ void HalfCubeMeshNode::HandleMessage(Message* message) {
 }
 
 GeosphereMeshNode::GeosphereMeshNode()
-  : MeshNode()
-  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  : mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
   , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
   , mFlatten(this, "Flatten", false, true, true, 0.0f, 1.0f)
 {
@@ -165,7 +159,7 @@ GeosphereMeshNode::GeosphereMeshNode()
 
 
 void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float flatten,
-  float size, int resolution, VertexPosUVNormTangent** oVertexTarget,
+  float size, int resolution, VertexPosUvNormTangent** oVertexTarget,
   IndexEntry** oIndexTarget, int* oBaseIndex)
 {
   /// Generate vertices
@@ -174,7 +168,7 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
   const Vec3 flatNormal = d2.Cross(d1).Normal();
   const Vec3 upVector(0, 1, 0);
 
-  VertexPosUVNormTangent* vertexTarget = *oVertexTarget;
+  VertexPosUvNormTangent* vertexTarget = *oVertexTarget;
   const int maxCoord = 1 << resolution;
   const float vRecip = 1.0f / float(maxCoord);
   for (int y = 0; y <= maxCoord; y++) {
@@ -190,10 +184,10 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
       const float xz = sqrtf(spherical.x * spherical.x + spherical.z * spherical.z);
       const float vrad = atan2f(xz, spherical.y);
       const Vec2 uv((urad / Pi) * 0.5f + 0.5f, vrad / Pi + 0.5f);
-      vertexTarget->position = pos;
-      vertexTarget->uv = uv;
-      vertexTarget->normal = normal;
-      vertexTarget->tangent = tangent;
+      vertexTarget->mPosition = pos;
+      vertexTarget->mUv = uv;
+      vertexTarget->mNormal = normal;
+      vertexTarget->mTangent = tangent;
       vertexTarget++;
     }
   }
@@ -252,10 +246,10 @@ void GeosphereMeshNode::Operate() {
   const int trianglesPerSide = 1 << (resolution * 2);
   const int indexCount = trianglesPerSide * 3 * 4;
 
-  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<VertexPosUvNormTangent> vertices(vertexCount);
   vector<IndexEntry> indices(indexCount);
 
-  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
 
   const float p = 1.0f / sqrtf(3.0f);
@@ -277,7 +271,7 @@ void GeosphereMeshNode::Operate() {
   MakeGeosphereTriangle(tv[1], tv[2], tv[3], flatten, size, resolution,
     &vertexTarget, &indexTarget, &baseIndex);
 
-  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertexCount);
   mMesh->AllocateIndices(indexCount);
 
   mMesh->UploadVertices(&vertices[0]);
@@ -298,8 +292,7 @@ void GeosphereMeshNode::HandleMessage(Message* message) {
 }
 
 PlaneMeshNode::PlaneMeshNode()
-  : MeshNode()
-  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  : mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
   , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
 {
   mResolution.SetDefaultValue(1);
@@ -318,10 +311,10 @@ void PlaneMeshNode::Operate() {
   const int vertexCount = verticesPerEdge * verticesPerEdge;
   const int indexCount = quadCount * 6;
 
-  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<VertexPosUvNormTangent> vertices(vertexCount);
   vector<IndexEntry> indices(indexCount);
 
-  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
 
   /// Generate vertices
@@ -333,10 +326,10 @@ void PlaneMeshNode::Operate() {
     float xCoord = -1.0f;
     float u = 0.0f;
     for (int x = 0; x <= segmentsPerEdge; x++) {
-      vertexTarget->position = Vec3(xCoord, 0.0, yCoord) * size;
-      vertexTarget->uv = Vec2(u, v);
-      vertexTarget->normal = Vec3(0, 1, 0);
-      vertexTarget->tangent = Vec3(1, 0, 0);
+      vertexTarget->mPosition = Vec3(xCoord, 0.0, yCoord) * size;
+      vertexTarget->mUv = Vec2(u, v);
+      vertexTarget->mNormal = Vec3(0, 1, 0);
+      vertexTarget->mTangent = Vec3(1, 0, 0);
       vertexTarget++;
       xCoord += coordStep;
       u += uvStep;
@@ -363,7 +356,7 @@ void PlaneMeshNode::Operate() {
     indexTarget += 6;
   }
 
-  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertexCount);
   mMesh->AllocateIndices(indexCount);
 
   mMesh->UploadVertices(&vertices[0]);
@@ -385,8 +378,7 @@ void PlaneMeshNode::HandleMessage(Message* message) {
 
 
 PolarSphereMeshNode::PolarSphereMeshNode()
-  : MeshNode()
-  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  : mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
   , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
 {
   mResolution.SetDefaultValue(5);
@@ -406,10 +398,10 @@ void PolarSphereMeshNode::Operate() {
   const int quadCount = (longAxisVertices - 1)* (shortAxisVertices - 1);
   const int indexCount = quadCount * 6;
 
-  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<VertexPosUvNormTangent> vertices(vertexCount);
   vector<IndexEntry> indices(indexCount);
 
-  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
 
   /// Generate vertices
@@ -428,10 +420,10 @@ void PolarSphereMeshNode::Operate() {
       const float xc = sinf(xCoord) * radius;
       const float zc = cosf(xCoord) * radius;
       Vec3 spherical(xc, yc, zc);
-      vertexTarget->position = spherical * size;
-      vertexTarget->uv = Vec2(u, v);
-      vertexTarget->normal = spherical;
-      vertexTarget->tangent = Vec3(0, 1, 0).Cross(spherical).Normal();
+      vertexTarget->mPosition = spherical * size;
+      vertexTarget->mUv = Vec2(u, v);
+      vertexTarget->mNormal = spherical;
+      vertexTarget->mTangent = Vec3(0, 1, 0).Cross(spherical).Normal();
       vertexTarget++;
       xCoord += xStep;
       u += uStep;
@@ -454,7 +446,7 @@ void PolarSphereMeshNode::Operate() {
     }
   }
 
-  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertexCount);
   mMesh->AllocateIndices(indexCount);
 
   mMesh->UploadVertices(&vertices[0]);

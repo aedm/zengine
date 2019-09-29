@@ -3,7 +3,7 @@
 #include "watcherui.h"
 #include <zengine.h>
 
-class StubWatcher : public WatcherUI
+class StubWatcher : public WatcherUi
 {
 public:
 	StubWatcher(const shared_ptr<StubNode>&);

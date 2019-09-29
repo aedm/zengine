@@ -5,7 +5,7 @@
 
 class CreateNodeCommand: public Command {
 public:
-  CreateNodeCommand(const shared_ptr<Node>& node, const shared_ptr<Graph>& graph);
+  CreateNodeCommand(shared_ptr<Node> node, shared_ptr<Graph> graph);
   ~CreateNodeCommand();
 
   bool Do() override;
@@ -19,8 +19,8 @@ private:
 
 class MoveNodeCommand: public Command {
 public:
-  MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position);
-  MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position, 
+  MoveNodeCommand(shared_ptr<Node> node, const Vec2& position);
+  MoveNodeCommand(shared_ptr<Node> node, const Vec2& position, 
     const Vec2& oldPosition);
 
   bool Do() override;
@@ -35,7 +35,7 @@ private:
 
 class ConnectNodeToSlotCommand: public Command {
 public:
-  ConnectNodeToSlotCommand(const shared_ptr<Node>& fromNode, Slot* toSlot);
+  ConnectNodeToSlotCommand(shared_ptr<Node> fromNode, Slot* toSlot);
 
   bool Do() override;
   bool Undo() override;

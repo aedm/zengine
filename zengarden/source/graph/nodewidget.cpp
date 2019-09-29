@@ -8,6 +8,7 @@
 #include <QPixmap>
 #include <QGuiApplication>
 #include <QScreen>
+#include <utility>
 
 /// Layout of the widget
 
@@ -49,11 +50,11 @@ struct {
 } Colors;
 
 NodeWidget::NodeWidget(const shared_ptr<Node>& node,
-  const std::function<void()>& onNeedsRedraw)
-  : WatcherUI(node)
-  , mOnNeedsRedraw(onNeedsRedraw)
+                       std::function<void()> onNeedsRedraw)
+  : WatcherUi(node)
+  , mOnNeedsRedraw(std::move(onNeedsRedraw))
 {
-  OnNameChange();
+  HandleNameChange();
   CreateWidgetSlots();
 }
 
@@ -95,7 +96,7 @@ void NodeWidget::CreateWidgetSlots() {
   mWidgetSlots.clear();
 
   for (Slot* slot : GetDirectNode()->GetPublicSlots()) {
-    if (IsInsanceOf<StringSlot*>(slot)) continue;
+    if (IsInstanceOf<StringSlot*>(slot)) continue;
     WidgetSlot* sw = new WidgetSlot();
     sw->mSlot = slot;
     mWidgetSlots.push_back(sw);
@@ -110,7 +111,7 @@ void NodeWidget::CalculateLayout() {
   const double fontHeightPoints = font.pointSizeF();
   const int fontHeight = int(fontHeightPoints / 72.0 * dpi);
 
-  mTitleHeight = fontHeight + TitlePadding * 2.0f + 1.0f;
+  mTitleHeight = float(fontHeight) + TitlePadding * 2.0f + 1.0f;
   float slotY = mTitleHeight + SlotSpacing;
   for (WidgetSlot* sw : mWidgetSlots) {
     sw->mPosition = Vec2(SlotLeftMargin, slotY);
@@ -200,6 +201,20 @@ void NodeWidget::OnSlotStructureChanged() {
 
 
 void NodeWidget::OnNameChange() {
+  HandleNameChange();
+}
+
+
+void NodeWidget::OnGraphPositionChanged() {
+  mOnNeedsRedraw();
+}
+
+
+void NodeWidget::OnSlotConnectionChanged(Slot* slot) {
+  mOnNeedsRedraw();
+}
+
+void NodeWidget::HandleNameChange() {
   static const QString stubLabel(" [stub]");
   const shared_ptr<Node> directNode = GetDirectNode();
 
@@ -221,25 +236,15 @@ void NodeWidget::OnNameChange() {
       if (IsPointerOf<StubNode>(node)) {
         const shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
         StubMetadata* metaData = stub->GetStubMetadata();
-        if (metaData != nullptr && !metaData->name.empty()) {
+        if (metaData != nullptr && !metaData->mName.empty()) {
           /// For shader stubs, use the stub name by default
-          text = QString::fromStdString(metaData->name);
+          text = QString::fromStdString(metaData->mName);
         }
       }
     }
   }
   mNodeTitle = text;
   mForceUpdate = true;
-  mOnNeedsRedraw();
-}
-
-
-void NodeWidget::OnGraphPositionChanged() {
-  mOnNeedsRedraw();
-}
-
-
-void NodeWidget::OnSlotConnectionChanged(Slot* slot) {
   mOnNeedsRedraw();
 }
 
@@ -294,7 +299,7 @@ void NodeWidget::PaintToImage()
     WidgetSlot* sw = mWidgetSlots[i];
 
     QColor slotColor = Colors.mSlotDefault;
-    if (mNextPaintState.mColoredSlotIndex == i) {
+    if (mNextPaintState.mColoredSlotIndex == int(i)) {
       switch (mNextPaintState.mSlotColorState) {
       case ColorState::DEFAULT:
         slotColor = Colors.mSlotDefault;

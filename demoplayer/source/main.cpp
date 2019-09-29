@@ -53,10 +53,8 @@ static PIXELFORMATDESCRIPTOR pfd = {
 
 bool running = true;
 LRESULT CALLBACK gdi01_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-  switch (uMsg) {
-  case WM_DESTROY:
+  if (uMsg == WM_DESTROY) {
     running = false;
-    break;
   }
   return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -89,7 +87,7 @@ void LoadEngineShaderFolder(const wstring& folder) {
 void LoadEngineShaders() {
   vector<wstring> engineStubSourceFiles;
   LoadEngineShaderFolder(EngineFolder);
-  TheEngineStubs->OnLoadFinished();
+  EngineStubs::OnLoadFinished();
 }
 
 
@@ -119,7 +117,9 @@ int CALLBACK WinMain(
   }
 
   /// Create window
+  // ReSharper disable CppInitializedValueIsAlwaysRewritten
   HWND hwnd = nullptr;
+  // ReSharper restore CppInitializedValueIsAlwaysRewritten
   if (windowed || recordVideo) {
     hwnd = CreateWindowEx(0, L"GDI01", L"teszkos demo", WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, CW_USEDEFAULT, windowWidth, windowHeight,
@@ -134,9 +134,9 @@ int CALLBACK WinMain(
   }
 
   /// Create device context
-  const HDC hDC = GetDC(hwnd);
-  SetPixelFormat(hDC, ChoosePixelFormat(hDC, &pfd), &pfd);
-  wglMakeCurrent(hDC, wglCreateContext(hDC));
+  const HDC hdc = GetDC(hwnd);  // NOLINT(misc-misplaced-const)
+  SetPixelFormat(hdc, ChoosePixelFormat(hdc, &pfd), &pfd);
+  wglMakeCurrent(hdc, wglCreateContext(hdc));
 
   /// Set up image recorder
   const ImageRecorder imageRecorder;
@@ -151,7 +151,6 @@ int CALLBACK WinMain(
     }
     if (!BASS_Init(1, 44100, 0, nullptr, nullptr)) ERR("Can't initialize BASS");
     bassChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_AUTOFREE);
-    QWORD pos = BASS_ChannelGetLength(bassChannel, BASS_POS_BYTE);
   }
 
   /// Initialize Zengine
@@ -164,17 +163,17 @@ int CALLBACK WinMain(
 
   /// Load precalc project file
   char* json = System::ReadFile(L"loading.zen");
-  shared_ptr<Document> loading = FromJSON(string(json));
+  shared_ptr<Document> loading = FromJson(string(json));
   ASSERT(loading);
   delete json;
 
   /// Show loading screen
   loading->mMovie.GetNode()->Draw(renderTarget, 0);
-  wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
+  wglSwapLayerBuffers(hdc, WGL_SWAP_MAIN_PLANE);
 
   /// Load demo file
   json = System::ReadFile(L"demo.zen");
-  shared_ptr<Document> doc = FromJSON(string(json));
+  shared_ptr<Document> doc = FromJson(string(json));
   ASSERT(doc);
   delete json;
 
@@ -246,7 +245,7 @@ int CALLBACK WinMain(
       imageRecorder.RecordImage(&pixelsFlip[0], videoWidth, videoHeight, frameNumber);
     }
 
-    wglSwapLayerBuffers(hDC, WGL_SWAP_MAIN_PLANE);
+    wglSwapLayerBuffers(hdc, WGL_SWAP_MAIN_PLANE);
     frameNumber++;
   };
 

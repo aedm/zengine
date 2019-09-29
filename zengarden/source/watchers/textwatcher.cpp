@@ -7,7 +7,7 @@ public:
     : QTextEdit(parent)
   {}
 
-  void keyPressEvent(QKeyEvent *e) {
+  void keyPressEvent(QKeyEvent *e) override {
     if (e->key() == Qt::Key_Return && (e->modifiers() & Qt::ControlModifier)) {
       mOnRebuild();
       return;
@@ -19,13 +19,13 @@ public:
 };
 
 TextWatcher::TextWatcher(const shared_ptr<Node>& node)
-  : WatcherUI(node)
+  : WatcherUi(node)
 {}
 
 TextWatcher::~TextWatcher() = default;
 
 void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
   shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
 
   /// Vertical layout
@@ -43,7 +43,7 @@ void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   /// Recompile button
   QPushButton* compileButton = new QPushButton("Rebuild", watcherWidget);
-  watcherWidget->connect(compileButton, &QPushButton::pressed, [=]() {
+  QObject::connect(compileButton, &QPushButton::pressed, [=]() {
     HandleRebuid();
   });
   mLayout->addWidget(compileButton);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "meshnode.h"
+#include "../shaders/valuestubslot.h"
 
 class CubeMeshNode: public MeshNode {
 public:
@@ -20,7 +21,7 @@ protected:
 
 class HalfCubeMeshNode : public MeshNode {
 public:
-  HalfCubeMeshNode();
+  HalfCubeMeshNode() = default;
 
 protected:
   void Operate() override;

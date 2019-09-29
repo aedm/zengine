@@ -37,7 +37,7 @@ private:
 
 
 /// A parameter panel item for slots
-class SlotWatcher : public WatcherUI {
+class SlotWatcher : public WatcherUi {
 public:
   /// Enable/disable editing
   virtual void UpdateReadOnly() = 0;

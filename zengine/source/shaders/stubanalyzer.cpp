@@ -137,7 +137,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     }
     StubGlobalSampler* globalSampler = new StubGlobalSampler();
     globalSampler->name = name.ToString();
-    globalSampler->usage = (GlobalSamplerUsage)usage;
+    globalSampler->usage = GlobalSamplerUsage(usage);
     globalSampler->isMultiSampler = (line->SubStrings[2].Token == TOKEN_sampler2DMS);
     globalSampler->isShadow = (line->SubStrings[2].Token == TOKEN_sampler2DShadow);
     mGlobalSamplers.push_back(globalSampler);
@@ -169,7 +169,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
   StubGlobalUniform* globalUniform = new StubGlobalUniform();
   globalUniform->name = name.ToString();
   globalUniform->type = shaderType;
-  globalUniform->usage = (GlobalUniformUsage)usage;
+  globalUniform->usage = GlobalUniformUsage(usage);
   mGlobalUniforms.push_back(globalUniform);
 }
 

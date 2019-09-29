@@ -4,7 +4,7 @@
 #include <utility>
 
 Texture::~Texture() {
-  OpenGL->DeleteTextureGpuData(mHandle);
+  OpenGLAPI::DeleteTextureGpuData(mHandle);
 }
 
 Texture::Texture(Handle handle, int width, int height, TexelType type,

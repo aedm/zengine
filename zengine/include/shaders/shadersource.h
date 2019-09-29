@@ -9,7 +9,7 @@ struct ShaderSource {
 
   /// Metadata for a uniform
   struct Uniform {
-    Uniform(const string& name, const shared_ptr<Node>& node, 
+    Uniform(string name, shared_ptr<Node> node, 
       GlobalUniformUsage globalType, ValueType type);
 
     const string mName;
@@ -20,7 +20,7 @@ struct ShaderSource {
 
   /// Metadata for a sampler
   struct Sampler {
-    Sampler(const string& name, const shared_ptr<Node>& node, 
+    Sampler(string name, shared_ptr<Node> node, 
       GlobalSamplerUsage globalType, bool isMultiSampler, bool isShadow);
 
     const string mName;
@@ -32,17 +32,17 @@ struct ShaderSource {
 
   /// Metadata for a SSBOs and image2Ds
   struct NamedResource {
-    NamedResource(const string& name, const shared_ptr<Node>& node);
+    NamedResource(string name, shared_ptr<Node> node);
 
     const string mName;
     const shared_ptr<Node> mNode;
   };
 
   ShaderSource(
-    const vector<Uniform>& uniforms,
-    const vector<Sampler>& samplers,
-    const vector<NamedResource>& ssbos,
-    const string& vertexSource, const string& fragmentSource);
+    vector<Uniform> uniforms,
+    vector<Sampler> samplers,
+    vector<NamedResource> ssbos,
+    string vertexSource, string fragmentSource);
 
   /// All uniforms from all shader stages merged
   const vector<Uniform> mUniforms;

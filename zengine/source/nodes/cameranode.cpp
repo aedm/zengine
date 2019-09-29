@@ -58,10 +58,10 @@ void CameraNode::SetupGlobals(Globals* globals) const
       (sinf(time * 0.87f) + cosf(time * 2.23f) + cosf(time * 3.71f + 0.8f)) * shake;
     const float zAngle =
       (sinf(time * 0.67f) + cosf(time * 2.43f) + cosf(time * 3.81f + 0.5f)) * shake;
-    const Matrix xRot = Matrix::Rotate(xAngle, Vec3(1, 0, 0));
-    const Matrix yRot = Matrix::Rotate(yAngle, Vec3(0, 1, 0));
+    const Matrix xShakeRot = Matrix::Rotate(xAngle, Vec3(1, 0, 0));
+    const Matrix yShakeRot = Matrix::Rotate(yAngle, Vec3(0, 1, 0));
     const Matrix zRot = Matrix::Rotate(zAngle, Vec3(0, 0, 1));
-    globals->Camera = xRot * yRot * zRot * globals->Camera;
+    globals->Camera = xShakeRot * yShakeRot * zRot * globals->Camera;
   }
 }
 

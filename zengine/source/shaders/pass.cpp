@@ -142,7 +142,7 @@ void Pass::Set(Globals* globals) {
     }
     else {
       /// Global uniform, takes value from the Globals object
-      const int offset = GlobalUniformOffsets[(UINT)source->mGlobalType];
+      const int offset = GlobalUniformOffsets[UINT(source->mGlobalType)];
       switch (source->mType) {
 #undef ITEM
 #define ITEM(name) \
@@ -164,7 +164,7 @@ void Pass::Set(Globals* globals) {
   }
 
   mUniformBuffer->UploadData(uniformArray, mShaderProgram->mUniformBlockSize);
-  OpenGL->SetShaderProgram(mShaderProgram, mUniformBuffer);
+  OpenGLAPI::SetShaderProgram(mShaderProgram, mUniformBuffer);
 
   /// Set samplers
   UINT i = 0;
@@ -172,6 +172,7 @@ void Pass::Set(Globals* globals) {
     const ShaderSource::Sampler* source = samplerMapper.mSource;
     const ShaderProgram::Sampler* target = samplerMapper.mTarget;
 
+    // ReSharper disable once CppInitializedValueIsAlwaysRewritten
     shared_ptr<Texture> tex = nullptr;
     if (samplerMapper.mSource->mGlobalType == GlobalSamplerUsage::LOCAL) {
       ASSERT(samplerMapper.mSource->mNode != nullptr);
@@ -179,7 +180,7 @@ void Pass::Set(Globals* globals) {
     }
     else {
       /// Global uniform, takes value from the Globals object
-      const int offset = GlobalSamplerOffsets[(UINT)source->mGlobalType];
+      const int offset = GlobalSamplerOffsets[UINT(source->mGlobalType)];
       void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
       tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
     }
@@ -188,13 +189,12 @@ void Pass::Set(Globals* globals) {
 
   /// Set SSBOs
   for (const auto& ssbo : mSSBOs.GetResources()) {
-    const ShaderSource::NamedResource* source = ssbo.mSource;
     const ShaderProgram::SSBO* target = ssbo.mTarget;
     shared_ptr<Buffer> buffer = 
       PointerCast<BufferNode>(ssbo.mSource->mNode)->GetBuffer();
     
     if (!buffer) continue;
-    OpenGL->SetSsbo(target->mIndex, buffer);
+    OpenGLAPI::SetSsbo(target->mIndex, buffer);
   }
 }
 

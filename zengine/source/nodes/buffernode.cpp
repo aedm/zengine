@@ -6,8 +6,8 @@ MeshToVertexBufferNode::MeshToVertexBufferNode()
   : mMeshSlot(this, "Mesh")
 {}
 
-const std::shared_ptr<Buffer> MeshToVertexBufferNode::GetBuffer() {
-  shared_ptr<MeshNode>& meshNode = mMeshSlot.GetNode();
+std::shared_ptr<Buffer> MeshToVertexBufferNode::GetBuffer() {
+  const shared_ptr<MeshNode>& meshNode = mMeshSlot.GetNode();
   if (!meshNode) return nullptr;
   auto& mesh = meshNode->GetMesh();
   if (!mesh) return nullptr;

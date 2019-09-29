@@ -1,7 +1,6 @@
 #pragma once
 
 #include "node.h"
-#include <vector>
 #include <map>
 
 using namespace std;
@@ -29,7 +28,4 @@ protected:
   shared_ptr<Node> GetReferencedNode() override;
 
   void Regenerate();
-
-private:
-  
 };

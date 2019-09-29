@@ -1,10 +1,9 @@
 #pragma once
 
 #include "watcherui.h"
-#include "watcherwidget.h"
 #include <zengine.h>
 
-class MovieWatcher: public WatcherUI {
+class MovieWatcher: public WatcherUi {
 public:
   MovieWatcher(const shared_ptr<Node>& node);
   virtual ~MovieWatcher();
@@ -14,7 +13,7 @@ public:
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void Paint(EventForwarderGLWidget* widget);
+  void Paint(EventForwarderGlWidget* widget);
   void HandleMovieCursorChange(float movieCursor) const;
 
   RenderTarget* mRenderTarget = nullptr;

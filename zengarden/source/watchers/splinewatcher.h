@@ -8,16 +8,15 @@
 
 class SplineWidget;
 
-class FloatSplineWatcher: public WatcherUI {
+class FloatSplineWatcher: public WatcherUi {
 public:
   FloatSplineWatcher(const shared_ptr<Node>& node);
-  virtual ~FloatSplineWatcher();
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
   
 protected:
-  Ui::SplineEditor mUI;
-  EventForwarderWidget* mSplineWidget;
+  Ui::SplineEditor mUi{};
+  EventForwarderWidget* mSplineWidget{};
 
   void OnRedraw() override;
   void OnSplineControlPointsChanged() override;
@@ -32,7 +31,7 @@ protected:
 
   QPointF ToScreenCoord(float time, float value) const;
   float ScreenToTime(int xPos) const;
-  Vec2 ScreenToPoint(QPoint& pos) const;
+  Vec2 ScreenToPoint(const QPoint& pos) const;
 
   Vec2 GetStepsPerPixel() const;
   QPointF GetPixelsPerStep() const;
@@ -50,7 +49,7 @@ protected:
   Vec2 mOriginalPoint;
 
   int mHoveredPointIndex = -1;
-  SplineLayer mHoveredLayer;
+  SplineLayer mHoveredLayer = SplineLayer::NONE;
 
   int mSelectedPointIndex = -2;
   SplineLayer mSelectedLayer = SplineLayer::NONE;
@@ -66,8 +65,8 @@ protected:
   shared_ptr<FloatSplineNode> GetSpline() const;
 
 private slots:
-  void DrawSpline(QPaintEvent* ev);
-  void DrawSplineComponentControl(QPainter& painter, SplineLayer component);
+  void DrawSpline(QPaintEvent* ev) const;
+  void DrawSplineComponentControl(QPainter& painter, SplineLayer layer) const;
 
   void RemovePoint();
   void AddPoint(SplineLayer layer);

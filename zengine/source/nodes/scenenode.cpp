@@ -56,7 +56,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   const bool directToSquare = globals->DirectToSquare > 0.5f;
 
   /// Get camera
-  auto& camera = mCamera.GetNode();
+  const auto& camera = mCamera.GetNode();
   if (camera == nullptr) return;
 
   /// Pass #1: skylight shadow
@@ -65,9 +65,9 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   const Vec3 s = mShadowMapSize.Get();
   const Vec3 lightDir = mSkyLightDirection.Get().Normal();
 
-  const Matrix lookat = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
+  const Matrix lookAt = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
   const Matrix target = Matrix::Translate(-camera->mTarget.Get());
-  globals->Camera = lookat * target;
+  globals->Camera = lookAt * target;
  
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
   globals->World.LoadIdentity();
@@ -184,15 +184,14 @@ void SceneNode::CalculateRenderDependencies() {
   }
 }
 
-void SceneNode::SetSceneTime(float time) {
+void SceneNode::SetSceneTime(float beats) {
   Update();
   for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
-    PointerCast<SceneTimeNode>(node)->Set(time);
+    PointerCast<SceneTimeNode>(node)->Set(beats);
   }
 }
 
-float SceneNode::GetSceneTime() const
-{
+float SceneNode::GetSceneTime() const {
   return mSceneTime;
 }
 

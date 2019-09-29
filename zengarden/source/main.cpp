@@ -10,7 +10,7 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
 int main(int argc, char *argv[])
 {
   QApplication app(argc, argv);
-  app.setStyle(QStyleFactory::create("fusion"));
+  QApplication::setStyle(QStyleFactory::create("fusion"));
 
   QPalette palette;
   palette.setColor(QPalette::Window, QColor(53, 53, 53));
@@ -26,9 +26,9 @@ int main(int argc, char *argv[])
 
   palette.setColor(QPalette::Highlight, QColor(120, 10, 120).lighter());
   palette.setColor(QPalette::HighlightedText, Qt::black);
-  app.setPalette(palette);
+  QApplication::setPalette(palette);
 
   ZenGarden mainWindow;
   mainWindow.show();
-  return app.exec();
+  return QApplication::exec();
 }

@@ -84,8 +84,8 @@ void MovieNode::HandleMessage(Message* message) {
       break;
     case MessageType::SCENE_TIME_EDITED:
     {
-      auto& clipNode = PointerCast<ClipNode>(message->mSource);
-      auto& scene = clipNode->mSceneSlot.GetNode();
+      const auto& clipNode = PointerCast<ClipNode>(message->mSource);
+      const auto& scene = clipNode->mSceneSlot.GetNode();
       if (!scene) return;
       const float time = clipNode->mStartTime.Get() + scene->GetSceneTime();
       NotifyWatchers(&Watcher::OnTimeEdited, time);

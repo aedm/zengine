@@ -4,15 +4,13 @@
 #include "../zengarden.h"
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QPushButton>
 
 PropertyEditor::PropertyEditor(const shared_ptr<Node>& node)
-  : WatcherUI(node) {}
+  : WatcherUi(node) {}
 
 
 void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
   shared_ptr<Node> node = GetDirectNode();
 
   /// Vertical layout

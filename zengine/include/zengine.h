@@ -1,6 +1,7 @@
 #pragma once
 /// Include file for Zengine.
 
+// ReSharper disable CppUnusedIncludeDirective
 #include "base/helpers.h"
 
 #include "dom/nodetype.h"
@@ -38,8 +39,9 @@
 #include "nodes/fluidnode.h"
 
 #include "serialize/lodepng.h"
+// ReSharper restore CppUnusedIncludeDirective
 
-/// Inits Zengine. Returns true if everything went okay.
+/// Initializes Zengine. Returns true if everything went okay.
 bool InitZengine();
 
 /// Closes Zengine, frees up resources

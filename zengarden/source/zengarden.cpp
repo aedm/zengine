@@ -2,7 +2,6 @@
 #include "util/uipainter.h"
 #include "util/util.h"
 #include "commands/command.h"
-#include "commands/graphCommands.h"
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
 #include "watchers/meshwatcher.h"
@@ -20,6 +19,7 @@
 #include <QtCore/QDir>
 #include <QMouseEvent>
 #include <QFileDialog>
+#include <bass.h>
 
 static ZenGarden* gZengarden;
 
@@ -99,7 +99,7 @@ void ZenGarden::InitModules() {
   connect(&mEngineShadersFolderWatcher, SIGNAL(fileChanged(const QString&)),
     this, SLOT(LoadEngineShader(const QString&)));
   LoadEngineShaders(mEngineShadersDir);
-  TheEngineStubs->OnLoadFinished();
+  EngineStubs::OnLoadFinished();
 
   InitPainter();
   Prototypes::Init();
@@ -178,6 +178,7 @@ void ZenGarden::keyPressEvent(QKeyEvent* event) {
   case Qt::Key_F7:
     mUI.bottomLeftPanel->setVisible(!mUI.bottomLeftPanel->isVisible());
     return;
+  default: break;
   }
   QMainWindow::keyPressEvent(event);
 }
@@ -196,7 +197,7 @@ void ZenGarden::LoadEngineShader(const QString& path) const
 void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
-    shared_ptr<WatcherUI> watcher;
+    shared_ptr<WatcherUi> watcher;
     if (IsExactType<FloatNode>(node)) {
       watcher =
         node->Watch<StaticValueWatcher<ValueType::FLOAT>>(PointerCast<FloatNode>(node));
@@ -220,7 +221,7 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
       watcher = node->Watch<SlotEditor>(node);
     }
     if (watcher) {
-      watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
+      watcher->mDeleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
       mPropertyEditor =
         new WatcherWidget(mUI.propertyPanel, watcher, WatcherPosition::PROPERTY_PANEL);
       watcher->SetWatcherWidget(mPropertyEditor);
@@ -241,13 +242,6 @@ void ZenGarden::SetMovieCursor(float beats) {
   mMovieCursor = beats;
   RestartMovieTimer();
 }
-
-
-void ZenGarden::SetClipCursor(float seconds) {
-  // TODO: make this work.
-
-}
-
 
 float ZenGarden::GetGlobalTime() const
 {
@@ -286,7 +280,7 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
   }
 
   WatcherWidget* watcherWidget = nullptr;
-  shared_ptr<WatcherUI> watcher;
+  shared_ptr<WatcherUi> watcher;
 
   /// Non-3D watchers
   if (IsPointerOf<StringNode>(refNode)) {
@@ -337,7 +331,7 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
   const int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
   tabWidget->setCurrentIndex(index);
   watcher->SetWatcherWidget(watcherWidget);
-  watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
+  watcher->mDeleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
 }
 
 
@@ -372,7 +366,7 @@ void ZenGarden::CreateNewDocument() {
 void ZenGarden::SetupMovieWatcher() {
   SafeDelete(mMovieWatcherWidget);
   shared_ptr<MovieNode> movieNode = mDocument->mMovie.GetNode();
-  shared_ptr<WatcherUI> watcher = movieNode->Watch<TimelineEditor>(movieNode);
+  shared_ptr<WatcherUi> watcher = movieNode->Watch<TimelineEditor>(movieNode);
   mMovieWatcherWidget =
     new WatcherWidget(mUI.timelineWidget, watcher, WatcherPosition::TIMELINE_PANEL);
   watcher->SetWatcherWidget(mMovieWatcherWidget);
@@ -386,7 +380,7 @@ void ZenGarden::HandleMenuSaveAs() {
   INFO("Saving document...");
   QTime myTimer;
   myTimer.start();
-  const string json = ToJSON(mDocument);
+  const string json = ToJson(mDocument);
   QFile file(fileName);
   file.open(QIODevice::WriteOnly);
   file.write(json.c_str());
@@ -425,7 +419,7 @@ void ZenGarden::HandleMenuOpen() {
 
   /// Parse file into a Document
   mCommonGLWidget->makeCurrent();
-  const shared_ptr<Document> document = FromJSON(string(json.get()));
+  const shared_ptr<Document> document = FromJson(string(json.get()));
   if (document == nullptr) return;
 
   /// Load succeeded, remove old document

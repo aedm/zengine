@@ -34,8 +34,7 @@ void FloatsToVec3Node::Operate() {
 }
 
 FloatToFloatNode::FloatToFloatNode()
-  : ValueNode<float>()
-  , mX(this, "X")
+  : mX(this, "X")
   , mValue(0)
 {}
 

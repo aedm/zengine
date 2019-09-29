@@ -102,7 +102,7 @@ public:
   /// - for non-multislots, this overrides the current connection.
   /// - for multislots, the node will be added to the list of connected nodes. 
   /// Returns false if connection is not possible due to type mismatch.
-  virtual bool Connect(const shared_ptr<Node>& node);
+  virtual bool Connect(const shared_ptr<Node>& target);
 
   /// Disconnects a node from this slot. 
   virtual void Disconnect(const shared_ptr<Node>&);
@@ -143,7 +143,7 @@ public:
   const bool mIsMultiSlot;
 
   /// Return the Nth connected node from a multislot
-  const shared_ptr<Node> operator[] (UINT index);
+  const shared_ptr<Node>& operator[] (UINT index);
 
   /// Returns true if slot is connected to its own default node (if it has one)
   virtual bool IsDefaulted();
@@ -246,9 +246,9 @@ public:
   virtual void SetName(const string& name);
   virtual const string& GetName() const;
   virtual void SetPosition(Vec2 position);
-  virtual const Vec2 GetPosition() const;
+  virtual Vec2 GetPosition() const;
   virtual void SetSize(Vec2 size);
-  virtual const Vec2 GetSize() const;
+  virtual Vec2 GetSize() const;
 
   /// Returns the list of publicly editable slots
   const vector<Slot*>& GetPublicSlots() const;
@@ -298,16 +298,16 @@ public:
   }
 
   /// Removes a Watcher from the watchers list
-  void RemoveWatcher(shared_ptr<Watcher> watcher);
+  void RemoveWatcher(const shared_ptr<Watcher>& watcher);
   void RemoveAllWatchers();
 
   /// Adds a new Watcher to the watchers list
-  void AssignWatcher(shared_ptr<Watcher> watcher);
+  void AssignWatcher(const shared_ptr<Watcher>& watcher);
 
 protected:
   template <class ...B>
   void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
-    for (auto watcher : mWatchers) ((watcher.get())->*M)(args...);
+    for (const auto& watcher : mWatchers) ((watcher.get())->*M)(args...);
   }
 
 private:

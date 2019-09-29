@@ -4,40 +4,39 @@
 #include <include/render/drawingapi.h>
 #include <include/base/helpers.h>
 
-shared_ptr<VertexFormat> VertexPos::format = make_shared<VertexFormat>(
+shared_ptr<VertexFormat> VertexPos::mFormat = make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK);
-shared_ptr<VertexFormat> VertexPosNorm::format = make_shared<VertexFormat>(
+shared_ptr<VertexFormat> VertexPosNorm::mFormat = make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
-shared_ptr<VertexFormat> VertexPosUVNorm::format = make_shared<VertexFormat>(
+shared_ptr<VertexFormat> VertexPosUvNorm::mFormat = make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
-shared_ptr<VertexFormat> VertexPosUVNormTangent::format = make_shared<VertexFormat>(
+shared_ptr<VertexFormat> VertexPosUvNormTangent::mFormat = make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK |
   VERTEXATTRIB_TANGENT_MASK);
-shared_ptr<VertexFormat> VertexPosUV::format = make_shared<VertexFormat>(
+shared_ptr<VertexFormat> VertexPosUv::mFormat = make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
 
 
 VertexFormat::VertexFormat(UINT binaryFormat) {
-  memset(mAttributesArray, 0, sizeof(void*) * (UINT)VertexAttributeUsage::COUNT);
+  memset(mAttributesArray, 0, sizeof(void*) * UINT(VertexAttributeUsage::COUNT));
 
   this->mBinaryFormat = binaryFormat;
   int stride = 0;
   for (int i = 0; binaryFormat; binaryFormat >>= 1, i++) {
     if (binaryFormat & 1) {
-      VertexAttribute attrib;
-      attrib.Usage = (VertexAttributeUsage)i;
-      attrib.Size = ValueTypeByteSize(VertexAttributeUsageToValueType(attrib.Usage));
-      attrib.Offset = stride;
-      mAttributes.push_back(attrib);
-      stride += attrib.Size;
+      VertexAttribute attribute{};
+      attribute.Usage = VertexAttributeUsage(i);
+      attribute.Size = ValueTypeByteSize(VertexAttributeUsageToValueType(attribute.Usage));
+      attribute.Offset = stride;
+      mAttributes.push_back(attribute);
+      stride += attribute.Size;
     }
   }
 
-  for (UINT i = 0; i < mAttributes.size(); i++) {
-    VertexAttribute& attrib = mAttributes[i];
-
+  for (auto& attribute : mAttributes)
+  {
     /// AttributesArray points into the vector. Meh.
-    mAttributesArray[(UINT)attrib.Usage] = &attrib;
+    mAttributesArray[UINT(attribute.Usage)] = &attribute;
   }
 
   mStride = stride;
@@ -56,7 +55,7 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
 
   /// Bind all attributes to their fixed layout location
   for (auto& attribute : mFormat->mAttributes) {
-    OpenGL->EnableVertexAttribute(UINT(attribute.Usage),
+    OpenGLAPI::EnableVertexAttribute(UINT(attribute.Usage),
       VertexAttributeUsageToValueType(attribute.Usage),
       attribute.Offset, mFormat->mStride);
   }

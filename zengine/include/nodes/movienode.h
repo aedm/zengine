@@ -26,7 +26,7 @@ private:
 
   void SortClips();
 
-  Globals mGlobals;
+  Globals mGlobals{};
 };
 
 typedef TypedSlot<MovieNode> MovieSlot;

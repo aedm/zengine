@@ -1,14 +1,9 @@
 #include "valuewidgets.h"
 #include "../watchers/watcherwidget.h"
 #include <QtWidgets/QBoxLayout>
-#include <QtWidgets/qgridlayout.h>
-#include <QtWidgets/qlabel.h>
-#include <QtWidgets/qslider.h>
-#include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qradiobutton.h>
 #include <QtWidgets/qbuttongroup.h>
 #include <QtGui/qpainter.h>
-#include <QtCore/QEvent>
 #include <QtGui/QMouseEvent>
 #include <QtCore/QTime>
 #include <utility>
@@ -184,6 +179,7 @@ template <ValueType T>
 ValueEditor<T>::ValueEditor(QWidget* parent, const QString& name, const VectorType& value) {
   static const char* suffixes[] = { ".x", ".y", ".z", ".w" };
   mValue = value;
+  // ReSharper disable once CppNonReclaimedResourceAcquisition
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);

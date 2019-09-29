@@ -20,17 +20,18 @@ SlotEditor::~SlotEditor() {
 
 template <ValueType T>
 bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
-  if (!IsPointerOf<ValueNode<ValueTypes<T>::Type>>(slot->GetReferencedNode())) {
+  if (!IsPointerOf<ValueNode<typename ValueTypes<T>::Type>>(slot->GetReferencedNode())) {
     return false;
   }
 
-  auto valueSlot = SafeCast<ValueSlot<ValueTypes<T>::Type>*>(slot);
+  auto valueSlot = SafeCast<ValueSlot<typename ValueTypes<T>::Type>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
-  shared_ptr<SlotWatcher> watcher = slotNode->Watch<TypedSlotWatcher<T>>(valueSlot);
+  shared_ptr<SlotWatcher> watcher = 
+    slotNode->template Watch<TypedSlotWatcher<T>>(valueSlot);
 
   WatcherWidget* widget =
     new WatcherWidget(parent, watcher, WatcherPosition::PROPERTY_PANEL);
-  watcher->deleteWatcherWidgetCallback =
+  watcher->mDeleteWatcherWidgetCallback =
     Delegate(this, &SlotEditor::RemoveWatcherWidget);
   layout->addWidget(widget);
   watcher->SetWatcherWidget(widget);
@@ -105,7 +106,7 @@ void SlotEditor::RebuildSlots() {
 }
 
 void SlotEditor::RemoveAllSlots() {
-  for (auto it : mSlotWatchers) {
+  for (const auto& it : mSlotWatchers) {
     if (it.second->GetDirectNode()) {
       it.second->GetDirectNode()->RemoveWatcher(it.second);
     }
@@ -136,7 +137,7 @@ void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
 
 
 SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
-  : WatcherUI(node) 
+  : WatcherUi(node) 
 {}
 
 

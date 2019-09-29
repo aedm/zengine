@@ -6,7 +6,7 @@ static const float DefaultPixelsPerSecond = 100.0f;
 static const int TrackHeightPixels = 20;
 
 TimelineEditor::TimelineEditor(const shared_ptr<MovieNode>& movieNode)
-  : WatcherUI(movieNode) 
+  : WatcherUi(movieNode) 
 {
   ZenGarden::GetInstance()->mOnMovieCursorChange += 
     Delegate(this, &TimelineEditor::HandleMovieCursorChange);
@@ -18,7 +18,7 @@ TimelineEditor::~TimelineEditor() {
 }
 
 void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
   mUI.setupUi(watcherWidget);
 
   mUI.watchMovieButton->setFocusPolicy(Qt::NoFocus);
@@ -30,12 +30,12 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   timelineLayout->addWidget(mTimelineCanvas);
 
   mTimelineCanvas->mOnPaint += Delegate(this, &TimelineEditor::DrawTimeline);
-  mTimelineCanvas->OnMousePress += Delegate(this, &TimelineEditor::HandleMouseDown);
-  mTimelineCanvas->OnMouseRelease += Delegate(this, &TimelineEditor::HandleMouseUp);
-  mTimelineCanvas->OnMouseMove += Delegate(this, &TimelineEditor::HandleMouseMove);
-  mTimelineCanvas->OnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
+  mTimelineCanvas->mOnMousePress += Delegate(this, &TimelineEditor::HandleMouseDown);
+  mTimelineCanvas->mOnMouseRelease += Delegate(this, &TimelineEditor::HandleMouseUp);
+  mTimelineCanvas->mOnMouseMove += Delegate(this, &TimelineEditor::HandleMouseMove);
+  mTimelineCanvas->mOnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
 
-  watcherWidget->connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
+  QObject::connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
     const shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
   });
@@ -55,14 +55,13 @@ void TimelineEditor::SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sc
   mSelectedClip->mSceneSlot.Connect(sceneNode);
 }
 
-void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
+void TimelineEditor::DrawTimeline(QPaintEvent* ev) const {
   QPainter painter(mTimelineCanvas);
   painter.fillRect(mTimelineCanvas->rect(), QBrush(QColor(23, 23, 23)));
 
   shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
-  //painter.setRenderHint(QPainter::Antialiasing);
   const float height = float(mTimelineCanvas->height());
   const float width = float(mTimelineCanvas->width());
 
@@ -159,6 +158,7 @@ void TimelineEditor::HandleMouseLeftDown(QMouseEvent* event) {
       }
       mTimelineCanvas->update();
       break;
+    default: break;
   }
 }
 

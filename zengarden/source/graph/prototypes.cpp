@@ -1,17 +1,16 @@
 #include "prototypes.h"
 #include <ui_operatorSelector.h>
-#include <QtCore/QDir>
 #include "../util/util.h"
 #include "../zengarden.h"
 
 Prototypes* ThePrototypes = nullptr;
 
-Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label,
+Prototypes::SelectorItem::SelectorItem(SelectorItem* parent, const QString& label,
   int prototypeIndex)
-  : QTreeWidgetItem(Parent)
+  : QTreeWidgetItem(parent)
   , mPrototypeIndex(prototypeIndex)
 {
-  setText(0, Label);
+  setText(0, label);
 }
 
 
@@ -99,7 +98,7 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
 
 void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int) const
 {
-  SelectorItem* item = static_cast<SelectorItem*>(Item);
+  SelectorItem* item = SafeCast<SelectorItem*>(Item);
   if (item->mPrototypeIndex >= 0) mDialog->done(item->mPrototypeIndex);
 }
 
@@ -115,7 +114,7 @@ void Prototypes::LoadStubs() {
   LoadStubFolder(QString("engine/stubs"), &mMainCategory);
 }
 
-void Prototypes::LoadStubFolder(QString folder, Category* category) {
+void Prototypes::LoadStubFolder(const QString& folder, Category* category) {
   static const QString shaderSuffix("shader");
 
   const QDir dir(folder);
@@ -136,7 +135,7 @@ void Prototypes::LoadStubFolder(QString folder, Category* category) {
       prototype->mNodeClass = nodeClass;
       prototype->mNode = stub;
       prototype->mName = QString::fromStdString(stub->GetStubMetadata() == nullptr
-        ? nodeClass->mClassName : stub->GetStubMetadata()->name);
+        ? nodeClass->mClassName : stub->GetStubMetadata()->mName);
       category->mPrototypes.push_back(prototype);
     }
   }

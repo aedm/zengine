@@ -399,13 +399,12 @@ Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) 
 }
 
 Quaternion Quaternion::FromEuler(float roll, float pitch, float yaw) {
-  float sr, cr, sp, cp, sy, cy;
   const float rr = 0.5f*roll;
   const float pp = 0.5f*pitch;
   const float yy = 0.5f*yaw;
-  sr = sinf(rr); cr = cosf(rr);
-  sp = sinf(pp); cp = cosf(pp);
-  sy = sinf(yy); cy = cosf(yy);
+  const float sr = sinf(rr); const float cr = cosf(rr);
+  const float sp = sinf(pp); const float cp = cosf(pp);
+  const float sy = sinf(yy); const float cy = cosf(yy);
 
   const float vx = sr*cp*cy - cr*sp*sy;
   const float vy = cr*sp*cy + sr*cp*sy;
@@ -440,9 +439,8 @@ Quaternion::Quaternion(Quaternion& q1, Quaternion& q2, float ratio) {
   const float cosom = q1.s * q2.s + q1.vx * q2.vx + q1.vy * q2.vy + q1.vz * q2.vz;
   float sclp, sclq;
   if (cosom < 0.9999f) {
-    float omega, sinom;
-    omega = acosf(cosom);
-    sinom = sinf(omega);
+    float omega = acosf(cosom);
+    float sinom = sinf(omega);
     sclp = sinf((1.0f - ratio) * omega) / sinom;
     sclq = sinf(ratio * omega) / sinom;
   }

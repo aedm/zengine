@@ -49,7 +49,7 @@ public:
   virtual void OnTimeEdited(float time);
 
 protected:
-  Watcher(const shared_ptr<Node>& node);
+  Watcher(shared_ptr<Node> node);
 
 private:
   /// Changes the node being watched. Only a Node should call this.

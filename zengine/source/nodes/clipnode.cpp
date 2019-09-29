@@ -21,7 +21,7 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
   if (mCopyToSecondaryBuffer.Get() >= 0.5f) {
     const int width = int(globals->RenderTargetSize.x);
     const int height = int(globals->RenderTargetSize.y);
-    OpenGL->BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer,
+    OpenGLAPI::BlitFrameBuffer(renderTarget->mGBufferId, renderTarget->mSecondaryFramebuffer,
       0, 0, width, height, 0, 0, width, height);
     OpenGL->SetFrameBuffer(renderTarget->mSecondaryFramebuffer);
     OpenGL->SetFrameBuffer(renderTarget->mGBufferId);
@@ -44,7 +44,7 @@ void ClipNode::Draw(RenderTarget* renderTarget, Globals* globals, float clipTime
     OpenGL->Clear(clearColor, clearDepth);
   }
 
-  auto& scene = mSceneSlot.GetNode();
+  const auto& scene = mSceneSlot.GetNode();
   if (!scene) return;
 
   float fakeClipTime = clipTime;

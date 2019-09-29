@@ -41,7 +41,7 @@ public:
     }
   }
 
-  const vector<Item> GetResources() {
+  const vector<Item>& GetResources() {
     return mResources;
   }
 

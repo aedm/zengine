@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../nodes/valuenodes.h"
-#include "./valuetype.h"
 
 template <typename T>
 class ValueStubSlot: public ValueSlot<T> {

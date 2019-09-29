@@ -37,7 +37,7 @@ start:
     if (message.mTarget == nullptr || message.mTarget.get() != node) continue;
     mMessageQueue.erase(it);
     mMessageSet.erase(message);
-    goto start;
+    goto start;  // NOLINT
   }
 }
 
@@ -132,8 +132,8 @@ void Slot::Disconnect(const shared_ptr<Node>& target) {
 
 void Slot::DisconnectAll(bool notifyOwner) {
   if (mIsMultiSlot) {
-    for (auto it = mMultiNodes.begin(); it != mMultiNodes.end(); ++it) {
-      (*it)->DisconnectFromSlot(this);
+    for (auto& mMultiNode : mMultiNodes) {
+      mMultiNode->DisconnectFromSlot(this);
     }
     mMultiNodes.clear();
     if (notifyOwner) {
@@ -201,7 +201,7 @@ void Slot::ChangeNodeIndex(const shared_ptr<Node>& node, UINT targetIndex) {
   }
 }
 
-const shared_ptr<Node> Slot::operator[](UINT index) {
+const shared_ptr<Node>& Slot::operator[](UINT index) {
   ASSERT(mIsMultiSlot);
   ASSERT(index < mMultiNodes.size());
   return mMultiNodes[index];
@@ -263,7 +263,7 @@ bool Node::IsGhostNode() {
   
 void Node::Dispose() {
   RemoveAllWatchers();
-  while (mDependants.size() > 0) {
+  while (!mDependants.empty()) {
     mDependants.at(0)->Disconnect(this->shared_from_this());
   }
 }
@@ -298,7 +298,7 @@ void Node::ReceiveMessage(Message* message) {
     NotifyWatchers(&Watcher::OnRedraw);
     break;
   case MessageType::NODE_NAME_CHANGED:
-    if (message->mSource.get() != nullptr) {
+    if (message->mSource) {
       NotifyWatchers(&Watcher::OnChildNameChange);
     }
     break;
@@ -363,7 +363,7 @@ Node::~Node() {
   RemoveAllWatchers();
 
   const vector<Slot*>& deps = GetDependants();
-  while (deps.size()) {
+  while (!deps.empty()) {
     Slot* slot = deps.back();
     shared_ptr<Node> owner = slot->GetOwner();
 
@@ -396,7 +396,7 @@ void Node::SetPosition(const Vec2 position) {
   NotifyWatchers(&Watcher::OnGraphPositionChanged);
 }
 
-const Vec2 Node::GetPosition() const {
+Vec2 Node::GetPosition() const {
   return mPosition;
 }
 
@@ -406,7 +406,7 @@ void Node::SetSize(const Vec2 size) {
   SendMsg(MessageType::NODE_NAME_CHANGED);
 }
 
-const Vec2 Node::GetSize() const {
+Vec2 Node::GetSize() const {
   return mSize;
 }
 
@@ -448,7 +448,7 @@ const unordered_map<string, Slot*>& Node::GetSerializableSlots() const
   return mSerializableSlotsByName;
 }
 
-void Node::RemoveWatcher(shared_ptr<Watcher> watcher) {
+void Node::RemoveWatcher(const shared_ptr<Watcher>& watcher) {
   const auto it = std::find(mWatchers.begin(), mWatchers.end(), watcher);
   if (it == mWatchers.end()) return;
   ASSERT(watcher->mNode.get() == this);
@@ -458,12 +458,12 @@ void Node::RemoveWatcher(shared_ptr<Watcher> watcher) {
 
 void Node::RemoveAllWatchers()
 {
-  while (mWatchers.size() > 0) {
+  while (!mWatchers.empty()) {
     RemoveWatcher(*mWatchers.begin());
   }
 }
 
-void Node::AssignWatcher(shared_ptr<Watcher> watcher) {
+void Node::AssignWatcher(const shared_ptr<Watcher>& watcher) {
   mWatchers.insert(watcher);
   watcher->ChangeNode(this->shared_from_this());
 }
@@ -487,8 +487,8 @@ private:
 
     for (Slot* slot : slots) {
       if (slot->mIsMultiSlot) {
-        for (const shared_ptr<Node>& node : slot->GetDirectMultiNodes()) {
-          Traverse(node);
+        for (const shared_ptr<Node>& directNode : slot->GetDirectMultiNodes()) {
+          Traverse(directNode);
         }
       }
       else if (!slot->IsDefaulted()) {

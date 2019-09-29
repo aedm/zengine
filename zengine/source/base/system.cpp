@@ -33,8 +33,7 @@ void System::ReadFilesInFolder(const wchar_t* folder, const wchar_t* extension,
                                vector<wstring>& oFileList) {
   wchar_t currentDir[1024];
   _wgetcwd(currentDir, 1023);
-
-  int err = _wchdir(folder);
+  _wchdir(folder);
 
   _wfinddata_t fileInfo;
   const auto handle = _wfindfirst(extension, &fileInfo);

@@ -5,7 +5,7 @@
 #include <zengine.h>
 #include "ui_movieeditor.h"
 
-class TimelineEditor: public WatcherUI {
+class TimelineEditor: public WatcherUi {
 public:
   TimelineEditor(const shared_ptr<MovieNode>& movieNode);
   virtual ~TimelineEditor();
@@ -16,10 +16,10 @@ public:
   void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const;
 
 private:
-  Ui::MovieEditor mUI;
-  EventForwarderWidget* mTimelineCanvas;
+  Ui::MovieEditor mUI{};
+  EventForwarderWidget* mTimelineCanvas{};
 
-  void DrawTimeline(QPaintEvent* ev);
+  void DrawTimeline(QPaintEvent* ev) const;
 
   float mTimelineStartTime = 0.0f;
   float mZoomLevel = 0.0f;
@@ -32,9 +32,9 @@ private:
     TIME_SEEK,
   };
   State mState = State::DEFAULT;
-  float mOriginalTimelineStartTime;
-  float mOriginalClipStart;
-  float mOriginalClipLength;
+  float mOriginalTimelineStartTime{};
+  float mOriginalClipStart{};
+  float mOriginalClipLength{};
   QPoint mOriginalMousePos;
   shared_ptr<ClipNode> mHoveredClip;
   shared_ptr<ClipNode> mSelectedClip;

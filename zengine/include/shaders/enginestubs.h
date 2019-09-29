@@ -21,7 +21,7 @@ public:
   string GetSource(const string& name);
 
   /// Engine stubs loaded, create built-in material passes and shaders
-  void OnLoadFinished();
+  static void OnLoadFinished();
 
 private:
   map<string, shared_ptr<StubNode>> mStubs;

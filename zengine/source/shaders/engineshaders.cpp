@@ -42,7 +42,7 @@ void EngineShaders::BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget,
   const UINT height = UINT(size.y);
 
   /// Blit G-Buffer into postprocess ping-pong buffers 
-  OpenGL->BlitFrameBuffer(renderTarget->mGBufferId,
+  OpenGLAPI::BlitFrameBuffer(renderTarget->mGBufferId,
                           renderTarget->GetPostprocessTargetFramebufferId(),
                           0, 0, width, height, 0, 0, width, height);
   renderTarget->SwapPostprocessBuffers();
@@ -66,7 +66,7 @@ void EngineShaders::ApplyDepthOfField(RenderTarget* renderTarget, Globals* globa
   mPostProcess_DOF->Set(globals);
   mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
 
-  OpenGL->BlitFrameBuffer(renderTarget->mDOFBufferId,
+  OpenGLAPI::BlitFrameBuffer(renderTarget->mDOFBufferId,
                           renderTarget->GetPostprocessTargetFramebufferId(),
                           0, 0, width, height, 0, 0, width, height);
   renderTarget->SwapPostprocessBuffers();
@@ -80,7 +80,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
   mPostProcess_GaussianBlurVertical->Update();
   if (!mPostProcess_GaussianBlurVertical->isComplete()) return;
 
-  Vec2 size = renderTarget->GetSize();
+  const Vec2 size = renderTarget->GetSize();
   UINT width = UINT(size.x);
   UINT height = UINT(size.y);
   const UINT originalWidth = width;
@@ -90,7 +90,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
 
   /// Decrease resolution
   for (UINT i = 0; i < downsampleCount; i++) {
-    OpenGL->BlitFrameBuffer(renderTarget->GetPostprocessSourceFramebufferId(),
+    OpenGLAPI::BlitFrameBuffer(renderTarget->GetPostprocessSourceFramebufferId(),
                             renderTarget->GetPostprocessTargetFramebufferId(),
                             0, 0, width, height, 0, 0, width / 2, height / 2);
     width /= 2;
@@ -99,7 +99,6 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
   }
 
   /// Blur the image
-  size = Vec2(float(width), float(height));
   globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth),
                                       float(height) / float(originalHeight));
   globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
@@ -127,7 +126,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
 
 
 void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* globals,
-  const shared_ptr<Texture>& sourceColorMSAA) const
+  const shared_ptr<Texture>& sourceColorMsaa) const
 {
   mPostProcess_GaussianBlur_Blend_MSAA->Update();
   if (!mPostProcess_GaussianBlur_Blend_MSAA->isComplete()) return;
@@ -139,7 +138,7 @@ void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* global
   OpenGL->SetFrameBuffer(renderTarget->mColorBufferId);
   glViewport(0, 0, width, height);
   globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
-  globals->GBufferSourceA = sourceColorMSAA;
+  globals->GBufferSourceA = sourceColorMsaa;
   mPostProcess_GaussianBlur_Blend_MSAA->Set(globals);
   mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
 }
@@ -207,7 +206,7 @@ void EngineShaders::BuildPostProcessPasses() {
 
   /// Fullscreen quad
   IndexEntry quadIndices[] = {0, 1, 2, 2, 1, 3};
-  VertexPosUV quadVertices[] = {
+  VertexPosUv quadVertices[] = {
     {Vec3(-1, -1, 0), Vec2(0, 0)},
     {Vec3(1, -1, 0), Vec2(1, 0)},
     {Vec3(-1, 1, 0), Vec2(0, 1)},

@@ -42,10 +42,10 @@ enum class VertexAttributeUsage {
 };
 
 enum VertexAttributeMask {
-  VERTEXATTRIB_POSITION_MASK = 1 << (UINT)VertexAttributeUsage::POSITION,
-  VERTEXATTRIB_TEXCOORD_MASK = 1 << (UINT)VertexAttributeUsage::TEXCOORD,
-  VERTEXATTRIB_NORMAL_MASK = 1 << (UINT)VertexAttributeUsage::NORMAL,
-  VERTEXATTRIB_TANGENT_MASK = 1 << (UINT)VertexAttributeUsage::TANGENT,
+  VERTEXATTRIB_POSITION_MASK = 1 << UINT(VertexAttributeUsage::POSITION),
+  VERTEXATTRIB_TEXCOORD_MASK = 1 << UINT(VertexAttributeUsage::TEXCOORD),
+  VERTEXATTRIB_NORMAL_MASK = 1 << UINT(VertexAttributeUsage::NORMAL),
+  VERTEXATTRIB_TANGENT_MASK = 1 << UINT(VertexAttributeUsage::TANGENT),
 };
 
 /// Convert vertex attribute usage to value type
@@ -64,7 +64,7 @@ class VertexFormat {
 public:
   VertexFormat(UINT binaryFormat);
 
-  bool HasAttribute(VertexAttributeUsage attrib) const;
+  bool HasAttribute(VertexAttributeUsage attribute) const;
 
   /// Size of all data of a single vertex in bytes
   int mStride;
@@ -75,52 +75,52 @@ public:
   /// List of vertex attributes
   vector<VertexAttribute> mAttributes;
 
-  VertexAttribute* mAttributesArray[(UINT)VertexAttributeUsage::COUNT];
+  VertexAttribute* mAttributesArray[UINT(VertexAttributeUsage::COUNT)]{};
 };
 
 
 /// Common vertex formats
 struct VertexPos {
-  Vec3 position;
+  Vec3 mPosition;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> format;
+  static shared_ptr<VertexFormat> mFormat;
 };
 
 
 struct VertexPosNorm {
-  Vec3 position;
-  Vec3 normal;
+  Vec3 mPosition;
+  Vec3 mNormal;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> format;
+  static shared_ptr<VertexFormat> mFormat;
 };
 
-struct VertexPosUVNorm {
-  Vec3 position;
-  Vec2 uv;
-  Vec3 normal;
+struct VertexPosUvNorm {
+  Vec3 mPosition;
+  Vec2 mUv;
+  Vec3 mNormal;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> format;
-};
-
-
-struct VertexPosUVNormTangent {
-  Vec3 position;
-  Vec2 uv;
-  Vec3 normal;
-  Vec3 tangent;
-
-  /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> format;
+  static shared_ptr<VertexFormat> mFormat;
 };
 
 
-struct VertexPosUV {
-  Vec3 position;
-  Vec2 uv;
+struct VertexPosUvNormTangent {
+  Vec3 mPosition;
+  Vec2 mUv;
+  Vec3 mNormal;
+  Vec3 mTangent;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> format;
+  static shared_ptr<VertexFormat> mFormat;
+};
+
+
+struct VertexPosUv {
+  Vec3 mPosition;
+  Vec2 mUv;
+
+  /// Vertex format descriptor for this struct
+  static shared_ptr<VertexFormat> mFormat;
 };

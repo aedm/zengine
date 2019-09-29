@@ -1,16 +1,13 @@
 #pragma once
 
-#include <QtWidgets/QMainWindow>
-#include <QtOpenGL/QGLWidget>
 #include <QFileSystemWatcher>
 #include "ui_zengarden.h"
 #include "watchers/documentwatcher.h"
 #include "watchers/logwatcher.h"
-#include "propertyeditor/propertyeditor.h"
+#include "watchers/watcherwidget.h"
 #include <zengine.h>
 #include <QtCore/QTime>
 #include <QtCore/QDir>
-#include <bass.h>
 
 class ZenGarden: public QMainWindow {
   Q_OBJECT
@@ -31,9 +28,6 @@ public:
 
   /// Sets the cursor relative to the beginning of the timeline
   void SetMovieCursor(float beats);
-
-  /// Sets the cursor relative to the beginning of the current clip
-  void SetClipCursor(float seconds);
 
   /// Returns the global time in seconds
   float GetGlobalTime() const;
@@ -101,7 +95,7 @@ private:
   void keyPressEvent(QKeyEvent* event) override;
 
   /// Music related
-  DWORD mBassMusicChannel = -1;
+  int mBassMusicChannel = -1;
   void LoadMusic();
   void PlayMusic(float beats) const;
   void StopMusic() const;

@@ -3,7 +3,6 @@
 #include "../serialize/json/jsonserializer.h"
 #include "../serialize/json/jsondeserializer.h"
 #include <include/base/helpers.h>
-#include <include/base/vectormath.h>
 #include <cstdarg>
 
 Logger* TheLogger = new Logger();
@@ -54,16 +53,6 @@ LogMessage::LogMessage(LogSeverity severity, const wchar_t* message) {
 }
 
 namespace Convert {
-  string IntToString(int value) {
-    char tmp[64];
-    sprintf_s(tmp, 64, "%d", value);
-    return string(tmp);
-  }
-
-  bool StringToFloat(const char* s, float& f) {
-    return sscanf(s, "%f", &f) != 1;
-  }
-
   std::wstring StringToWstring(const string& s) {
     std::wstring temp(s.length(), L' ');
     std::copy(s.begin(), s.end(), temp.begin());
@@ -71,12 +60,12 @@ namespace Convert {
   }
 }
 
-string ToJSON(const shared_ptr<Document>& document) {
-  const JSONSerializer serialzer(document);
-  return serialzer.GetJSON();
+string ToJson(const shared_ptr<Document>& document) {
+  const JSONSerializer serializer(document);
+  return serializer.GetJSON();
 }
 
-shared_ptr<Document> FromJSON(string& json) {
-  const JSONDeserializer deserialzer(json);
-  return deserialzer.GetDocument();
+shared_ptr<Document> FromJson(const string& json) {
+  const JSONDeserializer deserializer(json);
+  return deserializer.GetDocument();
 }

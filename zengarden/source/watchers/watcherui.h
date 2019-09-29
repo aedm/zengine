@@ -1,24 +1,22 @@
 #pragma once
 
 #include <zengine.h>
-#include <QtCore/QString>
-#include <QDragEnterEvent>
 #include <QDropEvent>
 
 class WatcherWidget;
-class EventForwarderGLWidget;
+class EventForwarderGlWidget;
 
 /// Watchers show the contents of a node or edit it. They show the content as a tab on 
 /// the ui, or as a property panel item, etc. Watchers belong to their WatcherWidgets, 
 /// and are destroyed by them.
-class WatcherUI: public Watcher {
+class WatcherUi: public Watcher {
   friend class WatcherWidget;
 
 public:
-  virtual ~WatcherUI();
+  virtual ~WatcherUi();
 
   /// Get the OpenGL widget, if any
-  EventForwarderGLWidget* GetGLWidget() const;
+  EventForwarderGlWidget* GetGlWidget() const;
 
   /// Get displayed name
   const QString& GetDisplayedName() const;
@@ -30,10 +28,10 @@ public:
   /// Set WatcherWidget that draws contents
   virtual void SetWatcherWidget(WatcherWidget* watcherWidget);
 
-  /// Destorys the watcher and its UI elements
+  /// Destroys the watcher and its UI elements
   void OnRemovedFromNode() override;
 
-  FastDelegate<void(WatcherWidget*)> deleteWatcherWidgetCallback;
+  FastDelegate<void(WatcherWidget*)> mDeleteWatcherWidgetCallback;
 
   /// Generate a name displayed for a node. If the node has no name, it shows
   /// the node type or the shader stub name.
@@ -43,7 +41,7 @@ public:
   WatcherWidget* mWatcherWidget = nullptr;
 
 protected:
-  WatcherUI(const shared_ptr<Node>& node);
+  WatcherUi(const shared_ptr<Node>& node);
 
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;

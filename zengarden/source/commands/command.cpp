@@ -29,11 +29,13 @@ bool CommandStack::Execute(Command* command) {
   }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 bool CommandStack::Redo() {
   NOT_IMPLEMENTED;
   return true;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 bool CommandStack::Undo() {
   NOT_IMPLEMENTED;
   return true;

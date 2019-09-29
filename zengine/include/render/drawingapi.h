@@ -42,7 +42,7 @@ struct RenderState {
 struct ShaderProgram {
   /// Uniform properties returned by the driver
   struct Uniform {
-    Uniform(const string& name, ValueType type, UINT offset);
+    Uniform(string name, ValueType type, UINT offset);
 
     /// Uniform name, must match the generated name inside the uniform block
     const string mName;
@@ -56,7 +56,7 @@ struct ShaderProgram {
 
   /// Sampler properties returned by the driver
   struct Sampler {
-    Sampler(const string& name, SamplerId handle);
+    Sampler(string name, SamplerId handle);
 
     /// Uniform name, must match the generated sampler name
     const string mName;
@@ -66,7 +66,7 @@ struct ShaderProgram {
   };
 
   struct SSBO {
-    SSBO(const string& name, UINT index);
+    SSBO(string name, UINT index);
     const string mName;
     const UINT mIndex;
   };
@@ -131,17 +131,17 @@ public:
   bool mProgramCompiledHack = false;
 
   /// Shader functions
-  shared_ptr<ShaderProgram> CreateShaderFromSource(const char* VertexSource,
-    const char* FragmentSource);
-  void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
+  shared_ptr<ShaderProgram> CreateShaderFromSource(const char* vertexSource,
+    const char* fragmentSource);
+  static void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
     const shared_ptr<Buffer>& uniformBuffer);
-  void SetUniform(UniformId Id, ValueType Type, const void* Values);
-  void EnableVertexAttribute(UINT Index, ValueType Type, UINT Offset, UINT Stride);
+  static void EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset, 
+    UINT stride);
 
   /// Buffer functions
   void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
   void SetIndexBuffer(const shared_ptr<Buffer>& buffer);
-  void SetSsbo(UINT index, const shared_ptr<Buffer>& buffer);
+  static void SetSsbo(UINT index, const shared_ptr<Buffer>& buffer);
 
   void Render(const shared_ptr<Buffer>& indexBuffer,
     UINT Count, PrimitiveTypeEnum primitiveType,
@@ -153,24 +153,24 @@ public:
   shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
     const void* texelData, bool gpuMemoryOnly,
     bool isMultisample, bool doesRepeat, bool generateMipmaps);
-  void DeleteTextureGpuData(Texture::Handle handle);
+  static void DeleteTextureGpuData(Texture::Handle handle);
   void UploadTextureGpuData(const shared_ptr<Texture>& texture, void* texelData);
 
   void SetTexture(const ShaderProgram::Sampler& sampler, 
     const shared_ptr<Texture>& texture, UINT slotIndex);
 
   /// Framebuffer operations
-  FrameBufferId CreateFrameBuffer(const shared_ptr<Texture>& depthBuffer,
+  static FrameBufferId CreateFrameBuffer(const shared_ptr<Texture>& depthBuffer,
     const shared_ptr<Texture>& targetBufferA,
     const shared_ptr<Texture>& targetBufferB);
-  void DeleteFrameBuffer(FrameBufferId frameBufferId);
+  static void DeleteFrameBuffer(FrameBufferId frameBufferId);
   void SetFrameBuffer(FrameBufferId frameBufferId);
-  void BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
+  static void BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
     int srcX0, int srcY0, int srcX1, int srcY1,
     int dstX0, int dstY0, int dstX1, int dstY1);
 
   /// Render parameters
-  void SetViewport(int x, int y, int width, int height, float depthMin = 0.0f,
+  static void SetViewport(int x, int y, int width, int height, float depthMin = 0.0f,
     float depthMax = 1.0f);
   void SetRenderState(const RenderState* State);
 
@@ -178,9 +178,9 @@ public:
   void Clear(bool colorBuffer = true, bool depthBuffer = true, UINT rgbColor = 0);
 
 private:
-  void SetTextureData(UINT width, UINT height, TexelType type, const void* texelData,
+  static void SetTextureData(UINT width, UINT height, TexelType type, const void* texelData,
     bool generateMipmap);
-  void SetTextureSubData(UINT x, UINT y, UINT width, UINT height, TexelType type, 
+  static void SetTextureSubData(UINT x, UINT y, UINT width, UINT height, TexelType type, 
     void* texelData);
 
   /// Shadowed buffer binds
@@ -200,17 +200,17 @@ private:
   void SetBlendMode(RenderState::BlendMode blendMode);
 
   /// Shadow values
-  FrameBufferId mBoundFrameBufferShadow;
-  VertexBufferHandle mBoundVertexBufferShadow;
-  IndexBufferHandle mBoundIndexBufferShadow;
+  FrameBufferId mBoundFrameBufferShadow{};
+  VertexBufferHandle mBoundVertexBufferShadow{};
+  IndexBufferHandle mBoundIndexBufferShadow{};
 
-  Texture::Handle mBoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
-  Texture::Handle mBoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS];
-  Texture::Handle mActiveTextureShadow;
+  Texture::Handle mBoundTextureShadow[MAX_COMBINED_TEXTURE_SLOTS]{};
+  Texture::Handle mBoundMultisampleTextureShadow[MAX_COMBINED_TEXTURE_SLOTS]{};
+  Texture::Handle mActiveTextureShadow{};
 
-  bool mDepthTestEnabledShadow;
-  RenderState::FaceMode mFaceMode;
-  RenderState::BlendMode mBlendMode;
-  bool mBlendEnabled;
-  UINT mClearColorShadow;
+  bool mDepthTestEnabledShadow{};
+  RenderState::FaceMode mFaceMode = RenderState::FaceMode::BACK;
+  RenderState::BlendMode mBlendMode = RenderState::BlendMode::NORMAL;
+  bool mBlendEnabled{};
+  UINT mClearColorShadow{};
 };

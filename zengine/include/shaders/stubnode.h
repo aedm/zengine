@@ -148,37 +148,37 @@ struct StubGlobalSampler {
 
 /// All metadata collected from a stub source.
 struct StubMetadata {
-  StubMetadata(const string& name, StubParameter::Type returnType,
-    const string& strippedSource,
-    const vector<OWNERSHIP StubParameter*>& parameters,
-    const vector<StubGlobalUniform*>& globalUniforms,
-    const vector<StubGlobalSampler*>& globalSamplers,
-    const vector<StubInOutVariable*>& inputs,
-    const vector<StubInOutVariable*>& outputs);
+  StubMetadata(string name, StubParameter::Type returnType,
+               string strippedSource,
+               vector<OWNERSHIP StubParameter*> parameters,
+               vector<StubGlobalUniform*> globalUniforms,
+               vector<StubGlobalSampler*> globalSamplers,
+               vector<StubInOutVariable*> inputs,
+               vector<StubInOutVariable*> outputs);
 
   ~StubMetadata();
 
   /// Value of the ":name" directive.
-  const string name;
+  const string mName;
 
   /// Value of the ":returns" directive.
-  const StubParameter::Type returnType;
+  const StubParameter::Type mReturnType;
 
   /// The source without any directives.
-  const string strippedSource;
+  const string mStrippedSource;
 
   /// Parameters of the stub. These become slots. (":param")
-  const vector<StubParameter*> parameters;
+  const vector<StubParameter*> mParameters;
 
   /// List of globals. (":global")
-  const vector<StubGlobalUniform*> globalUniforms;
-  const vector<StubGlobalSampler*> globalSamplers;
+  const vector<StubGlobalUniform*> mGlobalUniforms;
+  const vector<StubGlobalSampler*> mGlobalSamplers;
 
   /// List of stage inputs. (":input")
-  const vector<StubInOutVariable*> inputs;
+  const vector<StubInOutVariable*> mInputs;
 
   /// List of stage outputs. (":output")
-  const vector<StubInOutVariable*> outputs;
+  const vector<StubInOutVariable*> mOutputs;
 };
 
 

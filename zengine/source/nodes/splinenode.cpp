@@ -169,7 +169,7 @@ void SplineFloatComponent::CalculateTangent(int index) {
 }
 
 float FloatSplineNode::EvaluateLinearSpline(vector<SplinePoint>& points, float time) {
-  if (points.size() == 0) return 0.0f;
+  if (points.empty()) return 0.0f;
   if (points.size() == 1) return points[0].mValue;
 
   /// Binary search
@@ -265,7 +265,6 @@ SplineFloatComponent* FloatSplineNode::GetComponent(SplineLayer layer) {
       return &mBeatSpikeIntensityLayer;
     case SplineLayer::BEAT_QUANTIZER:
       return &mBeatQuantizerLayer;
-      break;
     default:
       SHOULD_NOT_HAPPEN;
       return nullptr;
