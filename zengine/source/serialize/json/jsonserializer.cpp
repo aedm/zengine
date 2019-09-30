@@ -24,6 +24,47 @@ const EnumMapperA SplineLayerMapper[] = {
   {"", -1}
 };
 
+template <typename Enum, typename Name>
+class EnumMap
+{
+public:
+  struct Item {
+    Enum mEnum;
+    Name mName;
+  };
+  constexpr EnumMap(const std::initializer_list<Item> items) : mItems(items) {}
+  Enum GetEnum(Name name) const {
+    for (const auto& item : mItems) {
+      if (item.mName == name) return item.mEnum;
+    }
+    return Enum(-1);
+  }
+  Name GetName(Enum enumValue) const {
+    for (const auto& item : mItems) {
+      if (item.mEnum == enumValue) return item.mName;
+    }
+    return nullptr;
+  }
+  std::initializer_list<Item> mItems;
+};
+
+template<typename Enum>
+constexpr EnumMap<Enum, const char*> MakeEnumMapA(
+  const std::initializer_list<typename EnumMap<Enum, const char*>::Item>& items)
+{
+  return EnumMap<Enum, const char*>(items);
+}
+
+template<typename Enum>
+constexpr EnumMap<Enum, const wchar_t*> MakeEnumMapW(
+  const std::initializer_list<typename EnumMap<Enum, const wchar_t*>::Item>& items)
+{
+  return EnumMap<Enum, const wchar_t*>(items);
+}
+
+constexpr auto x = MakeEnumMapA<SplineLayer>({ { SplineLayer::BASE, "foo"} });
+SplineLayer q1 = x.GetEnum("foo");
+
 
 JSONSerializer::JSONSerializer(const shared_ptr<Node>& root) {
   mJsonDocument.SetObject();
@@ -209,7 +250,7 @@ void JSONSerializer::SerializeGeneralNode(
           slotObject.AddMember("default", floatSlot->GetDefaultValue(), *mAllocator);
         }
         else if ((vec2Slot = dynamic_cast<Vec2Slot*>(slot)) != nullptr) {
-          slotObject.AddMember("default", SerializeVec2(vec2Slot->GetDefaultValue()), 
+          slotObject.AddMember("default", SerializeVec2(vec2Slot->GetDefaultValue()),
             *mAllocator);
         }
         else if ((vec3Slot = dynamic_cast<Vec3Slot*>(slot)) != nullptr) {
@@ -284,8 +325,8 @@ void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
 {
   shared_ptr<Texture> texture = node->Get();
   ASSERT(texture->mTexelData);
-  const string b64 = base64_encode(reinterpret_cast<UCHAR*>(&(*texture->mTexelData)[0]), 
-      UINT((*texture->mTexelData).size()));
+  const string b64 = base64_encode(reinterpret_cast<UCHAR*>(&(*texture->mTexelData)[0]),
+    UINT((*texture->mTexelData).size()));
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
   nodeValue.AddMember("type", rapidjson::Value(
