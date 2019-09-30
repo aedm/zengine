@@ -1,17 +1,16 @@
 #include "prototypes.h"
 #include <ui_operatorSelector.h>
-#include <QtCore/QDir>
 #include "../util/util.h"
 #include "../zengarden.h"
 
-Prototypes* ThePrototypes = NULL;
+Prototypes* ThePrototypes = nullptr;
 
-Prototypes::SelectorItem::SelectorItem(SelectorItem* Parent, QString Label,
+Prototypes::SelectorItem::SelectorItem(SelectorItem* parent, const QString& label,
   int prototypeIndex)
-  : QTreeWidgetItem(Parent)
+  : QTreeWidgetItem(parent)
   , mPrototypeIndex(prototypeIndex)
 {
-  setText(0, Label);
+  setText(0, label);
 }
 
 
@@ -63,8 +62,7 @@ void Prototypes::AddPrototype(NodeClass* nodeClass) {
   mMainCategory.mPrototypes.push_back(prototype);
 }
 
-Prototypes::~Prototypes() {
-}
+Prototypes::~Prototypes() = default;
 
 shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   QDialog dialog(Parent, Qt::FramelessWindowHint);
@@ -82,7 +80,7 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
     this, SLOT(HandleItemSelected(QTreeWidgetItem*, int)));
   //dialog.connect(SIGNAL(itemClicked()), this, SLOT(OnItemSelected()));
 
-  int ret = dialog.exec();
+  const int ret = dialog.exec();
   if (ret <= 0) return nullptr;
   const Prototype* prototype = allPrototypes[ret - 1];
 
@@ -98,8 +96,9 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
 }
 
 
-void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int) {
-  SelectorItem* item = static_cast<SelectorItem*>(Item);
+void Prototypes::HandleItemSelected(QTreeWidgetItem* Item, int) const
+{
+  SelectorItem* item = SafeCast<SelectorItem*>(Item);
   if (item->mPrototypeIndex >= 0) mDialog->done(item->mPrototypeIndex);
 }
 
@@ -115,10 +114,10 @@ void Prototypes::LoadStubs() {
   LoadStubFolder(QString("engine/stubs"), &mMainCategory);
 }
 
-void Prototypes::LoadStubFolder(QString folder, Category* category) {
+void Prototypes::LoadStubFolder(const QString& folder, Category* category) {
   static const QString shaderSuffix("shader");
 
-  QDir dir(folder);
+  const QDir dir(folder);
   for (QFileInfo& fileInfo : dir.entryInfoList()) {
     if (fileInfo.isDir()) {
       if (fileInfo.fileName().startsWith(".")) continue;
@@ -136,7 +135,7 @@ void Prototypes::LoadStubFolder(QString folder, Category* category) {
       prototype->mNodeClass = nodeClass;
       prototype->mNode = stub;
       prototype->mName = QString::fromStdString(stub->GetStubMetadata() == nullptr
-        ? nodeClass->mClassName : stub->GetStubMetadata()->name);
+        ? nodeClass->mClassName : stub->GetStubMetadata()->mName);
       category->mPrototypes.push_back(prototype);
     }
   }

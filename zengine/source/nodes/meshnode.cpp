@@ -2,7 +2,7 @@
 
 REGISTER_NODECLASS(StaticMeshNode, "Static Mesh");
 
-MeshNode::MeshNode() {}
+MeshNode::MeshNode() = default;
 
 const shared_ptr<Mesh>& MeshNode::GetMesh() const {
   return mMesh;

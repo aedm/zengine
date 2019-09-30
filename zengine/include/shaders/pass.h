@@ -41,7 +41,7 @@ public:
     }
   }
 
-  const vector<Item> GetResources() {
+  const vector<Item>& GetResources() {
     return mResources;
   }
 
@@ -61,7 +61,6 @@ public:
   /// Shader stages and sources
   StubSlot mVertexStub;
   StubSlot mFragmentStub;
-  StubSlot mUberShader;
 
   /// Pipeline state
   FloatSlot mFaceModeSlot;
@@ -70,22 +69,25 @@ public:
   FluidSlot mFluidColorTargetSlot;
   FluidSlot mFluidVelocityTargetSlot;
 
-  RenderState mRenderstate;
+  /// Uber shader
+  StubSlot mUberShader;
+  
+  RenderState mRenderstate{};
 
   void Set(Globals* globals);
 
   /// Returns true if pass can be used
-  bool isComplete();
+  bool isComplete() const;
 
   /// Get shader sources
-  string GetVertexShaderSource();
-  string GetFragmentShaderSource();
+  string GetVertexShaderSource() const;
+  string GetFragmentShaderSource() const;
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
   /// Creates the shader program
-  virtual void Operate() override;
+  void Operate() override;
 
   void BuildShaderSource();
 

@@ -4,12 +4,12 @@
 Q_DECLARE_METATYPE(shared_ptr<Graph>)
 
 enum MyRoles {
-  GraphNodeRole = Qt::UserRole + 1
+  GRAPH_NODE_ROLE = Qt::UserRole + 1
 };
 
 
 DocumentWatcher::DocumentWatcher(const shared_ptr<Node>& document)
-  : WatcherUI(document)
+  : WatcherUi(document)
 {}
 
 
@@ -19,36 +19,36 @@ DocumentWatcher::~DocumentWatcher() {
 
 
 void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
-  mUI.setupUi(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
+  mUi.setupUi(watcherWidget);
 
-  mUI.graphList->setFocusPolicy(Qt::NoFocus);
-  mUI.openButton->setFocusPolicy(Qt::NoFocus);
-  mUI.newGraphButton->setFocusPolicy(Qt::NoFocus);
-  mUI.deleteGraphButton->setFocusPolicy(Qt::NoFocus);
+  mUi.graphList->setFocusPolicy(Qt::NoFocus);
+  mUi.openButton->setFocusPolicy(Qt::NoFocus);
+  mUi.newGraphButton->setFocusPolicy(Qt::NoFocus);
+  mUi.deleteGraphButton->setFocusPolicy(Qt::NoFocus);
 
   mModel = new QStandardItemModel();
-  mUI.graphList->setModel(mModel);
+  mUi.graphList->setModel(mModel);
 
-  watcherWidget->connect(mUI.graphList, &QListView::clicked,
+  QObject::connect(mUi.graphList, &QListView::clicked,
     [=](const QModelIndex &index) {
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
+    const shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(graph);
   });
 
   RefreshGraphList();
 
-  watcherWidget->connect(mUI.openButton, &QPushButton::pressed, [=]() {
-    QModelIndex index = mUI.graphList->currentIndex();
+  QObject::connect(mUi.openButton, &QPushButton::pressed, [=]() {
+    const QModelIndex index = mUi.graphList->currentIndex();
     if (!index.isValid()) return;
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
+    const shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
     ZenGarden::GetInstance()->Watch(graph, WatcherPosition::RIGHT_TAB);
   });
 
-  watcherWidget->connect(mUI.newGraphButton, &QPushButton::pressed, [=]() {
-    shared_ptr<Graph> graph = make_shared<Graph>();
+  QObject::connect(mUi.newGraphButton, &QPushButton::pressed, [=]() {
+    const shared_ptr<Graph> graph = make_shared<Graph>();
     shared_ptr<Document> document = PointerCast<Document>(GetNode());
     document->mGraphs.Connect(graph);
   });
@@ -62,13 +62,14 @@ void DocumentWatcher::OnChildNameChange() {
   RefreshGraphList();
 }
 
-void DocumentWatcher::RefreshGraphList() {
-  shared_ptr<Document> doc = PointerCast<Document>(GetNode());
+void DocumentWatcher::RefreshGraphList() const
+{
+  const shared_ptr<Document> doc = PointerCast<Document>(GetNode());
   mModel->clear();
   for (const auto& node : doc->mGraphs.GetDirectMultiNodes()) {
     shared_ptr<Graph> graph = PointerCast<Graph>(node);
     QStandardItem* item = new QStandardItem(CreateDisplayedName(graph));
-    item->setData(QVariant::fromValue(graph), GraphNodeRole);
+    item->setData(QVariant::fromValue(graph), GRAPH_NODE_ROLE);
     mModel->appendRow(item);
   }
 }

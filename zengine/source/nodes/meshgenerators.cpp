@@ -7,8 +7,7 @@ REGISTER_NODECLASS(PlaneMeshNode, "Plane");
 REGISTER_NODECLASS(PolarSphereMeshNode, "PolarSphere");
 
 CubeMeshNode::CubeMeshNode()
-  : MeshNode()
-  , mSizeX(this, "SizeX")
+  : mSizeX(this, "SizeX")
   , mSizeY(this, "SizeY")
   , mSizeZ(this, "SizeZ")
 {}
@@ -16,40 +15,40 @@ CubeMeshNode::CubeMeshNode()
 void CubeMeshNode::Operate() {
   if (!mMesh) mMesh = make_shared<Mesh>();
 
-  float x = mSizeX.Get();
-  float y = mSizeY.Get();
-  float z = mSizeZ.Get();
+  const float x = mSizeX.Get();
+  const float y = mSizeY.Get();
+  const float z = mSizeZ.Get();
 
-  VertexPosUVNormTangent vertices[] = {
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0)},
-    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0)},
-    {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0)},
+  VertexPosUvNormTangent vertices[] = {
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
 
-    {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0)},
-    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0)},
+    {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
 
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0)},
-    {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0), Vec3(0, 0, 0)},
 
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0)},
-    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0)},
+    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0), Vec3(0, 0, 0)},
 
-    {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1)},
-    {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1)},
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1)},
+    {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1), Vec3(0, 0, 0)},
 
-    {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1)},
-    {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1)},
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, 0, -1)},
+    {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, 0, -1), Vec3(0, 0, 0)},
   };
 
   Vec3 tangents[] = {
@@ -63,14 +62,14 @@ void CubeMeshNode::Operate() {
 
   for (int i = 0; i < 6; i++) {
     for (int o = 0; o < 4; o++) {
-      vertices[i * 4 + o].tangent = tangents[i];
+      vertices[i * 4 + o].mTangent = tangents[i];
     }
   }
 
   IndexEntry indexes[3 * 2 * 6];
   int a = 0;
   for (int i = 0; i < 6; i++) {
-    int base = i * 4;
+    const int base = i * 4;
     indexes[a++] = 0 + base;
     indexes[a++] = 1 + base;
     indexes[a++] = 2 + base;
@@ -95,10 +94,6 @@ void CubeMeshNode::HandleMessage(Message* message) {
   default: break;
   }
 }
-
-HalfCubeMeshNode::HalfCubeMeshNode()
-  : MeshNode()
-{}
 
 void HalfCubeMeshNode::Operate() {
   if (!mMesh) mMesh = make_shared<Mesh>();
@@ -126,7 +121,7 @@ void HalfCubeMeshNode::Operate() {
   IndexEntry indexes[3 * 2 * 3];
   int a = 0;
   for (int i = 0; i < 3; i++) {
-    int base = i * 4;
+    const int base = i * 4;
     indexes[a++] = 0 + base;
     indexes[a++] = 1 + base;
     indexes[a++] = 2 + base;
@@ -153,8 +148,7 @@ void HalfCubeMeshNode::HandleMessage(Message* message) {
 }
 
 GeosphereMeshNode::GeosphereMeshNode()
-  : MeshNode()
-  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  : mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
   , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
   , mFlatten(this, "Flatten", false, true, true, 0.0f, 1.0f)
 {
@@ -165,35 +159,35 @@ GeosphereMeshNode::GeosphereMeshNode()
 
 
 void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float flatten,
-  float size, int resolution, VertexPosUVNormTangent** oVertexTarget,
+  float size, int resolution, VertexPosUvNormTangent** oVertexTarget,
   IndexEntry** oIndexTarget, int* oBaseIndex)
 {
   /// Generate vertices
-  Vec3 d1 = p2 - p1;
-  Vec3 d2 = p3 - p1;
-  Vec3 flatNormal = d2.Cross(d1).Normal();
-  Vec3 upVector(0, 1, 0);
+  const Vec3 d1 = p2 - p1;
+  const Vec3 d2 = p3 - p1;
+  const Vec3 flatNormal = d2.Cross(d1).Normal();
+  const Vec3 upVector(0, 1, 0);
 
-  VertexPosUVNormTangent* vertexTarget = *oVertexTarget;
-  int maxCoord = 1 << resolution;
-  float vRecip = 1.0f / float(maxCoord);
+  VertexPosUvNormTangent* vertexTarget = *oVertexTarget;
+  const int maxCoord = 1 << resolution;
+  const float vRecip = 1.0f / float(maxCoord);
   for (int y = 0; y <= maxCoord; y++) {
-    float yr = float(y) * vRecip;
+    const float yr = float(y) * vRecip;
     for (int x = 0; x <= maxCoord - y; x++) {
-      float xr = float(x) * vRecip;
+      const float xr = float(x) * vRecip;
       Vec3 p = p1 + d1 * xr + d2 * yr;
       Vec3 spherical = p.Normal();
-      Vec3 pos = (spherical + (p - spherical) * flatten) * size;
+      const Vec3 pos = (spherical + (p - spherical) * flatten) * size;
       Vec3 normal = spherical + (flatNormal - spherical) * flatten;
-      Vec3 tangent = upVector.Cross(normal).Normal();
-      float urad = atan2f(spherical.x, spherical.z);
-      float xz = sqrtf(spherical.x * spherical.x + spherical.z * spherical.z);
-      float vrad = atan2f(xz, spherical.y);
-      Vec2 uv((urad / Pi) * 0.5f + 0.5f, vrad / Pi + 0.5f);
-      vertexTarget->position = pos;
-      vertexTarget->uv = uv;
-      vertexTarget->normal = normal;
-      vertexTarget->tangent = tangent;
+      const Vec3 tangent = upVector.Cross(normal).Normal();
+      const float urad = atan2f(spherical.x, spherical.z);
+      const float xz = sqrtf(spherical.x * spherical.x + spherical.z * spherical.z);
+      const float vrad = atan2f(xz, spherical.y);
+      const Vec2 uv((urad / Pi) * 0.5f + 0.5f, vrad / Pi + 0.5f);
+      vertexTarget->mPosition = pos;
+      vertexTarget->mUv = uv;
+      vertexTarget->mNormal = normal;
+      vertexTarget->mTangent = tangent;
       vertexTarget++;
     }
   }
@@ -206,15 +200,15 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
   IndexEntry* indexTarget = *oIndexTarget;
 
   /// Generate indices
-  int baseIndex = *oBaseIndex;
-  int trianglesPerSide = 1 << (resolution * 2);
-  int verticesPerSide = (maxCoord + 1) * (maxCoord + 2) / 2;
+  const int baseIndex = *oBaseIndex;
+  const int trianglesPerSide = 1 << (resolution * 2);
+  const int verticesPerSide = (maxCoord + 1) * (maxCoord + 2) / 2;
   for (int i = 0; i < trianglesPerSide; i++) {
     /// Cache-friendlier ordering for really high resolution meshes
     int k = i;
     int x1 = 0, y1 = 0, x2 = 1, y2 = 0, x3 = 0, y3 = 1, step = 1;
     while (k > 0) {
-      int sel = k & 3;
+      const int sel = k & 3;
       x1 = x1 * dir[sel] + step * ox[sel];
       y1 = y1 * dir[sel] + step * oy[sel];
       x2 = x2 * dir[sel] + step * ox[sel];
@@ -224,9 +218,9 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
       step <<= 1;
       k >>= 2;
     }
-    int index1 = x1 + verticesPerSide - ((maxCoord - y1 + 1) * (maxCoord - y1 + 2) / 2);
-    int index2 = x2 + verticesPerSide - ((maxCoord - y2 + 1) * (maxCoord - y2 + 2) / 2);
-    int index3 = x3 + verticesPerSide - ((maxCoord - y3 + 1) * (maxCoord - y3 + 2) / 2);
+    const int index1 = x1 + verticesPerSide - ((maxCoord - y1 + 1) * (maxCoord - y1 + 2) / 2);
+    const int index2 = x2 + verticesPerSide - ((maxCoord - y2 + 1) * (maxCoord - y2 + 2) / 2);
+    const int index3 = x3 + verticesPerSide - ((maxCoord - y3 + 1) * (maxCoord - y3 + 2) / 2);
 
     indexTarget[0] = index1 + baseIndex;
     indexTarget[1] = index2 + baseIndex;
@@ -241,24 +235,24 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
 void GeosphereMeshNode::Operate() {
   if (!mMesh) mMesh = make_shared<Mesh>();
 
-  int resolution = int(mResolution.Get());
-  float size = mSize.Get();
-  float flatten = mFlatten.Get();
+  const int resolution = int(mResolution.Get());
+  const float size = mSize.Get();
+  const float flatten = mFlatten.Get();
 
-  int vertexPerEdge = 1 + (1 << resolution);
-  int vertexPerSide = vertexPerEdge * (vertexPerEdge + 1) / 2;
-  int vertexCount = 4 * vertexPerSide;
+  const int vertexPerEdge = 1 + (1 << resolution);
+  const int vertexPerSide = vertexPerEdge * (vertexPerEdge + 1) / 2;
+  const int vertexCount = 4 * vertexPerSide;
 
-  int trianglesPerSide = 1 << (resolution * 2);
-  int indexCount = trianglesPerSide * 3 * 4;
+  const int trianglesPerSide = 1 << (resolution * 2);
+  const int indexCount = trianglesPerSide * 3 * 4;
 
-  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<VertexPosUvNormTangent> vertices(vertexCount);
   vector<IndexEntry> indices(indexCount);
 
-  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
 
-  float p = 1.0f / sqrtf(3.0f);
+  const float p = 1.0f / sqrtf(3.0f);
   /// Tetraeder vertices
   Vec3 tv[] = {
     Vec3(1, 1, 1) * p,
@@ -277,7 +271,7 @@ void GeosphereMeshNode::Operate() {
   MakeGeosphereTriangle(tv[1], tv[2], tv[3], flatten, size, resolution,
     &vertexTarget, &indexTarget, &baseIndex);
 
-  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertexCount);
   mMesh->AllocateIndices(indexCount);
 
   mMesh->UploadVertices(&vertices[0]);
@@ -298,8 +292,7 @@ void GeosphereMeshNode::HandleMessage(Message* message) {
 }
 
 PlaneMeshNode::PlaneMeshNode()
-  : MeshNode()
-  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  : mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
   , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
 {
   mResolution.SetDefaultValue(1);
@@ -309,34 +302,34 @@ PlaneMeshNode::PlaneMeshNode()
 void PlaneMeshNode::Operate() {
   if (!mMesh) mMesh = make_shared<Mesh>();
 
-  int resolution = int(mResolution.Get());
-  float size = mSize.Get();
+  const int resolution = int(mResolution.Get());
+  const float size = mSize.Get();
 
-  int segmentsPerEdge = 1 << resolution;
-  int verticesPerEdge = segmentsPerEdge + 1;
-  int quadCount = segmentsPerEdge * segmentsPerEdge;
-  int vertexCount = verticesPerEdge * verticesPerEdge;
-  int indexCount = quadCount * 6;
+  const int segmentsPerEdge = 1 << resolution;
+  const int verticesPerEdge = segmentsPerEdge + 1;
+  const int quadCount = segmentsPerEdge * segmentsPerEdge;
+  const int vertexCount = verticesPerEdge * verticesPerEdge;
+  const int indexCount = quadCount * 6;
 
-  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<VertexPosUvNormTangent> vertices(vertexCount);
   vector<IndexEntry> indices(indexCount);
 
-  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
 
   /// Generate vertices
-  float uvStep = 1.0f / float(segmentsPerEdge);
-  float coordStep = uvStep * 2.0f;
+  const float uvStep = 1.0f / float(segmentsPerEdge);
+  const float coordStep = uvStep * 2.0f;
   float yCoord = -1.0f;
   float v = 0.0f;
   for (int y = 0; y <= segmentsPerEdge; y++) {
     float xCoord = -1.0f;
     float u = 0.0f;
     for (int x = 0; x <= segmentsPerEdge; x++) {
-      vertexTarget->position = Vec3(xCoord, 0.0, yCoord) * size;
-      vertexTarget->uv = Vec2(u, v);
-      vertexTarget->normal = Vec3(0, 1, 0);
-      vertexTarget->tangent = Vec3(1, 0, 0);
+      vertexTarget->mPosition = Vec3(xCoord, 0.0, yCoord) * size;
+      vertexTarget->mUv = Vec2(u, v);
+      vertexTarget->mNormal = Vec3(0, 1, 0);
+      vertexTarget->mTangent = Vec3(1, 0, 0);
       vertexTarget++;
       xCoord += coordStep;
       u += uvStep;
@@ -353,7 +346,7 @@ void PlaneMeshNode::Operate() {
       x += ((i >> (k * 2)) & 1) * (1 << k);
       y += ((i >> (k * 2 + 1)) & 1) * (1 << k);
     }
-    int p = x + y * verticesPerEdge;;
+    const int p = x + y * verticesPerEdge;;
     indexTarget[0] = p;
     indexTarget[1] = p + 1;
     indexTarget[2] = p + verticesPerEdge;
@@ -363,7 +356,7 @@ void PlaneMeshNode::Operate() {
     indexTarget += 6;
   }
 
-  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertexCount);
   mMesh->AllocateIndices(indexCount);
 
   mMesh->UploadVertices(&vertices[0]);
@@ -385,8 +378,7 @@ void PlaneMeshNode::HandleMessage(Message* message) {
 
 
 PolarSphereMeshNode::PolarSphereMeshNode()
-  : MeshNode()
-  , mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
+  : mResolution(this, "Resolution", false, true, true, 0.0f, 8.0f)
   , mSize(this, "Size", false, true, true, 0.0f, 10.0f)
 {
   mResolution.SetDefaultValue(5);
@@ -398,40 +390,40 @@ void PolarSphereMeshNode::Operate() {
 
   int resolution = int(mResolution.Get());
   if (resolution < 3) resolution = 3;
-  float size = mSize.Get();
+  const float size = mSize.Get();
 
-  int longAxisVertices = resolution * 2;
-  int shortAxisVertices = resolution;
-  int vertexCount = longAxisVertices * shortAxisVertices;
-  int quadCount = (longAxisVertices - 1)* (shortAxisVertices - 1);
-  int indexCount = quadCount * 6;
+  const int longAxisVertices = resolution * 2;
+  const int shortAxisVertices = resolution;
+  const int vertexCount = longAxisVertices * shortAxisVertices;
+  const int quadCount = (longAxisVertices - 1)* (shortAxisVertices - 1);
+  const int indexCount = quadCount * 6;
 
-  vector<VertexPosUVNormTangent> vertices(vertexCount);
+  vector<VertexPosUvNormTangent> vertices(vertexCount);
   vector<IndexEntry> indices(indexCount);
 
-  VertexPosUVNormTangent* vertexTarget = &vertices[0];
+  VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
 
   /// Generate vertices
-  float yStep = Pi / float(shortAxisVertices - 1);
-  float xStep = 2.0f * Pi / float(longAxisVertices - 1);
-  float uStep = 1.0f / float(longAxisVertices - 1);
-  float vStep = 1.0f / float(shortAxisVertices - 1);
+  const float yStep = Pi / float(shortAxisVertices - 1);
+  const float xStep = 2.0f * Pi / float(longAxisVertices - 1);
+  const float uStep = 1.0f / float(longAxisVertices - 1);
+  const float vStep = 1.0f / float(shortAxisVertices - 1);
   float yCoord = 0.0f;
   float v = 0.0f;
   for (int y = 0; y < shortAxisVertices; y++) {
     float xCoord = 0.0f;
     float u = 0.0f;
     for (int x = 0; x < longAxisVertices; x++) {
-      float radius = sinf(yCoord);
-      float yc = cosf(yCoord);
-      float xc = sinf(xCoord) * radius;
-      float zc = cosf(xCoord) * radius;
+      const float radius = sinf(yCoord);
+      const float yc = cosf(yCoord);
+      const float xc = sinf(xCoord) * radius;
+      const float zc = cosf(xCoord) * radius;
       Vec3 spherical(xc, yc, zc);
-      vertexTarget->position = spherical * size;
-      vertexTarget->uv = Vec2(u, v);
-      vertexTarget->normal = spherical;
-      vertexTarget->tangent = Vec3(0, 1, 0).Cross(spherical).Normal();
+      vertexTarget->mPosition = spherical * size;
+      vertexTarget->mUv = Vec2(u, v);
+      vertexTarget->mNormal = spherical;
+      vertexTarget->mTangent = Vec3(0, 1, 0).Cross(spherical).Normal();
       vertexTarget++;
       xCoord += xStep;
       u += uStep;
@@ -443,7 +435,7 @@ void PolarSphereMeshNode::Operate() {
   /// Generate indices
   for (int y = 0; y < shortAxisVertices-1; y++) {
     for (int x = 0; x < longAxisVertices-1; x++) {
-      int p = y * longAxisVertices + x;
+      const int p = y * longAxisVertices + x;
       indexTarget[0] = p;
       indexTarget[1] = p + 1;
       indexTarget[2] = p + longAxisVertices;
@@ -454,7 +446,7 @@ void PolarSphereMeshNode::Operate() {
     }
   }
 
-  mMesh->AllocateVertices(VertexPosUVNormTangent::format, vertexCount);
+  mMesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertexCount);
   mMesh->AllocateIndices(indexCount);
 
   mMesh->UploadVertices(&vertices[0]);

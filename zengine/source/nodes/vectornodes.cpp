@@ -6,11 +6,10 @@ REGISTER_NODECLASS(FloatToFloatNode, "Float To Float");
 REGISTER_NODECLASS(MaddNode, "MAdd");
 
 FloatsToVec3Node::FloatsToVec3Node()
-  : ValueNode<Vec3>()
-  , mValue(0, 0, 0)
-  , mX(this, "X")
+  : mX(this, "X")
   , mY(this, "Y")
   , mZ(this, "Z")
+  , mValue(0, 0, 0)
 {}
 
 const Vec3& FloatsToVec3Node::Get() {
@@ -35,8 +34,7 @@ void FloatsToVec3Node::Operate() {
 }
 
 FloatToFloatNode::FloatToFloatNode()
-  : ValueNode<float>()
-  , mX(this, "X")
+  : mX(this, "X")
   , mValue(0)
 {}
 
@@ -62,12 +60,11 @@ void FloatToFloatNode::Operate() {
 }
 
 FloatsToVec4Node::FloatsToVec4Node()
-  : ValueNode<Vec4>()
-  , mValue(0, 0, 0, 0)
-  , mX(this, "X")
+  : mX(this, "X")
   , mY(this, "Y")
   , mZ(this, "Z")
   , mW(this, "W")
+  , mValue(0, 0, 0, 0)
 {}
 
 const Vec4& FloatsToVec4Node::Get() {
@@ -92,11 +89,10 @@ void FloatsToVec4Node::Operate() {
 }
 
 MaddNode::MaddNode()
-  : ValueNode<float>()
-  , mValue(1)
-  , mA(this, "A")
+  : mA(this, "A")
   , mB(this, "B")
   , mC(this, "C")
+  , mValue(1)
 {
   mA.SetDefaultValue(1);
   mB.SetDefaultValue(1);

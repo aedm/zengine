@@ -3,10 +3,8 @@
 #include <zengine.h>
 #include <QTextStream>
 #include <QDir>
-#include <QString>
-#include <QByteArray>
 
-UiPainter* ThePainter = NULL;
+UiPainter* ThePainter = nullptr;
 
 void InitPainter() {
   ThePainter = new UiPainter();
@@ -93,8 +91,7 @@ UiPainter::UiPainter() {
   mTextBox->mMesh.Connect(mTexturedBoxMeshNode);
 }
 
-UiPainter::~UiPainter() {
-}
+UiPainter::~UiPainter() = default;
 
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
   VertexPos vertices[] = {
@@ -113,13 +110,13 @@ void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
   mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
 
-void UiPainter::DrawRect(const Vec2& TopLeft, const Vec2& Size) {
-  Vec3 pos(TopLeft.x + 0.5f, TopLeft.y + 0.5f, 0);
+void UiPainter::DrawRect(const Vec2& topLeft, const Vec2& size) {
+  const Vec3 pos(topLeft.x + 0.5f, topLeft.y + 0.5f, 0);
   VertexPos vertices[] = {
     {pos},
-    {pos + Vec3(Size.x - 1, 0, 0)},
-    {pos + Vec3(Size.x - 1, Size.y - 1, 0)},
-    {pos + Vec3(0, Size.y - 1, 0)},
+    {pos + Vec3(size.x - 1, 0, 0)},
+    {pos + Vec3(size.x - 1, size.y - 1, 0)},
+    {pos + Vec3(0, size.y - 1, 0)},
     {pos},
   };
   mRectMeshNode->GetMesh()->SetVertices(vertices);
@@ -139,9 +136,9 @@ void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
 }
 
 void UiPainter::DrawTexture(const shared_ptr<Texture>& texture, float x, float y) {
-  float w(texture->mWidth);
-  float h(texture->mHeight);
-  VertexPosUV vertices[] = {
+  const float w(texture->mWidth);
+  const float h(texture->mHeight);
+  VertexPosUv vertices[] = {
     {Vec3(x, y, 0), Vec2(0, 0)},
     {Vec3(x + w, y, 0), Vec2(1, 0)},
     {Vec3(x, y + h, 0), Vec2(0, 1)},
@@ -153,29 +150,9 @@ void UiPainter::DrawTexture(const shared_ptr<Texture>& texture, float x, float y
   mTexturedBox->Draw(&mGlobals, PassType::SOLID);
 }
 
-
-void UiPainter::DrawTextTexture(TextTexture* Tex, const Vec2& Position) {
-  float w = Tex->mTextSize.width();
-  float h = Tex->mTextSize.height();
-  shared_ptr<Texture> texture = Tex->GetTexture();
-  float u = w / float(texture->mWidth);
-  float v = h / float(texture->mHeight);
-  VertexPosUV vertices[] = {
-    {Vec3(Position.x, Position.y, 0), Vec2(0, 0)},
-    {Vec3(Position.x + w, Position.y, 0), Vec2(u, 0)},
-    {Vec3(Position.x, Position.y + h, 0), Vec2(0, v)},
-    {Vec3(Position.x + w, Position.y + h, 0), Vec2(u, v)},
-  };
-
-  mTextureNode->Set(texture);
-  mTexturedBoxMeshNode->GetMesh()->SetVertices(vertices);
-  mTextBox->Draw(&mGlobals, PassType::SOLID);
-}
-
-
 void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft,
   Vec2 size) {
-  OpenGL->SetViewport(0, 0, canvasWidth, canvasHeight);
+  OpenGLAPI::SetViewport(0, 0, canvasWidth, canvasHeight);
   mColor->Set(Vec4(1, 1, 1, 1));
 
   mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);

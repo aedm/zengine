@@ -2,7 +2,7 @@
 #include "../zengarden.h"
 
 MovieWatcher::MovieWatcher(const shared_ptr<Node>& node)
-  : WatcherUI(node)
+  : WatcherUi(node)
 {
   ZenGarden::GetInstance()->mOnMovieCursorChange += 
     Delegate(this, &MovieWatcher::HandleMovieCursorChange);
@@ -14,7 +14,7 @@ MovieWatcher::~MovieWatcher() {
 }
 
 void MovieWatcher::OnRedraw() {
-  GetGLWidget()->update();
+  GetGlWidget()->update();
 }
 
 void MovieWatcher::OnTimeEdited(float time) {
@@ -22,28 +22,29 @@ void MovieWatcher::OnTimeEdited(float time) {
 }
 
 void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
-  GetGLWidget()->OnPaint += Delegate(this, &MovieWatcher::Paint);
+  WatcherUi::SetWatcherWidget(watcherWidget);
+  GetGlWidget()->mOnPaint += Delegate(this, &MovieWatcher::Paint);
 }
 
-void MovieWatcher::Paint(EventForwarderGLWidget* widget) {
+void MovieWatcher::Paint(EventForwarderGlWidget* widget) {
   if (!mWatcherWidget) return;
 
   shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
   if (!mRenderTarget) {
-    GetGLWidget()->makeCurrent();
+    GetGlWidget()->makeCurrent();
     mRenderTarget =
       new RenderTarget(Vec2(float(mWatcherWidget->width()), float(mWatcherWidget->height())));
   }
 
-  Vec2 size = Vec2(widget->width(), widget->height());
+  const Vec2 size = Vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
 
   movieNode->Draw(mRenderTarget, ZenGarden::GetInstance()->GetMovieCursor());
 }
 
-void MovieWatcher::HandleMovieCursorChange(float movieCursor) {
-  GetGLWidget()->update();
+void MovieWatcher::HandleMovieCursorChange(float movieCursor) const
+{
+  GetGlWidget()->update();
 }

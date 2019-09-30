@@ -11,14 +11,14 @@ public:
 
   void Draw(RenderTarget* renderTarget, float time);
 
-  int GetTrackCount();
+  int GetTrackCount() const;
   const std::vector<shared_ptr<ClipNode>>& GetTrack(int trackIndex);
 
   /// Returns the end of the last clip
   float CalculateMovieLength();
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 private:
   // Tracks ordered by starting time of clips
@@ -26,7 +26,7 @@ private:
 
   void SortClips();
 
-  Globals mGlobals;
+  Globals mGlobals{};
 };
 
 typedef TypedSlot<MovieNode> MovieSlot;

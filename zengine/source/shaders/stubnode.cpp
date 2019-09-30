@@ -3,6 +3,7 @@
 #include <include/shaders/stubnode.h>
 #include <include/nodes/texturenode.h>
 #include <include/nodes/buffernode.h>
+#include <utility>
 
 REGISTER_NODECLASS(StubNode, "Stub");
 
@@ -40,8 +41,8 @@ const int GlobalSamplerOffsets[] = {
 };
 
 StubNode::StubNode()
-  : mMetadata(nullptr)
-  , mSource(this, "Source", false, false)
+  : mSource(this, "Source", false, false)
+  , mMetadata(nullptr)
 {}
 
 
@@ -70,33 +71,33 @@ void StubNode::Operate() {
   mParameterSlotMap.clear();
 
   /// Create a new list of slots
-  for (auto& param : mMetadata->parameters) {
+  for (auto& param : mMetadata->mParameters) {
     auto it = mParameterNameSlotMap.find(param->mName);
     bool canReuseSlot = false;
     if (it != mParameterNameSlotMap.end()) {
       switch (param->mType)
       {
       case StubParameter::Type::FLOAT:
-        canReuseSlot = IsInsanceOf<ValueStubSlot<float>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<float>*>(it->second);
         break;
       case StubParameter::Type::VEC2:
-        canReuseSlot = IsInsanceOf<ValueStubSlot<Vec2>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<Vec2>*>(it->second);
         break;
       case StubParameter::Type::VEC3:
-        canReuseSlot = IsInsanceOf<ValueStubSlot<Vec3>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<Vec3>*>(it->second);
         break;
       case StubParameter::Type::VEC4:
-        canReuseSlot = IsInsanceOf<ValueStubSlot<Vec4>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<Vec4>*>(it->second);
         break;
       case StubParameter::Type::MATRIX44:
-        canReuseSlot = IsInsanceOf<ValueStubSlot<Matrix>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<Matrix>*>(it->second);
         break;
       case StubParameter::Type::SAMPLER2D:
       case StubParameter::Type::IMAGE2D:
-        canReuseSlot = IsInsanceOf<TextureSlot*>(it->second);
+        canReuseSlot = IsInstanceOf<TextureSlot*>(it->second);
         break;
       case StubParameter::Type::BUFFER:
-        canReuseSlot = IsInsanceOf<BufferSlot*>(it->second);
+        canReuseSlot = IsInstanceOf<BufferSlot*>(it->second);
         break;
       default:
         break;
@@ -141,15 +142,17 @@ void StubNode::Operate() {
   }
 
   /// Delete unused slots
-  for (auto it = mParameterNameSlotMap.begin(); it != mParameterNameSlotMap.end(); ++it) {
-    SafeDelete(it->second);
+  for (auto& it : mParameterNameSlotMap)
+  {
+    SafeDelete(it.second);
   }
   mParameterNameSlotMap.clear();
 
   /// Index the new slots
-  for (auto it = mParameterSlotMap.begin(); it != mParameterSlotMap.end(); ++it) {
-    ASSERT(it->second != nullptr);
-    mParameterNameSlotMap[it->first->mName] = it->second;
+  for (auto& it : mParameterSlotMap)
+  {
+    ASSERT(it.second != nullptr);
+    mParameterNameSlotMap[it.first->mName] = it.second;
   }
 
   NotifyWatchers(&Watcher::OnSlotStructureChanged);
@@ -169,11 +172,11 @@ Slot* StubNode::GetSlotByParameterName(const string& name) {
 
 void StubNode::CopyFrom(const shared_ptr<Node>& node)
 {
-  shared_ptr<StubNode> original = PointerCast<StubNode>(node);
+  const shared_ptr<StubNode> original = PointerCast<StubNode>(node);
   mSource.SetDefaultValue(original->mSource.Get());
   mIsUpToDate = false;
   if (original->mMetadata) {
-    SetName(original->mMetadata->name);
+    SetName(original->mMetadata->mName);
   }
   Update();
 }
@@ -214,24 +217,25 @@ void StubNode::HandleMessage(Message* message) {
   }
 }
 
-StubMetadata::StubMetadata(const string& _name, StubParameter::Type _returnType,
-  const string& _strippedSource,
-  OWNERSHIP const vector<StubParameter*>& _parameters,
-  const vector<StubGlobalUniform*>& _globalUniforms,
-  const vector<StubGlobalSampler*>& _globalSamplers,
-  const vector<StubInOutVariable*>& _inputs,
-  const vector<StubInOutVariable*>& _outputs)
-  : name(_name)
-  , returnType(_returnType)
-  , parameters(_parameters)
-  , globalUniforms(_globalUniforms)
-  , globalSamplers(_globalSamplers)
-  , strippedSource(_strippedSource)
-  , inputs(_inputs)
-  , outputs(_outputs) {}
+StubMetadata::StubMetadata(string name, StubParameter::Type returnType,
+  string strippedSource,
+  OWNERSHIP vector<StubParameter*> parameters,
+  vector<StubGlobalUniform*> globalUniforms,
+  vector<StubGlobalSampler*> globalSamplers,
+  vector<StubInOutVariable*> inputs,
+  vector<StubInOutVariable*> outputs)
+  : mName(std::move(name))
+  , mReturnType(returnType)
+  , mStrippedSource(std::move(strippedSource))
+  , mParameters(std::move(parameters))
+  , mGlobalUniforms(std::move(globalUniforms))
+  , mGlobalSamplers(std::move(globalSamplers))
+  , mInputs(std::move(inputs))
+  , mOutputs(std::move(outputs))
+{}
 
 StubMetadata::~StubMetadata() {
-  for (auto x : parameters) delete(x);
+  for (auto x : mParameters) delete(x);
 }
 
 bool StubParameter::IsValidValueType(Type type) {

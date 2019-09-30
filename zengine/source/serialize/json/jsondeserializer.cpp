@@ -24,14 +24,15 @@ JSONDeserializer::JSONDeserializer(const string& json) {
   INFO("Loading done.");
 }
 
-shared_ptr<Document> JSONDeserializer::GetDocument() {
+shared_ptr<Document> JSONDeserializer::GetDocument() const
+{
   ASSERT(mDocument);
   return mDocument;
 }
 
 void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
-  string nodeClassName = value["node"].GetString();
-  int id = value["id"].GetInt();
+  const string nodeClassName = value["node"].GetString();
+  const int id = value["id"].GetInt();
   ASSERT(mNodes.find(id) == mNodes.end());
 
   shared_ptr<Node> node;
@@ -49,7 +50,7 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   }
 
   if (value.HasMember("position")) {
-    Vec2 position = DeserializeVec2(value["position"]);
+    const Vec2 position = DeserializeVec2(value["position"]);
     node->SetPosition(position);
   }
 
@@ -84,31 +85,31 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
 }
 
 Vec2 JSONDeserializer::DeserializeVec2(const rapidjson::Value& value) {
-  float x = value["x"].GetDouble();
-  float y = value["y"].GetDouble();
+  const float x = value["x"].GetDouble();
+  const float y = value["y"].GetDouble();
   return Vec2(x, y);
 }
 
 
 Vec3 JSONDeserializer::DeserializeVec3(const rapidjson::Value& value) {
-  float x = value["x"].GetDouble();
-  float y = value["y"].GetDouble();
-  float z = value["z"].GetDouble();
+  const float x = value["x"].GetDouble();
+  const float y = value["y"].GetDouble();
+  const float z = value["z"].GetDouble();
   return Vec3(x, y, z);
 }
 
 
 Vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
-  float x = value["x"].GetDouble();
-  float y = value["y"].GetDouble();
-  float z = value["z"].GetDouble();
-  float w = value["w"].GetDouble();
+  const float x = value["x"].GetDouble();
+  const float y = value["y"].GetDouble();
+  const float z = value["z"].GetDouble();
+  const float w = value["w"].GetDouble();
   return Vec4(x, y, z, w);
 }
 
 void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
-  int id = value["id"].GetInt();
-  shared_ptr<Node> node = mNodes.at(id);
+  const int id = value["id"].GetInt();
+  const shared_ptr<Node> node = mNodes.at(id);
   const auto& slots = node->GetSerializableSlots();
 
   if (value.HasMember("slots")) {
@@ -120,8 +121,8 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         const rapidjson::Value& jsonSlot = jsonSlots["Original"];
         if (jsonSlot.HasMember("connect")) {
           const rapidjson::Value& jsonConnect = jsonSlot["connect"];
-          int connId = jsonConnect.GetInt();
-          shared_ptr<Node> connNode = mNodes.at(connId);
+          const int connId = jsonConnect.GetInt();
+          const shared_ptr<Node> connNode = mNodes.at(connId);
           PointerCast<Ghost>(node)->mOriginalNode.Connect(connNode);
         }
       }
@@ -133,7 +134,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
 
       /// Find slot
       string slotName(itr->name.GetString());
-      auto& it = std::find_if(slots.begin(), slots.end(),
+      const auto& it = std::find_if(slots.begin(), slots.end(),
         [&](const auto& m) -> bool { return slotName == m.first; });
       if (it == slots.end()) {
         ERR("No such slot: %s", slotName.c_str());
@@ -191,36 +192,30 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
 }
 
 void JSONDeserializer::DeserializeStaticTextureNode(const rapidjson::Value& value,
-  const shared_ptr<StaticTextureNode>& node)
+  const shared_ptr<StaticTextureNode>& node) const
 {
-  int width = value["width"].GetInt();
-  int height = value["height"].GetInt();
+  const int width = value["width"].GetInt();
+  const int height = value["height"].GetInt();
   const char* typeString = value["type"].GetString();
   const char* texelString = value["base64"].GetString();
   int texelTypeInt = EnumMapperA::GetEnumFromString(TexelTypeMapper, typeString);
   if (texelTypeInt < 0) {
     ERR("Unknown texture type: %s", typeString);
   }
-  TexelType texelType = (TexelType)texelTypeInt;
-  UINT byteSize = width * height * OpenGLAPI::GetTexelByteCount(texelType);
-  //shared_ptr<vector<char>> texels = make_shared<vector<char>>(byteSize);
-
-  string texelContent = base64_decode(texelString);
-  //ASSERT(byteSize == texelContent.length());
-  //memcpy(&(*texels)[0], texelContent.c_str(), byteSize);
-
-  //Texture* texture = TheResourceManager->CreateTexture(width, height, texelType, texels);
-  shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, 
+  const TexelType texelType = TexelType(texelTypeInt);
+  const string texelContent = base64_decode(texelString);
+  const shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, 
     texelContent.c_str(), false, false, true, true);
   node->Set(texture);
 }
 
 
 void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
-  const shared_ptr<StaticMeshNode>& node) {
+  const shared_ptr<StaticMeshNode>& node) const
+{
   int binaryFormat = value["format"].GetInt();
-  UINT vertexCount = value["vertexcount"].GetInt();
-  shared_ptr<VertexFormat> format = make_shared<VertexFormat>(binaryFormat);
+  const UINT vertexCount = value["vertexcount"].GetInt();
+  const shared_ptr<VertexFormat> format = make_shared<VertexFormat>(binaryFormat);
   shared_ptr<Mesh> mesh = make_shared<Mesh>();
 
   mesh->AllocateVertices(format, vertexCount);
@@ -232,7 +227,7 @@ void JSONDeserializer::DeserializeStaticMeshNode(const rapidjson::Value& value,
   mesh->UploadVertices(&rawVertices[0]);
 
   if (value.HasMember("indices")) {
-    UINT indexCount = value["indexcount"].GetInt();
+    const UINT indexCount = value["indexcount"].GetInt();
     mesh->AllocateIndices(indexCount);
     vector<IndexEntry> indices(indexCount);
     const rapidjson::Value& jsonIndices = value["indices"];
@@ -253,14 +248,14 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
     const char* fieldName = EnumMapperA::GetStringFromEnum(SplineLayerMapper, l);
     if (!value.HasMember(fieldName)) continue;
 
-    SplineLayer layer = SplineLayer(l);
+    const SplineLayer layer = SplineLayer(l);
     const rapidjson::Value& jsonPoints = value[fieldName];
     for (UINT i = 0; i < jsonPoints.Size(); i++) {
       auto& jsonPoint = jsonPoints[i];
-      float time(jsonPoint["time"].GetDouble());
-      float value(jsonPoint["value"].GetDouble());
-      int pIndex = node->AddPoint(layer, time, value);
-      node->SetAutotangent(layer, pIndex, jsonPoint["autotangent"].GetBool());
+      const float time(jsonPoint["time"].GetDouble());
+      const float floatValue(jsonPoint["value"].GetDouble());
+      const int pIndex = node->AddPoint(layer, time, floatValue);
+      node->SetAutoTangent(layer, pIndex, jsonPoint["autotangent"].GetBool());
       node->SetBreakpoint(layer, pIndex, jsonPoint["breakpoint"].GetBool());
       node->SetLinear(layer, pIndex, jsonPoint["linear"].GetBool());
     }
@@ -271,7 +266,7 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
 void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
   const shared_ptr<StubNode>& node)
 {
-  string source = value["source"].GetString();
+  const string source = value["source"].GetString();
   node->mSource.SetDefaultValue(source);
   node->Update();
 }
@@ -279,7 +274,7 @@ void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
 
 void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
   if (value.HasMember("id")) {
-    int connId = value["id"].GetDouble();
+    const int connId = value["id"].GetDouble();
     auto& connNode = mNodes.at(connId);
     slot->Connect(connNode);
   }

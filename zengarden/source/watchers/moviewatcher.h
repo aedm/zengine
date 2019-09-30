@@ -1,21 +1,20 @@
 #pragma once
 
 #include "watcherui.h"
-#include "watcherwidget.h"
 #include <zengine.h>
 
-class MovieWatcher: public WatcherUI {
+class MovieWatcher: public WatcherUi {
 public:
   MovieWatcher(const shared_ptr<Node>& node);
   virtual ~MovieWatcher();
 
-  virtual void OnRedraw() override;
-  virtual void OnTimeEdited(float time) override;
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void OnRedraw() override;
+  void OnTimeEdited(float time) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void Paint(EventForwarderGLWidget* widget);
-  void HandleMovieCursorChange(float movieCursor);
+  void Paint(EventForwarderGlWidget* widget);
+  void HandleMovieCursorChange(float movieCursor) const;
 
   RenderTarget* mRenderTarget = nullptr;
 };

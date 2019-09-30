@@ -20,8 +20,9 @@ CameraNode::CameraNode()
   mOrientation.SetDefaultValue(Vec3(0, 0, 0));
 }
 
-void CameraNode::SetupGlobals(Globals* globals) {
-  Vec2 canvasSize = globals->RenderTargetSize;
+void CameraNode::SetupGlobals(Globals* globals) const
+{
+  const Vec2 canvasSize = globals->RenderTargetSize;
   globals->World.LoadIdentity();
 
   if (mOrthonormal) {
@@ -32,39 +33,39 @@ void CameraNode::SetupGlobals(Globals* globals) {
   }
 
   /// Projection matrix
-  float aspectRatio = canvasSize.x / canvasSize.y;
+  const float aspectRatio = canvasSize.x / canvasSize.y;
   globals->Projection =
     Matrix::Projection(mFovY.Get(), mZFar.Get(), mZNear.Get(), aspectRatio);
 
   /// Camera matrix
   //Matrix rotate = 
   //  Matrix::Rotate(Quaternion::FromEuler(mOrientation.x, mOrientation.y, 0));
-  Matrix xRot = Matrix::Rotate(mOrientation.Get().x, Vec3(1, 0, 0));
-  Matrix yRot = Matrix::Rotate(mOrientation.Get().y, Vec3(0, 1, 0));
+  const Matrix xRot = Matrix::Rotate(mOrientation.Get().x, Vec3(1, 0, 0));
+  const Matrix yRot = Matrix::Rotate(mOrientation.Get().y, Vec3(0, 1, 0));
   //Matrix lookAt = 
   //  Matrix::LookAt(Vec3(0, 0, mDistance.Get()), mTarget.Get(), Vec3(0, 1, 0));
   //globals->View = lookAt * xRot * yRot;
-  Matrix target = Matrix::Translate(-mTarget.Get());
-  Matrix distance = Matrix::Translate(Vec3(0, 0, -mDistance.Get()));
+  const Matrix target = Matrix::Translate(-mTarget.Get());
+  const Matrix distance = Matrix::Translate(Vec3(0, 0, -mDistance.Get()));
   globals->Camera = distance * xRot * yRot * target;
 
-  float shake = mShake.Get() * 0.1f;
+  const float shake = mShake.Get() * 0.1f;
   if (shake > 0.0f) {
-    float time = mShakeTime.Get() * mShakeSpeed.Get();
-    float xAngle =
+    const float time = mShakeTime.Get() * mShakeSpeed.Get();
+    const float xAngle =
       (sinf(time) + cosf(time * 2.53f) + sinf(time * 3.91f + 0.3f)) * shake;
-    float yAngle =
+    const float yAngle =
       (sinf(time * 0.87f) + cosf(time * 2.23f) + cosf(time * 3.71f + 0.8f)) * shake;
-    float zAngle =
+    const float zAngle =
       (sinf(time * 0.67f) + cosf(time * 2.43f) + cosf(time * 3.81f + 0.5f)) * shake;
-    Matrix xRot = Matrix::Rotate(xAngle, Vec3(1, 0, 0));
-    Matrix yRot = Matrix::Rotate(yAngle, Vec3(0, 1, 0));
-    Matrix zRot = Matrix::Rotate(zAngle, Vec3(0, 0, 1));
-    globals->Camera = xRot * yRot * zRot * globals->Camera;
+    const Matrix xShakeRot = Matrix::Rotate(xAngle, Vec3(1, 0, 0));
+    const Matrix yShakeRot = Matrix::Rotate(yAngle, Vec3(0, 1, 0));
+    const Matrix zRot = Matrix::Rotate(zAngle, Vec3(0, 0, 1));
+    globals->Camera = xShakeRot * yShakeRot * zRot * globals->Camera;
   }
 }
 
-CameraNode::~CameraNode() {}
+CameraNode::~CameraNode() = default;
 
 void CameraNode::HandleMessage(Message* message) {
   switch (message->mType) {

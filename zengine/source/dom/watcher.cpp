@@ -1,19 +1,21 @@
 #include <include/dom/watcher.h>
 #include <include/dom/node.h>
+#include <utility>
 
-Watcher::Watcher(const shared_ptr<Node>& node)
-  : mNode(node)
+Watcher::Watcher(shared_ptr<Node> node)
+  : mNode(std::move(node))
 {}
 
 Watcher::~Watcher() {
   ASSERT(mNode == nullptr);
 }
 
-shared_ptr<Node> Watcher::GetNode() {
+shared_ptr<Node> Watcher::GetNode() const
+{
   return mNode->GetReferencedNode();
 }
 
-std::shared_ptr<Node> Watcher::GetDirectNode()
+std::shared_ptr<Node> Watcher::GetDirectNode() const
 {
   return mNode;
 }

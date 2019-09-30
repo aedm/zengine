@@ -91,18 +91,18 @@ private:
 /// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
-  Slot(Node* owner, const string& name, bool isMultiSlot = false, bool isPublic = true,
+  Slot(Node* owner, string name, bool isMultiSlot = false, bool isPublic = true,
     bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
-  shared_ptr<Node> GetOwner();
-  bool IsOwnerExpired();
+  shared_ptr<Node> GetOwner() const;
+  bool IsOwnerExpired() const;
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
   /// - for multislots, the node will be added to the list of connected nodes. 
   /// Returns false if connection is not possible due to type mismatch.
-  virtual bool Connect(const shared_ptr<Node>& node);
+  virtual bool Connect(const shared_ptr<Node>& target);
 
   /// Disconnects a node from this slot. 
   virtual void Disconnect(const shared_ptr<Node>&);
@@ -143,14 +143,14 @@ public:
   const bool mIsMultiSlot;
 
   /// Return the Nth connected node from a multislot
-  const shared_ptr<Node> operator[] (UINT index);
+  const shared_ptr<Node>& operator[] (UINT index);
 
   /// Returns true if slot is connected to its own default node (if it has one)
   virtual bool IsDefaulted();
 
   /// Set ghost bit
   void SetGhost(bool isGhostSlot);
-  bool IsGhost();
+  bool IsGhost() const;
 
 protected:
   /// The operator which this slot is a member of
@@ -245,19 +245,19 @@ private:
 public:
   virtual void SetName(const string& name);
   virtual const string& GetName() const;
-  virtual void SetPosition(const Vec2 position);
-  virtual const Vec2 GetPosition() const;
-  virtual void SetSize(const Vec2 size);
-  virtual const Vec2 GetSize() const;
+  virtual void SetPosition(Vec2 position);
+  virtual Vec2 GetPosition() const;
+  virtual void SetSize(Vec2 size);
+  virtual Vec2 GetSize() const;
 
   /// Returns the list of publicly editable slots
-  const vector<Slot*>& GetPublicSlots();
+  const vector<Slot*>& GetPublicSlots() const;
 
   /// Returns the list of all slots
-  const vector<Slot*>& GetTraversableSlots();
+  const vector<Slot*>& GetTraversableSlots() const;
 
   /// Returns the slots that need to be serialized when saving / loading
-  const unordered_map<string, Slot*>& GetSerializableSlots();
+  const unordered_map<string, Slot*>& GetSerializableSlots() const;
 
 protected:
   /// Registers a new slot
@@ -290,7 +290,7 @@ private:
   /// --------------------------------------------------------
 public:
   template <typename T, typename ...P>
-  inline shared_ptr<T> Watch(P... args) {
+  shared_ptr<T> Watch(P... args) {
     static_assert(std::is_base_of<Watcher, T>::value, "T must be a Watcher");
     shared_ptr<T> watcher = make_shared<T>(args...);
     mWatchers.insert(watcher);
@@ -298,16 +298,16 @@ public:
   }
 
   /// Removes a Watcher from the watchers list
-  void RemoveWatcher(shared_ptr<Watcher> watcher);
+  void RemoveWatcher(const shared_ptr<Watcher>& watcher);
   void RemoveAllWatchers();
 
   /// Adds a new Watcher to the watchers list
-  void AssignWatcher(shared_ptr<Watcher> watcher);
+  void AssignWatcher(const shared_ptr<Watcher>& watcher);
 
 protected:
   template <class ...B>
-  inline void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
-    for (auto watcher : mWatchers) ((watcher.get())->*M)(args...);
+  void NotifyWatchers(void (Watcher::*M)(B...), B... args) {
+    for (const auto& watcher : mWatchers) ((watcher.get())->*M)(args...);
   }
 
 private:
@@ -327,7 +327,7 @@ public:
     return PointerCast<N>(GetReferencedNode());
   }
 
-  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
+  bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
     return IsPointerOf<N>(node->GetReferencedNode());
   }
 };

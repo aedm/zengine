@@ -12,7 +12,7 @@ public:
   typedef	UINT Handle;
 
   Texture(Handle handle, int width, int height, TexelType type,
-    const shared_ptr<vector<char>> texelData, bool isMultisample, bool doesRepeat,
+          shared_ptr<vector<char>> texelData, bool isMultisample, bool doesRepeat,
     bool generateMipmaps);
   ~Texture();
 

@@ -9,7 +9,7 @@ public:
   Slot mNodes;
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 };
 

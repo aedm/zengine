@@ -2,13 +2,13 @@
 
 CommandStack* TheCommandStack = new CommandStack();
 
-Command::~Command() {}
+Command::~Command() = default;
 
 Command::Command() {
   mIsActive = false;
 }
 
-CommandStack::CommandStack() {}
+CommandStack::CommandStack() = default;
 
 CommandStack::~CommandStack() {
   for (int i = mCommandList.size(); i > 0;) {
@@ -29,11 +29,13 @@ bool CommandStack::Execute(Command* command) {
   }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 bool CommandStack::Redo() {
   NOT_IMPLEMENTED;
   return true;
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 bool CommandStack::Undo() {
   NOT_IMPLEMENTED;
   return true;

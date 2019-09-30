@@ -12,7 +12,6 @@ SceneNode::SceneNode()
   , mSkyLightSpread(this, "Shadow spread", false, true, true, 0.0f, 30.0f)
   , mSkyLightSampleSpread(this, "Sample spread", false, true, true, 0.0f, 20.0f)
   , mSkyLightBias(this, "Shadow bias")
-  , mSceneTimes(this, string(), true, false, false, false)
   , mDOFEnabled(this, "DOF enabled")
   , mDOFFocusDistance(this, "DOF focus distance", false, true, true, 0.0f, 20.0f)
   , mDOFBlur(this, "DOF blur", false, true, true, 0.0f, 30.0f)
@@ -20,6 +19,7 @@ SceneNode::SceneNode()
   , mDOFBleed(this, "DOF bleed", false, true, true, 0.0f, 0.1f)
   , mZPrepassDisabled(this, "Disable Z prepass")
   , mFluidsSlot(this, "Fluids", true)
+  , mSceneTimes(this, string(), true, false, false, false)
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
@@ -34,15 +34,14 @@ SceneNode::SceneNode()
   mDOFBleed.SetDefaultValue(0.04f);
 }
 
-SceneNode::~SceneNode() {
-}
+SceneNode::~SceneNode() = default;
 
 void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
-  float globalTime = mGlobalTimeNode->Get();
-  float passedTime = globalTime - mLastRenderTime;
+  const float globalTime = mGlobalTimeNode->Get();
+  const float passedTime = globalTime - mLastRenderTime;
   mLastRenderTime = globalTime;
-  
-  float fluidAdvanceTime = passedTime > 0.1f ? 0.1f : passedTime;
+
+  const float fluidAdvanceTime = passedTime > 0.1f ? 0.1f : passedTime;
 
   /// Paint Fluids
   RenderDrawables(globals, PassType::FLUID_PAINT);
@@ -53,22 +52,22 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
     fluid->Render(fluidAdvanceTime);
   }
 
-  bool directToScreen = globals->DirectToScreen > 0.5f;
-  bool directToSquare = globals->DirectToSquare > 0.5f;
+  const bool directToScreen = globals->DirectToScreen > 0.5f;
+  const bool directToSquare = globals->DirectToSquare > 0.5f;
 
   /// Get camera
-  auto& camera = mCamera.GetNode();
+  const auto& camera = mCamera.GetNode();
   if (camera == nullptr) return;
 
   /// Pass #1: skylight shadow
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
-  Vec3 s = mShadowMapSize.Get();
-  Vec3 lightDir = mSkyLightDirection.Get().Normal();
-  
-  Matrix lookat = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
-  Matrix target = Matrix::Translate(-camera->mTarget.Get());
-  globals->Camera = lookat * target;
+  const Vec3 s = mShadowMapSize.Get();
+  const Vec3 lightDir = mSkyLightDirection.Get().Normal();
+
+  const Matrix lookAt = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
+  const Matrix target = Matrix::Translate(-camera->mTarget.Get());
+  globals->Camera = lookAt * target;
  
   globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
   globals->World.LoadIdentity();
@@ -78,7 +77,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
     auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->ComputeForcedShadowCenter(globals, shadowCenter);
   }
-  Matrix shadowCenterTarget = Matrix::Translate(-shadowCenter);
+  const Matrix shadowCenterTarget = Matrix::Translate(-shadowCenter);
   globals->Camera = shadowCenterTarget * globals->Camera;
 
   globals->SkylightProjection = globals->Projection;
@@ -139,7 +138,8 @@ void SceneNode::Operate() {
   CalculateRenderDependencies();
 }
 
-void SceneNode::RenderDrawables(Globals* globals, PassType passType) {
+void SceneNode::RenderDrawables(Globals* globals, PassType passType) const
+{
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
     auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->Draw(globals, passType);
@@ -184,14 +184,14 @@ void SceneNode::CalculateRenderDependencies() {
   }
 }
 
-void SceneNode::SetSceneTime(float time) {
+void SceneNode::SetSceneTime(float beats) {
   Update();
   for (auto& node : mSceneTimes.GetDirectMultiNodes()) {
-    PointerCast<SceneTimeNode>(node)->Set(time);
+    PointerCast<SceneTimeNode>(node)->Set(beats);
   }
 }
 
-float SceneNode::GetSceneTime() {
+float SceneNode::GetSceneTime() const {
   return mSceneTime;
 }
 

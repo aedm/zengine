@@ -23,7 +23,7 @@ public:
   void Draw(RenderTarget* renderTarget, Globals* globals, float clipTime);
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 typedef TypedSlot<ClipNode> ClipSlot;

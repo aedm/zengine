@@ -12,7 +12,7 @@ private:
   /// Returns true if a ghost slots was found in the subtree
   bool Traverse(const shared_ptr<Node>& node) {
     if (mVisited.find(node) != mVisited.end()) {
-      bool hadGhostSlot = mHadGhostSlot.find(node) != mHadGhostSlot.end();
+      const bool hadGhostSlot = mHadGhostSlot.find(node) != mHadGhostSlot.end();
       return hadGhostSlot;
     }
     mVisited.insert(node);
@@ -27,8 +27,8 @@ private:
       }
 
       if (slot->mIsMultiSlot) {
-        for (const shared_ptr<Node>& node : slot->GetDirectMultiNodes()) {
-          foundGhostSlot |= Traverse(node);
+        for (const shared_ptr<Node>& refNodes : slot->GetDirectMultiNodes()) {
+          foundGhostSlot |= Traverse(refNodes);
         }
       }
       else if (!slot->IsDefaulted()) {
@@ -52,8 +52,7 @@ private:
 };
 
 Ghost::Ghost()
-  : Node()
-  , mOriginalNode(this, "Original", false, false, true, true)
+  : mOriginalNode(this, "Original", false, false, true, true)
   , mMainInternalNode(this, string(), false, false, false, false)
 {
   Regenerate();
@@ -63,7 +62,8 @@ bool Ghost::IsGhostNode() {
   return true;
 }
 
-bool Ghost::IsDirectReference() {
+bool Ghost::IsDirectReference() const
+{
   return mMainInternalNode.GetDirectNode() == mOriginalNode.GetDirectNode();
 }
 
@@ -90,7 +90,7 @@ shared_ptr<Node> Ghost::GetReferencedNode() {
 }
 
 void Ghost::Regenerate() {
-  shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
+  const shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
   vector<shared_ptr<Node>> topologicalOrder;
   if (root != nullptr) GhostTransitiveClosure(root, topologicalOrder);
 
@@ -99,7 +99,7 @@ void Ghost::Regenerate() {
   ClearSlots();
   AddSlot(&mOriginalNode, false, true, true);
 
-  if (topologicalOrder.size() == 0) {
+  if (topologicalOrder.empty()) {
     /// No ghost slots, just reference the original node
     mMainInternalNode.Connect(mOriginalNode.GetReferencedNode());
   }
@@ -121,7 +121,7 @@ void Ghost::Regenerate() {
       /// Connect slots
       const auto& originalSlots = node->GetPublicSlots();
       const auto& internalNodeSlots = internalNode->GetPublicSlots();
-      size_t slotCount = originalSlots.size();
+      const size_t slotCount = originalSlots.size();
       ASSERT(slotCount == internalNode->GetPublicSlots().size());
       for (UINT i = 0; i < slotCount; i++) {
         Slot* originalSlot = originalSlots[i];
@@ -138,17 +138,17 @@ void Ghost::Regenerate() {
         else {
           if (originalSlot->mIsMultiSlot) {
             for (const auto& connectedNode : originalSlot->GetDirectMultiNodes()) {
-              auto it = newNodeMapping.find(connectedNode);
-              shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
-                ? connectedNode : it->second;
+              auto it2 = newNodeMapping.find(connectedNode);
+              shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
+                ? connectedNode : it2->second;
               internalSlot->Connect(nodeToConnect);
             }
           }
           else {
             shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
-            auto it = newNodeMapping.find(connectedNode);
-            shared_ptr<Node> nodeToConnect = (it == newNodeMapping.end())
-              ? connectedNode : it->second;
+            auto it2 = newNodeMapping.find(connectedNode);
+            shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
+              ? connectedNode : it2->second;
             internalSlot->Connect(nodeToConnect);
           }
         }

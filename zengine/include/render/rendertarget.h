@@ -9,22 +9,22 @@ public:
   ~RenderTarget();
 
   /// Sets the G-Buffer as render target
-  void SetGBufferAsTarget(Globals* globals);
-  void SetGBufferAsTargetForZPostPass(Globals* globals);
+  void SetGBufferAsTarget(Globals* globals) const;
+  void SetGBufferAsTargetForZPostPass(Globals* globals) const;
 
   /// Sets the final color buffer as render target, G-Buffer as source
-  void SetColorBufferAsTarget(Globals* globals);
-  void SetShadowBufferAsTarget(Globals* globals);
-  void SetSquareBufferAsTarget(Globals* globals);
+  void SetColorBufferAsTarget(Globals* globals) const;
+  void SetShadowBufferAsTarget(Globals* globals) const;
+  void SetSquareBufferAsTarget(Globals* globals) const;
 
   void Resize(Vec2 size);
-  Vec2 GetSize();
+  Vec2 GetSize() const;
 
   FrameBufferId GetPostprocessSourceFramebufferId();
   FrameBufferId GetPostprocessTargetFramebufferId();
   shared_ptr<Texture> GetPostprocessSourceTexture();
   void SwapPostprocessBuffers();
-  void FinishFrame();
+  void FinishFrame() const;
 
   /// G-buffer (MSAA)
   /// A: [4x16F] RGB: HDR final color, A: unused

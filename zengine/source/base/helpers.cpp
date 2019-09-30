@@ -3,8 +3,7 @@
 #include "../serialize/json/jsonserializer.h"
 #include "../serialize/json/jsondeserializer.h"
 #include <include/base/helpers.h>
-#include <include/base/vectormath.h>
-#include <stdarg.h>
+#include <cstdarg>
 
 Logger* TheLogger = new Logger();
 
@@ -22,7 +21,7 @@ void Logger::Log2(LogSeverity severity, const wchar_t* logString, ...) {
 
 void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
                       const wchar_t* logString, ...) {
-  int funlen = swprintf(TempStringW, LogMessageMaxLength, function);
+  const int funlen = swprintf(TempStringW, LogMessageMaxLength, function);
 
   va_list args;
   va_start(args, logString);
@@ -41,7 +40,7 @@ void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
   va_end(args);
 
   string tmp_string(TempStringA);
-  wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
+  const wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
 
   swprintf(TempStringW, LogMessageMaxLength, L"%s%s", function, tmp_wstring.c_str());
 
@@ -54,16 +53,6 @@ LogMessage::LogMessage(LogSeverity severity, const wchar_t* message) {
 }
 
 namespace Convert {
-  string IntToSring(int Value) {
-    char tmp[64];
-    sprintf_s(tmp, 64, "%d", Value);
-    return string(tmp);
-  }
-
-  bool StringToFloat(const char* S, float& F) {
-    return sscanf(S, "%f", &F) != 1;
-  }
-
   std::wstring StringToWstring(const string& s) {
     std::wstring temp(s.length(), L' ');
     std::copy(s.begin(), s.end(), temp.begin());
@@ -71,12 +60,12 @@ namespace Convert {
   }
 }
 
-string ToJSON(const shared_ptr<Document>& document) {
-  JSONSerializer serialzer(document);
-  return serialzer.GetJSON();
+string ToJson(const shared_ptr<Document>& document) {
+  const JSONSerializer serializer(document);
+  return serializer.GetJSON();
 }
 
-shared_ptr<Document> FromJSON(string& json) {
-  JSONDeserializer deserialzer(json);
-  return deserialzer.GetDocument();
+shared_ptr<Document> FromJson(const string& json) {
+  const JSONDeserializer deserializer(json);
+  return deserializer.GetDocument();
 }

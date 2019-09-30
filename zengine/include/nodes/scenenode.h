@@ -33,27 +33,27 @@ public:
   void Draw(RenderTarget* renderTarget, Globals* globals);
 
   /// Sets the clip-relative time to all SceneTimeNode dependencies
-  void SetSceneTime(float seconds);
+  void SetSceneTime(float beats);
 
-  /// Gets the currect time cursor
-  float GetSceneTime();
+  /// Gets the current time cursor
+  float GetSceneTime() const;
 
   /// hack
   void UpdateDependencies();
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
-  void RenderDrawables(Globals* globals, PassType passType);
+  void RenderDrawables(Globals* globals, PassType passType) const;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 private:
   vector<shared_ptr<Node>> mTransitiveClosure;
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
-  float mLastRenderTime;
+  float mLastRenderTime{};
 
   shared_ptr<GlobalTimeNode> mGlobalTimeNode = make_shared<GlobalTimeNode>();
 

@@ -11,22 +11,25 @@ class Slot;
 
 /// Returns true if the node is an instance of a certain class
 template<class T>
+// ReSharper disable once CppEntityUsedOnlyInUnevaluatedContext
 bool IsExactType(Node* node) {
   return typeid(T) == typeid(*node);
 }
 
 template<class T>
+// ReSharper disable once CppEntityUsedOnlyInUnevaluatedContext
 bool IsExactType(Slot* slot) {
   return typeid(T) == typeid(*slot);
 }
 
 template<class T>
+// ReSharper disable once CppEntityUsedOnlyInUnevaluatedContext
 bool IsExactType(const shared_ptr<Node>& node) {
   return typeid(T) == typeid(*node.get());
 }
 
 template<class T, class N>
-bool IsInsanceOf(N* ptr) {
+bool IsInstanceOf(N* ptr) {
   return dynamic_cast<T>(ptr) != nullptr;
 }
 
@@ -38,19 +41,20 @@ bool IsPointerOf(const shared_ptr<N>& ptr) {
 
 /// Exact type of the node. Poor man's reflection.
 struct NodeClass {
+  virtual ~NodeClass() = default;
   virtual shared_ptr<Node> Manufacture() = 0;
   string mClassName;
 };
 
 
-/// Poor man's reflection. This class keeps track of all possilbe Node classes.
+/// Poor man's reflection. This class keeps track of all possible Node classes.
 class NodeRegistry {
 public:
   static NodeRegistry* GetInstance();
 
   template<class T> void Register(NodeClass* nodeClass);
 
-  /// Returns NodeClass by name, node name doesn't have to be registered
+  /// Returns NodeClass by name, node name does not have to be registered
   NodeClass* GetNodeClass(const string& name);
 
   /// Returns NodeClass by node instance. Node must be registered
@@ -82,7 +86,7 @@ NodeClass* NodeRegistry::GetNodeClass() {
 
 /// Use this in .cpp files, not in headers!
 /// Registers a Node type in the engine. This makes the engine know about
-/// all the Node types that can be utilised, and it also enables serialization
+/// all the Node types that can be utilized, and it also enables serialization
 /// and deserialization of objects;
 #define REGISTER_NODECLASS(nodeClass, nodeClassName)                               \
   struct NodeClass_##nodeClass: public NodeClass {                                 \

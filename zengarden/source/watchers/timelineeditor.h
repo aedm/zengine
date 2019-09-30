@@ -5,21 +5,21 @@
 #include <zengine.h>
 #include "ui_movieeditor.h"
 
-class TimelineEditor: public WatcherUI {
+class TimelineEditor: public WatcherUi {
 public:
   TimelineEditor(const shared_ptr<MovieNode>& movieNode);
   virtual ~TimelineEditor();
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
-  virtual void OnRedraw() override;
-  virtual void OnChildNameChange();
-  void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode);
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void OnRedraw() override;
+  void OnChildNameChange() override;
+  void SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const;
 
 private:
-  Ui::MovieEditor mUI;
-  EventForwarderWidget* mTimelineCanvas;
+  Ui::MovieEditor mUI{};
+  EventForwarderWidget* mTimelineCanvas{};
 
-  void DrawTimeline(QPaintEvent* ev);
+  void DrawTimeline(QPaintEvent* ev) const;
 
   float mTimelineStartTime = 0.0f;
   float mZoomLevel = 0.0f;
@@ -32,14 +32,14 @@ private:
     TIME_SEEK,
   };
   State mState = State::DEFAULT;
-  float mOriginalTimelineStartTime;
-  float mOriginalClipStart;
-  float mOriginalClipLength;
+  float mOriginalTimelineStartTime{};
+  float mOriginalClipStart{};
+  float mOriginalClipLength{};
   QPoint mOriginalMousePos;
   shared_ptr<ClipNode> mHoveredClip;
   shared_ptr<ClipNode> mSelectedClip;
 
-  void HandleMovieCursorChange(float seconds);
+  void HandleMovieCursorChange(float seconds) const;
   void HandleMouseDown(QMouseEvent* event);
   void HandleMouseUp(QMouseEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
@@ -47,8 +47,8 @@ private:
   void HandleMouseMove(QMouseEvent* event);
   void HandleMouseWheel(QWheelEvent* event);
 
-  int TimeToScreen(float time);
-  int TimeRangeToPixels(float timeRange);
-  float ScreenToTime(int xPos);
-  float PixelsToTimeRange(int pixelCount);
+  int TimeToScreen(float time) const;
+  int TimeRangeToPixels(float timeRange) const;
+  float ScreenToTime(int xPos) const;
+  float PixelsToTimeRange(int pixelCount) const;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "meshnode.h"
+#include "../shaders/valuestubslot.h"
 
 class CubeMeshNode: public MeshNode {
 public:
@@ -11,22 +12,22 @@ protected:
   FloatSlot mSizeY;
   FloatSlot mSizeZ;
 
-  virtual void Operate() override;
+  void Operate() override;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 
 class HalfCubeMeshNode : public MeshNode {
 public:
-  HalfCubeMeshNode();
+  HalfCubeMeshNode() = default;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 class GeosphereMeshNode : public MeshNode {
@@ -38,10 +39,10 @@ public:
   FloatSlot mFlatten;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 class PlaneMeshNode : public MeshNode {
@@ -52,10 +53,10 @@ public:
   FloatSlot mSize;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 class PolarSphereMeshNode : public MeshNode {
@@ -66,9 +67,9 @@ public:
   FloatSlot mSize;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 

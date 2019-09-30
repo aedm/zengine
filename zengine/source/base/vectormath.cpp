@@ -1,7 +1,7 @@
 #include <include/base/vectormath.h>
-#include <math.h>
+#include <cmath>
 
-Vec2::Vec2() {}
+Vec2::Vec2() = default;
 
 Vec2::Vec2(float x, float y) {
   this->x = x;
@@ -9,23 +9,23 @@ Vec2::Vec2(float x, float y) {
 }
 
 Vec2 Vec2::operator- (const Vec2& op) const {
-  return Vec2(x - op.x, y - op.y);
+  return {x - op.x, y - op.y};
 }
 
 Vec2 Vec2::operator+ (const Vec2& op) const {
-  return Vec2(x + op.x, y + op.y);
+  return {x + op.x, y + op.y};
 }
 
 Vec2 Vec2::operator/ (const Vec2& op) const {
-  return Vec2(x / op.x, y / op.y);
+  return {x / op.x, y / op.y};
 }
 
 Vec2 Vec2::operator* (const Vec2& op) const {
-  return Vec2(x * op.x, y * op.y);
+  return {x * op.x, y * op.y};
 }
 
 Vec2 Vec2::operator* (float f) const {
-  return Vec2(x * f, y * f);
+  return {x * f, y * f};
 }
 
 Vec2 Vec2::operator/ (float f) const {
@@ -69,10 +69,10 @@ float Vec2::Length() const {
 }
 
 Vec2 Vec2::Dot(const Vec2& op) const {
-  return Vec2(x * op.x, y * op.y);
+  return {x * op.x, y * op.y};
 }
 
-Vec3::Vec3() {}
+Vec3::Vec3() = default;
 
 Vec3::Vec3(float x, float y, float z) {
   this->x = x;
@@ -85,23 +85,23 @@ float Vec3::Dot(const Vec3& op) const {
 }
 
 Vec3 Vec3::operator* (float f) const {
-  return Vec3(x * f, y * f, z * f);
+  return {x * f, y * f, z * f};
 }
 
 Vec3 Vec3::operator- (const Vec3& op) const {
-  return Vec3(x - op.x, y - op.y, z - op.z);
+  return {x - op.x, y - op.y, z - op.z};
 }
 
 Vec3 Vec3::operator+ (const Vec3& op) const {
-  return Vec3(x + op.x, y + op.y, z + op.z);
+  return {x + op.x, y + op.y, z + op.z};
 }
 
 Vec3 Vec3::operator- () const {
-  return Vec3(-x, -y, -z);
+  return {-x, -y, -z};
 }
 
 Vec3 Vec3::operator/(float f) const {
-  return Vec3(x / f, y / f, z / f);
+  return {x / f, y / f, z / f};
 }
 
 bool Vec3::operator==(const Vec3& op) const {
@@ -119,7 +119,7 @@ float Vec3::operator[](int n) const {
 }
 
 Vec3 Vec3::Cross(const Vec3& op) const {
-  return Vec3(y * op.z - z * op.y, z * op.x - x * op.z, x * op.y - y * op.x);
+  return {y * op.z - z * op.y, z * op.x - x * op.z, x * op.y - y * op.x};
 }
 
 float Vec3::LengthSquared() const {
@@ -160,7 +160,7 @@ Vec3& Vec3::operator+=(const Vec3& op) {
   return *this;
 }
 
-Vec4::Vec4() {}
+Vec4::Vec4() = default;
 
 Vec4::Vec4(float x, float y, float z, float w) {
   this->x = x;
@@ -181,7 +181,7 @@ float Vec4::Dot(const Vec4& v) const {
 }
 
 Vec4 Vec4::operator-(const Vec4& v) const {
-  return Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
+  return {x - v.x, y - v.y, z - v.z, w - v.w};
 }
 
 bool Vec4::operator == (const Vec4& v) const {
@@ -198,20 +198,21 @@ float Vec4::operator[](int n) const {
   return a[n];
 }
 
-Vec3 Vec4::XYZ() {
-  return Vec3(x, y, z);
+Vec3 Vec4::XYZ() const
+{
+  return {x, y, z};
 }
 
 Vec4 Vec4::operator*(const Matrix& m) const {
-  return Vec4(
+  return {
     x*m.m[0] + y*m.m[1] + z*m.m[2] + w*m.m[3],
     x*m.m[4] + y*m.m[5] + z*m.m[6] + w*m.m[7],
     x*m.m[8] + y*m.m[9] + z*m.m[10] + w*m.m[11],
     x*m.m[12] + y*m.m[13] + z*m.m[14] + w*m.m[15]
-  );
+  };
 }
 
-Matrix::Matrix() {}
+Matrix::Matrix() = default;
 
 float& Matrix::operator() (UINT y, UINT x) {
   return m[y * 4 + x];
@@ -229,9 +230,9 @@ Matrix Matrix::Translate(const Vec3& translateVector) {
 
 Matrix Matrix::Rotate(float angle, const Vec3& axis) {
   Matrix rot;
-  float sn = sinf(angle);
-  float cs = cosf(angle);
-  float nc = 1 - cs;
+  const float sn = sinf(angle);
+  const float cs = cosf(angle);
+  const float nc = 1 - cs;
   rot.m[0] = nc * (axis.x * axis.x) + cs;
   rot.m[1] = nc * (axis.y * axis.x) - sn * axis.z;
   rot.m[2] = nc * (axis.z * axis.x) + sn * axis.y;
@@ -256,10 +257,10 @@ Matrix Matrix::Rotate(const Quaternion& q) {
 
   Matrix rot;
 
-  float sqw = q.s * q.s;
-  float sqx = q.vx * q.vx;
-  float sqy = q.vy * q.vy;
-  float sqz = q.vz * q.vz;
+  const float sqw = q.s * q.s;
+  const float sqx = q.vx * q.vx;
+  const float sqy = q.vy * q.vy;
+  const float sqz = q.vz * q.vz;
 
   rot.m[0] = sqx - sqy - sqz + sqw;
   rot.m[5] = -sqx + sqy - sqz + sqw;
@@ -335,8 +336,8 @@ void Matrix::LoadIdentity() {
 }
 
 Matrix Matrix::Ortho(float x1, float y1, float x2, float y2) {
-  float rx = 1.0f / (x2 - x1);
-  float ry = 1.0f / (y2 - y1);
+  const float rx = 1.0f / (x2 - x1);
+  const float ry = 1.0f / (y2 - y1);
   Matrix m;
   m.m[0] = 2.0f*rx;	m.m[1] = 0;		      m.m[2] = 0;	    m.m[3] = -(x1 + x2) * rx;
   m.m[4] = 0;		    m.m[5] = -2.0f*ry;	m.m[6] = 0;	    m.m[7] = (y1 + y2) * ry;
@@ -346,9 +347,9 @@ Matrix Matrix::Ortho(float x1, float y1, float x2, float y2) {
 }
 
 Matrix Matrix::Ortho(float x1, float y1, float x2, float y2, float near, float far) {
-  float rx = 1.0f / (x2 - x1);
-  float ry = 1.0f / (y2 - y1);
-  float rz = 1.0f / (far - near);
+  const float rx = 1.0f / (x2 - x1);
+  const float ry = 1.0f / (y2 - y1);
+  const float rz = 1.0f / (far - near);
   Matrix m;
   m.m[0] = 2.0f*rx;	m.m[1] = 0;		      m.m[2] = 0;	      m.m[3] = -(x1 + x2) * rx;
   m.m[4] = 0;		    m.m[5] = 2.0f*ry;	  m.m[6] = 0;	      m.m[7] = -(y1 + y2) * ry;
@@ -362,8 +363,8 @@ Matrix Matrix::Projection(float fovY, float zFar, float zNear, float aspectRatio
   /// Create projection matrix
   /// https://unspecified.wordpress.com/2012/06/21/calculating-the-gluperspective-matrix-and-other-opengl-matrix-maths/
 
-  float f = 1.0f / tanf(fovY / 2.0f);
-  float a = zNear - zFar;
+  const float f = 1.0f / tanf(fovY / 2.0f);
+  const float a = zNear - zFar;
 
   Matrix m;
   m.m[0] = f / aspectRatio;	m.m[1] = 0;		m.m[2] = 0;	    m.m[3] = 0;
@@ -379,7 +380,7 @@ Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) 
   /// http://wiki.delphigl.com/index.php/gluLookAt
   const float epsilon = 0.001f;
 
-  Vec3 f = -(target - position).Normal();
+  const Vec3 f = -(target - position).Normal();
   Vec3 s = -f.Cross(up.Normal());
   float sl = s.Length();
   if (fabs(sl) < epsilon) {
@@ -387,7 +388,7 @@ Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) 
     sl = s.Length();
   }
   s /= sl;
-  Vec3 u = s.Cross(f);
+  const Vec3 u = s.Cross(f);
 
   Matrix m;
   m.m[0] = s.x;	  m.m[1] = s.y;	  m.m[2] = s.z;	  m.m[3] = 0;
@@ -398,23 +399,23 @@ Matrix Matrix::LookAt(const Vec3& position, const Vec3& target, const Vec3& up) 
 }
 
 Quaternion Quaternion::FromEuler(float roll, float pitch, float yaw) {
-  float sr, cr, sp, cp, sy, cy;
-  float rr = 0.5f*roll;
-  float pp = 0.5f*pitch;
-  float yy = 0.5f*yaw;
-  sr = sinf(rr); cr = cosf(rr);
-  sp = sinf(pp); cp = cosf(pp);
-  sy = sinf(yy); cy = cosf(yy);
+  const float rr = 0.5f*roll;
+  const float pp = 0.5f*pitch;
+  const float yy = 0.5f*yaw;
+  const float sr = sinf(rr); const float cr = cosf(rr);
+  const float sp = sinf(pp); const float cp = cosf(pp);
+  const float sy = sinf(yy); const float cy = cosf(yy);
 
-  float vx = sr*cp*cy - cr*sp*sy;
-  float vy = cr*sp*cy + sr*cp*sy;
-  float vz = cr*cp*sy - sr*sp*cy;
-  float s = cr*cp*cy + sr*sp*sy;
+  const float vx = sr*cp*cy - cr*sp*sy;
+  const float vy = cr*sp*cy + sr*cp*sy;
+  const float vz = cr*cp*sy - sr*sp*cy;
+  const float s = cr*cp*cy + sr*sp*sy;
   return Quaternion(s, vx, vy, vz);
 }
 
-void Quaternion::ToEuler(float& oRoll, float& oPitch, float& oYaw) {
-  float a = 2.0f  *  (s * vy - vx * vz);
+void Quaternion::ToEuler(float& oRoll, float& oPitch, float& oYaw) const
+{
+  const float a = 2.0f  *  (s * vy - vx * vz);
   if (a < 1.0f) {
     if (-1.0f < a) {
       oRoll = atan2f(2.0f * (vy * vz + s * vx), 1.0f - 2.0f * (vx * vx + vy * vy));
@@ -435,12 +436,11 @@ void Quaternion::ToEuler(float& oRoll, float& oPitch, float& oYaw) {
 }
 
 Quaternion::Quaternion(Quaternion& q1, Quaternion& q2, float ratio) {
-  float cosom = q1.s * q2.s + q1.vx * q2.vx + q1.vy * q2.vy + q1.vz * q2.vz;
+  const float cosom = q1.s * q2.s + q1.vx * q2.vx + q1.vy * q2.vy + q1.vz * q2.vz;
   float sclp, sclq;
   if (cosom < 0.9999f) {
-    float omega, sinom;
-    omega = acosf(cosom);
-    sinom = sinf(omega);
+    float omega = acosf(cosom);
+    float sinom = sinf(omega);
     sclp = sinf((1.0f - ratio) * omega) / sinom;
     sclq = sinf(ratio * omega) / sinom;
   }
@@ -455,16 +455,16 @@ Quaternion::Quaternion(Quaternion& q1, Quaternion& q2, float ratio) {
   vz = q1.vz * sclp + q2.vz * sclq;
 }
 
-Quaternion::Quaternion() {}
+Quaternion::Quaternion() = default;
 
 Quaternion::Quaternion(float _S, float _Vx, float _Vy, float _Vz)
   : s(_S), vx(_Vx), vy(_Vy), vz(_Vz) {}
 
 Quaternion& Quaternion::operator *= (Quaternion& q) {
-  float bs = s*q.s - vx*q.vx - vy*q.vy - vz*q.vz;
-  float bx = s*q.vx + vx*q.s + vy*q.vz - vz*q.vy;
-  float by = s*q.vy + vy*q.s + vz*q.vx - vx*q.vz;
-  float bz = s*q.vz + vz*q.s + vx*q.vy - vy*q.vx;
+  const float bs = s*q.s - vx*q.vx - vy*q.vy - vz*q.vz;
+  const float bx = s*q.vx + vx*q.s + vy*q.vz - vz*q.vy;
+  const float by = s*q.vy + vy*q.s + vz*q.vx - vx*q.vz;
+  const float bz = s*q.vz + vz*q.s + vx*q.vy - vy*q.vx;
 
   s = bs;
   vx = bx;
@@ -473,22 +473,18 @@ Quaternion& Quaternion::operator *= (Quaternion& q) {
   return *this;
 }
 
-Quaternion Quaternion::operator *(const Quaternion &q) {
-  float bs = s*q.s - vx*q.vx - vy*q.vy - vz*q.vz;
-  float bx = s*q.vx + vx*q.s + vy*q.vz - vz*q.vy;
-  float by = s*q.vy + vy*q.s + vz*q.vx - vx*q.vz;
-  float bz = s*q.vz + vz*q.s + vx*q.vy - vy*q.vx;
+Quaternion Quaternion::operator *(const Quaternion &q) const
+{
+  const float bs = s*q.s - vx*q.vx - vy*q.vy - vz*q.vz;
+  const float bx = s*q.vx + vx*q.s + vy*q.vz - vz*q.vy;
+  const float by = s*q.vy + vy*q.s + vz*q.vx - vx*q.vz;
+  const float bz = s*q.vz + vz*q.s + vx*q.vy - vy*q.vx;
   return Quaternion(bs, bx, by, bz);
 }
 
-Quaternion& Quaternion::operator = (const Quaternion& q) {
-  s = q.s;
-  vx = q.vx;
-  vy = q.vy;
-  vz = q.vz;
-  return *this;
-}
+Quaternion& Quaternion::operator = (const Quaternion& q) = default;
 
-Quaternion Quaternion::Conjugate() {
+Quaternion Quaternion::Conjugate() const
+{
   return Quaternion(s, -vx, -vy, -vz);
 }

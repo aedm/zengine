@@ -2,12 +2,12 @@
 #include "util/uipainter.h"
 #include "util/util.h"
 #include "commands/command.h"
-#include "commands/graphCommands.h"
 #include "graph/prototypes.h"
 #include "watchers/passwatcher.h"
 #include "watchers/meshwatcher.h"
 #include "watchers/scenewatcher.h"
 #include "watchers/drawablewatcher.h"
+#include "graph/graphwatcher.h"
 #include "watchers/textwatcher.h"
 #include "watchers/splinewatcher.h"
 #include "watchers/moviewatcher.h"
@@ -19,14 +19,13 @@
 #include <QtCore/QDir>
 #include <QMouseEvent>
 #include <QFileDialog>
+#include <bass.h>
 
 static ZenGarden* gZengarden;
 
 ZenGarden::ZenGarden(QWidget *parent)
   : QMainWindow(parent)
-  , mNextGraphIndex(0)
-  , mPropertyEditor(nullptr)
-  , mPropertyLayout(nullptr) {
+{
   gZengarden = this;
   mUI.setupUi(this);
 
@@ -100,7 +99,7 @@ void ZenGarden::InitModules() {
   connect(&mEngineShadersFolderWatcher, SIGNAL(fileChanged(const QString&)),
     this, SLOT(LoadEngineShader(const QString&)));
   LoadEngineShaders(mEngineShadersDir);
-  TheEngineStubs->OnLoadFinished();
+  EngineStubs::OnLoadFinished();
 
   InitPainter();
   Prototypes::Init();
@@ -126,10 +125,11 @@ void ZenGarden::DisposeModules() {
   CloseZengine();
 }
 
-float ZenGarden::GetElapsedBeats() {
-  float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
-  int elapsed = mTime.elapsed();
-  float beats = bps * float(elapsed) / 1000.0f;
+float ZenGarden::GetElapsedBeats() const
+{
+  const float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
+  const int elapsed = mTime.elapsed();
+  const float beats = bps * float(elapsed) / 1000.0f;
   return beats;
 }
 
@@ -139,7 +139,7 @@ void ZenGarden::RestartMovieTimer() {
   if (mPlayMovie) PlayMusic(mMovieCursor);
 }
 
-void ZenGarden::LoadEngineShaders(QDir& dir) {
+void ZenGarden::LoadEngineShaders(const QDir& dir) {
   static const QString shaderSuffix("shader");
   std::string a = dir.absolutePath().toStdString();
 
@@ -178,16 +178,18 @@ void ZenGarden::keyPressEvent(QKeyEvent* event) {
   case Qt::Key_F7:
     mUI.bottomLeftPanel->setVisible(!mUI.bottomLeftPanel->isVisible());
     return;
+  default: break;
   }
   QMainWindow::keyPressEvent(event);
 }
 
-void ZenGarden::LoadEngineShader(const QString& path) {
-  QFileInfo fileInfo(path);
+void ZenGarden::LoadEngineShader(const QString& path) const
+{
+  const QFileInfo fileInfo(path);
   INFO("loading '%s'", fileInfo.fileName().toLatin1().data());
-  unique_ptr<char> stubSource(Util::ReadFileQt(path));
-  QString relativePath = mEngineShadersDir.relativeFilePath(path);
-  QString stubName = relativePath.left(relativePath.lastIndexOf("."));
+  const unique_ptr<char> stubSource(Util::ReadFileQt(path));
+  const QString relativePath = mEngineShadersDir.relativeFilePath(path);
+  const QString stubName = relativePath.left(relativePath.lastIndexOf("."));
   TheEngineStubs->SetStubSource(stubName.toStdString(),
     string(stubSource.get()));
 }
@@ -195,7 +197,7 @@ void ZenGarden::LoadEngineShader(const QString& path) {
 void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
-    shared_ptr<WatcherUI> watcher;
+    shared_ptr<WatcherUi> watcher;
     if (IsExactType<FloatNode>(node)) {
       watcher =
         node->Watch<StaticValueWatcher<ValueType::FLOAT>>(PointerCast<FloatNode>(node));
@@ -219,7 +221,7 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
       watcher = node->Watch<SlotEditor>(node);
     }
     if (watcher) {
-      watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
+      watcher->mDeleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
       mPropertyEditor =
         new WatcherWidget(mUI.propertyPanel, watcher, WatcherPosition::PROPERTY_PANEL);
       watcher->SetWatcherWidget(mPropertyEditor);
@@ -229,7 +231,8 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
 }
 
 
-shared_ptr<Node> ZenGarden::GetNodeInPropertyEditor() {
+shared_ptr<Node> ZenGarden::GetNodeInPropertyEditor() const
+{
   if (!mPropertyEditor) return nullptr;
   return mPropertyEditor->mWatcher->GetDirectNode();
 }
@@ -240,31 +243,28 @@ void ZenGarden::SetMovieCursor(float beats) {
   RestartMovieTimer();
 }
 
-
-void ZenGarden::SetClipCursor(float seconds) {
-  // TODO: make this work.
-
-}
-
-
-float ZenGarden::GetGlobalTime() {
+float ZenGarden::GetGlobalTime() const
+{
   return GetElapsedBeats();
 }
 
-float ZenGarden::GetMovieCursor() {
+float ZenGarden::GetMovieCursor() const
+{
   return mMovieCursor;
 }
 
-shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() {
+shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() const
+{
   return mDocument->mProperties.GetNode();
 }
 
-std::shared_ptr<MovieNode> ZenGarden::GetMovieNode() {
+std::shared_ptr<MovieNode> ZenGarden::GetMovieNode() const
+{
   return mDocument->mMovie.GetNode();
 }
 
 void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition) {
-  shared_ptr<Node> refNode = node->GetReferencedNode();
+  const shared_ptr<Node> refNode = node->GetReferencedNode();
   QTabWidget* tabWidget = nullptr;
   switch (watcherPosition) {
   case WatcherPosition::UPPER_LEFT_TAB:
@@ -280,7 +280,7 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
   }
 
   WatcherWidget* watcherWidget = nullptr;
-  shared_ptr<WatcherUI> watcher;
+  shared_ptr<WatcherUi> watcher;
 
   /// Non-3D watchers
   if (IsPointerOf<StringNode>(refNode)) {
@@ -328,16 +328,16 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
       new GLWatcherWidget(tabWidget, watcher, mCommonGLWidget, watcherPosition, tabWidget);
   }
 
-  int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
+  const int index = tabWidget->addTab(watcherWidget, watcher->GetDisplayedName());
   tabWidget->setCurrentIndex(index);
   watcher->SetWatcherWidget(watcherWidget);
-  watcher->deleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
+  watcher->mDeleteWatcherWidgetCallback = Delegate(this, &ZenGarden::DeleteWatcherWidget);
 }
 
 
 void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
   if (widget->mTabWidget) {
-    int index = widget->mTabWidget->indexOf(widget);
+    const int index = widget->mTabWidget->indexOf(widget);
     ASSERT(index >= 0);
     widget->mTabWidget->removeTab(index);
   }
@@ -354,7 +354,7 @@ void ZenGarden::CreateNewDocument() {
   mDocument->mProperties.Connect(make_shared<PropertiesNode>());
   mDocument->mMovie.Connect(make_shared<MovieNode>());
 
-  shared_ptr<Graph> graph = make_shared<Graph>();
+  const shared_ptr<Graph> graph = make_shared<Graph>();
   mDocument->mGraphs.Connect(graph);
 
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
@@ -366,7 +366,7 @@ void ZenGarden::CreateNewDocument() {
 void ZenGarden::SetupMovieWatcher() {
   SafeDelete(mMovieWatcherWidget);
   shared_ptr<MovieNode> movieNode = mDocument->mMovie.GetNode();
-  shared_ptr<WatcherUI> watcher = movieNode->Watch<TimelineEditor>(movieNode);
+  shared_ptr<WatcherUi> watcher = movieNode->Watch<TimelineEditor>(movieNode);
   mMovieWatcherWidget =
     new WatcherWidget(mUI.timelineWidget, watcher, WatcherPosition::TIMELINE_PANEL);
   watcher->SetWatcherWidget(mMovieWatcherWidget);
@@ -374,24 +374,24 @@ void ZenGarden::SetupMovieWatcher() {
 }
 
 void ZenGarden::HandleMenuSaveAs() {
-  QString fileName = QFileDialog::getSaveFileName(this,
+  const QString fileName = QFileDialog::getSaveFileName(this,
     tr("Open project"), "app", tr("Zengine project (*.zen)"));
 
   INFO("Saving document...");
   QTime myTimer;
   myTimer.start();
-  string json = ToJSON(mDocument);
+  const string json = ToJson(mDocument);
   QFile file(fileName);
   file.open(QIODevice::WriteOnly);
   file.write(json.c_str());
 
-  int milliseconds = myTimer.elapsed();
+  const int milliseconds = myTimer.elapsed();
   INFO("Document saved in %.3f seconds.", float(milliseconds) / 1000.0f);
   mDocumentFileName = fileName;
 }
 
 void ZenGarden::Tick() {
-  float elapsedBeats = GetElapsedBeats();
+  const float elapsedBeats = GetElapsedBeats();
   if (mPlayMovie) {
     mMovieCursor = elapsedBeats - mMovieStartBeat;
     mOnMovieCursorChange(mMovieCursor);
@@ -405,7 +405,7 @@ void ZenGarden::HandleMenuNew() {
 }
 
 void ZenGarden::HandleMenuOpen() {
-  QString fileName = QFileDialog::getOpenFileName(this,
+  const QString fileName = QFileDialog::getOpenFileName(this,
     tr("Open project"), "app", tr("Zengine project (*.zen)"));
   if (fileName.isEmpty()) return;
 
@@ -414,12 +414,12 @@ void ZenGarden::HandleMenuOpen() {
   myTimer.start();
 
   /// Load file content
-  unique_ptr<char> json = unique_ptr<char>(Util::ReadFileQt(fileName));
+  const unique_ptr<char> json = unique_ptr<char>(Util::ReadFileQt(fileName));
   if (json == nullptr) return;
 
   /// Parse file into a Document
   mCommonGLWidget->makeCurrent();
-  shared_ptr<Document> document = FromJSON(string(json.get()));
+  const shared_ptr<Document> document = FromJson(string(json.get()));
   if (document == nullptr) return;
 
   /// Load succeeded, remove old document
@@ -429,7 +429,7 @@ void ZenGarden::HandleMenuOpen() {
 
   /// Make sure a MovieNode exists in the document.
   if (!mDocument->mMovie.GetNode()) {
-    shared_ptr<MovieNode> movieNode = make_shared<MovieNode>();
+    const shared_ptr<MovieNode> movieNode = make_shared<MovieNode>();
     mDocument->mMovie.Connect(movieNode);
   }
 
@@ -452,7 +452,7 @@ void ZenGarden::HandleMenuOpen() {
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
   SetupMovieWatcher();
 
-  int milliseconds = myTimer.elapsed();
+  const int milliseconds = myTimer.elapsed();
   INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
 }
 
@@ -480,16 +480,17 @@ void ZenGarden::LoadMusic() {
       INFO("dev %d: %s\n", a, di.name);
   }
 
-  if (!BASS_Init(1, 44100, 0, 0, NULL)) {
+  if (!BASS_Init(1, 44100, 0, nullptr, nullptr)) {
     ERR("Can't initialize BASS");
     return;
   }
   mBassMusicChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_PRESCAN);
 }
 
-void ZenGarden::PlayMusic(float beats) {
-  float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
-  float seconds = beats / bps;
+void ZenGarden::PlayMusic(float beats) const
+{
+  const float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
+  const float seconds = beats / bps;
   if (mBassMusicChannel < 0) return;
   BASS_ChannelSetPosition(mBassMusicChannel,
     BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds),
@@ -497,7 +498,8 @@ void ZenGarden::PlayMusic(float beats) {
   BASS_ChannelPlay(mBassMusicChannel, FALSE);
 }
 
-void ZenGarden::StopMusic() {
+void ZenGarden::StopMusic() const
+{
   if (mBassMusicChannel < 0) return;
   BASS_ChannelStop(mBassMusicChannel);
 }

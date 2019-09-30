@@ -20,17 +20,18 @@ SlotEditor::~SlotEditor() {
 
 template <ValueType T>
 bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
-  if (!IsPointerOf<ValueNode<ValueTypes<T>::Type>>(slot->GetReferencedNode())) {
+  if (!IsPointerOf<ValueNode<typename ValueTypes<T>::Type>>(slot->GetReferencedNode())) {
     return false;
   }
 
-  auto valueSlot = SafeCast<ValueSlot<ValueTypes<T>::Type>*>(slot);
+  auto valueSlot = SafeCast<ValueSlot<typename ValueTypes<T>::Type>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
-  shared_ptr<SlotWatcher> watcher = slotNode->Watch<TypedSlotWatcher<T>>(valueSlot);
+  shared_ptr<SlotWatcher> watcher = 
+    slotNode->template Watch<TypedSlotWatcher<T>>(valueSlot);
 
   WatcherWidget* widget =
     new WatcherWidget(parent, watcher, WatcherPosition::PROPERTY_PANEL);
-  watcher->deleteWatcherWidgetCallback =
+  watcher->mDeleteWatcherWidgetCallback =
     Delegate(this, &SlotEditor::RemoveWatcherWidget);
   layout->addWidget(widget);
   watcher->SetWatcherWidget(widget);
@@ -50,17 +51,19 @@ void SlotEditor::RebuildSlots() {
   mSlotsWidget = new QWidget(mWatcherWidget);
   mLayout->addWidget(mSlotsWidget);
   mSlotsWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-  QVBoxLayout* mSlotLayout = new QVBoxLayout(mSlotsWidget);
-  mSlotLayout->setSpacing(4);
-  mSlotLayout->setContentsMargins(0, 0, 0, 0);
+  // ReSharper disable CppNonReclaimedResourceAcquisition
+  QVBoxLayout* slotLayout = new QVBoxLayout(mSlotsWidget);
+  // ReSharper restore CppNonReclaimedResourceAcquisition
+  slotLayout->setSpacing(4);
+  slotLayout->setContentsMargins(0, 0, 0, 0);
 
-  shared_ptr<Node> directNode = GetDirectNode();
+  const shared_ptr<Node> directNode = GetDirectNode();
 
   /// Generate slot editors
   for (Slot* slot : directNode->GetPublicSlots()) {
     /// Create horizontal widget to add editor and ghost button
     QWidget* widget = new QWidget(mSlotsWidget);
-    mSlotLayout->addWidget(widget);
+    slotLayout->addWidget(widget);
 
     widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout* hLayout = new QHBoxLayout(widget);
@@ -85,25 +88,25 @@ void SlotEditor::RebuildSlots() {
     ghostButton->setIcon(mGhostIcon);
     hLayout->addWidget(ghostButton);
 
-    ghostButton->connect(ghostButton, &QPushButton::toggled, [=]() {
+    QPushButton::connect(ghostButton, &QPushButton::toggled, [=]() {
       slot->SetGhost(!slot->IsGhost());
     });
   }
 
   /// Source editor button
   if (IsExactType<StubNode>(directNode)) {
-    auto stub = PointerCast<StubNode>(directNode);
+    const auto stub = PointerCast<StubNode>(directNode);
     QPushButton* sourceButton = new QPushButton("Edit source", mSlotsWidget);
-    mSlotsWidget->connect(sourceButton, &QPushButton::pressed, [=]() {
+    QWidget::connect(sourceButton, &QPushButton::pressed, [=]() {
       ZenGarden::GetInstance()->Watch(
         stub->mSource.GetReferencedNode(), WatcherPosition::RIGHT_TAB);
     });
-    mSlotLayout->addWidget(sourceButton);
+    slotLayout->addWidget(sourceButton);
   }
 }
 
 void SlotEditor::RemoveAllSlots() {
-  for (auto it : mSlotWatchers) {
+  for (const auto& it : mSlotWatchers) {
     if (it.second->GetDirectNode()) {
       it.second->GetDirectNode()->RemoveWatcher(it.second);
     }
@@ -127,13 +130,14 @@ void SlotEditor::OnSlotStructureChanged() {
   RebuildSlots();
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
   delete watcherWidget;
 }
 
 
 SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
-  : WatcherUI(node) 
+  : WatcherUi(node) 
 {}
 
 
@@ -192,19 +196,19 @@ void PassSlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   SlotEditor::SetWatcherWidget(watcherWidget);
 
   /// Recompile button
-  QPushButton* copyVSButton = new QPushButton("Copy VS source", watcherWidget);
-  watcherWidget->connect(copyVSButton, &QPushButton::pressed, [=]() {
-    shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
-    string source = passNode->GetVertexShaderSource();
+  QPushButton* copyVsButton = new QPushButton("Copy VS source", watcherWidget);
+  WatcherWidget::connect(copyVsButton, &QPushButton::pressed, [=]() {
+    const shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    const string source = passNode->GetVertexShaderSource();
     QApplication::clipboard()->setText(QString::fromStdString(source));
   });
-  mLayout->addWidget(copyVSButton);
+  mLayout->addWidget(copyVsButton);
 
-  QPushButton* copyFSButton = new QPushButton("Copy FS source", watcherWidget);
-  watcherWidget->connect(copyFSButton, &QPushButton::pressed, [=]() {
-    shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
-    string source = passNode->GetFragmentShaderSource();
+  QPushButton* copyFsButton = new QPushButton("Copy FS source", watcherWidget);
+  WatcherWidget::connect(copyFsButton, &QPushButton::pressed, [=]() {
+    const shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    const string source = passNode->GetFragmentShaderSource();
     QApplication::clipboard()->setText(QString::fromStdString(source));
   });
-  mLayout->addWidget(copyFSButton);
+  mLayout->addWidget(copyFsButton);
 }

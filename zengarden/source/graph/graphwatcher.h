@@ -3,14 +3,13 @@
 #include "../watchers/watcherwidget.h"
 #include "../watchers/watcherui.h"
 #include <zengine.h>
-#include <vector>
 
 using namespace std;
 class NodeWidget;
 class Graph;
 class Node;
 
-class GraphWatcher: public WatcherUI {
+class GraphWatcher: public WatcherUi {
   friend class NodeWidget;
   friend class Node; 
 
@@ -20,35 +19,35 @@ public:
 
   shared_ptr<NodeWidget> GetNodeWidget(const shared_ptr<Node>& node);
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
   /// Qt widget event handlers
-  void HandleMousePress(EventForwarderGLWidget*, QMouseEvent* event);
-  void HandleMouseRelease(EventForwarderGLWidget*, QMouseEvent* event);
-  void HandleMouseMove(EventForwarderGLWidget*, QMouseEvent* event);
-  void HandleMouseWheel(EventForwarderGLWidget*, QWheelEvent* event);
+  void HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event);
+  void HandleMouseRelease(EventForwarderGlWidget*, QMouseEvent* event);
+  void HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event);
+  void HandleMouseWheel(EventForwarderGlWidget*, QWheelEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
   void HandleMouseLeftUp(QMouseEvent* event);
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseRightUp(QMouseEvent* event);
-  void HandleKeyPress(EventForwarderGLWidget*, QKeyEvent* event);
+  void HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* event);
 
   /// Watcher callbacks
-  virtual void OnSlotConnectionChanged(Slot* slot);
+  void OnSlotConnectionChanged(Slot* slot) override;
 
   /// Sends an update message. Graph panel will be repainted at the next suitable moment.
-  void Update();
+  void Update() const;
 
   /// Draws the graph
-  void Paint(EventForwarderGLWidget*);
+  void Paint(EventForwarderGlWidget*);
 
   /// All wigdets on the graph
-  shared_ptr<Graph> GetGraph();
+  shared_ptr<Graph> GetGraph() const;
 
   /// Handle drag events
-  virtual void HandleDragEnterEvent(QDragEnterEvent* event) override;
-  virtual void HandleDropEvent(QDropEvent* event) override;
+  void HandleDragEnterEvent(QDragEnterEvent* event) override;
+  void HandleDropEvent(QDropEvent* event) override;
 
   /// Mapping from node to widget
   map<shared_ptr<Node>, shared_ptr<NodeWidget>> mWidgetMap;
@@ -72,16 +71,16 @@ private:
   float mZoomFactor = 1.0f;
   int mZoomExponent = 0;
 
-  /// Convertes pixel coordinates (eg. mouse) to world coordinates
-  Vec2 MouseToWorld(QMouseEvent* event);
-  Vec2 CanvasToWorld(const Vec2& canvasCoord);
-  void GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft);
+  /// Converts pixel coordinates (eg. mouse) to world coordinates
+  Vec2 MouseToWorld(QMouseEvent* event) const;
+  Vec2 CanvasToWorld(const Vec2& canvasCoord) const;
+  void GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) const;
 
   /// True if mouse movement was made during STATE_MOVE_NODES
-  bool mAreNodesMoved;
+  bool mAreNodesMoved{};
 
   /// True if connection is estimated to be valid
-  bool mIsConnectionValid;
+  bool mIsConnectionValid{};
 
   /// Mouse position when the clicking occured
   Vec2 mOriginalMousePos;
@@ -94,7 +93,7 @@ private:
 
   /// Clicked widget for some operations
   shared_ptr<NodeWidget> mClickedWidget;
-  int mClickedSlotIndex;
+  int mClickedSlotIndex{};
 
   /// Hovered widget and slot
   shared_ptr<NodeWidget> mHoveredWidget;

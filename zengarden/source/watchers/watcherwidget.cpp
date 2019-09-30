@@ -2,13 +2,14 @@
 #include "watcherui.h"
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTabWidget>
+#include <utility>
 
-WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher, 
+WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUi> watcher, 
   WatcherPosition position, QTabWidget* tabWidget)
   : QWidget(parent)
   , mPosition(position)
   , mTabWidget(tabWidget)
-  , mWatcher(watcher)
+  , mWatcher(std::move(watcher))
 {}
 
 WatcherWidget::~WatcherWidget() {
@@ -24,14 +25,14 @@ WatcherWidget::~WatcherWidget() {
   }
 }
 
-EventForwarderGLWidget* WatcherWidget::GetGLWidget() {
+EventForwarderGlWidget* WatcherWidget::GetGLWidget() {
   SHOULD_NOT_HAPPEN;
   return nullptr;
 }
 
 void WatcherWidget::SetTabLabel(const QString& text) {
   if (mTabWidget != nullptr) {
-    int index = mTabWidget->indexOf(this);
+    const int index = mTabWidget->indexOf(this);
     if (index >= 0) mTabWidget->setTabText(index, text);
   }
 }
@@ -44,7 +45,7 @@ void WatcherWidget::dropEvent(QDropEvent *event) {
   mWatcher->HandleDropEvent(event);
 }
 
-GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher,
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, const shared_ptr<WatcherUi>& watcher,
   QGLWidget* shareWidget, WatcherPosition position,
   QTabWidget* tabWidget)
   : WatcherWidget(parent, watcher, position, tabWidget)
@@ -53,52 +54,52 @@ GLWatcherWidget::GLWatcherWidget(QWidget* parent, shared_ptr<WatcherUI> watcher,
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mGLWidget = new EventForwarderGLWidget(this, shareWidget);
+  mGLWidget = new EventForwarderGlWidget(this, shareWidget);
   layout->addWidget(mGLWidget);
 }
 
-GLWatcherWidget::~GLWatcherWidget() {}
+GLWatcherWidget::~GLWatcherWidget() = default;
 
-EventForwarderGLWidget* GLWatcherWidget::GetGLWidget() {
+EventForwarderGlWidget* GLWatcherWidget::GetGLWidget() {
   return mGLWidget;
 }
 
 
-EventForwarderGLWidget::EventForwarderGLWidget(QWidget* Parent, QGLWidget* ShareWidget)
+EventForwarderGlWidget::EventForwarderGlWidget(QWidget* Parent, QGLWidget* ShareWidget)
   : QGLWidget(Parent, ShareWidget) {
   setAttribute(Qt::WA_OpaquePaintEvent);
 }
 
-EventForwarderGLWidget::~EventForwarderGLWidget() {}
+EventForwarderGlWidget::~EventForwarderGlWidget() = default;
 
-void EventForwarderGLWidget::mouseMoveEvent(QMouseEvent* event) {
-  OnMouseMove(this, event);
+void EventForwarderGlWidget::mouseMoveEvent(QMouseEvent* event) {
+  mOnMouseMove(this, event);
 }
 
-void EventForwarderGLWidget::mousePressEvent(QMouseEvent* event) {
-  OnMousePress(this, event);
+void EventForwarderGlWidget::mousePressEvent(QMouseEvent* event) {
+  mOnMousePress(this, event);
 }
 
-void EventForwarderGLWidget::mouseReleaseEvent(QMouseEvent* event) {
-  OnMouseRelease(this, event);
+void EventForwarderGlWidget::mouseReleaseEvent(QMouseEvent* event) {
+  mOnMouseRelease(this, event);
 }
 
-void EventForwarderGLWidget::keyPressEvent(QKeyEvent* event) {
-  OnKeyPress(this, event);
+void EventForwarderGlWidget::keyPressEvent(QKeyEvent* event) {
+  mOnKeyPress(this, event);
   QGLWidget::keyPressEvent(event);
 }
 
-void EventForwarderGLWidget::keyReleaseEvent(QKeyEvent* event) {
-  OnKeyRelease(this, event);
+void EventForwarderGlWidget::keyReleaseEvent(QKeyEvent* event) {
+  mOnKeyRelease(this, event);
 }
 
-void EventForwarderGLWidget::paintGL() {
+void EventForwarderGlWidget::paintGL() {
   OpenGL->OnContextSwitch();
-  OnPaint(this);
+  mOnPaint(this);
 }
 
-void EventForwarderGLWidget::wheelEvent(QWheelEvent * event) {
-  OnMouseWheel(this, event);
+void EventForwarderGlWidget::wheelEvent(QWheelEvent * event) {
+  mOnMouseWheel(this, event);
 }
 
 
@@ -112,25 +113,25 @@ void EventForwarderWidget::paintEvent(QPaintEvent* ev) {
 }
 
 void EventForwarderWidget::mouseMoveEvent(QMouseEvent* event) {
-  OnMouseMove(event);
+  mOnMouseMove(event);
 }
 
 void EventForwarderWidget::mousePressEvent(QMouseEvent* event) {
-  OnMousePress(event);
+  mOnMousePress(event);
 }
 
 void EventForwarderWidget::mouseReleaseEvent(QMouseEvent* event) {
-  OnMouseRelease(event);
+  mOnMouseRelease(event);
 
 }
 void EventForwarderWidget::keyPressEvent(QKeyEvent* event) {
-  OnKeyPress(event);
+  mOnKeyPress(event);
 }
 
 void EventForwarderWidget::keyReleaseEvent(QKeyEvent* event) {
-  OnKeyRelease(event);
+  mOnKeyRelease(event);
 }
 
 void EventForwarderWidget::wheelEvent(QWheelEvent * event) {
-  OnMouseWheel(event);
+  mOnMouseWheel(event);
 }

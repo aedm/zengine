@@ -2,7 +2,6 @@
 
 #include <zengine.h>
 #include "../watchers/watcherui.h"
-#include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/qlineedit.h>
 
@@ -17,7 +16,7 @@ class Slider : public QWidget {
 
 public:
   Slider(QWidget* parent, QString text, float value, float minimum, float maximum);
-  virtual ~Slider() {}
+  virtual ~Slider() = default;
 
   Event<float> onValueChange;
 
@@ -27,12 +26,12 @@ public:
   void Set(float value);
   void SetRange(float minimum, float maximum);
 
-  float Get();
+  float Get() const;
 
 private:
-  void paintEvent(QPaintEvent *e);
-  virtual void mousePressEvent(QMouseEvent * event) override;
-  virtual void mouseMoveEvent(QMouseEvent * event) override;
+  void paintEvent(QPaintEvent *e) override;
+  void mousePressEvent(QMouseEvent * event) override;
+  void mouseMoveEvent(QMouseEvent * event) override;
 
   void HandleMouse(QMouseEvent * event);
 
@@ -40,7 +39,7 @@ private:
   float mMinimum;
   float	mMaximum;
   float mValue;
-  bool mIsReadOnly;
+  bool mIsReadOnly = false;
 };
 
 
@@ -71,7 +70,7 @@ public:
 
   /// Set the value of the editor
   void Set(float value);
-  void SetRange(float minimum, float maximum);
+  void SetRange(float minimum, float maximum) const;
 
   /// Subscribe to get value updates
   Event<QWidget*, const float&> onValueChange;
@@ -80,7 +79,7 @@ public:
   void SetReadOnly(bool readOnly);
 
 protected:
-  void SetTextBoxValue(float value);
+  void SetTextBoxValue(float value) const;
   void SliderValueChanged(float value);
   void SpinBoxValueChanged();
 
@@ -106,7 +105,7 @@ public:
   //typename ValueTypes<T>::Type;
   typedef typename ValueTypes<T>::Type VectorType;
 
-  ValueEditor(QWidget* parent, QString name, const VectorType& value);
+  ValueEditor(QWidget* parent, const QString& name, const VectorType& value);
 
   /// Set the value of the editor
   void Set(const VectorType& value);
@@ -125,7 +124,7 @@ protected:
   VectorType mValue;
 
   /// Float editors for each dimension
-  FloatEditor* mFloatEditors[VectorType::Dimensions];
+  FloatEditor* mFloatEditors[VectorType::Dimensions]{};
 
   /// Handles value change from float editors
   void HandleFloatValueChange(QWidget* floatEditor, const float& value);

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "node.h"
-#include <vector>
 #include <map>
 
 using namespace std;
@@ -12,24 +11,21 @@ public:
 
   Slot mOriginalNode;
 
-  virtual bool IsGhostNode() override;
+  bool IsGhostNode() override;
   
   /// Returns true if ghost node is simply a reference without any
   /// internal nodes.
-  bool IsDirectReference();
+  bool IsDirectReference() const;
 
 protected:
   set<shared_ptr<Node>> mInternalNodes;
   map<shared_ptr<Node>, shared_ptr<Node>> mNodeMapping;
 
   Slot mMainInternalNode;
-  
-  virtual void HandleMessage(Message* message) override;
 
-  virtual shared_ptr<Node> GetReferencedNode() override;
+  void HandleMessage(Message* message) override;
+
+  shared_ptr<Node> GetReferencedNode() override;
 
   void Regenerate();
-
-private:
-  
 };

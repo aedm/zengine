@@ -6,7 +6,7 @@ static const float DefaultPixelsPerSecond = 100.0f;
 static const int TrackHeightPixels = 20;
 
 TimelineEditor::TimelineEditor(const shared_ptr<MovieNode>& movieNode)
-  : WatcherUI(movieNode) 
+  : WatcherUi(movieNode) 
 {
   ZenGarden::GetInstance()->mOnMovieCursorChange += 
     Delegate(this, &TimelineEditor::HandleMovieCursorChange);
@@ -18,7 +18,7 @@ TimelineEditor::~TimelineEditor() {
 }
 
 void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
   mUI.setupUi(watcherWidget);
 
   mUI.watchMovieButton->setFocusPolicy(Qt::NoFocus);
@@ -30,13 +30,13 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   timelineLayout->addWidget(mTimelineCanvas);
 
   mTimelineCanvas->mOnPaint += Delegate(this, &TimelineEditor::DrawTimeline);
-  mTimelineCanvas->OnMousePress += Delegate(this, &TimelineEditor::HandleMouseDown);
-  mTimelineCanvas->OnMouseRelease += Delegate(this, &TimelineEditor::HandleMouseUp);
-  mTimelineCanvas->OnMouseMove += Delegate(this, &TimelineEditor::HandleMouseMove);
-  mTimelineCanvas->OnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
+  mTimelineCanvas->mOnMousePress += Delegate(this, &TimelineEditor::HandleMouseDown);
+  mTimelineCanvas->mOnMouseRelease += Delegate(this, &TimelineEditor::HandleMouseUp);
+  mTimelineCanvas->mOnMouseMove += Delegate(this, &TimelineEditor::HandleMouseMove);
+  mTimelineCanvas->mOnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
 
-  watcherWidget->connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
-    shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
+  QObject::connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
+    const shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
   });
 }
@@ -49,49 +49,49 @@ void TimelineEditor::OnChildNameChange() {
   mTimelineCanvas->update();
 }
 
-void TimelineEditor::SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) {
+void TimelineEditor::SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const
+{
   if (!mSelectedClip) return;
   mSelectedClip->mSceneSlot.Connect(sceneNode);
 }
 
-void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
+void TimelineEditor::DrawTimeline(QPaintEvent* ev) const {
   QPainter painter(mTimelineCanvas);
   painter.fillRect(mTimelineCanvas->rect(), QBrush(QColor(23, 23, 23)));
 
   shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
-  //painter.setRenderHint(QPainter::Antialiasing);
-  float height = float(mTimelineCanvas->height());
-  float width = float(mTimelineCanvas->width());
+  const float height = float(mTimelineCanvas->height());
+  const float width = float(mTimelineCanvas->width());
 
   // Draw track separators
   painter.setPen(QColor(80, 80, 80));
   for (int i = 1; i <= movieNode->GetTrackCount(); i++) {
-    int y = TrackHeightPixels * i;
+    const int y = TrackHeightPixels * i;
     painter.drawLine(QPoint(0, y), QPointF(width, y));
   }
 
   // Draw ruler
   painter.fillRect(QRect(0, 0, width, TrackHeightPixels), QBrush(QColor(120, 120, 120)));
 
-  float timeMarksInterval = powf(0.5f, roundf(mZoomLevel));
-  float firstMarkToDraw = 
+  const float timeMarksInterval = powf(0.5f, roundf(mZoomLevel));
+  const float firstMarkToDraw = 
     timeMarksInterval * floorf(mTimelineStartTime / timeMarksInterval);
-  float lastMarkToDraw = ScreenToTime(width);
+  const float lastMarkToDraw = ScreenToTime(width);
   painter.setPen(QColor(0, 0, 0));
   for (float time = firstMarkToDraw; time < lastMarkToDraw; time += timeMarksInterval) {
-    int x = TimeToScreen(time);
+    const int x = TimeToScreen(time);
     painter.drawLine(QPoint(x, TrackHeightPixels / 2), QPointF(x, TrackHeightPixels));
     painter.drawText(x + 5, TrackHeightPixels - 5, QString::number(time, 'f', 3));
   }
 
   // Draw tracks
   for (int i = 0; i < movieNode->GetTrackCount(); i++) {
-    int yTop = (i + 1) * TrackHeightPixels;
+    const int yTop = (i + 1) * TrackHeightPixels;
     const vector<shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
     for (const auto& clipNode : track) {
-      int left = TimeToScreen(clipNode->mStartTime.Get());
+      const int left = TimeToScreen(clipNode->mStartTime.Get());
       int length = TimeRangeToPixels(clipNode->mLength.Get());
       if (length < 0) length = 0;
       QRect rect(left, yTop, length, TrackHeightPixels);
@@ -117,13 +117,14 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) {
   }
 
   /// Draw movie cursor
-  float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
-  int cursorPos = TimeToScreen(movieCursor);
+  const float movieCursor = ZenGarden::GetInstance()->GetMovieCursor();
+  const int cursorPos = TimeToScreen(movieCursor);
   painter.setPen(QColor(200, 200, 100));
   painter.drawLine(QPoint(cursorPos, 0), QPoint(cursorPos, height));
 }
 
-void TimelineEditor::HandleMovieCursorChange(float seconds) {
+void TimelineEditor::HandleMovieCursorChange(float seconds) const
+{
   mTimelineCanvas->update();
 }
 
@@ -157,6 +158,7 @@ void TimelineEditor::HandleMouseLeftDown(QMouseEvent* event) {
       }
       mTimelineCanvas->update();
       break;
+    default: break;
   }
 }
 
@@ -172,12 +174,12 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
     {
       shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
       if (!movieNode) break;
-      QPoint pos = event->pos();
+      const QPoint pos = event->pos();
       for (int i = 0; i < movieNode->GetTrackCount(); i++) {
-        int yTop = (i + 1) * TrackHeightPixels;
+        const int yTop = (i + 1) * TrackHeightPixels;
         const vector<shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
         for (const  auto& clipNode : track) {
-          int left = TimeToScreen(clipNode->mStartTime.Get());
+          const int left = TimeToScreen(clipNode->mStartTime.Get());
           int length = TimeRangeToPixels(clipNode->mLength.Get());
           if (length < 0) length = 0;
           QRect rect(left, yTop, length, TrackHeightPixels);
@@ -201,8 +203,8 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
     break;
     case State::WINDOW_MOVE:
     {
-      QPoint diff = mOriginalMousePos - event->pos();
-      float timeDiff = PixelsToTimeRange(diff.x());
+      const QPoint diff = mOriginalMousePos - event->pos();
+      const float timeDiff = PixelsToTimeRange(diff.x());
       mTimelineStartTime = mOriginalTimelineStartTime + timeDiff;
       mTimelineCanvas->update();
     }
@@ -210,16 +212,16 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
     case State::CLIP_MOVE:
     {
       if (!mSelectedClip) return;
-      QPoint diff = mOriginalMousePos - event->pos();
-      float timeDiff = PixelsToTimeRange(diff.x());
+      const QPoint diff = mOriginalMousePos - event->pos();
+      const float timeDiff = PixelsToTimeRange(diff.x());
       mSelectedClip->mStartTime.SetDefaultValue(mOriginalClipStart - timeDiff);
     }
     break;
     case State::CLIP_LENGTH_ADJUST:
     {
       if (!mSelectedClip) return;
-      QPoint diff = mOriginalMousePos - event->pos();
-      float timeDiff = PixelsToTimeRange(diff.x());
+      const QPoint diff = mOriginalMousePos - event->pos();
+      const float timeDiff = PixelsToTimeRange(diff.x());
       mSelectedClip->mLength.SetDefaultValue(mOriginalClipLength - timeDiff);
     }
     break;
@@ -229,30 +231,34 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
 }
 
 void TimelineEditor::HandleMouseWheel(QWheelEvent* event) {
-  int zoomFactor = event->delta();
-  float timeUnderCursor = ScreenToTime(event->pos().x());
+  const int zoomFactor = event->delta();
+  const float timeUnderCursor = ScreenToTime(event->pos().x());
   mZoomLevel += float(zoomFactor) / 300.0f;
-  float newTimeUnderCursor = ScreenToTime(event->pos().x());
+  const float newTimeUnderCursor = ScreenToTime(event->pos().x());
   mTimelineStartTime -= (newTimeUnderCursor - timeUnderCursor);
   mTimelineCanvas->update();
 }
 
-int TimelineEditor::TimeToScreen(float time) {
+int TimelineEditor::TimeToScreen(float time) const
+{
   return TimeRangeToPixels(time - mTimelineStartTime);
 }
 
-int TimelineEditor::TimeRangeToPixels(float timeRange) {
+int TimelineEditor::TimeRangeToPixels(float timeRange) const
+{
   // At zoomlevel 0 this is how many pixels should be one second
-  float pixelsPerSecond = DefaultPixelsPerSecond * powf(2.0f, mZoomLevel);
+  const float pixelsPerSecond = DefaultPixelsPerSecond * powf(2.0f, mZoomLevel);
   return pixelsPerSecond * timeRange;
 }
 
-float TimelineEditor::ScreenToTime(int xPos) {
+float TimelineEditor::ScreenToTime(int xPos) const
+{
   return PixelsToTimeRange(xPos) + mTimelineStartTime;
 }
 
-float TimelineEditor::PixelsToTimeRange(int pixelCount) {
-  float pixelsPerSecond = DefaultPixelsPerSecond * powf(2.0f, mZoomLevel);
+float TimelineEditor::PixelsToTimeRange(int pixelCount) const
+{
+  const float pixelsPerSecond = DefaultPixelsPerSecond * powf(2.0f, mZoomLevel);
   return float(pixelCount) / pixelsPerSecond;
 }
 

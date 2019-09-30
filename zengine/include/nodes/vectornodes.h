@@ -10,12 +10,12 @@ public:
   FloatSlot mY;
   FloatSlot mZ;
 
-  virtual const Vec3& Get() override;
+  const Vec3& Get() override;
 
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   Vec3 mValue;
 };
@@ -29,12 +29,12 @@ public:
   FloatSlot mZ;
   FloatSlot mW;
 
-  virtual const Vec4& Get() override;
+  const Vec4& Get() override;
 
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   Vec4 mValue;
 };
@@ -46,12 +46,12 @@ public:
 
   FloatSlot mX;
 
-  virtual const float& Get() override;
+  const float& Get() override;
 
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   float mValue;
 };
@@ -64,12 +64,12 @@ public:
   FloatSlot mB;
   FloatSlot mC;
 
-  virtual const float& Get() override;
+  const float& Get() override;
 
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
 protected:
-  virtual void Operate() override;
+  void Operate() override;
 
   float mValue;
 };

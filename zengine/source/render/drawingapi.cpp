@@ -4,6 +4,7 @@
 
 #define GLEW_STATIC
 #include <glew/glew.h>
+#include <utility>
 
 bool GLDisableErrorChecks = false;
 
@@ -11,7 +12,7 @@ bool GLDisableErrorChecks = false;
 #ifdef _DEBUG
 void CheckGLError() {
   if (GLDisableErrorChecks) return;
-  GLenum error = glGetError();
+  const GLenum error = glGetError();
   ASSERT(error == GL_NO_ERROR);
 }
 #else
@@ -39,23 +40,23 @@ static GLVersion gOpenGLVersions[] = {
   {&__GLEW_VERSION_4_3, L"4.3"},
   {&__GLEW_VERSION_4_4, L"4.4"},
   {&__GLEW_VERSION_4_5, L"4.5"},
-  {NULL, NULL}
+  {nullptr, nullptr}
 };
 
 OpenGLAPI::OpenGLAPI() {
-  GLenum err = glewInit();
+  const GLenum err = glewInit();
   ASSERT(err == GLEW_OK);
   if (err != GLEW_OK) {
     ERR(L"Cannot initialize OpenGL.");
     SHOULD_NOT_HAPPEN;
   }
   else {
-    const wchar_t* versionName = NULL;
-    for (GLVersion* version = gOpenGLVersions; version->version != NULL; version++) {
+    const wchar_t* versionName = nullptr;
+    for (GLVersion* version = gOpenGLVersions; version->version != nullptr; version++) {
       if (*version->version) versionName = version->name;
     }
 
-    if (versionName == NULL) ERR(L"OpenGL not found at all.");
+    if (versionName == nullptr) ERR(L"OpenGL not found at all.");
     else INFO(L"OpenGL version %s found.", versionName);
 
     if (!GLEW_VERSION_4_5) {
@@ -70,7 +71,7 @@ OpenGLAPI::OpenGLAPI() {
 }
 
 
-OpenGLAPI::~OpenGLAPI() {}
+OpenGLAPI::~OpenGLAPI() = default;
 
 
 void OpenGLAPI::OnContextSwitch() {
@@ -83,21 +84,21 @@ void OpenGLAPI::OnContextSwitch() {
   mBlendEnabled = true;
   SetBlendMode(RenderState::BlendMode::NORMAL);
 
-  DepthTestEnabledShadow = true;
+  mDepthTestEnabledShadow = true;
   SetDepthTest(false);
 
-  ClearColorShadow = 1;
+  mClearColorShadow = 1;
   SetClearColor(0);
 
   glDepthMask(true);
 
-  ActiveTextureShadow = -1;
-  BoundVertexBufferShadow = -1;
-  BoundIndexBufferShadow = -1;
-  BoundFrameBufferShadow = -1;
+  mActiveTextureShadow = -1;
+  mBoundVertexBufferShadow = -1;
+  mBoundIndexBufferShadow = -1;
+  mBoundFrameBufferShadow = -1;
   for (int i = 0; i < MAX_COMBINED_TEXTURE_SLOTS; i++) {
-    BoundTextureShadow[i] = (GLuint)-1;
-    BoundMultisampleTextureShadow[i] = (GLuint)-1;
+    mBoundTextureShadow[i] = GLuint(-1);
+    mBoundMultisampleTextureShadow[i] = GLuint(-1);
   }
   CheckGLError();
 }
@@ -108,9 +109,9 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
 
   CheckGLError();
   /// Create shader object, set the source, and compile
-  GLuint shader = glCreateShader(shaderType);
+  const GLuint shader = glCreateShader(shaderType);
   GLint length = GLint(strlen(source));
-  glShaderSource(shader, 1, (const char **)&source, &length);
+  glShaderSource(shader, 1, static_cast<const char **>(&source), &length);
   glCompileShader(shader);
 
   /// Make sure the compilation was successful
@@ -145,14 +146,14 @@ void CollectUniformsFromProgram(GLuint program,
   ASSERT(uniformBlockCount == 1);
 
   /// And it should be at index 0
-  int uniformBlockIndex = glGetUniformBlockIndex(program, "Uniforms");
+  const int uniformBlockIndex = glGetUniformBlockIndex(program, "Uniforms");
   ASSERT(uniformBlockIndex == 0);
 
   /// This is how OpenGL interface API works. Beautiful like a megmikrózott kefir.
   /// Get the number of active uniforms inside the uniform block, and the block size.
   const GLenum blockPropsList[] = { GL_NUM_ACTIVE_VARIABLES, GL_BUFFER_DATA_SIZE };
 #pragma pack(push, 1)
-  struct { GLint mUniformCount, mSize; } blockProps;
+  struct { GLint mUniformCount, mSize; } blockProps{};
 #pragma pack(pop)
   glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex,
     ElementCount(blockPropsList), blockPropsList,
@@ -169,7 +170,7 @@ void CollectUniformsFromProgram(GLuint program,
   /// Query the properties of each uniform inside the block
   const GLenum uniformProperties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET };
 #pragma pack(push, 1)
-  struct { GLint mNameLength, mType, mLocation, mOffset; } values;
+  struct { GLint mNameLength, mType, mLocation, mOffset; } values{};
 #pragma pack(pop)
 
   for (int blockIndex = 0; blockIndex < blockProps.mUniformCount; ++blockIndex) {
@@ -193,8 +194,7 @@ void CollectUniformsFromProgram(GLuint program,
     default: SHOULD_NOT_HAPPEN; break;
     }
 
-    uniforms.push_back(
-      ShaderProgram::Uniform(string(&name[0]), nodeType, values.mOffset));
+    uniforms.emplace_back(string(&name[0]), nodeType, values.mOffset);
   }
   *oBlockSize = blockProps.mSize;
 }
@@ -217,7 +217,7 @@ void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos)
     GLint props[propCount];
     glGetProgramResourceiv(program, GL_SHADER_STORAGE_BLOCK, i, propCount,
       blockPropsList, propCount, nullptr, props);
-    GLint isReferenced = (props[0] + props[1]) > 0;
+    const GLint isReferenced = (props[0] + props[1]) > 0;
     glGetProgramResourceName(program, GL_SHADER_STORAGE_BLOCK, i, sizeof(name), nullptr,
       name);
     GLuint resouceIndex =
@@ -250,8 +250,8 @@ void CollectOpaqueFromProgram(GLuint program, vector<ShaderProgram::Sampler>& sa
       &type, &samplerName[0]);
     if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE ||
       type == GL_SAMPLER_2D_SHADOW) {
-      GLint location = glGetUniformLocation(program, &samplerName[0]);
-      samplers.push_back(ShaderProgram::Sampler(string(&samplerName[0]), location));
+      const GLint location = glGetUniformLocation(program, &samplerName[0]);
+      samplers.emplace_back(string(&samplerName[0]), location);
     }
   }
   CheckGLError();
@@ -275,7 +275,7 @@ bool LinkProgram(GLuint program) {
       WARN("Shader compiler: %s", log);
     }
     CheckGLError();
-    delete log;
+    delete[] log;
   }
 
   return result == GL_TRUE;
@@ -342,57 +342,30 @@ void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
 }
 
 
-void OpenGLAPI::SetUniform(UniformId id, ValueType type, const void* values) {
-  CheckGLError();
-
-  switch (type) {
-  case ValueType::FLOAT:
-    glUniform1f(id, *(const GLfloat*)values);
-    break;
-  case ValueType::VEC2:
-    glUniform2fv(id, 1, (const GLfloat*)values);
-    break;
-  case ValueType::VEC3:
-    glUniform3fv(id, 1, (const GLfloat*)values);
-    break;
-  case ValueType::VEC4:
-    glUniform4fv(id, 1, (const GLfloat*)values);
-    break;
-  case ValueType::MATRIX44:
-    glUniformMatrix4fv(id, 1, false, (const GLfloat*)values);
-    break;
-  default:
-    SHOULD_NOT_HAPPEN;
-    break;
-  }
-  CheckGLError();
-}
-
-
-void OpenGLAPI::BindVertexBuffer(VertexBufferHandle bufferID) {
-  if (bufferID != BoundVertexBufferShadow) {
-    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
+void OpenGLAPI::BindVertexBuffer(VertexBufferHandle bufferId) {
+  if (bufferId != mBoundVertexBufferShadow) {
+    glBindBuffer(GL_ARRAY_BUFFER, bufferId);
     CheckGLError();
-    BoundVertexBufferShadow = bufferID;
+    mBoundVertexBufferShadow = bufferId;
   }
 }
 
 
-void OpenGLAPI::BindIndexBuffer(IndexBufferHandle bufferID) {
-  if (bufferID != BoundIndexBufferShadow) {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+void OpenGLAPI::BindIndexBuffer(IndexBufferHandle bufferId) {
+  if (bufferId != mBoundIndexBufferShadow) {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId);
     CheckGLError();
-    BoundIndexBufferShadow = bufferID;
+    mBoundIndexBufferShadow = bufferId;
   }
 }
 
 
-void OpenGLAPI::BindFrameBuffer(GLuint frameBufferID) {
-  if (frameBufferID != BoundFrameBufferShadow) {
+void OpenGLAPI::BindFrameBuffer(FrameBufferId frameBufferId) {
+  if (frameBufferId != mBoundFrameBufferShadow) {
     CheckGLError();
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
     CheckGLError();
-    BoundFrameBufferShadow = frameBufferID;
+    mBoundFrameBufferShadow = frameBufferId;
   }
 }
 
@@ -416,7 +389,7 @@ void OpenGLAPI::Render(const shared_ptr<Buffer>& indexBuffer, UINT count,
     BindIndexBuffer(indexBuffer->GetHandle());
     CheckGLError();
     glDrawElementsInstanced(
-      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, NULL, instanceCount);
+      GetGLPrimitive(primitiveType), count, GL_UNSIGNED_INT, nullptr, instanceCount);
   }
   else {
     glDrawArraysInstanced(GetGLPrimitive(primitiveType), 0, count, instanceCount);
@@ -451,13 +424,13 @@ void OpenGLAPI::SetRenderState(const RenderState* state) {
 
 
 void OpenGLAPI::SetDepthTest(bool enable) {
-  if (enable == DepthTestEnabledShadow) return;
+  if (enable == mDepthTestEnabledShadow) return;
   if (enable) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
   }
   else glDisable(GL_DEPTH_TEST);
-  DepthTestEnabledShadow = enable;
+  mDepthTestEnabledShadow = enable;
 }
 
 
@@ -516,13 +489,13 @@ inline float IntColorToFloat(UINT color) {
 
 
 void OpenGLAPI::SetClearColor(UINT clearColor) {
-  if (clearColor == ClearColorShadow) return;
+  if (clearColor == mClearColorShadow) return;
   glClearColor(
     IntColorToFloat((clearColor >> 16) & 0xff),
     IntColorToFloat((clearColor >> 8) & 0xff),
     IntColorToFloat((clearColor) & 0xff),
     1.0f);
-  ClearColorShadow = clearColor;
+  mClearColorShadow = clearColor;
   CheckGLError();
 }
 
@@ -620,7 +593,7 @@ shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type
       }
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
-    auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    const auto wrapMode = doesRepeat ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
 
@@ -666,13 +639,13 @@ void OpenGLAPI::SetTextureSubData(UINT x, UINT y, UINT width, UINT height,
 }
 
 
-void OpenGLAPI::DeleteTextureGPUData(Texture::Handle handle) {
+void OpenGLAPI::DeleteTextureGpuData(Texture::Handle handle) {
   glDeleteTextures(1, &handle);
   CheckGLError();
 }
 
 
-void OpenGLAPI::UploadTextureGPUData(const shared_ptr<Texture>& texture,
+void OpenGLAPI::UploadTextureGpuData(const shared_ptr<Texture>& texture,
   void* texelData) {
   ASSERT(!PleaseNoNewResources);
   ASSERT(!texture->mTexelData);
@@ -714,9 +687,6 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
   //BindFrameBuffer(bufferId);
   CheckGLError();
 
-  bool isMultisample = (depthBuffer ? depthBuffer : targetBufferA)->mIsMultisample;
-  GLenum target = isMultisample ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
-
   if (depthBuffer) {
     glNamedFramebufferTexture(bufferId, GL_DEPTH_ATTACHMENT, depthBuffer->mHandle, 0);
   }
@@ -747,7 +717,7 @@ FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffe
     glNamedFramebufferReadBuffer(bufferId, GL_COLOR_ATTACHMENT0);
   }
 
-  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE) {
     ERR("Framebuffer incomplete, status: 0x%x\n", status);
   }
@@ -763,8 +733,8 @@ void OpenGLAPI::DeleteFrameBuffer(FrameBufferId frameBufferId) {
 }
 
 
-void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferid) {
-  BindFrameBuffer(frameBufferid);
+void OpenGLAPI::SetFrameBuffer(FrameBufferId frameBufferId) {
+  BindFrameBuffer(frameBufferId);
   CheckGLError();
 }
 
@@ -782,26 +752,26 @@ void OpenGLAPI::BlitFrameBuffer(FrameBufferId source, FrameBufferId target,
 }
 
 
-void OpenGLAPI::SetActiveTexture(GLuint activeTextureIndex) {
-  if (ActiveTextureShadow == activeTextureIndex) return;
+void OpenGLAPI::SetActiveTexture(UINT activeTextureIndex) {
+  if (mActiveTextureShadow == activeTextureIndex) return;
   glActiveTexture(GL_TEXTURE0 + activeTextureIndex);
-  ActiveTextureShadow = activeTextureIndex;
+  mActiveTextureShadow = activeTextureIndex;
   CheckGLError();
 }
 
 
-void OpenGLAPI::BindTexture(GLuint textureID) {
-  if (BoundTextureShadow[ActiveTextureShadow] == textureID) return;
-  glBindTexture(GL_TEXTURE_2D, textureID);
-  BoundTextureShadow[ActiveTextureShadow] = textureID;
+void OpenGLAPI::BindTexture(Texture::Handle textureId) {
+  if (mBoundTextureShadow[mActiveTextureShadow] == textureId) return;
+  glBindTexture(GL_TEXTURE_2D, textureId);
+  mBoundTextureShadow[mActiveTextureShadow] = textureId;
   CheckGLError();
 }
 
 
-void OpenGLAPI::BindMultisampleTexture(GLuint textureID) {
-  if (BoundMultisampleTextureShadow[ActiveTextureShadow] == textureID) return;
-  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureID);
-  BoundMultisampleTextureShadow[ActiveTextureShadow] = textureID;
+void OpenGLAPI::BindMultisampleTexture(Texture::Handle textureId) {
+  if (mBoundMultisampleTextureShadow[mActiveTextureShadow] == textureId) return;
+  glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureId);
+  mBoundMultisampleTextureShadow[mActiveTextureShadow] = textureId;
   CheckGLError();
 }
 
@@ -816,7 +786,7 @@ void OpenGLAPI::SetIndexBuffer(const shared_ptr<Buffer>& buffer) {
 }
 
 
-void OpenGLAPI::SetSSBO(UINT index, const shared_ptr<Buffer>& buffer) {
+void OpenGLAPI::SetSsbo(UINT index, const shared_ptr<Buffer>& buffer) {
   if (!buffer) return;
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, buffer->GetHandle());
 }
@@ -837,7 +807,8 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
   }
   CheckGLError();
   glEnableVertexAttribArray(index);
-  glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)size_t(offset));
+  glVertexAttribPointer(index, size, type, GL_FALSE, stride, 
+    reinterpret_cast<void*>(size_t(offset)));
   CheckGLError();
 }
 
@@ -863,13 +834,13 @@ ShaderProgram::~ShaderProgram() {
   CheckGLError();
 }
 
-ShaderProgram::Uniform::Uniform(const string& name, ValueType type, UINT offset)
-  : mName(name)
+ShaderProgram::Uniform::Uniform(string name, ValueType type, UINT offset)
+  : mName(std::move(name))
   , mType(type)
   , mOffset(offset) {}
 
-ShaderProgram::Sampler::Sampler(const string& name, SamplerId handle)
-  : mName(name)
+ShaderProgram::Sampler::Sampler(string name, SamplerId handle)
+  : mName(std::move(name))
   , mHandle(handle) {}
 
 Buffer::Buffer(int byteSize) {
@@ -895,7 +866,8 @@ void Buffer::Allocate(int byteSize) {
   }
 }
 
-bool Buffer::IsEmpty() {
+bool Buffer::IsEmpty() const
+{
   return mHandle == 0 || mByteSize <= 0;
 }
 
@@ -916,11 +888,13 @@ void Buffer::UploadData(const void* data, int byteSize) {
   CheckGLError();
 }
 
-DrawingAPIHandle Buffer::GetHandle() {
+DrawingAPIHandle Buffer::GetHandle() const
+{
   return mHandle;
 }
 
-int Buffer::GetByteSize() {
+int Buffer::GetByteSize() const
+{
   return mByteSize;
 }
 
@@ -933,7 +907,7 @@ void Buffer::Release() {
   CheckGLError();
 }
 
-ShaderProgram::SSBO::SSBO(const string& name, UINT index)
-  : mName(name)
+ShaderProgram::SSBO::SSBO(string name, UINT index)
+  : mName(std::move(name))
   , mIndex(index)
 {}

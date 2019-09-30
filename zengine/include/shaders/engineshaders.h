@@ -15,17 +15,18 @@ public:
 
 private:
   void BuildPostProcessPasses();
-  void BuildMaterialPasses();
+  void BuildMaterialPasses() const;
 
   /// Copies resolved color to a postprocess buffer
   /// in: Gbuffer (MSAA)
   /// out: postprocess source buffer
-  void BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget, Globals* globals);
+  static void BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget, 
+    Globals* globals);
 
   /// Generates depth of field effect
   /// in: Gbuffer (MSAA)
   /// out: DOF buffer (MSAA) + postprocess source buffer (no MSAA)
-  void ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals);
+  void ApplyDepthOfField(RenderTarget* renderTarget, Globals* globals) const;
 
   /// Shrinks postprocess texture and applies Gaussian blur to it
   /// in: postprocess source buffer
@@ -36,7 +37,7 @@ private:
   /// in: Gbuffer (MSAA) + postprocess source buffer
   /// out: screen
   void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
-    const shared_ptr<Texture>& sourceColorMSAA);
+    const shared_ptr<Texture>& sourceColorMsaa) const;
 
   shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First = make_shared<Pass>();
   shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal = make_shared<Pass>();
@@ -45,7 +46,6 @@ private:
   shared_ptr<Pass> mPostProcess_DOF = make_shared<Pass>();
 
 public:
-
   shared_ptr<Pass> mFluid_CurlPass = make_shared<Pass>();
   shared_ptr<Pass> mFluid_VorticityPass = make_shared<Pass>();
   shared_ptr<Pass> mFluid_DivergencePass = make_shared<Pass>();

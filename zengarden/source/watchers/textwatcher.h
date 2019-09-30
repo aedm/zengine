@@ -5,16 +5,16 @@
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QTextEdit>
 
-class TextWatcher: public WatcherUI {
+class TextWatcher: public WatcherUi {
 public:
   TextWatcher(const shared_ptr<Node>& node);
   virtual ~TextWatcher();
 
-  virtual void SetWatcherWidget(WatcherWidget* watcherWidget) override;
+  void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  QBoxLayout* mLayout;
-  QTextEdit* mTextEdit;
+  QBoxLayout* mLayout{};
+  QTextEdit* mTextEdit{};
 
-  void HandleRebuid();
+  void HandleRebuid() const;
 };

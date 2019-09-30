@@ -1,6 +1,5 @@
 #pragma once
 
-#include "watcherwidget.h"
 #include <zengine.h>
 #include <QtWidgets/QTextEdit>
 
@@ -12,7 +11,7 @@ public:
 	~LogWatcher();
 
 private:
-	void						Log(LogMessage Message);
+	void						Log(LogMessage Message) const;
 
 	QTextEdit*					TextEdit;
 };

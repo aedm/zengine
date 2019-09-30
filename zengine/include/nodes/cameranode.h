@@ -8,15 +8,15 @@ public:
   CameraNode();
   virtual ~CameraNode();
 
-  void SetupGlobals(Globals* globals);
+  void SetupGlobals(Globals* globals) const;
 
   /// Camera setup
-  FloatSlot mFovY;
-  FloatSlot mZFar;
-  FloatSlot mZNear;
-  FloatSlot mDistance;
   Vec3Slot mTarget;
+  FloatSlot mDistance;
   Vec3Slot mOrientation;
+  FloatSlot mFovY;
+  FloatSlot mZNear;
+  FloatSlot mZFar;
 
   FloatSlot mShake;
   FloatSlot mShakeTime;
@@ -26,7 +26,7 @@ public:
 
 protected:
   /// Handle received messages
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 };
 
 typedef TypedSlot<CameraNode> CameraSlot;

@@ -13,10 +13,10 @@ public:
   virtual ~Watcher();
 
   /// Returns the live node being watched
-  shared_ptr<Node> GetNode();
+  shared_ptr<Node> GetNode() const;
 
   /// Returns the direct node being watched
-  shared_ptr<Node> GetDirectNode();
+  shared_ptr<Node> GetDirectNode() const;
 
   /// Destroys the watcher and its UI elements
   virtual void OnRemovedFromNode();
@@ -49,7 +49,7 @@ public:
   virtual void OnTimeEdited(float time);
 
 protected:
-  Watcher(const shared_ptr<Node>& node);
+  Watcher(shared_ptr<Node> node);
 
 private:
   /// Changes the node being watched. Only a Node should call this.

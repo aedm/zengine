@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 #ifndef LODEPNG_H
 #define LODEPNG_H
 
-#include <string.h> /*for size_t*/
+#include <cstring> /*for size_t*/
 
 extern const char* LODEPNG_VERSION_STRING;
 
@@ -626,17 +626,17 @@ void lodepng_encoder_settings_init(LodePNGEncoderSettings* settings);
 typedef struct LodePNGState
 {
 #ifdef LODEPNG_COMPILE_DECODER
-  LodePNGDecoderSettings decoder; /*the decoding settings*/
+  LodePNGDecoderSettings decoder{}; /*the decoding settings*/
 #endif /*LODEPNG_COMPILE_DECODER*/
 #ifdef LODEPNG_COMPILE_ENCODER
-  LodePNGEncoderSettings encoder; /*the encoding settings*/
+  LodePNGEncoderSettings encoder{}; /*the encoding settings*/
 #endif /*LODEPNG_COMPILE_ENCODER*/
-  LodePNGColorMode info_raw; /*specifies the format in which you would like to get the raw pixel buffer*/
-  LodePNGInfo info_png; /*info of the PNG image obtained after decoding*/
-  unsigned error;
+  LodePNGColorMode info_raw{}; /*specifies the format in which you would like to get the raw pixel buffer*/
+  LodePNGInfo info_png{}; /*info of the PNG image obtained after decoding*/
+  unsigned error{};
 #ifdef LODEPNG_COMPILE_CPP
   /* For the lodepng::State subclass. */
-  virtual ~LodePNGState(){}
+  virtual ~LodePNGState() = default;
 #endif
 } LodePNGState;
 

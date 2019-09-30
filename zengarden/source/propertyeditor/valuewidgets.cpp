@@ -1,29 +1,25 @@
 #include "valuewidgets.h"
 #include "../watchers/watcherwidget.h"
 #include <QtWidgets/QBoxLayout>
-#include <QtWidgets/qgridlayout.h>
-#include <QtWidgets/qlabel.h>
-#include <QtWidgets/qslider.h>
-#include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qradiobutton.h>
 #include <QtWidgets/qbuttongroup.h>
 #include <QtGui/qpainter.h>
-#include <QtCore/QEvent>
 #include <QtGui/QMouseEvent>
 #include <QtCore/QTime>
+#include <utility>
 
 
-Slider::Slider(QWidget* Parent, QString text, float value, float minimum, float maximum)
-  : QWidget(Parent)
-  , mValue(value)
+Slider::Slider(QWidget* parent, QString text, float value, float minimum, float maximum)
+  : QWidget(parent)
+  , mText(std::move(text))
   , mMinimum(minimum)
   , mMaximum(maximum)
-  , mText(text)
-  , mIsReadOnly(false) {}
+  , mValue(value)
+{}
 
 void Slider::paintEvent(QPaintEvent *e) {
   QPainter painter(this);
-  QSize widgetSize = size();
+  const QSize widgetSize = size();
   painter.setPen(palette().dark().color().darker());
   painter.setBrush(palette().alternateBase().color());
   painter.drawRect(0, 0, widgetSize.width() - 1, widgetSize.height() - 1);
@@ -33,7 +29,7 @@ void Slider::paintEvent(QPaintEvent *e) {
     if (mIsReadOnly) painter.setBrush(palette().highlight().color().darker());
     else painter.setBrush(palette().highlight().color());
 
-    int widthPx = widgetSize.width() - 2;
+    const int widthPx = widgetSize.width() - 2;
     int full = float(widthPx) * (mValue - mMinimum) / (mMaximum - mMinimum);
     if (full > widthPx) full = widthPx;
     else if (full < 0) full = 0;
@@ -58,7 +54,7 @@ void Slider::mouseMoveEvent(QMouseEvent * event) {
 
 void Slider::HandleMouse(QMouseEvent * event) {
   if (mMaximum > mMinimum) {
-    float newValue = 
+    const float newValue = 
       mMinimum + float(event->x() + 1) * (mMaximum - mMinimum) / float(width());
     if (mValue != newValue) {
       onValueChange(newValue);
@@ -66,7 +62,8 @@ void Slider::HandleMouse(QMouseEvent * event) {
   }
 }
 
-float Slider::Get() {
+float Slider::Get() const
+{
   return mValue;
 }
 
@@ -110,7 +107,7 @@ ValueEditor<ValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float 
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  mSlider = new Slider(this, name, mValue, 0, 1);
+  mSlider = new Slider(this, std::move(name), mValue, 0, 1);
   mSlider->setMinimumHeight(20);
   mSlider->setMinimumWidth(70);
   mSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -129,7 +126,8 @@ ValueEditor<ValueType::FLOAT>::ValueEditor(QWidget* parent, QString name, float 
 }
 
 
-void ValueEditor<ValueType::FLOAT>::SetTextBoxValue(float value) {
+void ValueEditor<ValueType::FLOAT>::SetTextBoxValue(float value) const
+{
   if (mAllowTextboxValueChanges) {
     mTextBox->setText(QString::number(value, 'g', 3));
   }
@@ -147,7 +145,7 @@ void ValueEditor<ValueType::FLOAT>::SliderValueChanged(float value) {
 
 
 void ValueEditor<ValueType::FLOAT>::SpinBoxValueChanged() {
-  float value = mTextBox->text().toFloat();
+  const float value = mTextBox->text().toFloat();
   if (mIsReadOnly || value == mValue) return;
   /// TODO: slider should set and repaint itself
   mSlider->Set(value);
@@ -164,7 +162,8 @@ void ValueEditor<ValueType::FLOAT>::Set(float value) {
   mSlider->Set(value);
 }
 
-void ValueEditor<ValueType::FLOAT>::SetRange(float minimum, float maximum) {
+void ValueEditor<ValueType::FLOAT>::SetRange(float minimum, float maximum) const
+{
   mSlider->SetRange(minimum, maximum);
 }
 
@@ -177,9 +176,10 @@ void ValueEditor<ValueType::FLOAT>::SetReadOnly(bool readOnly) {
 
 
 template <ValueType T>
-ValueEditor<T>::ValueEditor(QWidget* parent, QString name, const VectorType& value) {
+ValueEditor<T>::ValueEditor(QWidget* parent, const QString& name, const VectorType& value) {
   static const char* suffixes[] = { ".x", ".y", ".z", ".w" };
   mValue = value;
+  // ReSharper disable once CppNonReclaimedResourceAcquisition
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);

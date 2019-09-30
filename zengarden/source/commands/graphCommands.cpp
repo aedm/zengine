@@ -1,12 +1,13 @@
+#include <utility>
 #include "graphCommands.h"
 #include "../graph/nodewidget.h"
 
 CreateNodeCommand::CreateNodeCommand(
-  const shared_ptr<Node>& node, const shared_ptr<Graph>& graph)
-  : mNode(node)
-  , mGraph(graph) {}
+  shared_ptr<Node> node, shared_ptr<Graph> graph)
+  : mNode(std::move(node))
+  , mGraph(std::move(graph)) {}
 
-CreateNodeCommand::~CreateNodeCommand() {}
+CreateNodeCommand::~CreateNodeCommand() = default;
 
 bool CreateNodeCommand::Do() {
   mGraph->mNodes.Connect(mNode);
@@ -18,15 +19,15 @@ bool CreateNodeCommand::Undo() {
   return true;
 }
 
-MoveNodeCommand::MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position)
-  : mNode(node)
+MoveNodeCommand::MoveNodeCommand(shared_ptr<Node> node, const Vec2& position)
+  : mNode(std::move(node))
   , mNewPosition(position) {
   mOldPosition = mNode->GetPosition();
 }
 
-MoveNodeCommand::MoveNodeCommand(const shared_ptr<Node>& node, const Vec2& position,
+MoveNodeCommand::MoveNodeCommand(shared_ptr<Node> node, const Vec2& position,
                                  const Vec2& oldPosition) 
-  : mNode(node)
+  : mNode(std::move(node))
   , mNewPosition(position)
   , mOldPosition(oldPosition)
 {}
@@ -43,8 +44,8 @@ bool MoveNodeCommand::Undo() {
 
 
 ConnectNodeToSlotCommand::ConnectNodeToSlotCommand(
-  const shared_ptr<Node>& fromNode, Slot* slot)
-  : mNewNode(fromNode)
+  shared_ptr<Node> fromNode, Slot* slot)
+  : mNewNode(std::move(fromNode))
   , mSlot(slot) 
 {
   /// TODO: keep old, connected nodes (multinodes)

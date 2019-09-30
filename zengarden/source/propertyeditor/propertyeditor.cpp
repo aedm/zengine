@@ -4,15 +4,13 @@
 #include "../zengarden.h"
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QPushButton>
 
 PropertyEditor::PropertyEditor(const shared_ptr<Node>& node)
-  : WatcherUI(node) {}
+  : WatcherUi(node) {}
 
 
 void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
-  WatcherUI::SetWatcherWidget(watcherWidget);
+  WatcherUi::SetWatcherWidget(watcherWidget);
   shared_ptr<Node> node = GetDirectNode();
 
   /// Vertical layout
@@ -21,7 +19,7 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   /// Node type
-  shared_ptr<Node> referencedNode = node->GetReferencedNode();
+  const shared_ptr<Node> referencedNode = node->GetReferencedNode();
   string typeString;
   if (referencedNode.use_count() > 0) {
     typeString =
@@ -52,7 +50,8 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-void PropertyEditor::HandleNameTexBoxChanged() {
+void PropertyEditor::HandleNameTexBoxChanged() const
+{
   shared_ptr<Node> node = GetDirectNode();
   if (node) {
     node->SetName(mNameTextBox->text().toStdString());

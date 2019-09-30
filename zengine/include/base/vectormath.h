@@ -30,7 +30,7 @@ public:
   float	Length() const;
   Vec2 Dot(const Vec2& op) const;
 
-  float	x, y;
+  float	x{}, y{};
 };
 
 class Vec3 {
@@ -40,7 +40,7 @@ public:
   Vec3();
   Vec3(float x, float y, float z);
 
-  float x, y, z;
+  float x{}, y{}, z{};
 
   Vec3 operator * (float f) const;
   Vec3 operator - (const Vec3& op) const;
@@ -74,7 +74,7 @@ public:
   Vec4(float x, float y, float z, float w);
   Vec4(Vec3 v, float w);
 
-  float x, y, z, w;
+  float x{}, y{}, z{}, w{};
 
   float Dot(const Vec4& v) const;
   Vec4 operator - (const Vec4& v) const;
@@ -84,7 +84,7 @@ public:
   float& operator[] (int n);
   float operator[] (int n) const;
 
-  Vec3 XYZ();
+  Vec3 XYZ() const;
 };
 
 class Matrix {
@@ -99,7 +99,7 @@ public:
   void LoadIdentity();
 
   /// Matrix data
-  float			m[16];
+  float			m[16]{};
 
   /// 3D transformation matrices
   static Matrix	Translate(const Vec3& translateVector);
@@ -127,14 +127,14 @@ public:
   /// Spherical interpolation constructor
   Quaternion(Quaternion& q1, Quaternion& q2, float ratio);
 
-  float s, vx, vy, vz;
+  float s{}, vx{}, vy{}, vz{};
 
   static Quaternion FromEuler(float roll, float pitch, float yaw);
-  void ToEuler(float& oRoll, float& oPitch, float& oYaw);
+  void ToEuler(float& oRoll, float& oPitch, float& oYaw) const;
 
-  Quaternion Conjugate();
+  Quaternion Conjugate() const;
 
   Quaternion& operator *= (Quaternion& q);
-  Quaternion operator * (const Quaternion& q);
+  Quaternion operator * (const Quaternion& q) const;
   Quaternion& operator = (const Quaternion& q);
 };

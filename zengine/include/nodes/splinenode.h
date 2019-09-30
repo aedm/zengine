@@ -17,13 +17,13 @@ struct SplinePoint
 	float	mTangentBefore, mTangentAfter;
 
   // Is next section is linear or curved
-  bool mIsLinear;
+  bool mIsLinear{};
 
   // If true, tangents are automatically calculated
-	bool mIsAutoangent;					
+	bool mIsAutoangent{};					
 
   // Indicates breakpoint (tangents are not continuous)
-	bool mIsBreakpoint;						
+	bool mIsBreakpoint{};						
 
 	void SetValue(float time, float value);
 };
@@ -37,14 +37,14 @@ class SplineComponent {
 
 public:
   /// Having a virtual destructor makes sure the class has RTTI information
-  virtual ~SplineComponent() {}
+  virtual ~SplineComponent() = default;
 
   /// Returns the points of the spline
-  const vector<SplinePoint>& GetPoints();
+  const vector<SplinePoint>& GetPoints() const;
 
 protected:
   /// Disallow direct instantiation
-  SplineComponent() {}
+  SplineComponent() = default;
 
   /// Finds the last spline point which's time is not greater than the argument
   /// Returns -1 if there are no points before (or exactly at) the argument
@@ -67,8 +67,8 @@ class SplineFloatComponent: public SplineComponent {
   friend class FloatSplineNode;
 
 public:
-  SplineFloatComponent() {}
-  virtual ~SplineFloatComponent() {}
+  SplineFloatComponent() = default;
+  virtual ~SplineFloatComponent() = default;
 
   float Get(float time);
 
@@ -80,7 +80,7 @@ protected:
   void SetPointValue(int index, float time, float value);
 
   /// Calculates tangents of the Nth control point
-  virtual void CalculateTangent(int index) override;
+  void CalculateTangent(int index) override;
 };
 
 
@@ -110,7 +110,7 @@ public:
   virtual ~FloatSplineNode();
 
   /// Returns spline value at current scene time
-  virtual const float& Get() override;
+  const float& Get() override;
 
   /// Returns spline components value at a given time
   float GetValue(float time);
@@ -142,7 +142,7 @@ public:
   void SetLinear(SplineLayer layer, int index, bool linear);
 
   /// Sets whether tangents should be automatically calculated for a given point
-  void SetAutotangent(SplineLayer layer, int index, bool autotangent);
+  void SetAutoTangent(SplineLayer layer, int index, bool autoTangent);
 
   void SetBaseOffset(float baseOffset);
   void AddBasePointWithOffset();
@@ -157,14 +157,14 @@ public:
   FloatSlot mTimeSlot;
 
 protected:
-  virtual void HandleMessage(Message* message) override;
+  void HandleMessage(Message* message) override;
 
   /// Computer layer values
   float GetNoiseValue(float time);
   float GetBeatSpikeValue(float time);
   float GetBeatQuantizerValue(float time);
 
-  float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
+  static float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
 
   /// Control points of spline
   SplineFloatComponent mBaseLayer;
@@ -181,7 +181,7 @@ protected:
   float mBaseOffset = 0.0f;
 
   void InvalidateCurrentValue();
-  virtual void Operate();
+  void Operate() override;
 };
 
 

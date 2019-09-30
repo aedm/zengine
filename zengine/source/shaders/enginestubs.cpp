@@ -1,10 +1,6 @@
 #include <include/shaders/enginestubs.h>
 #include <include/shaders/engineshaders.h>
 
-EngineStubs::EngineStubs() {
-
-}
-
 EngineStubs::~EngineStubs() {
   for (auto& stub : mStubs) {
     stub.second->Dispose();
@@ -13,7 +9,7 @@ EngineStubs::~EngineStubs() {
 
 void EngineStubs::SetStubSource(const std::string& name, const std::string& source) {
   shared_ptr<StubNode> stub;
-  auto& it = mStubs.find(name);
+  const auto& it = mStubs.find(name);
   if (it == mStubs.end()) {
     stub = make_shared<StubNode>();
     mStubs[name] = stub;

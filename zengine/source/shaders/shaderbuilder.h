@@ -35,12 +35,12 @@ private:
     string mName;
 
     /// Value type
-    StubParameter::Type mType;
+    StubParameter::Type mType = StubParameter::Type::TVOID;
   };
 
   /// Inputs and output of the shader stage
   struct InterfaceVariable {
-    InterfaceVariable(ValueType type, const string& name, int layout = -1);
+    InterfaceVariable(ValueType type, string name, int layout = -1);
 
     /// Variable type
     ValueType mType;
@@ -92,15 +92,15 @@ private:
 
   /// Collect uniforms and samplers
   void AddGlobalsToDependencies(ShaderStage* shaderStage);
-  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage);
+  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage) const;
   void AddLocalsToDependencies();
 
   /// Generate source
   void GenerateSource(ShaderStage* shaderStage);
   void GenerateSourceHeader(ShaderStage* shaderStage);
-  void GenerateInputInterface(ShaderStage* shaderStage);
+  static void GenerateInputInterface(ShaderStage* shaderStage);
   void GenerateSourceFunctions(ShaderStage* shaderStage);
-  void GenerateSourceMain(ShaderStage* shaderStage);
+  void GenerateSourceMain(ShaderStage* shaderStage) const;
 
   static const string& GetValueTypeString(ValueType type);
   static const string& GetParamTypeString(StubParameter::Type type,

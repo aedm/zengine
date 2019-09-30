@@ -1,6 +1,5 @@
 #pragma once
 #include "system.h"
-#include <assert.h>
 #include <memory>
 
 using namespace std;
@@ -8,7 +7,7 @@ using namespace std;
 #if 1
 #	ifdef _DEBUG
 #		define ASSERT(x) { if (!(x)) __debugbreak(); }
-#		define DEBUGBREAK(errstr) { ERR(errstr); __debugbreak(); }
+#		define DEBUGBREAK __debugbreak()
 #	else
 #		define ASSERT(x)
 #		define DEBUGBREAK
@@ -19,7 +18,6 @@ using namespace std;
 
 #define NOT_IMPLEMENTED ASSERT(false);
 #define SHOULD_NOT_HAPPEN ASSERT(false);
-
 
 template<typename T, typename K>
 T SafeCast(K object) {
@@ -33,9 +31,10 @@ T SafeCast(K object) {
 }
 
 template<typename T, typename K>
+// ReSharper disable once CppConstValueFunctionReturnType
 const shared_ptr<T> PointerCast(const shared_ptr<K>& object) {
 #ifdef _DEBUG
-  shared_ptr<T> cast = dynamic_pointer_cast<T>(object);
+  const shared_ptr<T> cast = dynamic_pointer_cast<T>(object);
   ASSERT(object == nullptr || cast != nullptr);
   return cast;
 #else 
@@ -126,18 +125,18 @@ typedef EnumMapper<wchar_t>	EnumMapperW;
 template<typename CharType>
 const CharType*	EnumMapper<CharType>::GetStringFromEnum(
     const EnumMapper<CharType>* mapper, int enumId) {
-  for (; mapper->value != -1; mapper++) {
+  for (; mapper->value != -1; ++mapper) {
     if (enumId == mapper->value) return mapper->name;
   }
   ERR(L"GetStringFromEnum: Unknown enum: %d.", enumId);
-  return NULL;
+  return nullptr;
 }
 
 
 template<typename CharType>
 int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper, 
                                             const CharType* value) {
-  for (; mapper->value != -1; mapper++) {
+  for (; mapper->value != -1; ++mapper) {
     if (strcmp(value, mapper->name) == 0) return mapper->value;
   }
   return -1;
@@ -146,7 +145,7 @@ int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper,
 template<typename CharType>
 int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper, 
                                             const CharType* value, int stringLength) {
-  for (; mapper->value != -1; mapper++) {
+  for (; mapper->value != -1; ++mapper) {
     if (strlen(mapper->name) == stringLength &&
         strncmp(value, mapper->name, stringLength) == 0) {
       return mapper->value;
@@ -156,10 +155,8 @@ int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper,
 }
 
 namespace Convert {
-  string IntToSring(int value);
-  bool StringToFloat(const char* s, float& f);
-  wstring StringToWstring(const string& sourceString);
+  extern wstring StringToWstring(const string& sourceString);
 }
 
-string ToJSON(const shared_ptr<Document>& document);
-shared_ptr<Document> FromJSON(string& json);
+extern string ToJson(const shared_ptr<Document>& document);
+extern shared_ptr<Document> FromJson(const string& json);

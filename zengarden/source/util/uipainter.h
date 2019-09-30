@@ -1,7 +1,7 @@
 #pragma once
 
-#include "textTexture.h"
 #include <zengine.h>
+#include <QFont>
 
 class QString;
 class UiPainter;
@@ -25,7 +25,6 @@ public:
   void DrawRect(const Vec2& topLeft, const Vec2& size);
   void DrawBox(const Vec2& topLeft, const Vec2& size);
   void DrawTexture(const shared_ptr<Texture>& texture, float x, float y);
-  void DrawTextTexture(TextTexture* texture, const Vec2& position);
 
   shared_ptr<Vec4Node> mColor = make_shared<Vec4Node>();
   shared_ptr<StaticTextureNode> mTextureNode = make_shared<StaticTextureNode>();
@@ -48,6 +47,6 @@ private:
   const shared_ptr<Drawable> mTexturedBox = make_shared<Drawable>();
   const shared_ptr<Drawable> mTextBox = make_shared<Drawable>();
 
-  Globals mGlobals;
+  Globals mGlobals{};
 };
 
