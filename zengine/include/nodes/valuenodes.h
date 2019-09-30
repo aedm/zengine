@@ -134,7 +134,8 @@ template<typename T>
 bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
   if (mNode == target || (target == nullptr && mNode == mDefault)) return true;
   if (target && !DoesAcceptNode(target)) {
-    DEBUGBREAK("Slot and node type mismatch");
+    ERR("Slot and node type mismatch");
+    DEBUGBREAK;
     return false;
   }
   if (mNode) mNode->DisconnectFromSlot(this);

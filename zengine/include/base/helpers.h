@@ -7,7 +7,7 @@ using namespace std;
 #if 1
 #	ifdef _DEBUG
 #		define ASSERT(x) { if (!(x)) __debugbreak(); }
-#		define DEBUGBREAK(errstr) { ERR(errstr); __debugbreak(); }
+#		define DEBUGBREAK __debugbreak()
 #	else
 #		define ASSERT(x)
 #		define DEBUGBREAK

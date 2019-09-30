@@ -83,7 +83,8 @@ bool Slot::IsOwnerExpired() const
 
 bool Slot::Connect(const shared_ptr<Node>& target) {
   if (target && !DoesAcceptNode(target)) {
-    DEBUGBREAK("Slot doesn't accept node.");
+    ERR("Slot doesn't accept node.");
+    DEBUGBREAK;
     return false;
   }
   if (mIsMultiSlot) {
