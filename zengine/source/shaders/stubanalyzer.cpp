@@ -18,7 +18,7 @@ OWNERSHIP StubMetadata* StubAnalyzer::FromText(const char* stubSource) {
 StubAnalyzer::StubAnalyzer(const char* stubSource)
   : mCurrentLineNumber(-1)
   , mReturnType(StubParameter::Type::TVOID) {
-  vector<SourceLine*>* lines = SplitToWords(stubSource);
+  std::vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
     mCurrentLineNumber = line->LineNumber;
     if (line->SubStrings[0].Token == TOKEN_COLON) {
@@ -96,8 +96,8 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
 }
 
 
-void StubAnalyzer::AnalyzeVariable(SourceLine* line, 
-  vector<StubInOutVariable*>& Storage) const
+void StubAnalyzer::AnalyzeVariable(SourceLine* line,
+                                   std::vector<StubInOutVariable*>& Storage) const
 {
   if (line->SubStrings.size() < 4) {
     ERR("line %d: Wrong syntax", mCurrentLineNumber);

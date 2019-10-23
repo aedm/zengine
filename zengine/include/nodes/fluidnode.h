@@ -7,7 +7,6 @@
 class FluidNode : public Node {
 public:
   FluidNode();
-  ~FluidNode();
 
   FloatSlot mCurlAmount;
   FloatSlot mPressureFade;
@@ -44,15 +43,15 @@ private:
   FrameBufferId mPressure1FbId = 0;
   FrameBufferId mPressure2FbId = 0;
 
-  shared_ptr<Texture> mColor1Texture = nullptr;
-  shared_ptr<Texture> mColor2Texture = nullptr;
-  shared_ptr<Texture> mVelocity1Texture = nullptr;
-  shared_ptr<Texture> mVelocity2Texture = nullptr;
-  shared_ptr<Texture> mVelocity3Texture = nullptr;
-  shared_ptr<Texture> mCurlTexture = nullptr;
-  shared_ptr<Texture> mDivergenceTexture = nullptr;
-  shared_ptr<Texture> mPressureTexture1 = nullptr;
-  shared_ptr<Texture> mPressureTexture2 = nullptr;
+  std::shared_ptr<Texture> mColor1Texture = nullptr;
+  std::shared_ptr<Texture> mColor2Texture = nullptr;
+  std::shared_ptr<Texture> mVelocity1Texture = nullptr;
+  std::shared_ptr<Texture> mVelocity2Texture = nullptr;
+  std::shared_ptr<Texture> mVelocity3Texture = nullptr;
+  std::shared_ptr<Texture> mCurlTexture = nullptr;
+  std::shared_ptr<Texture> mDivergenceTexture = nullptr;
+  std::shared_ptr<Texture> mPressureTexture1 = nullptr;
+  std::shared_ptr<Texture> mPressureTexture2 = nullptr;
 };
 
 typedef TypedSlot<FluidNode> FluidSlot;

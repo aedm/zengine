@@ -46,8 +46,8 @@ void Pass::Operate() {
   mShaderProgram.reset();
   if (!mShaderSource) return;
 
-  const string& vertexSource = mShaderSource->mVertexSource;
-  const string& fragmentSource = mShaderSource->mFragmentSource;
+  const std::string& vertexSource = mShaderSource->mVertexSource;
+  const std::string& fragmentSource = mShaderSource->mFragmentSource;
 
   INFO("Building shader program...");
   mShaderProgram =
@@ -173,7 +173,7 @@ void Pass::Set(Globals* globals) {
     const ShaderProgram::Sampler* target = samplerMapper.mTarget;
 
     // ReSharper disable once CppInitializedValueIsAlwaysRewritten
-    shared_ptr<Texture> tex = nullptr;
+    std::shared_ptr<Texture> tex = nullptr;
     if (samplerMapper.mSource->mGlobalType == GlobalSamplerUsage::LOCAL) {
       ASSERT(samplerMapper.mSource->mNode != nullptr);
       tex = PointerCast<TextureNode>(samplerMapper.mSource->mNode)->Get();
@@ -182,7 +182,7 @@ void Pass::Set(Globals* globals) {
       /// Global uniform, takes value from the Globals object
       const int offset = GlobalSamplerOffsets[UINT(source->mGlobalType)];
       void* sourcePointer = reinterpret_cast<char*>(globals) + offset;
-      tex = *reinterpret_cast<shared_ptr<Texture>*>(sourcePointer);
+      tex = *reinterpret_cast<std::shared_ptr<Texture>*>(sourcePointer);
     }
     OpenGL->SetTexture(*target, tex ? tex : nullptr, i++);
   }
@@ -190,7 +190,7 @@ void Pass::Set(Globals* globals) {
   /// Set SSBOs
   for (const auto& ssbo : mSSBOs.GetResources()) {
     const ShaderProgram::SSBO* target = ssbo.mTarget;
-    shared_ptr<Buffer> buffer = 
+    std::shared_ptr<Buffer> buffer = 
       PointerCast<BufferNode>(ssbo.mSource->mNode)->GetBuffer();
     
     if (!buffer) continue;

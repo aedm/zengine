@@ -10,33 +10,31 @@
 #include <string>
 #include <unordered_map>
 
-using namespace std;
-
 class JSONDeserializer {
 public:
-  JSONDeserializer(const string& json);
-  shared_ptr<Document> GetDocument() const;
+  JSONDeserializer(const std::string& json);
+  std::shared_ptr<Document> GetDocument() const;
 
 private:
   void DeserializeNode(rapidjson::Value& value);
 
   static void DeserializeFloatNode(const rapidjson::Value& value, 
-    const shared_ptr<FloatNode>& node);
+    const std::shared_ptr<FloatNode>& node);
   static void DeserializeVec2Node(const rapidjson::Value& value, 
-    const shared_ptr<Vec2Node>& node);
+    const std::shared_ptr<Vec2Node>& node);
   static void DeserializeVec3Node(const rapidjson::Value& value, 
-    const shared_ptr<Vec3Node>& node);
+    const std::shared_ptr<Vec3Node>& node);
   static void DeserializeVec4Node(const rapidjson::Value& value, 
-    const shared_ptr<Vec4Node>& node);
+    const std::shared_ptr<Vec4Node>& node);
   static void DeserializeFloatSplineNode(const rapidjson::Value& value, 
-    const shared_ptr<FloatSplineNode>& node);
+    const std::shared_ptr<FloatSplineNode>& node);
 
   void DeserializeStaticTextureNode(const rapidjson::Value& value, 
-    const shared_ptr<StaticTextureNode>& node) const;
+    const std::shared_ptr<StaticTextureNode>& node) const;
   static void DeserializeStubNode(const rapidjson::Value& value, 
-    const shared_ptr<StubNode>& node);
+    const std::shared_ptr<StubNode>& node);
   void DeserializeStaticMeshNode(const rapidjson::Value& value, 
-    const shared_ptr<StaticMeshNode>& node) const;
+    const std::shared_ptr<StaticMeshNode>& node) const;
 
   void ConnectSlots(rapidjson::Value& value);
   
@@ -47,7 +45,7 @@ private:
   static Vec3 DeserializeVec3(const rapidjson::Value& value);
   static Vec4 DeserializeVec4(const rapidjson::Value& value);
 
-  unordered_map<int, shared_ptr<Node>> mNodes;
+  std::unordered_map<int, std::shared_ptr<Node>> mNodes;
 
-  shared_ptr<Document> mDocument;
+  std::shared_ptr<Document> mDocument;
 };

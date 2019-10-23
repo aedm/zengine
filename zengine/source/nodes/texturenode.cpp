@@ -4,17 +4,17 @@
 REGISTER_NODECLASS(StaticTextureNode, "Texture");
 REGISTER_NODECLASS(TextureFileNode, "Texture file");
 
-template<> StaticValueNode<shared_ptr<Texture>>::StaticValueNode()
-  : ValueNode<shared_ptr<Texture>>() {
+template<> StaticValueNode<std::shared_ptr<Texture>>::StaticValueNode()
+  : ValueNode<std::shared_ptr<Texture>>() {
 }
 
 template<>
-void StaticValueNode<shared_ptr<Texture>>::Set(const shared_ptr<Texture>& newValue) {
+void StaticValueNode<std::shared_ptr<Texture>>::Set(const std::shared_ptr<Texture>& newValue) {
   mValue = newValue;
   SendMsg(MessageType::VALUE_CHANGED);
 }
 
-template class StaticValueNode<shared_ptr<Texture>>;
+template class StaticValueNode<std::shared_ptr<Texture>>;
 
 TextureFileNode::TextureFileNode()
   : mFileName(this, "FileName", false, false, true)

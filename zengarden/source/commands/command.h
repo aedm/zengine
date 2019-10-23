@@ -3,8 +3,6 @@
 #include <zengine.h>
 #include <vector>
 
-using namespace std;
-
 class CommandStack;
 extern CommandStack* TheCommandStack;
 
@@ -44,5 +42,5 @@ public:
   bool Redo();
 
 private:
-  vector<Command*> mCommandList;
+  std::vector<Command*> mCommandList;
 };

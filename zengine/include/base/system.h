@@ -7,7 +7,6 @@
 #include <set>
 #include <vector>
 
-using namespace std;
 using namespace fastdelegate;
 
 class System {
@@ -15,7 +14,7 @@ public:
   static OWNERSHIP char* ReadFile(const wchar_t* fileName);
 
   static void ReadFilesInFolder(const wchar_t* folder, const wchar_t* extension, 
-                                vector<wstring>& oFileList);
+                                std::vector<std::wstring>& oFileList);
 };
 
 template <class X, class Y, class RetType, typename... Params>
@@ -45,5 +44,5 @@ public:
     }
   }
 
-  set<FastDelegate<void(Types...)>>	mDelegates;
+  std::set<FastDelegate<void(Types...)>>	mDelegates;
 };

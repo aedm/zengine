@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../dom/node.h"
 #include "../nodes/valuenodes.h"
@@ -6,8 +6,6 @@
 #include "valuetype.h"
 #include <vector>
 #include <map>
-
-using namespace std;
 
 /// Macro list for global uniforms (name/usage, type)
 #define GLOBALUNIFORM_LIST \
@@ -93,7 +91,7 @@ struct Globals {
   GLOBALUNIFORM_LIST
 
 #undef ITEM
-#define ITEM(name) shared_ptr<Texture> name;
+#define ITEM(name) std::shared_ptr<Texture> name;
   GLOBALSAMPLER_LIST
 };
 
@@ -114,7 +112,7 @@ struct StubParameter {
   };
 
   Type mType;
-  string mName;
+  std::string mName;
 
   static bool IsValidValueType(Type type);
   static ValueType ToValueType(Type type);
@@ -125,21 +123,21 @@ struct StubParameter {
 /// ":input vec4 MyColor" -- creates "inMyColor" input variable.
 struct StubInOutVariable {
   ValueType type;
-  string name;
+  std::string name;
 };
 
 /// Global uniforms
 /// ":global vec2 gRenderTargetSize"
 struct StubGlobalUniform {
   ValueType type;
-  string name;
+  std::string name;
   GlobalUniformUsage usage;
 };
 
 /// Global samplers
 /// ":global sampler2D gSquareTexture"
 struct StubGlobalSampler {
-  string name;
+  std::string name;
   GlobalSamplerUsage usage;
   bool isMultiSampler; // type is "sampler2DMS"
   bool isShadow; // type is "sampler2DShadow"
@@ -148,37 +146,37 @@ struct StubGlobalSampler {
 
 /// All metadata collected from a stub source.
 struct StubMetadata {
-  StubMetadata(string name, StubParameter::Type returnType,
-               string strippedSource,
-               vector<OWNERSHIP StubParameter*> parameters,
-               vector<StubGlobalUniform*> globalUniforms,
-               vector<StubGlobalSampler*> globalSamplers,
-               vector<StubInOutVariable*> inputs,
-               vector<StubInOutVariable*> outputs);
+  StubMetadata(std::string name, StubParameter::Type returnType,
+               std::string strippedSource,
+               std::vector<OWNERSHIP StubParameter*> parameters,
+               std::vector<StubGlobalUniform*> globalUniforms,
+               std::vector<StubGlobalSampler*> globalSamplers,
+               std::vector<StubInOutVariable*> inputs,
+               std::vector<StubInOutVariable*> outputs);
 
   ~StubMetadata();
 
   /// Value of the ":name" directive.
-  const string mName;
+  const std::string mName;
 
-  /// Value of the ":returns" directive.
+  /// Value of theű ":returns" directive.
   const StubParameter::Type mReturnType;
 
   /// The source without any directives.
-  const string mStrippedSource;
+  const std::string mStrippedSource;
 
   /// Parameters of the stub. These become slots. (":param")
-  const vector<StubParameter*> mParameters;
+  const std::vector<StubParameter*> mParameters;
 
   /// List of globals. (":global")
-  const vector<StubGlobalUniform*> mGlobalUniforms;
-  const vector<StubGlobalSampler*> mGlobalSamplers;
+  const std::vector<StubGlobalUniform*> mGlobalUniforms;
+  const std::vector<StubGlobalSampler*> mGlobalSamplers;
 
   /// List of stage inputs. (":input")
-  const vector<StubInOutVariable*> mInputs;
+  const std::vector<StubInOutVariable*> mInputs;
 
   /// List of stage outputs. (":output")
-  const vector<StubInOutVariable*> mOutputs;
+  const std::vector<StubInOutVariable*> mOutputs;
 };
 
 
@@ -197,13 +195,13 @@ public:
 
   /// Get slot by shader parameter name
   Slot* GetSlotByParameter(StubParameter*);
-  Slot* GetSlotByParameterName(const string& name);
+  Slot* GetSlotByParameterName(const std::string& name);
 
   /// Source of the stub
   StringSlot mSource;
 
   /// Copies shader source from another StubNode
-  void CopyFrom(const shared_ptr<Node>& node) override;
+  void CopyFrom(const std::shared_ptr<Node>& node) override;
 
 protected:
   /// Performs metadata analysis on the new stub source.
@@ -216,10 +214,10 @@ protected:
   StubMetadata* mMetadata;
 
   /// Maps stub parameters to stub slots
-  map<StubParameter*, Slot*> mParameterSlotMap;
-  map<string, Slot*> mParameterNameSlotMap;
+  std::map<StubParameter*, Slot*> mParameterSlotMap;
+  std::map<std::string, Slot*> mParameterNameSlotMap;
 };
 
 typedef TypedSlot<StubNode> StubSlot;
 
-ValueType NodeToValueType(const shared_ptr<Node>& node);
+ValueType NodeToValueType(const std::shared_ptr<Node>& node);

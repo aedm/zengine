@@ -5,6 +5,7 @@
 #define GLEW_STATIC
 #include <glew/glew.h>
 #include <utility>
+#include <memory>
 
 bool GLDisableErrorChecks = false;
 
@@ -135,8 +136,9 @@ static ShaderHandle CompileAndAttachShader(GLuint program, GLuint shaderType,
   return shader;
 }
 
-void CollectUniformsFromProgram(GLuint program, 
-  vector<ShaderProgram::Uniform>& uniforms, UINT* oBlockSize)
+void CollectUniformsFromProgram(GLuint program,
+                                std::vector<ShaderProgram::Uniform>& uniforms, 
+  UINT* oBlockSize)
 {
   /// Query uniform blocks
   GLint uniformBlockCount;
@@ -163,9 +165,9 @@ void CollectUniformsFromProgram(GLuint program,
   uniforms.reserve(blockProps.mUniformCount);
 
   std::vector<GLint> uniformLocations(blockProps.mUniformCount);
-  const GLenum activeUnifProp[1] = { GL_ACTIVE_VARIABLES };
-  glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex, 1, activeUnifProp,
-    blockProps.mUniformCount, nullptr, &uniformLocations[0]);
+  const GLenum activeUniformProp[1] = { GL_ACTIVE_VARIABLES };
+  glGetProgramResourceiv(program, GL_UNIFORM_BLOCK, uniformBlockIndex, 1, 
+    activeUniformProp, blockProps.mUniformCount, nullptr, &uniformLocations[0]);
 
   /// Query the properties of each uniform inside the block
   const GLenum uniformProperties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_OFFSET };
@@ -180,7 +182,7 @@ void CollectUniformsFromProgram(GLuint program,
       reinterpret_cast<GLint*>(&values));
 
     /// Get the name
-    vector<char> name(values.mNameLength);
+    std::vector<char> name(values.mNameLength);
     glGetProgramResourceName(program, GL_UNIFORM, uniformLocations[blockIndex],
       values.mNameLength, nullptr, &name[0]);
 
@@ -194,12 +196,12 @@ void CollectUniformsFromProgram(GLuint program,
     default: SHOULD_NOT_HAPPEN; break;
     }
 
-    uniforms.emplace_back(string(&name[0]), nodeType, values.mOffset);
+    uniforms.emplace_back(std::string(&name[0]), nodeType, values.mOffset);
   }
   *oBlockSize = blockProps.mSize;
 }
 
-void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos) {
+void CollectSSBOsFromProgram(GLuint program, std::vector<ShaderProgram::SSBO>& ssbos) {
   /// Query buffer indexes
   GLint bufferCount, ssboCount;
   glGetProgramInterfaceiv(program, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES,
@@ -228,18 +230,18 @@ void CollectSSBOsFromProgram(GLuint program, vector<ShaderProgram::SSBO>& ssbos)
     if (isReferenced) {
       /// Set up binding point
       glShaderStorageBlockBinding(program, resouceIndex, resouceIndex);
-      ssbos.emplace_back(string(name), resouceIndex);
+      ssbos.emplace_back(std::string(name), resouceIndex);
     }
   }
 }
 
-void CollectOpaqueFromProgram(GLuint program, vector<ShaderProgram::Sampler>& samplers) {
+void CollectOpaqueFromProgram(GLuint program, std::vector<ShaderProgram::Sampler>& samplers) {
   GLint uniformCount;
   glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &uniformCount);
 
   GLint uniformNameMaxLength;
   glGetProgramiv(program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformNameMaxLength);
-  vector<char> samplerName(uniformNameMaxLength);
+  std::vector<char> samplerName(uniformNameMaxLength);
 
   for (int uniformIndex = 0; uniformIndex < uniformCount; uniformIndex++) {
     /// Request info about Nth uniform
@@ -251,7 +253,7 @@ void CollectOpaqueFromProgram(GLuint program, vector<ShaderProgram::Sampler>& sa
     if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_MULTISAMPLE ||
       type == GL_SAMPLER_2D_SHADOW) {
       const GLint location = glGetUniformLocation(program, &samplerName[0]);
-      samplers.emplace_back(string(&samplerName[0]), location);
+      samplers.emplace_back(std::string(&samplerName[0]), location);
     }
   }
   CheckGLError();
@@ -281,7 +283,7 @@ bool LinkProgram(GLuint program) {
   return result == GL_TRUE;
 }
 
-shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
+std::shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   const char* vertexSource, const char* fragmentSource) 
 {
   ASSERT(!PleaseNoNewResources);
@@ -319,20 +321,20 @@ shared_ptr<ShaderProgram> OpenGLAPI::CreateShaderFromSource(
   }
 
   UINT uniformBlockSize;
-  vector<ShaderProgram::Uniform> uniforms;
-  vector<ShaderProgram::Sampler> samplers;
-  vector<ShaderProgram::SSBO> ssbos;
+  std::vector<ShaderProgram::Uniform> uniforms;
+  std::vector<ShaderProgram::Sampler> samplers;
+  std::vector<ShaderProgram::SSBO> ssbos;
   CollectUniformsFromProgram(program, uniforms, &uniformBlockSize);
   CollectOpaqueFromProgram(program, samplers);
   CollectSSBOsFromProgram(program, ssbos);
   
-  return make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
+  return std::make_shared<ShaderProgram>(program, vertexShaderHandle, fragmentShaderHandle,
     uniforms, samplers, ssbos, uniformBlockSize);
 }
 
 
-void OpenGLAPI::SetShaderProgram(const shared_ptr<ShaderProgram>& program,
-  const shared_ptr<Buffer>& uniformBuffer) 
+void OpenGLAPI::SetShaderProgram(const std::shared_ptr<ShaderProgram>& program,
+  const std::shared_ptr<Buffer>& uniformBuffer) 
 {
   CheckGLError();
   glUseProgram(program->mProgramHandle);
@@ -381,7 +383,7 @@ GLenum GetGLPrimitive(PrimitiveTypeEnum primitiveType) {
 }
 
 
-void OpenGLAPI::Render(const shared_ptr<Buffer>& indexBuffer, UINT count,
+void OpenGLAPI::Render(const std::shared_ptr<Buffer>& indexBuffer, UINT count,
   PrimitiveTypeEnum primitiveType, UINT instanceCount) 
 {
   CheckGLError();
@@ -551,7 +553,7 @@ UINT OpenGLAPI::GetTexelByteCount(TexelType type) {
 }
 
 
-shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type,
+std::shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type,
   const void* texelData, bool gpuMemoryOnly, bool isMultisample,
   bool doesRepeat, bool generateMipmaps)
 {
@@ -601,13 +603,13 @@ shared_ptr<Texture> OpenGLAPI::MakeTexture(int width, int height, TexelType type
   }
 
   CheckGLError();
-  shared_ptr<vector<char>> texelVector = nullptr;
+  std::shared_ptr<std::vector<char>> texelVector = nullptr;
   if (!gpuMemoryOnly) {
-    texelVector = make_shared<vector<char>>();
+    texelVector = std::make_shared<std::vector<char>>();
     texelVector->resize(width * height * 4);
     memcpy(&(*texelVector)[0], texelData, width * height * 4);
   }
-  return make_shared<Texture>(handle, width, height, type,
+  return std::make_shared<Texture>(handle, width, height, type,
     texelVector, isMultisample, doesRepeat, generateMipmaps);
 }
 
@@ -645,7 +647,7 @@ void OpenGLAPI::DeleteTextureGpuData(Texture::Handle handle) {
 }
 
 
-void OpenGLAPI::UploadTextureGpuData(const shared_ptr<Texture>& texture,
+void OpenGLAPI::UploadTextureGpuData(const std::shared_ptr<Texture>& texture,
   void* texelData) {
   ASSERT(!PleaseNoNewResources);
   ASSERT(!texture->mTexelData);
@@ -658,7 +660,7 @@ void OpenGLAPI::UploadTextureGpuData(const shared_ptr<Texture>& texture,
 
 
 void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler,
-  const shared_ptr<Texture>& texture, UINT slotIndex)
+  const std::shared_ptr<Texture>& texture, UINT slotIndex)
 {
   CheckGLError();
   SetActiveTexture(slotIndex);
@@ -674,9 +676,9 @@ void OpenGLAPI::SetTexture(const ShaderProgram::Sampler& sampler,
 }
 
 
-FrameBufferId OpenGLAPI::CreateFrameBuffer(const shared_ptr<Texture>& depthBuffer,
-  const shared_ptr<Texture>& targetBufferA,
-  const shared_ptr<Texture>& targetBufferB)
+FrameBufferId OpenGLAPI::CreateFrameBuffer(const std::shared_ptr<Texture>& depthBuffer,
+  const std::shared_ptr<Texture>& targetBufferA,
+  const std::shared_ptr<Texture>& targetBufferB)
 {
   ASSERT(!PleaseNoNewResources);
   ASSERT(!targetBufferA || !depthBuffer ||
@@ -776,17 +778,17 @@ void OpenGLAPI::BindMultisampleTexture(Texture::Handle textureId) {
 }
 
 
-void OpenGLAPI::SetVertexBuffer(const shared_ptr<Buffer>& buffer) {
+void OpenGLAPI::SetVertexBuffer(const std::shared_ptr<Buffer>& buffer) {
   BindVertexBuffer(buffer->GetHandle());
 }
 
 
-void OpenGLAPI::SetIndexBuffer(const shared_ptr<Buffer>& buffer) {
+void OpenGLAPI::SetIndexBuffer(const std::shared_ptr<Buffer>& buffer) {
   BindIndexBuffer(buffer->GetHandle());
 }
 
 
-void OpenGLAPI::SetSsbo(UINT index, const shared_ptr<Buffer>& buffer) {
+void OpenGLAPI::SetSsbo(UINT index, const std::shared_ptr<Buffer>& buffer) {
   if (!buffer) return;
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, buffer->GetHandle());
 }
@@ -814,7 +816,7 @@ void OpenGLAPI::EnableVertexAttribute(UINT index, ValueType nodeType, UINT offse
 
 ShaderProgram::ShaderProgram(ShaderHandle shaderHandle, 
   ShaderHandle vertexProgramHandle, ShaderHandle fragmentProgramHandle,
-  vector<Uniform>& uniforms, vector<Sampler>& samplers, vector<SSBO>& ssbos,
+  std::vector<Uniform>& uniforms, std::vector<Sampler>& samplers, std::vector<SSBO>& ssbos,
   UINT uniformBlockSize)
   : mProgramHandle(shaderHandle)
   , mVertexShaderHandle(vertexProgramHandle)
@@ -834,12 +836,12 @@ ShaderProgram::~ShaderProgram() {
   CheckGLError();
 }
 
-ShaderProgram::Uniform::Uniform(string name, ValueType type, UINT offset)
+ShaderProgram::Uniform::Uniform(std::string name, ValueType type, UINT offset)
   : mName(std::move(name))
   , mType(type)
   , mOffset(offset) {}
 
-ShaderProgram::Sampler::Sampler(string name, SamplerId handle)
+ShaderProgram::Sampler::Sampler(std::string name, SamplerId handle)
   : mName(std::move(name))
   , mHandle(handle) {}
 
@@ -907,7 +909,7 @@ void Buffer::Release() {
   CheckGLError();
 }
 
-ShaderProgram::SSBO::SSBO(string name, UINT index)
+ShaderProgram::SSBO::SSBO(std::string name, UINT index)
   : mName(std::move(name))
   , mIndex(index)
 {}

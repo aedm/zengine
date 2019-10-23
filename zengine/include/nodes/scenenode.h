@@ -6,6 +6,7 @@
 #include "../render/rendertarget.h"
 #include "../shaders/pass.h"
 #include "timenode.h"
+#include <memory>
 
 class SceneNode: public Node {
 public:
@@ -50,12 +51,12 @@ protected:
   void HandleMessage(Message* message) override;
 
 private:
-  vector<shared_ptr<Node>> mTransitiveClosure;
+  std::vector<std::shared_ptr<Node>> mTransitiveClosure;
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
   float mLastRenderTime{};
 
-  shared_ptr<GlobalTimeNode> mGlobalTimeNode = make_shared<GlobalTimeNode>();
+  std::shared_ptr<GlobalTimeNode> mGlobalTimeNode = std::make_shared<GlobalTimeNode>();
 
   void CalculateRenderDependencies();
 };

@@ -22,19 +22,19 @@ private:
   void AnalyzeParam(SourceLine* line);
   void AnalyzeGlobal(SourceLine* line);
   void AnalyzeVariable(SourceLine* line,
-                       vector<StubInOutVariable*>& storage) const;
+                       std::vector<StubInOutVariable*>& storage) const;
 
   StubParameter::Type TokenToType(const SubString& subStr) const;
 
   int mCurrentLineNumber;
 
   /// Builders
-  string mName;
-  string mStrippedSource;
+  std::string mName;
+  std::string mStrippedSource;
   StubParameter::Type mReturnType;
-  vector<StubParameter*> mParameters;
-  vector<StubGlobalUniform*> mGlobalUniforms;
-  vector<StubGlobalSampler*> mGlobalSamplers;
-  vector<StubInOutVariable*> mInputs;
-  vector<StubInOutVariable*> mOutputs;
+  std::vector<StubParameter*> mParameters;
+  std::vector<StubGlobalUniform*> mGlobalUniforms;
+  std::vector<StubGlobalSampler*> mGlobalSamplers;
+  std::vector<StubInOutVariable*> mInputs;
+  std::vector<StubInOutVariable*> mOutputs;
 };

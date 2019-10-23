@@ -166,13 +166,13 @@ Slot* StubNode::GetSlotByParameter(StubParameter* parameter) {
   return mParameterSlotMap.at(parameter);
 }
 
-Slot* StubNode::GetSlotByParameterName(const string& name) {
+Slot* StubNode::GetSlotByParameterName(const std::string& name) {
   return mParameterNameSlotMap.at(name);
 }
 
-void StubNode::CopyFrom(const shared_ptr<Node>& node)
+void StubNode::CopyFrom(const std::shared_ptr<Node>& node)
 {
-  const shared_ptr<StubNode> original = PointerCast<StubNode>(node);
+  const std::shared_ptr<StubNode> original = PointerCast<StubNode>(node);
   mSource.SetDefaultValue(original->mSource.Get());
   mIsUpToDate = false;
   if (original->mMetadata) {
@@ -217,13 +217,13 @@ void StubNode::HandleMessage(Message* message) {
   }
 }
 
-StubMetadata::StubMetadata(string name, StubParameter::Type returnType,
-  string strippedSource,
-  OWNERSHIP vector<StubParameter*> parameters,
-  vector<StubGlobalUniform*> globalUniforms,
-  vector<StubGlobalSampler*> globalSamplers,
-  vector<StubInOutVariable*> inputs,
-  vector<StubInOutVariable*> outputs)
+StubMetadata::StubMetadata(std::string name, StubParameter::Type returnType,
+                           std::string strippedSource,
+                           OWNERSHIP std::vector<StubParameter*> parameters,
+                           std::vector<StubGlobalUniform*> globalUniforms,
+                           std::vector<StubGlobalSampler*> globalSamplers,
+                           std::vector<StubInOutVariable*> inputs,
+                           std::vector<StubInOutVariable*> outputs)
   : mName(std::move(name))
   , mReturnType(returnType)
   , mStrippedSource(std::move(strippedSource))
@@ -270,7 +270,7 @@ ValueType StubParameter::ToValueType(Type type)
   }
 }
 
-ValueType NodeToValueType(const shared_ptr<Node>& node) {
+ValueType NodeToValueType(const std::shared_ptr<Node>& node) {
   if (IsPointerOf<ValueNode<float>>(node)) return ValueType::FLOAT;
   if (IsPointerOf<ValueNode<Vec2>>(node)) return ValueType::VEC2;
   if (IsPointerOf<ValueNode<Vec3>>(node)) return ValueType::VEC3;

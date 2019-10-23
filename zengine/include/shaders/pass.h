@@ -5,8 +5,7 @@
 #include "../render/drawingapi.h"
 #include "../nodes/fluidnode.h"
 #include <map>
-
-using namespace std;
+#include <memory>
 
 enum class PassType {
   FLUID_PAINT,
@@ -28,9 +27,11 @@ public:
     {}
   };
 
-  void Collect(const vector<SourceType>& sources, const vector<ProgramType>& targets) {
+  void Collect(const std::vector<SourceType>& sources, 
+    const std::vector<ProgramType>& targets)
+  {
     mResources.clear();
-    map<string, const SourceType*> mapByName;
+    std::map<std::string, const SourceType*> mapByName;
     for (const auto& source : sources) {
       mapByName[source.mName] = &source;
     }
@@ -41,16 +42,16 @@ public:
     }
   }
 
-  const vector<Item>& GetResources() {
+  const std::vector<Item>& GetResources() {
     return mResources;
   }
 
 private:
-  vector<Item> mResources;
+  std::vector<Item> mResources;
 };
 
 
-/// A renderpass is a way to render an object. Materials consist of several
+/// A render pass is a way to render an object. Materials consist of several
 /// render passes, eg. an opaque pass, a transparent pass, a shadow pass etc.
 /// It manages the entire render pipeline, including setting a shader program,
 /// render states, and connecting pipeline resources.
@@ -80,8 +81,8 @@ public:
   bool isComplete() const;
 
   /// Get shader sources
-  string GetVertexShaderSource() const;
-  string GetFragmentShaderSource() const;
+  std::string GetVertexShaderSource() const;
+  std::string GetFragmentShaderSource() const;
 
 protected:
   void HandleMessage(Message* message) override;
@@ -92,10 +93,10 @@ protected:
   void BuildShaderSource();
 
   /// Generated shader source
-  shared_ptr<ShaderSource> mShaderSource;
+  std::shared_ptr<ShaderSource> mShaderSource;
   
   /// Compiled and linked shader program
-  shared_ptr<ShaderProgram> mShaderProgram;
+  std::shared_ptr<ShaderProgram> mShaderProgram;
 
   /// Mapping between nodes and shader resources
   ShaderResourceMap<ShaderProgram::Uniform, ShaderSource::Uniform> mUniforms;
@@ -104,7 +105,7 @@ protected:
 
   /// Client-side uniform buffer. 
   /// Uniforms are assembled in this array and then uploaded to OpenGL
-  shared_ptr<Buffer> mUniformBuffer = make_shared<Buffer>();
+  std::shared_ptr<Buffer> mUniformBuffer = std::make_shared<Buffer>();
 };
 
 typedef TypedSlot<Pass> PassSlot;

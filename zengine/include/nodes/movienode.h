@@ -12,7 +12,7 @@ public:
   void Draw(RenderTarget* renderTarget, float time);
 
   int GetTrackCount() const;
-  const std::vector<shared_ptr<ClipNode>>& GetTrack(int trackIndex);
+  const std::vector<std::shared_ptr<ClipNode>>& GetTrack(int trackIndex);
 
   /// Returns the end of the last clip
   float CalculateMovieLength();
@@ -22,7 +22,7 @@ protected:
 
 private:
   // Tracks ordered by starting time of clips
-  vector<vector<shared_ptr<ClipNode>>> mTracks;
+  std::vector<std::vector<std::shared_ptr<ClipNode>>> mTracks;
 
   void SortClips();
 

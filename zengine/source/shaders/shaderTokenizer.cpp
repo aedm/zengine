@@ -105,11 +105,11 @@ SubString GetNextWord(const char* Position, int LineNumber)
 
 
 /// Splits the while source code into words
-vector<SourceLine*>* Shaders::SplitToWords( const char* source )
+std::vector<SourceLine*>* Shaders::SplitToWords( const char* source )
 {
 	int lineNumber = 1;
 	const char* pos = source;
-	vector<SourceLine*>* lines = new vector<SourceLine*>();
+  std::vector<SourceLine*>* lines = new std::vector<SourceLine*>();
 	SourceLine* line = nullptr;
 	while (*pos != 0)
 	{
@@ -160,13 +160,13 @@ SubString::SubString( const char* _Begin, UINT _Length, ShaderTokenEnum _Token )
   , Length(_Length)
 {}
 
-string SubString::ToString() const
+std::string SubString::ToString() const
 {
 	if (Token == TOKEN_STRING) 
 	{
-		return string(Begin + 1, Length - 2);
+		return std::string(Begin + 1, Length - 2);
 	}
-	return string(Begin, Length);
+	return std::string(Begin, Length);
 }
 
 SourceLine::SourceLine(int _LineNumber, const char* LineBegin)

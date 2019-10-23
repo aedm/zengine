@@ -3,8 +3,6 @@
 #include "node.h"
 #include <map>
 
-using namespace std;
-
 class Ghost : public Node {
 public:
   Ghost();
@@ -18,14 +16,14 @@ public:
   bool IsDirectReference() const;
 
 protected:
-  set<shared_ptr<Node>> mInternalNodes;
-  map<shared_ptr<Node>, shared_ptr<Node>> mNodeMapping;
+  std::set<std::shared_ptr<Node>> mInternalNodes;
+  std::map<std::shared_ptr<Node>, std::shared_ptr<Node>> mNodeMapping;
 
   Slot mMainInternalNode;
 
   void HandleMessage(Message* message) override;
 
-  shared_ptr<Node> GetReferencedNode() override;
+  std::shared_ptr<Node> GetReferencedNode() override;
 
   void Regenerate();
 };

@@ -8,8 +8,8 @@ Texture::~Texture() {
 }
 
 Texture::Texture(Handle handle, int width, int height, TexelType type,
-  shared_ptr<vector<char>> texelData, bool isMultisample, bool doesRepeat,
-  bool generateMipmaps)
+                 std::shared_ptr<std::vector<char>> texelData, bool isMultisample, 
+  bool doesRepeat, bool generateMipmaps)
   : mHandle(handle)
   , mWidth(width)
   , mHeight(height)

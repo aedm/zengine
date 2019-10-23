@@ -11,7 +11,7 @@ public:
   PassSlot mZPostPass;
   PassSlot mFluidPaintPass;
 
-  shared_ptr<Pass> GetPass(PassType passType);
+  std::shared_ptr<Pass> GetPass(PassType passType);
 
 protected:
   void HandleMessage(Message* message) override;
@@ -24,7 +24,7 @@ public:
   SolidMaterial();
   virtual ~SolidMaterial();
 
-  shared_ptr<Node> GetReferencedNode() override;
+  std::shared_ptr<Node> GetReferencedNode() override;
 
 protected:
   void HandleMessage(Message* message) override;
@@ -32,10 +32,10 @@ protected:
 private:
   void SetupSlots();
 
-  const shared_ptr<Material> mMaterial;
-  const shared_ptr<Pass> mSolidPass;
-  const shared_ptr<StubNode> mSolidVertexStub;
-  const shared_ptr<StubNode> mSolidFragmentStub;
+  const std::shared_ptr<Material> mMaterial;
+  const std::shared_ptr<Pass> mSolidPass;
+  const std::shared_ptr<StubNode> mSolidVertexStub;
+  const std::shared_ptr<StubNode> mSolidFragmentStub;
 
   Slot mGhostSlot;
 };

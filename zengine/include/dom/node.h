@@ -10,7 +10,6 @@
 #include <memory>
 #include <deque>
 
-using namespace std;
 using namespace fastdelegate;
 
 class Node;
@@ -62,8 +61,8 @@ enum class MessageType {
 };
 
 struct Message {
-  shared_ptr<Node> mSource;
-  shared_ptr<Node> mTarget;
+  std::shared_ptr<Node> mSource;
+  std::shared_ptr<Node> mTarget;
   Slot* mSlot;
   MessageType mType;
 
@@ -75,7 +74,7 @@ class MessageQueue {
   friend class Node;
 
 public:
-  void Enqueue(const shared_ptr<Node>& source, const shared_ptr<Node>& target, 
+  void Enqueue(const std::shared_ptr<Node>& source, const std::shared_ptr<Node>& target, 
     MessageType type, Slot* slot = nullptr);
 
 private:
@@ -91,21 +90,21 @@ private:
 /// Nodes can have multiple input slots, which connect them to other nodes' slots.
 class Slot {
 public:
-  Slot(Node* owner, string name, bool isMultiSlot = false, bool isPublic = true,
+  Slot(Node* owner, std::string name, bool isMultiSlot = false, bool isPublic = true,
     bool isSerializable = true, bool isTraversable = true);
   virtual ~Slot();
 
-  shared_ptr<Node> GetOwner() const;
+  std::shared_ptr<Node> GetOwner() const;
   bool IsOwnerExpired() const;
 
   /// Attaches slot to node. 
   /// - for non-multislots, this overrides the current connection.
   /// - for multislots, the node will be added to the list of connected nodes. 
   /// Returns false if connection is not possible due to type mismatch.
-  virtual bool Connect(const shared_ptr<Node>& target);
+  virtual bool Connect(const std::shared_ptr<Node>& target);
 
   /// Disconnects a node from this slot. 
-  virtual void Disconnect(const shared_ptr<Node>&);
+  virtual void Disconnect(const std::shared_ptr<Node>&);
 
   /// Disconnects all nodes from this slot. If NotifyOwner is true, the slot
   /// send a SLOT_CONNECTION_CHANGED message to its owner.
@@ -113,37 +112,37 @@ public:
 
   /// Removes the connected node from connected nodes list, 
   /// and reinserts it at the "TargetIndex" position. Only for multislots.
-  void ChangeNodeIndex(const shared_ptr<Node>& node, UINT targetIndex);
+  void ChangeNodeIndex(const std::shared_ptr<Node>& node, UINT targetIndex);
 
   /// Returns referenced connected node (single slots only)
   /// Subclasses of Slot have a properly typed GetNode() method.
-  shared_ptr<Node> GetReferencedNode() const;
+  std::shared_ptr<Node> GetReferencedNode() const;
 
   /// Returns directly connected node, no reference following (single slots only)
-  shared_ptr<Node> GetDirectNode() const;
+  std::shared_ptr<Node> GetDirectNode() const;
 
   /// Returns the number of connected nodes (only for multislot)
   UINT GetMultiNodeCount() const;
 
   /// Returns the 'index'th connected node reference (only for multislot)
-  shared_ptr<Node> GetReferencedMultiNode(UINT index) const;
+  std::shared_ptr<Node> GetReferencedMultiNode(UINT index) const;
 
   /// Returns the multinodes *without* forwarding,
   /// ie. not calling Node::GetReferencedNode()
-  const vector<shared_ptr<Node>>& GetDirectMultiNodes() const;
+  const std::vector<std::shared_ptr<Node>>& GetDirectMultiNodes() const;
   
   /// Type of object this slot accepts
-  virtual bool DoesAcceptNode(const shared_ptr<Node>& node) const;
+  virtual bool DoesAcceptNode(const std::shared_ptr<Node>& node) const;
 
   /// The name of the slot. Can only be set once. The reason it's not a const
   /// is that it's not necessarily known at constructor time.
-  const string mName;
+  const std::string mName;
 
   /// True if the slot can connect to multiple nodes
   const bool mIsMultiSlot;
 
   /// Return the Nth connected node from a multislot
-  const shared_ptr<Node>& operator[] (UINT index);
+  const std::shared_ptr<Node>& operator[] (UINT index);
 
   /// Returns true if slot is connected to its own default node (if it has one)
   virtual bool IsDefaulted();
@@ -157,10 +156,10 @@ protected:
   Node* const mOwner;
 
   /// The slot is connected to this node (nullptr if multislot)
-  shared_ptr<Node> mNode;
+  std::shared_ptr<Node> mNode;
 
   /// The slot is connected to these nodes (empty if not multislot)
-  vector<shared_ptr<Node>> mMultiNodes;
+  std::vector<std::shared_ptr<Node>> mMultiNodes;
 
   /// Ghost slots will be the slots of ghost nodes. They are free parameters 
   /// that users can change.
@@ -168,7 +167,7 @@ protected:
 };
 
 /// An operation that takes its slot values as input and computes an output
-class Node: public enable_shared_from_this<Node> {
+class Node: public std::enable_shared_from_this<Node> {
   friend class Slot;
   friend class Watcher;
   friend class MessageQueue;
@@ -178,21 +177,21 @@ public:
   virtual ~Node();
 
   /// List of slots this node's output is connected to
-  const vector<Slot*>& GetDependants() const;
+  const std::vector<Slot*>& GetDependants() const;
 
   /// Reruns Operate() if not up to date (also updates on ancestors)
   void Update();
 
   /// Calculates the transitive closure of the node to "oResult" in topological ordering.
   /// Deepest nodes come first. 
-  void GenerateTransitiveClosure(vector<shared_ptr<Node>>& oResultm, 
+  void GenerateTransitiveClosure(std::vector<std::shared_ptr<Node>>& oResultm, 
     bool includeHiddenSlots);
 
   /// Returns a node which can actually do what it claims to do. Most nodes
   /// return "this", but there are a few exceptions that refer to a different node:
   /// - Ghost nodes are references to other nodes (TODO)
   /// - Composite nodes have internal, hidden nodes that do the heavy lifting
-  virtual shared_ptr<Node> GetReferencedNode();
+  virtual std::shared_ptr<Node> GetReferencedNode();
 
   virtual bool IsGhostNode();
 
@@ -201,7 +200,7 @@ public:
 
   /// Copies content from other node of the same type.
   /// This is useful for creating new nodes with predefined content, eg shader stubs.
-  virtual void CopyFrom(const shared_ptr<Node>& node);
+  virtual void CopyFrom(const std::shared_ptr<Node>& node);
 
 protected:
   Node(bool isForwarderNode = false);
@@ -226,11 +225,11 @@ protected:
 
   /// Enqueues message
   void EnqueueMessage(MessageType message, Slot* slot = nullptr, 
-    const shared_ptr<Node>& sender = nullptr);
+    const std::shared_ptr<Node>& sender = nullptr);
 
 private:
   /// Slots that this node is connected to (as an input)
-  vector<Slot*> mDependants;
+  std::vector<Slot*> mDependants;
 
   /// Add or remove slot to/from notification list
   void ConnectToSlot(Slot* slot);
@@ -243,21 +242,21 @@ private:
   /// This section can be disabled without hurting the engine.
   /// --------------------------------------------------------
 public:
-  virtual void SetName(const string& name);
-  virtual const string& GetName() const;
+  virtual void SetName(const std::string& name);
+  virtual const std::string& GetName() const;
   virtual void SetPosition(Vec2 position);
   virtual Vec2 GetPosition() const;
   virtual void SetSize(Vec2 size);
   virtual Vec2 GetSize() const;
 
   /// Returns the list of publicly editable slots
-  const vector<Slot*>& GetPublicSlots() const;
+  const std::vector<Slot*>& GetPublicSlots() const;
 
   /// Returns the list of all slots
-  const vector<Slot*>& GetTraversableSlots() const;
+  const std::vector<Slot*>& GetTraversableSlots() const;
 
   /// Returns the slots that need to be serialized when saving / loading
-  const unordered_map<string, Slot*>& GetSerializableSlots() const;
+  const std::unordered_map<std::string, Slot*>& GetSerializableSlots() const;
 
 protected:
   /// Registers a new slot
@@ -268,41 +267,41 @@ protected:
 
 private:
   /// Custom name of the node
-  string mName;
+  std::string mName;
 
   /// Position and size on the Graph
   Vec2 mPosition;
   Vec2 mSize;
 
   /// Public slots of this node.
-  vector<Slot*>	mPublicSlots;
+  std::vector<Slot*>	mPublicSlots;
 
   /// All traversable slots of this node. These include hidden slots that aren't 
   /// displayed on the UI (like SceneTime slots of SplineNodes), but they don't
   /// include generated slots (like for StubNodes).
-  vector<Slot*>	mTraversableSlots;
+  std::vector<Slot*>	mTraversableSlots;
 
   /// Slots that need to be serialized when saving / loading.
-  unordered_map<string, Slot*> mSerializableSlotsByName;
+  std::unordered_map<std::string, Slot*> mSerializableSlotsByName;
   
   /// ------------------ Watcher operations ------------------
   /// This section can be disabled without hurting the engine.
   /// --------------------------------------------------------
 public:
   template <typename T, typename ...P>
-  shared_ptr<T> Watch(P... args) {
+  std::shared_ptr<T> Watch(P... args) {
     static_assert(std::is_base_of<Watcher, T>::value, "T must be a Watcher");
-    shared_ptr<T> watcher = make_shared<T>(args...);
+    std::shared_ptr<T> watcher = make_shared<T>(args...);
     mWatchers.insert(watcher);
     return watcher;
   }
 
   /// Removes a Watcher from the watchers list
-  void RemoveWatcher(const shared_ptr<Watcher>& watcher);
+  void RemoveWatcher(const std::shared_ptr<Watcher>& watcher);
   void RemoveAllWatchers();
 
   /// Adds a new Watcher to the watchers list
-  void AssignWatcher(const shared_ptr<Watcher>& watcher);
+  void AssignWatcher(const std::shared_ptr<Watcher>& watcher);
 
 protected:
   template <class ...B>
@@ -312,22 +311,22 @@ protected:
 
 private:
   /// Watchers
-  set<shared_ptr<Watcher>> mWatchers;
+  std::set<std::shared_ptr<Watcher>> mWatchers;
 };
 
 /// A slot which only accepts a certain Node class, eg TypedSlot<ValueNode<float>>
 template<class N>
 class TypedSlot: public Slot {
 public:
-  TypedSlot(Node* owner, const string& name, bool isMultiSlot = false,
+  TypedSlot(Node* owner, const std::string& name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true)
     : Slot(owner, name, isMultiSlot, isPublic, isSerializable) {}
 
-  shared_ptr<N> GetNode() {
+  std::shared_ptr<N> GetNode() {
     return PointerCast<N>(GetReferencedNode());
   }
 
-  bool DoesAcceptNode(const shared_ptr<Node>& node) const override {
+  bool DoesAcceptNode(const std::shared_ptr<Node>& node) const override {
     return IsPointerOf<N>(node->GetReferencedNode());
   }
 };

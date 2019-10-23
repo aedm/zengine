@@ -14,7 +14,7 @@ void Zengine::InitGDIPlus() {
   GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 }
 
-shared_ptr<Texture> Zengine::LoadTextureFromFile(const wstring& fileName) {
+std::shared_ptr<Texture> Zengine::LoadTextureFromFile(const std::wstring& fileName) {
   Gdiplus::Bitmap bitmap(fileName.c_str());
   const UINT width = bitmap.GetWidth();
   const UINT height = bitmap.GetHeight();

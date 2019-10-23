@@ -4,7 +4,6 @@
 #include "../watchers/watcherui.h"
 #include <zengine.h>
 
-using namespace std;
 class NodeWidget;
 class Graph;
 class Node;

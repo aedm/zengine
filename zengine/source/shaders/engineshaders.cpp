@@ -3,11 +3,13 @@
 
 #define GLEW_STATIC
 #include <glew/glew.h>
+#include <memory>
+#include <memory>
 
 static const UINT BloomEffectMaxResolution = 256;
 
 EngineShaders::EngineShaders() 
-  : mSolidShadowPass(make_shared<Pass>())
+  : mSolidShadowPass(std::make_shared<Pass>())
 {
   BuildPostProcessPasses();
   BuildMaterialPasses();
@@ -108,7 +110,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
   for (UINT i = 0; i < gaussIterationCount * 2; i++) {
     OpenGL->SetFrameBuffer(renderTarget->GetPostprocessTargetFramebufferId());
     globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
-    shared_ptr<Pass> pass = (i % 2 == 0)
+    std::shared_ptr<Pass> pass = (i % 2 == 0)
       ? mPostProcess_GaussianBlurHorizontal : mPostProcess_GaussianBlurVertical;
     if (i == 0) {
       pass = mPostProcess_GaussianBlurHorizontal_First;
@@ -126,7 +128,7 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
 
 
 void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* globals,
-  const shared_ptr<Texture>& sourceColorMsaa) const
+  const std::shared_ptr<Texture>& sourceColorMsaa) const
 {
   mPostProcess_GaussianBlur_Blend_MSAA->Update();
   if (!mPostProcess_GaussianBlur_Blend_MSAA->isComplete()) return;
@@ -143,8 +145,8 @@ void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* global
   mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
 }
 
-void ConnectQuadPass(shared_ptr<Pass>& pass, shared_ptr<StubNode>& vertexStub,
-  shared_ptr<StubNode>& fragmentStub)
+void ConnectQuadPass(std::shared_ptr<Pass>& pass, std::shared_ptr<StubNode>& vertexStub,
+  std::shared_ptr<StubNode>& fragmentStub)
 {
   pass->mVertexStub.Connect(vertexStub);
   pass->mFragmentStub.Connect(fragmentStub);
@@ -155,17 +157,17 @@ void ConnectQuadPass(shared_ptr<Pass>& pass, shared_ptr<StubNode>& vertexStub,
 }
 
 void EngineShaders::BuildPostProcessPasses() {
-  shared_ptr<StubNode> fullscreenVertex =
+  std::shared_ptr<StubNode> fullscreenVertex =
     TheEngineStubs->GetStub("postprocess/fullscreen-vertex");
-  shared_ptr<StubNode> gaussianHorizontalFirst =
+  std::shared_ptr<StubNode> gaussianHorizontalFirst =
     TheEngineStubs->GetStub("postprocess/gaussianblur-horizontal-first");
-  shared_ptr<StubNode> gaussianHorizontal =
+  std::shared_ptr<StubNode> gaussianHorizontal =
     TheEngineStubs->GetStub("postprocess/gaussianblur-horizontal");
-  shared_ptr<StubNode> gaussianVertical =
+  std::shared_ptr<StubNode> gaussianVertical =
     TheEngineStubs->GetStub("postprocess/gaussianblur-vertical");
-  shared_ptr<StubNode> gaussianBlendMSAA =
+  std::shared_ptr<StubNode> gaussianBlendMSAA =
     TheEngineStubs->GetStub("postprocess/gaussianblur-blend-msaa");
-  shared_ptr<StubNode> dofFragment =
+  std::shared_ptr<StubNode> dofFragment =
     TheEngineStubs->GetStub("postprocess/depth-of-field");
 
   ConnectQuadPass(mPostProcess_GaussianBlurHorizontal, 
@@ -179,21 +181,21 @@ void EngineShaders::BuildPostProcessPasses() {
   ConnectQuadPass(mPostProcess_DOF,
     fullscreenVertex, dofFragment);
 
-  shared_ptr<StubNode> fluidVertexShader =
+  std::shared_ptr<StubNode> fluidVertexShader =
     TheEngineStubs->GetStub("fluid/vertex");
-  shared_ptr<StubNode> curlFS = 
+  std::shared_ptr<StubNode> curlFS = 
     TheEngineStubs->GetStub("fluid/curl-fragment");
-  shared_ptr<StubNode> vorticityFS = 
+  std::shared_ptr<StubNode> vorticityFS = 
     TheEngineStubs->GetStub("fluid/vorticity-fragment");
-  shared_ptr<StubNode> divergenceFS = 
+  std::shared_ptr<StubNode> divergenceFS = 
     TheEngineStubs->GetStub("fluid/divergence-fragment");
-  shared_ptr<StubNode> fadeoutFS = 
+  std::shared_ptr<StubNode> fadeoutFS = 
     TheEngineStubs->GetStub("fluid/fadeout-fragment");
-  shared_ptr<StubNode> pressureFS = 
+  std::shared_ptr<StubNode> pressureFS = 
     TheEngineStubs->GetStub("fluid/pressure-fragment");
-  shared_ptr<StubNode> gradientFS = 
+  std::shared_ptr<StubNode> gradientFS = 
     TheEngineStubs->GetStub("fluid/gradientSubtract-fragment");
-  shared_ptr<StubNode> advectionFS = 
+  std::shared_ptr<StubNode> advectionFS = 
     TheEngineStubs->GetStub("fluid/advection-fragment");
 
   ConnectQuadPass(mFluid_CurlPass, fluidVertexShader, curlFS);
@@ -213,7 +215,7 @@ void EngineShaders::BuildPostProcessPasses() {
     {Vec3(1, 1, 0), Vec2(1, 1)},
   };
 
-  mFullScreenQuad = make_shared<Mesh>();
+  mFullScreenQuad = std::make_shared<Mesh>();
   mFullScreenQuad->SetIndices(quadIndices);
   mFullScreenQuad->SetVertices(quadVertices);
 }

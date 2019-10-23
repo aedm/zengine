@@ -36,7 +36,7 @@ template<> StaticValueNode<Vec2>::StaticValueNode();
 template<> StaticValueNode<Vec3>::StaticValueNode();
 template<> StaticValueNode<Vec4>::StaticValueNode();
 template<> StaticValueNode<Matrix>::StaticValueNode();
-template<> StaticValueNode<string>::StaticValueNode();
+template<> StaticValueNode<std::string>::StaticValueNode();
 
 
 template<typename T>
@@ -55,7 +55,7 @@ const T& StaticValueNode<T>::Get() {
 template<typename T>
 class ValueSlot: public TypedSlot<ValueNode<T>> {
 public:
-  ValueSlot(Node* owner, const string& name, bool isMultiSlot = false,
+  ValueSlot(Node* owner, const std::string& name, bool isMultiSlot = false,
             bool isPublic = true, bool isSerializable = true,
             float minimum = 0.0f, float maximum = 1.0f);
 
@@ -75,11 +75,11 @@ public:
 
   /// Attaches slot to node. If the node parameter is nullptr, 
   /// the slot connects to the built-in node instead.
-  bool Connect(const shared_ptr<Node>& target) override;
+  bool Connect(const std::shared_ptr<Node>& target) override;
 
   /// Disconnects a node from this slot, and connects it
   /// to the built-in node.
-  void Disconnect(const shared_ptr<Node>&) override;
+  void Disconnect(const std::shared_ptr<Node>&) override;
   void DisconnectAll(bool notifyOwner) override;
 
   /// Returns true if slot is connected to its own default node
@@ -87,18 +87,18 @@ public:
 
 protected:
   /// Default value
-  shared_ptr<StaticValueNode<T>> mDefault;
+  std::shared_ptr<StaticValueNode<T>> mDefault;
   float mMinimum;
   float mMaximum;
 };
 
 
 template<typename T>
-ValueSlot<T>::ValueSlot(Node* owner, const string& name, bool isMultiSlot,
+ValueSlot<T>::ValueSlot(Node* owner, const std::string& name, bool isMultiSlot,
                         bool isPublic, bool isSerializable,
                         float minimum, float maximum)
   : TypedSlot<ValueNode<T>>(owner, name, isMultiSlot, isPublic, isSerializable)
-  , mDefault(make_shared<StaticValueNode<T>>())
+  , mDefault(std::make_shared<StaticValueNode<T>>())
   , mMinimum(minimum)
   , mMaximum(maximum)
 {
@@ -131,7 +131,7 @@ const T& ValueSlot<T>::GetDefaultValue() {
 
 
 template<typename T>
-bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
+bool ValueSlot<T>::Connect(const std::shared_ptr<Node>& target) {
   if (mNode == target || (target == nullptr && mNode == mDefault)) return true;
   if (target && !DoesAcceptNode(target)) {
     ERR("Slot and node type mismatch");
@@ -147,7 +147,7 @@ bool ValueSlot<T>::Connect(const shared_ptr<Node>& target) {
 
 
 template<typename T>
-void ValueSlot<T>::Disconnect(const shared_ptr<Node>& target) {
+void ValueSlot<T>::Disconnect(const std::shared_ptr<Node>& target) {
   ASSERT(target == mNode);
   ASSERT(target != nullptr);
   mNode->DisconnectFromSlot(this);
@@ -186,11 +186,11 @@ typedef ValueSlot<Vec2> Vec2Slot;
 typedef ValueSlot<Vec3> Vec3Slot;
 typedef ValueSlot<Vec4> Vec4Slot;
 typedef ValueSlot<Matrix> MatrixSlot;
-typedef ValueSlot<string> StringSlot;
+typedef ValueSlot<std::string> StringSlot;
 
 typedef StaticValueNode<float> FloatNode;
 typedef StaticValueNode<Vec2> Vec2Node;
 typedef StaticValueNode<Vec3> Vec3Node;
 typedef StaticValueNode<Vec4> Vec4Node;
 typedef StaticValueNode<Matrix> MatrixNode;
-typedef StaticValueNode<string> StringNode;
+typedef StaticValueNode<std::string> StringNode;

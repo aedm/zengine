@@ -15,11 +15,11 @@ void MovieNode::Draw(RenderTarget* renderTarget, float time) {
   mGlobals.DirectToScreen = 0.0f;
   bool clipFound = false;
   bool postprocessApplied = false;
-  for (vector<shared_ptr<ClipNode>>& track : mTracks) {
+  for (std::vector<std::shared_ptr<ClipNode>>& track : mTracks) {
     int clipIndex = 0;
     const int clipCount = int(track.size());
     for (; clipIndex < clipCount; clipIndex++) {
-      shared_ptr<ClipNode>& clip = track[clipIndex];
+      std::shared_ptr<ClipNode>& clip = track[clipIndex];
       const float startTime = clip->mStartTime.Get();
       const float endTime = startTime + clip->mLength.Get();
       if (startTime <= time && endTime > time) {
@@ -58,7 +58,7 @@ int MovieNode::GetTrackCount() const
   return int(mTracks.size());
 }
 
-const std::vector<shared_ptr<ClipNode>>& MovieNode::GetTrack(int trackIndex) {
+const std::vector<std::shared_ptr<ClipNode>>& MovieNode::GetTrack(int trackIndex) {
   return mTracks[trackIndex];
 }
 
@@ -108,7 +108,7 @@ void MovieNode::SortClips() {
 
   for (auto& track : mTracks) {
     std::sort(track.begin(), track.end(), 
-      [](const shared_ptr<ClipNode>& a, const shared_ptr<ClipNode>& b) {
+      [](const std::shared_ptr<ClipNode>& a, const std::shared_ptr<ClipNode>& b) {
       return a->mStartTime.Get() < b->mStartTime.Get();
     });
   }

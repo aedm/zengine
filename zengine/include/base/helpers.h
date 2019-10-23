@@ -2,8 +2,6 @@
 #include "system.h"
 #include <memory>
 
-using namespace std;
-
 #if 1
 #	ifdef _DEBUG
 #		define ASSERT(x) { if (!(x)) __debugbreak(); }
@@ -32,9 +30,9 @@ T SafeCast(K object) {
 
 template<typename T, typename K>
 // ReSharper disable once CppConstValueFunctionReturnType
-const shared_ptr<T> PointerCast(const shared_ptr<K>& object) {
+const std::shared_ptr<T> PointerCast(const std::shared_ptr<K>& object) {
 #ifdef _DEBUG
-  const shared_ptr<T> cast = dynamic_pointer_cast<T>(object);
+  const std::shared_ptr<T> cast = std::dynamic_pointer_cast<T>(object);
   ASSERT(object == nullptr || cast != nullptr);
   return cast;
 #else 
@@ -105,6 +103,45 @@ public:
 
 
 /// Enum mapping facility 
+template <typename Enum, typename Name>
+class EnumMap
+{
+public:
+  struct Item {
+    Name mName;
+    Enum mEnum;
+  };
+  constexpr EnumMap(const std::initializer_list<Item> items) : mItems(items) {}
+  Enum GetEnum(Name name) const {
+    for (const auto& item : mItems) {
+      if (item.mName == name) return item.mEnum;
+    }
+    return Enum(-1);
+  }
+  Name GetName(Enum enumValue) const {
+    for (const auto& item : mItems) {
+      if (item.mEnum == enumValue) return item.mName;
+    }
+    return nullptr;
+  }
+  std::initializer_list<Item> mItems;
+};
+
+template<typename Enum>
+constexpr EnumMap<Enum, const char*> MakeEnumMapA(
+  const std::initializer_list<typename EnumMap<Enum, const char*>::Item>& items)
+{
+  return EnumMap<Enum, const char*>(items);
+}
+
+template<typename Enum>
+constexpr EnumMap<Enum, const wchar_t*> MakeEnumMapW(
+  const std::initializer_list<typename EnumMap<Enum, const wchar_t*>::Item>& items)
+{
+  return EnumMap<Enum, const wchar_t*>(items);
+}
+
+
 template<typename CharType>
 struct EnumMapper {
   const CharType*	name;
@@ -155,8 +192,8 @@ int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper,
 }
 
 namespace Convert {
-  extern wstring StringToWstring(const string& sourceString);
+  extern std::wstring StringToWstring(const std::string& sourceString);
 }
 
-extern string ToJson(const shared_ptr<Document>& document);
-extern shared_ptr<Document> FromJson(const string& json);
+extern std::string ToJson(const std::shared_ptr<Document>& document);
+extern std::shared_ptr<Document> FromJson(const std::string& json);

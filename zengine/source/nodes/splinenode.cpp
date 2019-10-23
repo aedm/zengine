@@ -3,6 +3,7 @@
 #include <include/nodes/splinenode.h>
 #include <include/nodes/scenenode.h>
 #include <cmath>
+#include <memory>
 
 REGISTER_NODECLASS(FloatSplineNode, "Float Spline");
 
@@ -29,7 +30,7 @@ FloatSplineNode::FloatSplineNode()
   , mBeatSpikeLength(this, "Beat spike length")
   , mBeatSpikeEasing(this, "Beat spike easing")
   , mBeatQuantizerFrequency(this, "Quantizer freq")
-  , mSceneTimeNode(make_shared<SceneTimeNode>())
+  , mSceneTimeNode(std::make_shared<SceneTimeNode>())
   , mTimeSlot(this, "Time", false, false, false)
 {
   mTimeSlot.Connect(mSceneTimeNode);
@@ -168,7 +169,7 @@ void SplineFloatComponent::CalculateTangent(int index) {
   }
 }
 
-float FloatSplineNode::EvaluateLinearSpline(vector<SplinePoint>& points, float time) {
+float FloatSplineNode::EvaluateLinearSpline(std::vector<SplinePoint>& points, float time) {
   if (points.empty()) return 0.0f;
   if (points.size() == 1) return points[0].mValue;
 

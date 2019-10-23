@@ -11,7 +11,7 @@ public:
 
   void ApplyPostProcess(RenderTarget* renderTarget, Globals* globals);
    
-  const shared_ptr<Pass> mSolidShadowPass;
+  const std::shared_ptr<Pass> mSolidShadowPass;
 
 private:
   void BuildPostProcessPasses();
@@ -37,24 +37,24 @@ private:
   /// in: Gbuffer (MSAA) + postprocess source buffer
   /// out: screen
   void RenderFinalImage(RenderTarget* renderTarget, Globals* globals, 
-    const shared_ptr<Texture>& sourceColorMsaa) const;
+    const std::shared_ptr<Texture>& sourceColorMsaa) const;
 
-  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First = make_shared<Pass>();
-  shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal = make_shared<Pass>();
-  shared_ptr<Pass> mPostProcess_GaussianBlurVertical = make_shared<Pass>();
-  shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA = make_shared<Pass>();
-  shared_ptr<Pass> mPostProcess_DOF = make_shared<Pass>();
+  std::shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal_First = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mPostProcess_GaussianBlurHorizontal = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mPostProcess_GaussianBlurVertical = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mPostProcess_GaussianBlur_Blend_MSAA = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mPostProcess_DOF = std::make_shared<Pass>();
 
 public:
-  shared_ptr<Pass> mFluid_CurlPass = make_shared<Pass>();
-  shared_ptr<Pass> mFluid_VorticityPass = make_shared<Pass>();
-  shared_ptr<Pass> mFluid_DivergencePass = make_shared<Pass>();
-  shared_ptr<Pass> mFluid_FadeOutPass = make_shared<Pass>();
-  shared_ptr<Pass> mFluid_PressurePass = make_shared<Pass>();
-  shared_ptr<Pass> mFluid_GradientSubtractPass = make_shared<Pass>();
-  shared_ptr<Pass> mFluid_AdvectionPass = make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_CurlPass = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_VorticityPass = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_DivergencePass = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_FadeOutPass = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_PressurePass = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_GradientSubtractPass = std::make_shared<Pass>();
+  std::shared_ptr<Pass> mFluid_AdvectionPass = std::make_shared<Pass>();
     
-  shared_ptr<Mesh> mFullScreenQuad;
+  std::shared_ptr<Mesh> mFullScreenQuad;
 };
 
 extern EngineShaders* TheEngineShaders;

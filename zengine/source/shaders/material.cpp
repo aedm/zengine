@@ -20,7 +20,7 @@ void Material::HandleMessage(Message* message) {
   }
 }
 
-shared_ptr<Pass> Material::GetPass(PassType passType) {
+std::shared_ptr<Pass> Material::GetPass(PassType passType) {
   switch (passType) {
     case PassType::SHADOW: return mShadowPass.GetNode();
     case PassType::SOLID: return mSolidPass.GetNode();
@@ -34,10 +34,10 @@ shared_ptr<Pass> Material::GetPass(PassType passType) {
 REGISTER_NODECLASS(SolidMaterial, "Solid Material");
 
 SolidMaterial::SolidMaterial()
-  : mMaterial(make_shared<Material>())
-  , mSolidPass(make_shared<Pass>())
-  , mSolidVertexStub(make_shared<StubNode>())
-  , mSolidFragmentStub(make_shared<StubNode>())
+  : mMaterial(std::make_shared<Material>())
+  , mSolidPass(std::make_shared<Pass>())
+  , mSolidVertexStub(std::make_shared<StubNode>())
+  , mSolidFragmentStub(std::make_shared<StubNode>())
   , mGhostSlot(this, "", false, false, false, true)
 {
   mMaterial->mShadowPass.Connect(TheEngineShaders->mSolidShadowPass);
@@ -67,7 +67,7 @@ SolidMaterial::~SolidMaterial() {
   mSolidFragmentStub->Dispose();
 }
 
-shared_ptr<Node> SolidMaterial::GetReferencedNode() {
+std::shared_ptr<Node> SolidMaterial::GetReferencedNode() {
   return mMaterial;
 }
 

@@ -15,10 +15,8 @@
 #include <shellapi.h>
 #include "imagerecorder.h"
 
-using namespace std;
-
-const wstring EngineFolder = L"engine/main/";
-const wstring ShaderExtension = L".shader";
+const std::wstring EngineFolder = L"engine/main/";
+const std::wstring ShaderExtension = L".shader";
 //#define FULLSCREEN
 
 /// HACK HACK HACK
@@ -66,15 +64,15 @@ void Log(LogMessage Message) {
 }
 
 
-void LoadEngineShaderFolder(const wstring& folder) {
-  vector<wstring> engineStubSourceFiles;
+void LoadEngineShaderFolder(const std::wstring& folder) {
+  std::vector<std::wstring> engineStubSourceFiles;
   System::ReadFilesInFolder(folder.c_str(), L"*", engineStubSourceFiles);
-  for (wstring& fileName : engineStubSourceFiles) {
+  for (std::wstring& fileName : engineStubSourceFiles) {
     if (fileName[fileName.length() - 1] == L'.') continue;
-    if (wstring(fileName.end() - 7, fileName.end()) == ShaderExtension) {
-      string stubName(fileName.begin() + EngineFolder.length(),
+    if (std::wstring(fileName.end() - 7, fileName.end()) == ShaderExtension) {
+      std::string stubName(fileName.begin() + EngineFolder.length(),
         fileName.end() - ShaderExtension.length());
-      string source(System::ReadFile(fileName.c_str()));
+      std::string source(System::ReadFile(fileName.c_str()));
       TheEngineStubs->SetStubSource(stubName, source);;
     }
     else {
@@ -85,7 +83,7 @@ void LoadEngineShaderFolder(const wstring& folder) {
 
 
 void LoadEngineShaders() {
-  vector<wstring> engineStubSourceFiles;
+  std::vector<std::wstring> engineStubSourceFiles;
   LoadEngineShaderFolder(EngineFolder);
   EngineStubs::OnLoadFinished();
 }
@@ -163,7 +161,7 @@ int CALLBACK WinMain(
 
   /// Load precalc project file
   char* json = System::ReadFile(L"loading.zen");
-  shared_ptr<Document> loading = FromJson(string(json));
+  std::shared_ptr<Document> loading = FromJson(std::string(json));
   ASSERT(loading);
   delete json;
 
@@ -173,12 +171,12 @@ int CALLBACK WinMain(
 
   /// Load demo file
   json = System::ReadFile(L"demo.zen");
-  shared_ptr<Document> doc = FromJson(string(json));
+  std::shared_ptr<Document> doc = FromJson(std::string(json));
   ASSERT(doc);
   delete json;
 
   /// Compile shaders, upload resources
-  vector<shared_ptr<Node>> nodes;
+  std::vector<std::shared_ptr<Node>> nodes;
   doc->GenerateTransitiveClosure(nodes, true);
   for (const auto& node : nodes) node->Update();
 
@@ -186,7 +184,7 @@ int CALLBACK WinMain(
   //PleaseNoNewResources = true;
 
   /// Calculate demo length
-  shared_ptr<MovieNode> movieNode = doc->mMovie.GetNode();
+  std::shared_ptr<MovieNode> movieNode = doc->mMovie.GetNode();
   const float movieLength = movieNode->CalculateMovieLength();
   const float beatsPerSecond = doc->mProperties.GetNode()->mBPM.Get() / 60.0f;;
 
@@ -198,8 +196,8 @@ int CALLBACK WinMain(
 
   const int videoWidth = int(renderTarget->mSize.x);
   const int videoHeight = int(renderTarget->mSize.y);
-  vector<unsigned char> pixels(videoWidth * videoHeight * 4);
-  vector<unsigned char> pixelsFlip(videoWidth * videoHeight * 4);
+  std::vector<unsigned char> pixels(videoWidth * videoHeight * 4);
+  std::vector<unsigned char> pixelsFlip(videoWidth * videoHeight * 4);
 
   /// Play demo
   const DWORD startTime = timeGetTime();

@@ -4,8 +4,6 @@
 #include <include/base/defines.h>
 #include <vector>
 
-using namespace std;
-
 namespace Shaders {
 
   /// Macrolist for shader tokens
@@ -62,16 +60,16 @@ namespace Shaders {
     ShaderTokenEnum Token;
     const char* Begin;
     UINT Length;
-    string ToString() const;
+    std::string ToString() const;
   };
 
   struct SourceLine {
     int					LineNumber;
-    vector<SubString>	SubStrings;
+    std::vector<SubString>	SubStrings;
     SubString			EntireLine;
 
     SourceLine(int LineNumber, const char* LineBegin);
   };
 
-  OWNERSHIP vector<SourceLine*>* SplitToWords(const char* Text);
+  OWNERSHIP std::vector<SourceLine*>* SplitToWords(const char* Text);
 }

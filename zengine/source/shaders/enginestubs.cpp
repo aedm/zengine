@@ -1,5 +1,6 @@
 #include <include/shaders/enginestubs.h>
 #include <include/shaders/engineshaders.h>
+#include <memory>
 
 EngineStubs::~EngineStubs() {
   for (auto& stub : mStubs) {
@@ -8,10 +9,10 @@ EngineStubs::~EngineStubs() {
 }
 
 void EngineStubs::SetStubSource(const std::string& name, const std::string& source) {
-  shared_ptr<StubNode> stub;
+  std::shared_ptr<StubNode> stub;
   const auto& it = mStubs.find(name);
   if (it == mStubs.end()) {
-    stub = make_shared<StubNode>();
+    stub = std::make_shared<StubNode>();
     mStubs[name] = stub;
   }
   else {
@@ -20,11 +21,11 @@ void EngineStubs::SetStubSource(const std::string& name, const std::string& sour
   stub->mSource.SetDefaultValue(source);
 }
 
-shared_ptr<StubNode> EngineStubs::GetStub(const string& name) {
+std::shared_ptr<StubNode> EngineStubs::GetStub(const std::string& name) {
   return mStubs.at(name);
 }
 
-std::string EngineStubs::GetSource(const string& name) {
+std::string EngineStubs::GetSource(const std::string& name) {
   return mStubs.at(name)->mSource.GetDefaultValue();
 }
 

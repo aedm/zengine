@@ -35,13 +35,13 @@ public:
 
   /// Generate a name displayed for a node. If the node has no name, it shows
   /// the node type or the shader stub name.
-  static QString CreateDisplayedName(const shared_ptr<Node>& node);
+  static QString CreateDisplayedName(const std::shared_ptr<Node>& node);
 
   /// The watcher widget that contains this watcher
   WatcherWidget* mWatcherWidget = nullptr;
 
 protected:
-  WatcherUi(const shared_ptr<Node>& node);
+  WatcherUi(const std::shared_ptr<Node>& node);
 
   /// The name of the node. Can be something else if the node has no name.
   QString mDisplayedName;

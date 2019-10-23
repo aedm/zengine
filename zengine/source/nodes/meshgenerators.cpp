@@ -13,7 +13,7 @@ CubeMeshNode::CubeMeshNode()
 {}
 
 void CubeMeshNode::Operate() {
-  if (!mMesh) mMesh = make_shared<Mesh>();
+  if (!mMesh) mMesh = std::make_shared<Mesh>();
 
   const float x = mSizeX.Get();
   const float y = mSizeY.Get();
@@ -96,7 +96,7 @@ void CubeMeshNode::HandleMessage(Message* message) {
 }
 
 void HalfCubeMeshNode::Operate() {
-  if (!mMesh) mMesh = make_shared<Mesh>();
+  if (!mMesh) mMesh = std::make_shared<Mesh>();
 
   VertexPosNorm vertices[] = {
     /// Top
@@ -233,7 +233,7 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
 
 
 void GeosphereMeshNode::Operate() {
-  if (!mMesh) mMesh = make_shared<Mesh>();
+  if (!mMesh) mMesh = std::make_shared<Mesh>();
 
   const int resolution = int(mResolution.Get());
   const float size = mSize.Get();
@@ -246,8 +246,8 @@ void GeosphereMeshNode::Operate() {
   const int trianglesPerSide = 1 << (resolution * 2);
   const int indexCount = trianglesPerSide * 3 * 4;
 
-  vector<VertexPosUvNormTangent> vertices(vertexCount);
-  vector<IndexEntry> indices(indexCount);
+  std::vector<VertexPosUvNormTangent> vertices(vertexCount);
+  std::vector<IndexEntry> indices(indexCount);
 
   VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
@@ -300,7 +300,7 @@ PlaneMeshNode::PlaneMeshNode()
 }
 
 void PlaneMeshNode::Operate() {
-  if (!mMesh) mMesh = make_shared<Mesh>();
+  if (!mMesh) mMesh = std::make_shared<Mesh>();
 
   const int resolution = int(mResolution.Get());
   const float size = mSize.Get();
@@ -311,8 +311,8 @@ void PlaneMeshNode::Operate() {
   const int vertexCount = verticesPerEdge * verticesPerEdge;
   const int indexCount = quadCount * 6;
 
-  vector<VertexPosUvNormTangent> vertices(vertexCount);
-  vector<IndexEntry> indices(indexCount);
+  std::vector<VertexPosUvNormTangent> vertices(vertexCount);
+  std::vector<IndexEntry> indices(indexCount);
 
   VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];
@@ -386,7 +386,7 @@ PolarSphereMeshNode::PolarSphereMeshNode()
 }
 
 void PolarSphereMeshNode::Operate() {
-  if (!mMesh) mMesh = make_shared<Mesh>();
+  if (!mMesh) mMesh = std::make_shared<Mesh>();
 
   int resolution = int(mResolution.Get());
   if (resolution < 3) resolution = 3;
@@ -398,8 +398,8 @@ void PolarSphereMeshNode::Operate() {
   const int quadCount = (longAxisVertices - 1)* (shortAxisVertices - 1);
   const int indexCount = quadCount * 6;
 
-  vector<VertexPosUvNormTangent> vertices(vertexCount);
-  vector<IndexEntry> indices(indexCount);
+  std::vector<VertexPosUvNormTangent> vertices(vertexCount);
+  std::vector<IndexEntry> indices(indexCount);
 
   VertexPosUvNormTangent* vertexTarget = &vertices[0];
   IndexEntry* indexTarget = &indices[0];

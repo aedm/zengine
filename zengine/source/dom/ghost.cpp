@@ -3,21 +3,23 @@
 
 class GhostTransitiveClosure {
 public:
-  GhostTransitiveClosure(const shared_ptr<Node>& root, vector<shared_ptr<Node>>& oResult) {
+  GhostTransitiveClosure(const std::shared_ptr<Node>& root, 
+    std::vector<std::shared_ptr<Node>>& oResult)
+  {
     mResult = &oResult;
     Traverse(root);
   }
 
 private:
   /// Returns true if a ghost slots was found in the subtree
-  bool Traverse(const shared_ptr<Node>& node) {
+  bool Traverse(const std::shared_ptr<Node>& node) {
     if (mVisited.find(node) != mVisited.end()) {
       const bool hadGhostSlot = mHadGhostSlot.find(node) != mHadGhostSlot.end();
       return hadGhostSlot;
     }
     mVisited.insert(node);
 
-    const vector<Slot*>& slots = node->GetPublicSlots();
+    const std::vector<Slot*>& slots = node->GetPublicSlots();
     bool foundGhostSlot = false;
 
     for (Slot* slot : slots) {
@@ -27,12 +29,12 @@ private:
       }
 
       if (slot->mIsMultiSlot) {
-        for (const shared_ptr<Node>& refNodes : slot->GetDirectMultiNodes()) {
+        for (const std::shared_ptr<Node>& refNodes : slot->GetDirectMultiNodes()) {
           foundGhostSlot |= Traverse(refNodes);
         }
       }
       else if (!slot->IsDefaulted()) {
-        shared_ptr<Node> dependency = slot->GetDirectNode();
+        std::shared_ptr<Node> dependency = slot->GetDirectNode();
         if (dependency != nullptr) {
           foundGhostSlot |= Traverse(dependency);
         }
@@ -46,14 +48,14 @@ private:
     return foundGhostSlot;
   }
 
-  vector<shared_ptr<Node>>* mResult;
-  set<shared_ptr<Node>> mVisited;
-  set<shared_ptr<Node>> mHadGhostSlot;
+  std::vector<std::shared_ptr<Node>>* mResult;
+  std::set<std::shared_ptr<Node>> mVisited;
+  std::set<std::shared_ptr<Node>> mHadGhostSlot;
 };
 
 Ghost::Ghost()
   : mOriginalNode(this, "Original", false, false, true, true)
-  , mMainInternalNode(this, string(), false, false, false, false)
+  , mMainInternalNode(this, std::string(), false, false, false, false)
 {
   Regenerate();
 }
@@ -85,17 +87,17 @@ void Ghost::HandleMessage(Message* message)
   }
 }
 
-shared_ptr<Node> Ghost::GetReferencedNode() {
+std::shared_ptr<Node> Ghost::GetReferencedNode() {
   return mMainInternalNode.GetReferencedNode();
 }
 
 void Ghost::Regenerate() {
-  const shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
-  vector<shared_ptr<Node>> topologicalOrder;
+  const std::shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
+  std::vector<std::shared_ptr<Node>> topologicalOrder;
   if (root != nullptr) GhostTransitiveClosure(root, topologicalOrder);
 
-  set<shared_ptr<Node>> newInternalNodes;
-  map<shared_ptr<Node>, shared_ptr<Node>> newNodeMapping;
+  std::set<std::shared_ptr<Node>> newInternalNodes;
+  std::map<std::shared_ptr<Node>, std::shared_ptr<Node>> newNodeMapping;
   ClearSlots();
   AddSlot(&mOriginalNode, false, true, true);
 
@@ -104,8 +106,8 @@ void Ghost::Regenerate() {
     mMainInternalNode.Connect(mOriginalNode.GetReferencedNode());
   }
   else {
-    for (shared_ptr<Node>& node : topologicalOrder) {
-      shared_ptr<Node> internalNode;
+    for (std::shared_ptr<Node>& node : topologicalOrder) {
+      std::shared_ptr<Node> internalNode;
       auto it = mNodeMapping.find(node);
       if (it == mNodeMapping.end()) {
         /// Node was not copied before
@@ -139,15 +141,15 @@ void Ghost::Regenerate() {
           if (originalSlot->mIsMultiSlot) {
             for (const auto& connectedNode : originalSlot->GetDirectMultiNodes()) {
               auto it2 = newNodeMapping.find(connectedNode);
-              shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
+              std::shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
                 ? connectedNode : it2->second;
               internalSlot->Connect(nodeToConnect);
             }
           }
           else {
-            shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
+            std::shared_ptr<Node> connectedNode = originalSlot->GetDirectNode();
             auto it2 = newNodeMapping.find(connectedNode);
-            shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
+            std::shared_ptr<Node> nodeToConnect = (it2 == newNodeMapping.end())
               ? connectedNode : it2->second;
             internalSlot->Connect(nodeToConnect);
           }
