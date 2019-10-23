@@ -18,7 +18,7 @@ public:
   Event<> mOnRebuild;
 };
 
-TextWatcher::TextWatcher(const shared_ptr<Node>& node)
+TextWatcher::TextWatcher(const std::shared_ptr<Node>& node)
   : WatcherUi(node)
 {}
 
@@ -26,7 +26,7 @@ TextWatcher::~TextWatcher() = default;
 
 void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUi::SetWatcherWidget(watcherWidget);
-  shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
+  std::shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
 
   /// Vertical layout
   mLayout = new QVBoxLayout(watcherWidget);
@@ -51,6 +51,6 @@ void TextWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
 void TextWatcher::HandleRebuid() const
 {
-  shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
+  std::shared_ptr<StringNode> stringNode = PointerCast<StringNode>(GetNode());
   stringNode->Set(mTextEdit->toPlainText().toStdString());
 }

@@ -1,7 +1,7 @@
 #include "moviewatcher.h"
 #include "../zengarden.h"
 
-MovieWatcher::MovieWatcher(const shared_ptr<Node>& node)
+MovieWatcher::MovieWatcher(const std::shared_ptr<Node>& node)
   : WatcherUi(node)
 {
   ZenGarden::GetInstance()->mOnMovieCursorChange += 
@@ -29,7 +29,7 @@ void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 void MovieWatcher::Paint(EventForwarderGlWidget* widget) {
   if (!mWatcherWidget) return;
 
-  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
+  std::shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
   if (!mRenderTarget) {

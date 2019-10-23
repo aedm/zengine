@@ -5,13 +5,13 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 
-PropertyEditor::PropertyEditor(const shared_ptr<Node>& node)
+PropertyEditor::PropertyEditor(const std::shared_ptr<Node>& node)
   : WatcherUi(node) {}
 
 
 void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUi::SetWatcherWidget(watcherWidget);
-  shared_ptr<Node> node = GetDirectNode();
+  std::shared_ptr<Node> node = GetDirectNode();
 
   /// Vertical layout
   mLayout = new QVBoxLayout(watcherWidget);
@@ -19,8 +19,8 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mLayout->setContentsMargins(0, 0, 0, 0);
 
   /// Node type
-  const shared_ptr<Node> referencedNode = node->GetReferencedNode();
-  string typeString;
+  const std::shared_ptr<Node> referencedNode = node->GetReferencedNode();
+  std::string typeString;
   if (referencedNode.use_count() > 0) {
     typeString =
       NodeRegistry::GetInstance()->GetNodeClass(node->GetReferencedNode())->mClassName;
@@ -52,7 +52,7 @@ void PropertyEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
 void PropertyEditor::HandleNameTexBoxChanged() const
 {
-  shared_ptr<Node> node = GetDirectNode();
+  std::shared_ptr<Node> node = GetDirectNode();
   if (node) {
     node->SetName(mNameTextBox->text().toStdString());
   }
@@ -61,7 +61,7 @@ void PropertyEditor::HandleNameTexBoxChanged() const
 
 template<ValueType T>
 StaticValueWatcher<T>::StaticValueWatcher(
-  const shared_ptr<StaticValueNode<VectorType>>& node)
+  const std::shared_ptr<StaticValueNode<VectorType>>& node)
   : PropertyEditor(node) {}
 
 
@@ -69,7 +69,7 @@ template<ValueType T>
 void StaticValueWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   PropertyEditor::SetWatcherWidget(watcherWidget);
 
-  shared_ptr<StaticValueNode<VectorType>> vectorNode =
+  std::shared_ptr<StaticValueNode<VectorType>> vectorNode =
     PointerCast<StaticValueNode<VectorType>>(GetNode());
   mVectorEditor = new ValueEditor<T>(watcherWidget, "", vectorNode->Get());
   mVectorEditor->onValueChange +=
@@ -82,7 +82,7 @@ template<ValueType T>
 void StaticValueWatcher<T>::HandleEditorValueChange(QWidget* editor,
   const VectorType& value)
 {
-  shared_ptr<StaticValueNode<VectorType>> vectorNode =
+  std::shared_ptr<StaticValueNode<VectorType>> vectorNode =
     PointerCast<StaticValueNode<VectorType>>(GetNode());
   vectorNode->Set(value);
 }

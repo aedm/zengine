@@ -291,7 +291,7 @@ public:
   template <typename T, typename ...P>
   std::shared_ptr<T> Watch(P... args) {
     static_assert(std::is_base_of<Watcher, T>::value, "T must be a Watcher");
-    std::shared_ptr<T> watcher = make_shared<T>(args...);
+    std::shared_ptr<T> watcher = std::make_shared<T>(args...);
     mWatchers.insert(watcher);
     return watcher;
   }

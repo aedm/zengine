@@ -9,7 +9,7 @@
 /// General node editor, displays name and type of the Node
 class PropertyEditor: public WatcherUi {
 public:
-  PropertyEditor(const shared_ptr<Node>& node);
+  PropertyEditor(const std::shared_ptr<Node>& node);
   virtual ~PropertyEditor() = default;
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
@@ -27,7 +27,7 @@ template<ValueType T>
 class StaticValueWatcher : public PropertyEditor {
 public:
   typedef typename ValueTypes<T>::Type VectorType;
-  StaticValueWatcher(const shared_ptr<StaticValueNode<VectorType>>& node);
+  StaticValueWatcher(const std::shared_ptr<StaticValueNode<VectorType>>& node);
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 

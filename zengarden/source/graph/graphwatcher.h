@@ -13,10 +13,10 @@ class GraphWatcher: public WatcherUi {
   friend class Node; 
 
 public:
-  GraphWatcher(const shared_ptr<Node>& graph);
+  GraphWatcher(const std::shared_ptr<Node>& graph);
   virtual ~GraphWatcher();
 
-  shared_ptr<NodeWidget> GetNodeWidget(const shared_ptr<Node>& node);
+  std::shared_ptr<NodeWidget> GetNodeWidget(const std::shared_ptr<Node>& node);
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
@@ -42,17 +42,17 @@ private:
   void Paint(EventForwarderGlWidget*);
 
   /// All wigdets on the graph
-  shared_ptr<Graph> GetGraph() const;
+  std::shared_ptr<Graph> GetGraph() const;
 
   /// Handle drag events
   void HandleDragEnterEvent(QDragEnterEvent* event) override;
   void HandleDropEvent(QDropEvent* event) override;
 
   /// Mapping from node to widget
-  map<shared_ptr<Node>, shared_ptr<NodeWidget>> mWidgetMap;
+  std::map<std::shared_ptr<Node>, std::shared_ptr<NodeWidget>> mWidgetMap;
 
   /// Operators currectly selected
-  set<shared_ptr<NodeWidget>> mSelectedNodeWidgets;
+  std::set<std::shared_ptr<NodeWidget>> mSelectedNodeWidgets;
 
   /// State machine
   enum class State {
@@ -91,22 +91,22 @@ private:
   Vec2 mCurrentMousePos;
 
   /// Clicked widget for some operations
-  shared_ptr<NodeWidget> mClickedWidget;
+  std::shared_ptr<NodeWidget> mClickedWidget;
   int mClickedSlotIndex{};
 
   /// Hovered widget and slot
-  shared_ptr<NodeWidget> mHoveredWidget;
+  std::shared_ptr<NodeWidget> mHoveredWidget;
   int mHoveredSlotIndex;
 
   /// Operators currectly selected
-  map<shared_ptr<NodeWidget>, Vec2> mOriginalWidgetPositions;
+  std::map<std::shared_ptr<NodeWidget>, Vec2> mOriginalWidgetPositions;
 
 
   void DeselectAll();
-  void SelectSingleWidget(const shared_ptr<NodeWidget>& nodeWidget);
+  void SelectSingleWidget(const std::shared_ptr<NodeWidget>& nodeWidget);
   void StorePositionOfSelectedNodes();
 
-  void FindHoveredWidget(Vec2 mousePos, shared_ptr<NodeWidget>* oHoveredWidget,
+  void FindHoveredWidget(Vec2 mousePos, std::shared_ptr<NodeWidget>* oHoveredWidget,
     int* oSlotIndex);
 
   /// NodeWidgets can request a redraw

@@ -13,7 +13,7 @@ class NodeWidget: public WatcherUi {
   friend class MoveNodeCommand;
 
 public:
-  NodeWidget(const shared_ptr<Node>& node, std::function<void()> onNeedsRedraw);
+  NodeWidget(const std::shared_ptr<Node>& node, std::function<void()> onNeedsRedraw);
   virtual ~NodeWidget();
 
   enum class ColorState {
@@ -46,7 +46,7 @@ public:
     Vec2 mSpotPos;
     Slot* mSlot = nullptr;
   };
-  const vector<WidgetSlot*>& GetWidgetSlots() const;
+  const std::vector<WidgetSlot*>& GetWidgetSlots() const;
 
 private:
   void OnSlotStructureChanged() override;
@@ -85,7 +85,7 @@ private:
   float mTitleHeight = 0.0f;
   Vec2 mOutputPosition;
   QString mNodeTitle;
-  vector<WidgetSlot*>	mWidgetSlots;
+  std::vector<WidgetSlot*>	mWidgetSlots;
 
   /// This will be called if the widget initiates drawing
   std::function<void()> mOnNeedsRedraw;
@@ -99,7 +99,7 @@ private:
   /// Painter used to draw the widget texture
   QPainter mPainter;
 
-  shared_ptr<Texture> mTexture = nullptr;
+  std::shared_ptr<Texture> mTexture = nullptr;
   bool mForceUpdate = true;
   void DiscardTexture();
   void PaintToImage();

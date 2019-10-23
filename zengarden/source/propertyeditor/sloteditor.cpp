@@ -5,7 +5,7 @@
 #include <QtWidgets/QLabel>
 #include <QClipboard>
 
-SlotEditor::SlotEditor(const shared_ptr<Node>& node)
+SlotEditor::SlotEditor(const std::shared_ptr<Node>& node)
   : PropertyEditor(node) 
 {
   mGhostIcon.addFile(QStringLiteral(":/zengarden/icons/angle-right.svg"), 
@@ -26,7 +26,7 @@ bool SlotEditor::AddSlot(Slot* slot, QWidget* parent, QLayout* layout) {
 
   auto valueSlot = SafeCast<ValueSlot<typename ValueTypes<T>::Type>*>(slot);
   auto slotNode = valueSlot->GetReferencedNode();
-  shared_ptr<SlotWatcher> watcher = 
+  std::shared_ptr<SlotWatcher> watcher =
     slotNode->template Watch<TypedSlotWatcher<T>>(valueSlot);
 
   WatcherWidget* widget =
@@ -57,7 +57,7 @@ void SlotEditor::RebuildSlots() {
   slotLayout->setSpacing(4);
   slotLayout->setContentsMargins(0, 0, 0, 0);
 
-  const shared_ptr<Node> directNode = GetDirectNode();
+  const std::shared_ptr<Node> directNode = GetDirectNode();
 
   /// Generate slot editors
   for (Slot* slot : directNode->GetPublicSlots()) {
@@ -136,7 +136,7 @@ void SlotEditor::RemoveWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 
-SlotWatcher::SlotWatcher(const shared_ptr<Node>& node)
+SlotWatcher::SlotWatcher(const std::shared_ptr<Node>& node)
   : WatcherUi(node) 
 {}
 
@@ -156,7 +156,7 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  shared_ptr<ValueNode<Type>> valueNode = PointerCast<ValueNode<Type>>(GetNode());
+  std::shared_ptr<ValueNode<Type>> valueNode = PointerCast<ValueNode<Type>>(GetNode());
   auto value = valueNode->Get();
 
   mEditor = new ValueEditor<T>(watcherWidget,
@@ -188,7 +188,7 @@ template class TypedSlotWatcher<ValueType::VEC2>;
 template class TypedSlotWatcher<ValueType::VEC3>;
 template class TypedSlotWatcher<ValueType::VEC4>;
 
-PassSlotEditor::PassSlotEditor(const shared_ptr<Node>& node)
+PassSlotEditor::PassSlotEditor(const std::shared_ptr<Node>& node)
   : SlotEditor(node)
 {}
 
@@ -198,16 +198,16 @@ void PassSlotEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   /// Recompile button
   QPushButton* copyVsButton = new QPushButton("Copy VS source", watcherWidget);
   WatcherWidget::connect(copyVsButton, &QPushButton::pressed, [=]() {
-    const shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
-    const string source = passNode->GetVertexShaderSource();
+    const std::shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    const std::string source = passNode->GetVertexShaderSource();
     QApplication::clipboard()->setText(QString::fromStdString(source));
   });
   mLayout->addWidget(copyVsButton);
 
   QPushButton* copyFsButton = new QPushButton("Copy FS source", watcherWidget);
   WatcherWidget::connect(copyFsButton, &QPushButton::pressed, [=]() {
-    const shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
-    const string source = passNode->GetFragmentShaderSource();
+    const std::shared_ptr<Pass> passNode = PointerCast<Pass>(GetNode());
+    const std::string source = passNode->GetFragmentShaderSource();
     QApplication::clipboard()->setText(QString::fromStdString(source));
   });
   mLayout->addWidget(copyFsButton);

@@ -187,17 +187,17 @@ void ZenGarden::LoadEngineShader(const QString& path) const
 {
   const QFileInfo fileInfo(path);
   INFO("loading '%s'", fileInfo.fileName().toLatin1().data());
-  const unique_ptr<char> stubSource(Util::ReadFileQt(path));
+  const std::unique_ptr<char> stubSource(Util::ReadFileQt(path));
   const QString relativePath = mEngineShadersDir.relativeFilePath(path);
   const QString stubName = relativePath.left(relativePath.lastIndexOf("."));
   TheEngineStubs->SetStubSource(stubName.toStdString(),
-    string(stubSource.get()));
+                                std::string(stubSource.get()));
 }
 
-void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
+void ZenGarden::SetNodeForPropertyEditor(const std::shared_ptr<Node>& node) {
   SafeDelete(mPropertyEditor);
   if (node != nullptr) {
-    shared_ptr<WatcherUi> watcher;
+    std::shared_ptr<WatcherUi> watcher;
     if (IsExactType<FloatNode>(node)) {
       watcher =
         node->Watch<StaticValueWatcher<ValueType::FLOAT>>(PointerCast<FloatNode>(node));
@@ -231,7 +231,7 @@ void ZenGarden::SetNodeForPropertyEditor(const shared_ptr<Node>& node) {
 }
 
 
-shared_ptr<Node> ZenGarden::GetNodeInPropertyEditor() const
+std::shared_ptr<Node> ZenGarden::GetNodeInPropertyEditor() const
 {
   if (!mPropertyEditor) return nullptr;
   return mPropertyEditor->mWatcher->GetDirectNode();
@@ -253,7 +253,7 @@ float ZenGarden::GetMovieCursor() const
   return mMovieCursor;
 }
 
-shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() const
+std::shared_ptr<PropertiesNode> ZenGarden::GetPropertiesNode() const
 {
   return mDocument->mProperties.GetNode();
 }
@@ -263,8 +263,8 @@ std::shared_ptr<MovieNode> ZenGarden::GetMovieNode() const
   return mDocument->mMovie.GetNode();
 }
 
-void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition) {
-  const shared_ptr<Node> refNode = node->GetReferencedNode();
+void ZenGarden::Watch(const std::shared_ptr<Node>& node, WatcherPosition watcherPosition) {
+  const std::shared_ptr<Node> refNode = node->GetReferencedNode();
   QTabWidget* tabWidget = nullptr;
   switch (watcherPosition) {
   case WatcherPosition::UPPER_LEFT_TAB:
@@ -280,7 +280,7 @@ void ZenGarden::Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosit
   }
 
   WatcherWidget* watcherWidget = nullptr;
-  shared_ptr<WatcherUi> watcher;
+  std::shared_ptr<WatcherUi> watcher;
 
   /// Non-3D watchers
   if (IsPointerOf<StringNode>(refNode)) {
@@ -350,11 +350,11 @@ void ZenGarden::DeleteWatcherWidget(WatcherWidget* widget) {
 
 void ZenGarden::CreateNewDocument() {
   DeleteDocument();
-  mDocument = make_shared<Document>();
-  mDocument->mProperties.Connect(make_shared<PropertiesNode>());
-  mDocument->mMovie.Connect(make_shared<MovieNode>());
+  mDocument = std::make_shared<Document>();
+  mDocument->mProperties.Connect(std::make_shared<PropertiesNode>());
+  mDocument->mMovie.Connect(std::make_shared<MovieNode>());
 
-  const shared_ptr<Graph> graph = make_shared<Graph>();
+  const std::shared_ptr<Graph> graph = std::make_shared<Graph>();
   mDocument->mGraphs.Connect(graph);
 
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
@@ -365,8 +365,8 @@ void ZenGarden::CreateNewDocument() {
 
 void ZenGarden::SetupMovieWatcher() {
   SafeDelete(mMovieWatcherWidget);
-  shared_ptr<MovieNode> movieNode = mDocument->mMovie.GetNode();
-  shared_ptr<WatcherUi> watcher = movieNode->Watch<TimelineEditor>(movieNode);
+  std::shared_ptr<MovieNode> movieNode = mDocument->mMovie.GetNode();
+  std::shared_ptr<WatcherUi> watcher = movieNode->Watch<TimelineEditor>(movieNode);
   mMovieWatcherWidget =
     new WatcherWidget(mUI.timelineWidget, watcher, WatcherPosition::TIMELINE_PANEL);
   watcher->SetWatcherWidget(mMovieWatcherWidget);
@@ -380,7 +380,7 @@ void ZenGarden::HandleMenuSaveAs() {
   INFO("Saving document...");
   QTime myTimer;
   myTimer.start();
-  const string json = ToJson(mDocument);
+  const std::string json = ToJson(mDocument);
   QFile file(fileName);
   file.open(QIODevice::WriteOnly);
   file.write(json.c_str());
@@ -414,12 +414,12 @@ void ZenGarden::HandleMenuOpen() {
   myTimer.start();
 
   /// Load file content
-  const unique_ptr<char> json = unique_ptr<char>(Util::ReadFileQt(fileName));
+  const std::unique_ptr<char> json = std::unique_ptr<char>(Util::ReadFileQt(fileName));
   if (json == nullptr) return;
 
   /// Parse file into a Document
   mCommonGLWidget->makeCurrent();
-  const shared_ptr<Document> document = FromJson(string(json.get()));
+  const std::shared_ptr<Document> document = FromJson(std::string(json.get()));
   if (document == nullptr) return;
 
   /// Load succeeded, remove old document
@@ -429,18 +429,18 @@ void ZenGarden::HandleMenuOpen() {
 
   /// Make sure a MovieNode exists in the document.
   if (!mDocument->mMovie.GetNode()) {
-    const shared_ptr<MovieNode> movieNode = make_shared<MovieNode>();
+    const std::shared_ptr<MovieNode> movieNode = std::make_shared<MovieNode>();
     mDocument->mMovie.Connect(movieNode);
   }
 
   /// Make sure a PropertiesNode exists in the document.
   if (!mDocument->mProperties.GetNode()) {
-    mDocument->mProperties.Connect(make_shared<PropertiesNode>());
+    mDocument->mProperties.Connect(std::make_shared<PropertiesNode>());
   }
 
   /// Open "debug" node first -- nvidia Nsight workaround, it can only debug the
   /// first OpenGL window
-  vector<shared_ptr<Node>> nodes;
+  std::vector<std::shared_ptr<Node>> nodes;
   mDocument->GenerateTransitiveClosure(nodes, false);
   for (const auto& node : nodes) {
     if (node->GetName() == "debug") {
@@ -464,7 +464,7 @@ void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
   mCommonGLWidget->makeCurrent();
 
-  vector<shared_ptr<Node>> nodes;
+  std::vector<std::shared_ptr<Node>> nodes;
   mDocument->GenerateTransitiveClosure(nodes, false);
   for (UINT i = nodes.size(); i > 0; i--) {
     if (nodes[i - 1].use_count()) nodes[i - 1]->Dispose();

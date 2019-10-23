@@ -49,7 +49,7 @@ struct {
   const QColor mFrameInvalidConnection = QColor::fromRgbF(1, 0, 0, 1);
 } Colors;
 
-NodeWidget::NodeWidget(const shared_ptr<Node>& node,
+NodeWidget::NodeWidget(const std::shared_ptr<Node>& node,
                        std::function<void()> onNeedsRedraw)
   : WatcherUi(node)
   , mOnNeedsRedraw(std::move(onNeedsRedraw))
@@ -135,7 +135,7 @@ void NodeWidget::UpdateTexture() {
     unsigned char* bits = mImage.bits();
     const int height = mImage.height();
     const int width = mImage.width();
-    vector<char> texels(height * width * 4);
+    std::vector<char> texels(height * width * 4);
     unsigned char* source = bits;
     unsigned char* dest = reinterpret_cast<unsigned char*>(&texels[0]);
     for (int i = 0; i < height * width; i++) {
@@ -170,7 +170,7 @@ static Vec4 ReferenceHeaderColor = Vec4(0.4, 0.0, 0.2, Opacity);
 void NodeWidget::Paint() {
   UpdateTexture();
 
-  const shared_ptr<Node> node = GetDirectNode();
+  const std::shared_ptr<Node> node = GetDirectNode();
   const Vec2 position = node->GetPosition();
   ThePainter->DrawTexture(mTexture, position.x, position.y);
 }
@@ -216,7 +216,7 @@ void NodeWidget::OnSlotConnectionChanged(Slot* slot) {
 
 void NodeWidget::HandleNameChange() {
   static const QString stubLabel(" [stub]");
-  const shared_ptr<Node> directNode = GetDirectNode();
+  const std::shared_ptr<Node> directNode = GetDirectNode();
 
   QString text;
   if (!directNode->GetName().empty()) {
@@ -224,7 +224,7 @@ void NodeWidget::HandleNameChange() {
     text = QString::fromStdString(directNode->GetName());
   }
   else {
-    const shared_ptr<Node> node = GetNode();
+    const std::shared_ptr<Node> node = GetNode();
     if (!node->GetName().empty()) {
       /// Live node has a name, use that.
       text = QString::fromStdString(directNode->GetName());
@@ -234,7 +234,7 @@ void NodeWidget::HandleNameChange() {
       text = QString::fromStdString(
         NodeRegistry::GetInstance()->GetNodeClass(node)->mClassName);
       if (IsPointerOf<StubNode>(node)) {
-        const shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
+        const std::shared_ptr<StubNode> stub = PointerCast<StubNode>(node);
         StubMetadata* metaData = stub->GetStubMetadata();
         if (metaData != nullptr && !metaData->mName.empty()) {
           /// For shader stubs, use the stub name by default
@@ -260,7 +260,7 @@ void NodeWidget::DiscardTexture() {
 
 void NodeWidget::PaintToImage()
 {
-  shared_ptr<Node> node = GetDirectNode();
+  std::shared_ptr<Node> node = GetDirectNode();
   Vec2 size = node->GetSize();
   int iWidth = int(ceilf(size.x));
   int iHeight = int(ceilf(size.y));

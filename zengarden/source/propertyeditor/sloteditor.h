@@ -8,13 +8,13 @@ class SlotWatcher;
 /// Widget that displays editable node slots
 class SlotEditor : public PropertyEditor {
 public:
-  SlotEditor(const shared_ptr<Node>& node);
+  SlotEditor(const std::shared_ptr<Node>& node);
   virtual ~SlotEditor();
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 private:
-  map<Slot*, shared_ptr<SlotWatcher>> mSlotWatchers;
+  std::map<Slot*, std::shared_ptr<SlotWatcher>> mSlotWatchers;
 
   void OnSlotConnectionChanged(Slot* slot) override;
   void OnSlotStructureChanged() override;
@@ -43,7 +43,7 @@ public:
   virtual void UpdateReadOnly() = 0;
 
 protected:
-  SlotWatcher(const shared_ptr<Node>& node);
+  SlotWatcher(const std::shared_ptr<Node>& node);
 };
 
 
@@ -72,7 +72,7 @@ private:
 
 class PassSlotEditor : public SlotEditor {
 public:
-  PassSlotEditor(const shared_ptr<Node>& node);
+  PassSlotEditor(const std::shared_ptr<Node>& node);
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 };

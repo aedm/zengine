@@ -1,14 +1,17 @@
 #pragma once
 
 #include "generalscenewatcher.h"
+#include <memory>
+#include <memory>
+#include <memory>
 
 class PassWatcher : public GeneralSceneWatcher
 {
 public:
-  PassWatcher(const shared_ptr<Node>& pass);
+  PassWatcher(const std::shared_ptr<Node>& pass);
 
 protected:
-  shared_ptr<Material> mMaterial = make_shared<Material>();
-  shared_ptr<Drawable> mDrawable = make_shared<Drawable>();
-  shared_ptr<StaticMeshNode> mMesh = make_shared<StaticMeshNode>();
+  std::shared_ptr<Material> mMaterial = std::make_shared<Material>();
+  std::shared_ptr<Drawable> mDrawable = std::make_shared<Drawable>();
+  std::shared_ptr<StaticMeshNode> mMesh = std::make_shared<StaticMeshNode>();
 };

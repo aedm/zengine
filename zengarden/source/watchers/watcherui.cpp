@@ -2,7 +2,7 @@
 #include "watcherwidget.h"
 #include "../graph/prototypes.h"
 
-WatcherUi::WatcherUi(const shared_ptr<Node>& node)
+WatcherUi::WatcherUi(const std::shared_ptr<Node>& node)
     : Watcher(node)
 {
   mDisplayedName = CreateDisplayedName(GetDirectNode());
@@ -27,7 +27,7 @@ EventForwarderGlWidget* WatcherUi::GetGlWidget() const
 }
 
 
-QString WatcherUi::CreateDisplayedName(const shared_ptr<Node>& node) {
+QString WatcherUi::CreateDisplayedName(const std::shared_ptr<Node>& node) {
   ASSERT(node != nullptr);
 
   if (!node->GetName().empty()) {
@@ -35,11 +35,11 @@ QString WatcherUi::CreateDisplayedName(const shared_ptr<Node>& node) {
     return QString::fromStdString(node->GetName());
   }
 
-  const shared_ptr<Node> referencedNode = node->GetReferencedNode();
+  const std::shared_ptr<Node> referencedNode = node->GetReferencedNode();
   if (referencedNode.use_count() == 0) return "Empty ghost";
 
   if (IsPointerOf<StubNode>(referencedNode)) {
-    const shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);
+    const std::shared_ptr<StubNode> stub = PointerCast<StubNode>(referencedNode);
     StubMetadata* metaData = stub->GetStubMetadata();
     if (metaData != nullptr && !metaData->mName.empty()) {
       /// For shader stubs, use the stub name by default

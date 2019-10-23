@@ -5,7 +5,7 @@
 static const float DefaultPixelsPerBeat = 30.0f;
 static const float DefaultPixelsPerValue = 30.0f;
 
-FloatSplineWatcher::FloatSplineWatcher(const shared_ptr<Node>& node)
+FloatSplineWatcher::FloatSplineWatcher(const std::shared_ptr<Node>& node)
   : WatcherUi(node) {}
 
 void FloatSplineWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
@@ -70,7 +70,7 @@ void FloatSplineWatcher::OnSplineControlPointsChanged() {
 
 
 void FloatSplineWatcher::AddPoint(SplineLayer layer) {
-  shared_ptr<FloatSplineNode> spline = GetSpline();
+  std::shared_ptr<FloatSplineNode> spline = GetSpline();
   const float time = spline->mTimeSlot.Get();
   const float value = spline->GetComponent(layer)->Get(time);
   const int index = spline->AddPoint(layer, time, value);
@@ -81,7 +81,7 @@ void FloatSplineWatcher::AddPoint(SplineLayer layer) {
 
 void FloatSplineWatcher::RemovePoint() {
   if (mSelectedPointIndex >= 0) {
-    shared_ptr<FloatSplineNode> spline = GetSpline();
+    std::shared_ptr<FloatSplineNode> spline = GetSpline();
     spline->RemovePoint(mSelectedLayer, mSelectedPointIndex);
     const int pointsCount = spline->GetComponent(mSelectedLayer)->GetPoints().size();
     if (mSelectedPointIndex >= pointsCount) {
@@ -108,7 +108,7 @@ void FloatSplineWatcher::HandleValueEdited() const
   bool ok;
   const float f = uiString.toFloat(&ok);
   if (ok) {
-    shared_ptr<FloatSplineNode> spline = GetSpline();
+    std::shared_ptr<FloatSplineNode> spline = GetSpline();
     auto& point = spline->GetComponent(mSelectedLayer)->GetPoints()[mSelectedPointIndex];
     spline->SetPointValue(mSelectedLayer, mSelectedPointIndex, point.mTime, f);
     mUi.valueLineEdit->clearFocus();
@@ -123,7 +123,7 @@ void FloatSplineWatcher::HandleTimeEdited() const
   bool ok;
   const float f = uiString.toFloat(&ok);
   if (ok) {
-    shared_ptr<FloatSplineNode> spline = GetSpline();
+    std::shared_ptr<FloatSplineNode> spline = GetSpline();
     auto& point = spline->GetComponent(mSelectedLayer)->GetPoints()[mSelectedPointIndex];
     spline->SetPointValue(mSelectedLayer, mSelectedPointIndex, f, point.mValue);
     mUi.timeLineEdit->clearFocus();
@@ -131,7 +131,7 @@ void FloatSplineWatcher::HandleTimeEdited() const
 }
 
 
-shared_ptr<FloatSplineNode> FloatSplineWatcher::GetSpline() const
+std::shared_ptr<FloatSplineNode> FloatSplineWatcher::GetSpline() const
 {
   return PointerCast<FloatSplineNode>(GetNode());
 }
@@ -157,7 +157,7 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
     {
       const QPoint diff = event->pos() - mOriginalMousePos;
       const Vec2 p = mOriginalPoint + GetStepsPerPixel().Dot(Vec2(diff.x(), diff.y()));
-      shared_ptr<FloatSplineNode> spline = PointerCast<FloatSplineNode>(GetNode());
+      std::shared_ptr<FloatSplineNode> spline = PointerCast<FloatSplineNode>(GetNode());
       spline->SetPointValue(mHoveredLayer, mHoveredPointIndex, p.x, p.y);
       mSplineWidget->update();
       SelectPoint(mSelectedLayer, mSelectedPointIndex);
@@ -169,7 +169,7 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
     default:
     {
       const QPoint mouse = event->pos();
-      shared_ptr<FloatSplineNode> spline = GetSpline();
+      std::shared_ptr<FloatSplineNode> spline = GetSpline();
 
       for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT);
            layer++) {
@@ -216,7 +216,7 @@ void FloatSplineWatcher::HandleMouseLeftDown(QMouseEvent* event) {
     SelectPoint(mHoveredLayer, mHoveredPointIndex);
     mOriginalMousePos = event->pos();
 
-    shared_ptr<FloatSplineNode> spline = GetSpline();
+    std::shared_ptr<FloatSplineNode> spline = GetSpline();
     const SplinePoint& p =
       spline->GetComponent(mHoveredLayer)->GetPoints()[mHoveredPointIndex];
     mOriginalPoint = Vec2(p.mTime, p.mValue);
@@ -384,7 +384,7 @@ void FloatSplineWatcher::DrawSpline(QPaintEvent* ev) const {
     if (beat >= lastMarkToDraw) break;
   }
 
-  shared_ptr<FloatSplineNode> spline = GetSpline();
+  std::shared_ptr<FloatSplineNode> spline = GetSpline();
 
   /// Draw scene time
   painter.setPen(QColor(80, 200, 80));
@@ -434,7 +434,7 @@ void FloatSplineWatcher::DrawSpline(QPaintEvent* ev) const {
 void FloatSplineWatcher::DrawSplineComponentControl(
   QPainter& painter, SplineLayer layer) const
 {
-  shared_ptr<FloatSplineNode> spline = GetSpline();
+  std::shared_ptr<FloatSplineNode> spline = GetSpline();
   SplineFloatComponent* component = spline->GetComponent(layer);
 
   const UINT sampleCount = mSplineWidget->width();

@@ -19,7 +19,7 @@ class WatcherWidget: public QWidget {
   friend class WatcherUi;
 
 public:
-  WatcherWidget(QWidget* parent, shared_ptr<WatcherUi> watcher, WatcherPosition position,
+  WatcherWidget(QWidget* parent, std::shared_ptr<WatcherUi> watcher, WatcherPosition position,
                 QTabWidget* tabWidget = nullptr);
   virtual ~WatcherWidget();
 
@@ -29,7 +29,7 @@ public:
   const WatcherPosition	mPosition;
   QTabWidget* mTabWidget = nullptr;
 
-  shared_ptr<WatcherUi> mWatcher;
+  std::shared_ptr<WatcherUi> mWatcher;
 protected:
 
   void SetTabLabel(const QString& text);
@@ -92,8 +92,8 @@ protected:
 
 class GLWatcherWidget: public WatcherWidget {
 public:
-  GLWatcherWidget(QWidget* parent, const shared_ptr<WatcherUi>& watcher, QGLWidget* shareWidget, 
-                  WatcherPosition position, QTabWidget* tabWidget = nullptr);
+  GLWatcherWidget(QWidget* parent, const std::shared_ptr<WatcherUi>& watcher, 
+    QGLWidget* shareWidget, WatcherPosition position, QTabWidget* tabWidget = nullptr);
   virtual ~GLWatcherWidget();
 
   EventForwarderGlWidget* GetGLWidget() override;

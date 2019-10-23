@@ -1,14 +1,15 @@
 #include "documentwatcher.h"
 #include "../zengarden.h"
+#include <memory>
 
-Q_DECLARE_METATYPE(shared_ptr<Graph>)
+Q_DECLARE_METATYPE(std::shared_ptr<Graph>)
 
 enum MyRoles {
   GRAPH_NODE_ROLE = Qt::UserRole + 1
 };
 
 
-DocumentWatcher::DocumentWatcher(const shared_ptr<Node>& document)
+DocumentWatcher::DocumentWatcher(const std::shared_ptr<Node>& document)
   : WatcherUi(document)
 {}
 
@@ -33,7 +34,7 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   QObject::connect(mUi.graphList, &QListView::clicked,
     [=](const QModelIndex &index) {
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    const shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
+    const std::shared_ptr<Graph> graph = item->data().value<std::shared_ptr<Graph>>();
     ZenGarden::GetInstance()->SetNodeForPropertyEditor(graph);
   });
 
@@ -43,13 +44,13 @@ void DocumentWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
     const QModelIndex index = mUi.graphList->currentIndex();
     if (!index.isValid()) return;
     QStandardItem* item = this->mModel->itemFromIndex(index);
-    const shared_ptr<Graph> graph = item->data().value<shared_ptr<Graph>>();
+    const std::shared_ptr<Graph> graph = item->data().value<std::shared_ptr<Graph>>();
     ZenGarden::GetInstance()->Watch(graph, WatcherPosition::RIGHT_TAB);
   });
 
   QObject::connect(mUi.newGraphButton, &QPushButton::pressed, [=]() {
-    const shared_ptr<Graph> graph = make_shared<Graph>();
-    shared_ptr<Document> document = PointerCast<Document>(GetNode());
+    const std::shared_ptr<Graph> graph = std::make_shared<Graph>();
+    std::shared_ptr<Document> document = PointerCast<Document>(GetNode());
     document->mGraphs.Connect(graph);
   });
 }
@@ -64,10 +65,10 @@ void DocumentWatcher::OnChildNameChange() {
 
 void DocumentWatcher::RefreshGraphList() const
 {
-  const shared_ptr<Document> doc = PointerCast<Document>(GetNode());
+  const std::shared_ptr<Document> doc = PointerCast<Document>(GetNode());
   mModel->clear();
   for (const auto& node : doc->mGraphs.GetDirectMultiNodes()) {
-    shared_ptr<Graph> graph = PointerCast<Graph>(node);
+    std::shared_ptr<Graph> graph = PointerCast<Graph>(node);
     QStandardItem* item = new QStandardItem(CreateDisplayedName(graph));
     item->setData(QVariant::fromValue(graph), GRAPH_NODE_ROLE);
     mModel->appendRow(item);
