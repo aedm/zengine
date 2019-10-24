@@ -114,7 +114,7 @@ public:
   EnumMap(const std::initializer_list<Item>& items) : mItems(items) {}
   Enum GetEnum(Name name) const {
     for (const auto& item : mItems) {
-      if (item.mName == name) return item.mEnum;
+      if (strcmp(item.mName, name) == 0) return item.mEnum;
     }
     return Enum(-1);
   }
