@@ -13,14 +13,7 @@
 
 extern const EnumMapperA TexelTypeMapper[];
 //extern EnumMap<SplineLayer, const char*> SplineLayerMapper;
-inline constexpr auto SplineLayerMapper = MakeEnumMapA<SplineLayer>({
-  {"base", SplineLayer::BASE},
-  {"noise", SplineLayer::NOISE},
-  {"beat_spike_intensity", SplineLayer::BEAT_SPIKE_INTENSITY},
-  {"beat_spike_frequency", SplineLayer::BEAT_SPIKE_FREQUENCY},
-  {"beat_quantizer", SplineLayer::BEAT_QUANTIZER},
-});
-
+extern const EnumMap<SplineLayer, const char*> SplineLayerMapper;
 
 class JSONSerializer {
 public:

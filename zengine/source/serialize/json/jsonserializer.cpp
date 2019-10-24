@@ -15,6 +15,13 @@ const EnumMapperA TexelTypeMapper[] = {
   {"", -1}
 };
 
+const EnumMap<SplineLayer, const char*> SplineLayerMapper = MakeEnumMapA<SplineLayer>({
+  {"base", SplineLayer::BASE},
+  {"noise", SplineLayer::NOISE},
+  {"beat_spike_intensity", SplineLayer::BEAT_SPIKE_INTENSITY},
+  {"beat_spike_frequency", SplineLayer::BEAT_SPIKE_FREQUENCY},
+  {"beat_quantizer", SplineLayer::BEAT_QUANTIZER},
+  });
 
 
 

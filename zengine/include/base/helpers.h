@@ -111,7 +111,7 @@ public:
     Name mName;
     Enum mEnum;
   };
-  constexpr EnumMap(const std::initializer_list<Item> items) : mItems(items) {}
+  constexpr EnumMap(const std::initializer_list<Item>& items) : mItems(items) {}
   Enum GetEnum(Name name) const {
     for (const auto& item : mItems) {
       if (item.mName == name) return item.mEnum;
@@ -124,18 +124,18 @@ public:
     }
     return nullptr;
   }
-  std::initializer_list<Item> mItems;
+  std::vector<Item> mItems;
 };
 
 template<typename Enum>
-constexpr EnumMap<Enum, const char*> MakeEnumMapA(
+EnumMap<Enum, const char*> MakeEnumMapA(
   const std::initializer_list<typename EnumMap<Enum, const char*>::Item>& items)
 {
   return EnumMap<Enum, const char*>(items);
 }
 
 template<typename Enum>
-constexpr EnumMap<Enum, const wchar_t*> MakeEnumMapW(
+EnumMap<Enum, const wchar_t*> MakeEnumMapW(
   const std::initializer_list<typename EnumMap<Enum, const wchar_t*>::Item>& items)
 {
   return EnumMap<Enum, const wchar_t*>(items);

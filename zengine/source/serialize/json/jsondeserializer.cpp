@@ -88,25 +88,25 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
 }
 
 Vec2 JSONDeserializer::DeserializeVec2(const rapidjson::Value& value) {
-  const float x = value["x"].GetDouble();
-  const float y = value["y"].GetDouble();
+  const float x = float(value["x"].GetDouble());
+  const float y = float(value["y"].GetDouble());
   return Vec2(x, y);
 }
 
 
 Vec3 JSONDeserializer::DeserializeVec3(const rapidjson::Value& value) {
-  const float x = value["x"].GetDouble();
-  const float y = value["y"].GetDouble();
-  const float z = value["z"].GetDouble();
+  const float x = float(value["x"].GetDouble());
+  const float y = float(value["y"].GetDouble());
+  const float z = float(value["z"].GetDouble());
   return Vec3(x, y, z);
 }
 
 
 Vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
-  const float x = value["x"].GetDouble();
-  const float y = value["y"].GetDouble();
-  const float z = value["z"].GetDouble();
-  const float w = value["w"].GetDouble();
+  const float x = float(value["x"].GetDouble());
+  const float y = float(value["y"].GetDouble());
+  const float z = float(value["z"].GetDouble());
+  const float w = float(value["w"].GetDouble());
   return Vec4(x, y, z, w);
 }
 
@@ -176,7 +176,8 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         SafeCast<StringSlot*>(slot)->SetDefaultValue(jsonSlot["default"].GetString());
       }
       else if (dynamic_cast<FloatSlot*>(slot)) {
-        SafeCast<FloatSlot*>(slot)->SetDefaultValue(jsonSlot["default"].GetDouble());
+        SafeCast<FloatSlot*>(slot)->SetDefaultValue(
+          float(jsonSlot["default"].GetDouble()));
       }
       else if (dynamic_cast<Vec2Slot*>(slot)) {
         SafeCast<Vec2Slot*>(slot)->
@@ -255,8 +256,8 @@ void JSONDeserializer::DeserializeFloatSplineNode(const rapidjson::Value& value,
     const rapidjson::Value& jsonPoints = value[fieldName];
     for (UINT i = 0; i < jsonPoints.Size(); i++) {
       auto& jsonPoint = jsonPoints[i];
-      const float time(jsonPoint["time"].GetDouble());
-      const float floatValue(jsonPoint["value"].GetDouble());
+      const float time = float(jsonPoint["time"].GetDouble());
+      const float floatValue = float(jsonPoint["value"].GetDouble());
       const int pIndex = node->AddPoint(layer, time, floatValue);
       node->SetAutoTangent(layer, pIndex, jsonPoint["autotangent"].GetBool());
       node->SetBreakpoint(layer, pIndex, jsonPoint["breakpoint"].GetBool());
@@ -277,7 +278,7 @@ void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
 
 void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
   if (value.HasMember("id")) {
-    const int connId = value["id"].GetDouble();
+    const int connId = int(value["id"].GetDouble());
     auto& connNode = mNodes.at(connId);
     slot->Connect(connNode);
   }
@@ -285,7 +286,7 @@ void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot*
 
 void JSONDeserializer::DeserializeFloatNode(const rapidjson::Value& value,
   const std::shared_ptr<FloatNode>& node) {
-  node->Set(value["value"].GetDouble());
+  node->Set(float(value["value"].GetDouble()));
 }
 
 void JSONDeserializer::DeserializeVec2Node(const rapidjson::Value& value,
