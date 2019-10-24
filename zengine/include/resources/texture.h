@@ -4,15 +4,13 @@
 #include <memory>
 #include <vector>
 
-using namespace std;
-
 /// Texture map
 class Texture {
 public:
   typedef	UINT Handle;
 
   Texture(Handle handle, int width, int height, TexelType type,
-          shared_ptr<vector<char>> texelData, bool isMultisample, bool doesRepeat,
+          std::shared_ptr<std::vector<char>> texelData, bool isMultisample, bool doesRepeat,
     bool generateMipmaps);
   ~Texture();
 
@@ -23,6 +21,6 @@ public:
   const bool mIsMultisample;
   const bool mDoesRepeat;
   const bool mGenerateMipmaps;
-  const shared_ptr<vector<char>> mTexelData;
+  const std::shared_ptr<std::vector<char>> mTexelData;
 };
 

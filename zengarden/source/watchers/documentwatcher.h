@@ -7,7 +7,7 @@
 
 class DocumentWatcher : public WatcherUi {
 public:
-  DocumentWatcher(const shared_ptr<Node>& documentNode);
+  DocumentWatcher(const std::shared_ptr<Node>& documentNode);
   virtual ~DocumentWatcher();
 
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;

@@ -4,8 +4,6 @@
 #include <vector>
 #include <memory>
 
-using namespace std;
-
 // Possible types of shader values and variables
 enum class ValueType {
   FLOAT,
@@ -73,7 +71,7 @@ public:
   UINT mBinaryFormat;
 
   /// List of vertex attributes
-  vector<VertexAttribute> mAttributes;
+  std::vector<VertexAttribute> mAttributes;
 
   VertexAttribute* mAttributesArray[UINT(VertexAttributeUsage::COUNT)]{};
 };
@@ -84,7 +82,7 @@ struct VertexPos {
   Vec3 mPosition;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> mFormat;
+  static std::shared_ptr<VertexFormat> mFormat;
 };
 
 
@@ -93,7 +91,7 @@ struct VertexPosNorm {
   Vec3 mNormal;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> mFormat;
+  static std::shared_ptr<VertexFormat> mFormat;
 };
 
 struct VertexPosUvNorm {
@@ -102,7 +100,7 @@ struct VertexPosUvNorm {
   Vec3 mNormal;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> mFormat;
+  static std::shared_ptr<VertexFormat> mFormat;
 };
 
 
@@ -113,7 +111,7 @@ struct VertexPosUvNormTangent {
   Vec3 mTangent;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> mFormat;
+  static std::shared_ptr<VertexFormat> mFormat;
 };
 
 
@@ -122,5 +120,5 @@ struct VertexPosUv {
   Vec2 mUv;
 
   /// Vertex format descriptor for this struct
-  static shared_ptr<VertexFormat> mFormat;
+  static std::shared_ptr<VertexFormat> mFormat;
 };

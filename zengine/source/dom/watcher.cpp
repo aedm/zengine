@@ -2,7 +2,7 @@
 #include <include/dom/node.h>
 #include <utility>
 
-Watcher::Watcher(shared_ptr<Node> node)
+Watcher::Watcher(std::shared_ptr<Node> node)
   : mNode(std::move(node))
 {}
 
@@ -10,7 +10,7 @@ Watcher::~Watcher() {
   ASSERT(mNode == nullptr);
 }
 
-shared_ptr<Node> Watcher::GetNode() const
+std::shared_ptr<Node> Watcher::GetNode() const
 {
   return mNode->GetReferencedNode();
 }
@@ -20,7 +20,7 @@ std::shared_ptr<Node> Watcher::GetDirectNode() const
   return mNode;
 }
 
-void Watcher::ChangeNode(const shared_ptr<Node>& node) {
+void Watcher::ChangeNode(const std::shared_ptr<Node>& node) {
   mNode = node;
   OnRedraw();
 }

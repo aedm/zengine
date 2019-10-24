@@ -39,8 +39,8 @@ void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
   _vsnprintf(TempStringA, LogMessageMaxLength, logString, args);
   va_end(args);
 
-  string tmp_string(TempStringA);
-  const wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
+  std::string tmp_string(TempStringA);
+  const std::wstring tmp_wstring(tmp_string.begin(), tmp_string.end());
 
   swprintf(TempStringW, LogMessageMaxLength, L"%s%s", function, tmp_wstring.c_str());
 
@@ -53,19 +53,19 @@ LogMessage::LogMessage(LogSeverity severity, const wchar_t* message) {
 }
 
 namespace Convert {
-  std::wstring StringToWstring(const string& s) {
+  std::wstring StringToWstring(const std::string& s) {
     std::wstring temp(s.length(), L' ');
     std::copy(s.begin(), s.end(), temp.begin());
     return temp;
   }
 }
 
-string ToJson(const shared_ptr<Document>& document) {
+std::string ToJson(const std::shared_ptr<Document>& document) {
   const JSONSerializer serializer(document);
   return serializer.GetJSON();
 }
 
-shared_ptr<Document> FromJson(const string& json) {
+std::shared_ptr<Document> FromJson(const std::string& json) {
   const JSONDeserializer deserializer(json);
   return deserializer.GetDocument();
 }

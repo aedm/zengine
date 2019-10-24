@@ -5,14 +5,14 @@
 
 class ShaderBuilder {
 public:
-  static shared_ptr<ShaderSource> FromStubs(
-    const shared_ptr<StubNode>& vertexStub, const shared_ptr<StubNode>& fragmentStub);
+  static std::shared_ptr<ShaderSource> FromStubs(
+    const std::shared_ptr<StubNode>& vertexStub, const std::shared_ptr<StubNode>& fragmentStub);
 
 private:
-  ShaderBuilder(const shared_ptr<StubNode>& vertexStub,
-    const shared_ptr<StubNode>& fragmentStub);
+  ShaderBuilder(const std::shared_ptr<StubNode>& vertexStub,
+    const std::shared_ptr<StubNode>& fragmentStub);
 
-  shared_ptr<ShaderSource> MakeShaderSource();
+  std::shared_ptr<ShaderSource> MakeShaderSource();
 
   /// How to reference a certain Node dependency within GLSL code? 
   /// Stubs translate to a function call and a variable to store its return value.
@@ -20,10 +20,10 @@ private:
     StubReference(StubParameter::Type type);
 
     /// The variable name in the main function
-    string mVariableName;
+    std::string mVariableName;
 
     /// Function name for stubs
-    string mFunctionName;
+    std::string mFunctionName;
 
     /// Stub return type
     const StubParameter::Type mType;
@@ -32,7 +32,7 @@ private:
   /// Non-stub Nodes translate to a uniform/sampler value
   struct ValueReference {
     /// Generated uniform/sampler name
-    string mName;
+    std::string mName;
 
     /// Value type
     StubParameter::Type mType = StubParameter::Type::TVOID;
@@ -40,13 +40,13 @@ private:
 
   /// Inputs and output of the shader stage
   struct InterfaceVariable {
-    InterfaceVariable(ValueType type, string name, int layout = -1);
+    InterfaceVariable(ValueType type, std::string name, int layout = -1);
 
     /// Variable type
     ValueType mType;
 
     /// Variable name
-    string mName;
+    std::string mName;
 
     /// Output layout number for G-Buffers
     int mLayout;
@@ -60,39 +60,39 @@ private:
     void GenerateStubNames();
 
     /// Topologic order of dependencies
-    vector<shared_ptr<Node>> mDependencies;
+    std::vector<std::shared_ptr<Node>> mDependencies;
 
     /// References of stub nodes
-    map<shared_ptr<Node>, shared_ptr<StubReference>> mStubMap;
+    std::map<std::shared_ptr<Node>, std::shared_ptr<StubReference>> mStubMap;
 
     /// Stader stage type
     const bool mIsVertexShader;
 
     /// Things that need to be #define'd at the beginning of the shader code
-    vector<string> mDefines;
+    std::vector<std::string> mDefines;
 
     /// Generated source code
-    stringstream mSourceStream;
+    std::stringstream mSourceStream;
 
     /// Inputs and outputs of the shader stage
-    map<string, shared_ptr<InterfaceVariable>> mInputsMap;
-    vector<shared_ptr<InterfaceVariable>> mInputs;
-    vector<shared_ptr<InterfaceVariable>> mOutputs;
+    std::map<std::string, std::shared_ptr<InterfaceVariable>> mInputsMap;
+    std::vector<std::shared_ptr<InterfaceVariable>> mInputs;
+    std::vector<std::shared_ptr<InterfaceVariable>> mOutputs;
   };
 
   /// Creates topological order of dependency tree
-  void CollectDependencies(const shared_ptr<Node>& root, ShaderStage* shaderStage);
+  void CollectDependencies(const std::shared_ptr<Node>& root, ShaderStage* shaderStage);
 
   /// Traverses stub graph for a shader stage, called only by CollectDependencies
-  void TraverseDependencies(const shared_ptr<Node>& root,
-    ShaderBuilder::ShaderStage* shaderStage, set<shared_ptr<Node>>& visitedNodes);
+  void TraverseDependencies(const std::shared_ptr<Node>& root,
+    ShaderBuilder::ShaderStage* shaderStage, std::set<std::shared_ptr<Node>>& visitedNodes);
 
   /// Generates function and variable names
   void GenerateNames();
 
   /// Collect uniforms and samplers
   void AddGlobalsToDependencies(ShaderStage* shaderStage);
-  void CollectInputsAndOutputs(const shared_ptr<Node>& node, ShaderStage* shaderStage) const;
+  void CollectInputsAndOutputs(const std::shared_ptr<Node>& node, ShaderStage* shaderStage) const;
   void AddLocalsToDependencies();
 
   /// Generate source
@@ -102,22 +102,22 @@ private:
   void GenerateSourceFunctions(ShaderStage* shaderStage);
   void GenerateSourceMain(ShaderStage* shaderStage) const;
 
-  static const string& GetValueTypeString(ValueType type);
-  static const string& GetParamTypeString(StubParameter::Type type,
+  static const std::string& GetValueTypeString(ValueType type);
+  static const std::string& GetParamTypeString(StubParameter::Type type,
     bool isMultiSampler = false, bool isShadow = false);
 
   ShaderStage mVertexStage;
   ShaderStage mFragmentStage;
 
   /// References of uniform/smapler nodes
-  map<shared_ptr<Node>, shared_ptr<ValueReference>> mUniformMap;
-  map<shared_ptr<Node>, shared_ptr<ValueReference>> mSamplerMap;
-  map<shared_ptr<Node>, shared_ptr<ValueReference>> mBufferMap;
-  set<GlobalUniformUsage> mUsedGlobalUniforms;
-  set<GlobalSamplerUsage> mUsedGlobalSamplers;
+  std::map<std::shared_ptr<Node>, std::shared_ptr<ValueReference>> mUniformMap;
+  std::map<std::shared_ptr<Node>, std::shared_ptr<ValueReference>> mSamplerMap;
+  std::map<std::shared_ptr<Node>, std::shared_ptr<ValueReference>> mBufferMap;
+  std::set<GlobalUniformUsage> mUsedGlobalUniforms;
+  std::set<GlobalSamplerUsage> mUsedGlobalSamplers;
 
   /// Metadata
-  vector<ShaderSource::Uniform> mUniforms;
-  vector<ShaderSource::Sampler> mSamplers;
-  vector<ShaderSource::NamedResource> mSSBOs;
+  std::vector<ShaderSource::Uniform> mUniforms;
+  std::vector<ShaderSource::Sampler> mSamplers;
+  std::vector<ShaderSource::NamedResource> mSSBOs;
 };

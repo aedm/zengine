@@ -6,7 +6,7 @@
 class StubWatcher : public WatcherUi
 {
 public:
-	StubWatcher(const shared_ptr<StubNode>&);
+	StubWatcher(const std::shared_ptr<StubNode>&);
 	virtual ~StubWatcher();
 
 };

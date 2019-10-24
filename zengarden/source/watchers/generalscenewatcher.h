@@ -8,7 +8,7 @@ class SceneNode;
 
 class RenderForwarder: public Watcher {
 public:
-  RenderForwarder(const shared_ptr<SceneNode>& node);
+  RenderForwarder(const std::shared_ptr<SceneNode>& node);
   virtual ~RenderForwarder() = default;
   void OnRedraw() override;
   FastDelegate<void()> mOnRedraw;
@@ -16,7 +16,7 @@ public:
 
 class GeneralSceneWatcher: public WatcherUi {
 public:
-  GeneralSceneWatcher(const shared_ptr<Node>& node);
+  GeneralSceneWatcher(const std::shared_ptr<Node>& node);
   virtual ~GeneralSceneWatcher();
 
   /// Initializes resources needed for scene watchers
@@ -33,13 +33,13 @@ protected:
   RenderTarget* mRenderTarget = nullptr;
 
   ///// Scene node to be drawn.
-  //shared_ptr<Node> mScene;
+  //std::shared_ptr<Node> mScene;
   
   /// Default scene node, might be unused
-  shared_ptr<SceneNode> mTheScene;
+  std::shared_ptr<SceneNode> mTheScene;
 
   /// Forwarder that catches render events for the default scene
-  shared_ptr<RenderForwarder> mRenderForwarder;
+  std::shared_ptr<RenderForwarder> mRenderForwarder;
 
   /// Qt widget event handlers
   void HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event);
@@ -58,11 +58,11 @@ protected:
   float mOriginalDistance = 0.0f;
 
   /// Static resources initializes by Init()
-  static shared_ptr<Material> mDefaultMaterial;
+  static std::shared_ptr<Material> mDefaultMaterial;
 
 private:
   /// The Drawable supplied by an implementation
-  shared_ptr<Drawable> mDrawable;
+  std::shared_ptr<Drawable> mDrawable;
 
   Globals mGlobals;
 };

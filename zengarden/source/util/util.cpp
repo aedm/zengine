@@ -6,8 +6,11 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 #include "../commands/graphCommands.h"
-
-using namespace std;
+#include <memory>
+#include <memory>
+#include <memory>
+#include <memory>
+#include <memory>
 
 namespace Util {
 
@@ -30,9 +33,9 @@ namespace Util {
   }
 
 
-  shared_ptr<Pass> LoadShader(const char* VertexFile, const char* FragmentFile) {
-    const unique_ptr<char> vertexContent(ReadFileQt(VertexFile));
-    const unique_ptr<char> fragmentContent(ReadFileQt(FragmentFile));
+  std::shared_ptr<Pass> LoadShader(const char* VertexFile, const char* FragmentFile) {
+    const std::unique_ptr<char> vertexContent(ReadFileQt(VertexFile));
+    const std::unique_ptr<char> fragmentContent(ReadFileQt(FragmentFile));
 
     if (!vertexContent || !fragmentContent) {
       ERR("Missing content.");
@@ -40,12 +43,12 @@ namespace Util {
     }
 
     /// TODO: use LoadStub instead
-    shared_ptr<StubNode> vertexStub = make_shared<StubNode>();
-    vertexStub->mSource.SetDefaultValue(string(vertexContent.get()));
-    shared_ptr<StubNode> fragmentStub = make_shared<StubNode>();
-    fragmentStub->mSource.SetDefaultValue(string(fragmentContent.get()));
+    std::shared_ptr<StubNode> vertexStub = std::make_shared<StubNode>();
+    vertexStub->mSource.SetDefaultValue(std::string(vertexContent.get()));
+    std::shared_ptr<StubNode> fragmentStub = std::make_shared<StubNode>();
+    fragmentStub->mSource.SetDefaultValue(std::string(fragmentContent.get()));
 
-    shared_ptr<Pass> pass = make_shared<Pass>();
+    std::shared_ptr<Pass> pass = std::make_shared<Pass>();
     pass->mVertexStub.Connect(vertexStub);
     pass->mFragmentStub.Connect(fragmentStub);
 
@@ -56,7 +59,7 @@ namespace Util {
     return Vec3(v.x, v.y, v.z);
   }
 
-  shared_ptr<Mesh> LoadMesh(const QString& fileName) {
+  std::shared_ptr<Mesh> LoadMesh(const QString& fileName) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(fileName.toStdString(),
                                              aiProcess_CalcTangentSpace |
@@ -97,7 +100,7 @@ namespace Util {
 
     INFO("Importing mesh: %d faces, %d vertices", mesh->mNumFaces, mesh->mNumVertices);
 
-    vector<IndexEntry> indices;
+    std::vector<IndexEntry> indices;
     for (UINT i = 0; i < mesh->mNumFaces; i++) {
       aiFace& face = mesh->mFaces[i];
       if (face.mNumIndices != 3) {
@@ -109,7 +112,7 @@ namespace Util {
       }
     }
 
-    vector<VertexPosUvNormTangent> vertices(mesh->mNumVertices);
+    std::vector<VertexPosUvNormTangent> vertices(mesh->mNumVertices);
     for (UINT i = 0; i < mesh->mNumVertices; i++) {
       vertices[i].mPosition = ToVec3(mesh->mVertices[i]);
       const Vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
@@ -118,7 +121,7 @@ namespace Util {
       vertices[i].mTangent = ToVec3(mesh->mTangents[i]);
     }
 
-    shared_ptr<Mesh> zenmesh = make_shared<Mesh>();
+    std::shared_ptr<Mesh> zenmesh = std::make_shared<Mesh>();
     zenmesh->AllocateVertices(VertexPosUvNormTangent::mFormat, vertices.size());
     zenmesh->UploadVertices(&vertices[0]);
     zenmesh->AllocateIndices(indices.size());
@@ -127,21 +130,21 @@ namespace Util {
     return zenmesh;
   }
 
-  shared_ptr<StubNode> LoadStub(const QString& fileName) {
-    const unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
+  std::shared_ptr<StubNode> LoadStub(const QString& fileName) {
+    const std::unique_ptr<char> stubSource(Util::ReadFileQt(fileName));
     /// TODO: register this as an engine node
-    shared_ptr<StubNode> stub = make_shared<StubNode>();
+    auto stub = std::make_shared<StubNode>();
     stub->mSource.SetDefaultValue(stubSource.get());
     return stub;
   }
 
-  void DisposeNodes(const set<shared_ptr<Node>>& nodes)
+  void DisposeNodes(const std::set<std::shared_ptr<Node>>& nodes)
   {
-    vector<shared_ptr<Node>> nodeList(nodes.begin(), nodes.end());
+    std::vector<std::shared_ptr<Node>> nodeList(nodes.begin(), nodes.end());
     for (UINT i = 0; i < nodeList.size(); i++) {
-      const shared_ptr<Node> node = nodeList[i];
+      const std::shared_ptr<Node> node = nodeList[i];
       for (Slot* slot : node->GetDependants()) {
-        shared_ptr<Node> refNode = slot->GetOwner();
+        std::shared_ptr<Node> refNode = slot->GetOwner();
         if (!refNode->IsGhostNode()) continue;
         if (std::find(nodeList.begin(), nodeList.end(), refNode) == nodeList.end()) {
           /// Ghost node wasn't in the list, add it

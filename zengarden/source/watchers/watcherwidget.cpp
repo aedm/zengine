@@ -4,7 +4,7 @@
 #include <QtWidgets/QTabWidget>
 #include <utility>
 
-WatcherWidget::WatcherWidget(QWidget* parent, shared_ptr<WatcherUi> watcher, 
+WatcherWidget::WatcherWidget(QWidget* parent, std::shared_ptr<WatcherUi> watcher, 
   WatcherPosition position, QTabWidget* tabWidget)
   : QWidget(parent)
   , mPosition(position)
@@ -45,7 +45,7 @@ void WatcherWidget::dropEvent(QDropEvent *event) {
   mWatcher->HandleDropEvent(event);
 }
 
-GLWatcherWidget::GLWatcherWidget(QWidget* parent, const shared_ptr<WatcherUi>& watcher,
+GLWatcherWidget::GLWatcherWidget(QWidget* parent, const std::shared_ptr<WatcherUi>& watcher,
   QGLWidget* shareWidget, WatcherPosition position,
   QTabWidget* tabWidget)
   : WatcherWidget(parent, watcher, position, tabWidget)

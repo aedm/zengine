@@ -20,11 +20,11 @@ public:
   static void OpenGLMakeCurrent();
 
   /// Open a watcher
-  void Watch(const shared_ptr<Node>& node, WatcherPosition watcherPosition);
+  void Watch(const std::shared_ptr<Node>& node, WatcherPosition watcherPosition);
 
   /// Property editor related
-  void SetNodeForPropertyEditor(const shared_ptr<Node>& node);
-  shared_ptr<Node> GetNodeInPropertyEditor() const;
+  void SetNodeForPropertyEditor(const std::shared_ptr<Node>& node);
+  std::shared_ptr<Node> GetNodeInPropertyEditor() const;
 
   /// Sets the cursor relative to the beginning of the timeline
   void SetMovieCursor(float beats);
@@ -39,10 +39,10 @@ public:
   Event<float> mOnMovieCursorChange;
 
   /// Returns the PropertiesNode associated with the current document
-  shared_ptr<PropertiesNode> GetPropertiesNode() const;
+  std::shared_ptr<PropertiesNode> GetPropertiesNode() const;
 
   /// Returns the PropertiesNode associated with the current document
-  shared_ptr<MovieNode> GetMovieNode() const;
+  std::shared_ptr<MovieNode> GetMovieNode() const;
 
 private:
   /// Closes a watcher tab
@@ -63,7 +63,7 @@ private:
   QGLWidget* mCommonGLWidget = nullptr;
 
   /// The currently open document
-  shared_ptr<Document> mDocument;
+  std::shared_ptr<Document> mDocument;
   DocumentWatcher* mDocumentWatcher = nullptr;
   QString mDocumentFileName;
   

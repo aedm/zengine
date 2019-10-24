@@ -7,25 +7,22 @@
 #include <rapidjson/include/rapidjson/prettywriter.h>
 #include <rapidjson/include/rapidjson/stringbuffer.h>
 
-const EnumMapperA TexelTypeMapper[] = {
-  {"RGBA8", UINT(TexelType::ARGB8)},
-  {"RGBA16", UINT(TexelType::ARGB16)},
-  {"RGBA16F", UINT(TexelType::ARGB16F)},
-  {"RGBA32F", UINT(TexelType::ARGB32F)},
-  {"", -1}
+const EnumMapA<TexelType> TexelTypeMapper = {
+  {"RGBA8", TexelType::ARGB8},
+  {"RGBA16", TexelType::ARGB16},
+  {"RGBA16F", TexelType::ARGB16F},
+  {"RGBA32F", TexelType::ARGB32F},
 };
 
-const EnumMapperA SplineLayerMapper[] = {
-  {"base", UINT(SplineLayer::BASE)},
-  {"noise", UINT(SplineLayer::NOISE)},
-  {"beat_spike_intensity", UINT(SplineLayer::BEAT_SPIKE_INTENSITY)},
-  {"beat_spike_frequency", UINT(SplineLayer::BEAT_SPIKE_FREQUENCY)},
-  {"beat_quantizer", UINT(SplineLayer::BEAT_QUANTIZER)},
-  {"", -1}
+const EnumMapA<SplineLayer> SplineLayerMapper = {
+  {"base", SplineLayer::BASE},
+  {"noise", SplineLayer::NOISE},
+  {"beat_spike_intensity", SplineLayer::BEAT_SPIKE_INTENSITY},
+  {"beat_spike_frequency", SplineLayer::BEAT_SPIKE_FREQUENCY},
+  {"beat_quantizer", SplineLayer::BEAT_QUANTIZER},
 };
 
-
-JSONSerializer::JSONSerializer(const shared_ptr<Node>& root) {
+JSONSerializer::JSONSerializer(const std::shared_ptr<Node>& root) {
   mJsonDocument.SetObject();
   mAllocator = &mJsonDocument.GetAllocator();
 
@@ -35,7 +32,7 @@ JSONSerializer::JSONSerializer(const shared_ptr<Node>& root) {
   DumpNodes();
 }
 
-string JSONSerializer::GetJSON() const
+std::string JSONSerializer::GetJSON() const
 {
   rapidjson::StringBuffer buffer;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
@@ -45,7 +42,7 @@ string JSONSerializer::GetJSON() const
   return buffer.GetString();
 }
 
-void JSONSerializer::Traverse(const shared_ptr<Node>& root) {
+void JSONSerializer::Traverse(const std::shared_ptr<Node>& root) {
   mNodes[root] = ++mNodeCount;
 
   /// Traverse slots
@@ -60,7 +57,7 @@ void JSONSerializer::Traverse(const shared_ptr<Node>& root) {
       }
     }
     else {
-      shared_ptr<Node> node = slot->GetDirectNode();
+      std::shared_ptr<Node> node = slot->GetDirectNode();
       if (node == nullptr || slot->IsDefaulted()) continue;
       auto it = mNodes.find(node);
       if (it == mNodes.end()) {
@@ -81,7 +78,7 @@ void JSONSerializer::DumpNodes() {
 }
 
 
-rapidjson::Value JSONSerializer::Serialize(const shared_ptr<Node>& node) {
+rapidjson::Value JSONSerializer::Serialize(const std::shared_ptr<Node>& node) {
   rapidjson::Value v(rapidjson::kObjectType);
 
   /// Save class type
@@ -166,7 +163,7 @@ rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) const
 
 
 void JSONSerializer::SerializeGeneralNode(
-  rapidjson::Value& nodeValue, const shared_ptr<Node>& node)
+  rapidjson::Value& nodeValue, const std::shared_ptr<Node>& node)
 {
   /// Save slots
   if (!node->GetSerializableSlots().empty()) {
@@ -209,7 +206,7 @@ void JSONSerializer::SerializeGeneralNode(
           slotObject.AddMember("default", floatSlot->GetDefaultValue(), *mAllocator);
         }
         else if ((vec2Slot = dynamic_cast<Vec2Slot*>(slot)) != nullptr) {
-          slotObject.AddMember("default", SerializeVec2(vec2Slot->GetDefaultValue()), 
+          slotObject.AddMember("default", SerializeVec2(vec2Slot->GetDefaultValue()),
             *mAllocator);
         }
         else if ((vec3Slot = dynamic_cast<Vec3Slot*>(slot)) != nullptr) {
@@ -233,31 +230,31 @@ void JSONSerializer::SerializeGeneralNode(
 
 
 void JSONSerializer::SerializeFloatNode(
-  rapidjson::Value& nodeValue, const shared_ptr<FloatNode>& node) const
+  rapidjson::Value& nodeValue, const std::shared_ptr<FloatNode>& node) const
 {
   nodeValue.AddMember("value", node->Get(), *mAllocator);
 }
 
 void JSONSerializer::SerializeVec2Node(
-  rapidjson::Value& nodeValue, const shared_ptr<Vec2Node>& node) const
+  rapidjson::Value& nodeValue, const std::shared_ptr<Vec2Node>& node) const
 {
   nodeValue.AddMember("value", SerializeVec2(node->Get()), *mAllocator);
 }
 
 void JSONSerializer::SerializeVec3Node(
-  rapidjson::Value& nodeValue, const shared_ptr<Vec3Node>& node) const
+  rapidjson::Value& nodeValue, const std::shared_ptr<Vec3Node>& node) const
 {
   nodeValue.AddMember("value", SerializeVec3(node->Get()), *mAllocator);
 }
 
 void JSONSerializer::SerializeVec4Node(
-  rapidjson::Value& nodeValue, const shared_ptr<Vec4Node>& node) const
+  rapidjson::Value& nodeValue, const std::shared_ptr<Vec4Node>& node) const
 {
   nodeValue.AddMember("value", SerializeVec4(node->Get()), *mAllocator);
 }
 
 void JSONSerializer::SerializeFloatSplineNode(
-  rapidjson::Value& nodeValue, const shared_ptr<FloatSplineNode>& node) const
+  rapidjson::Value& nodeValue, const std::shared_ptr<FloatSplineNode>& node) const
 {
   for (UINT layer = UINT(SplineLayer::BASE); layer < UINT(SplineLayer::COUNT); layer++) {
     SplineFloatComponent* component = node->GetComponent(SplineLayer(layer));
@@ -273,31 +270,30 @@ void JSONSerializer::SerializeFloatSplineNode(
       p.AddMember("linear", point.mIsLinear, *mAllocator);
       pointArray.PushBack(p, *mAllocator);
     }
-    const char* fieldName = EnumMapperA::GetStringFromEnum(SplineLayerMapper, layer);
+    const char* fieldName = SplineLayerMapper.GetName(SplineLayer(layer));
     nodeValue.AddMember(rapidjson::GenericStringRef<char>(fieldName), pointArray,
       *mAllocator);
   }
 }
 
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
-  const shared_ptr<TextureNode>& node) const
+  const std::shared_ptr<TextureNode>& node) const
 {
-  shared_ptr<Texture> texture = node->Get();
+  const std::shared_ptr<Texture>& texture = node->Get();
   ASSERT(texture->mTexelData);
-  const string b64 = base64_encode(reinterpret_cast<UCHAR*>(&(*texture->mTexelData)[0]), 
-      UINT((*texture->mTexelData).size()));
+  const std::string b64 = base64_encode(reinterpret_cast<UCHAR*>(&(*texture->mTexelData)[0]),
+    UINT((*texture->mTexelData).size()));
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
   nodeValue.AddMember("type", rapidjson::Value(
-    EnumMapperA::GetStringFromEnum(TexelTypeMapper, int(texture->mType)), *mAllocator),
-    *mAllocator);
+    TexelTypeMapper.GetName(texture->mType), *mAllocator), *mAllocator);
   nodeValue.AddMember("base64", b64, *mAllocator);
 }
 
 void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
-  const shared_ptr<StaticMeshNode>& node) const
+  const std::shared_ptr<StaticMeshNode>& node) const
 {
-  const shared_ptr<Mesh>& mesh = node->GetMesh();
+  const std::shared_ptr<Mesh>& mesh = node->GetMesh();
   ASSERT(mesh->mRawVertexData != nullptr);
   nodeValue.AddMember("format", mesh->mFormat->mBinaryFormat, *mAllocator);
   nodeValue.AddMember("vertexcount", mesh->mVertexCount, *mAllocator);
@@ -321,9 +317,9 @@ void JSONSerializer::SerializeStaticMeshNode(rapidjson::Value& nodeValue,
 }
 
 void JSONSerializer::SerializeStubNode(
-  rapidjson::Value& nodeValue, const shared_ptr<StubNode>& node) const
+  rapidjson::Value& nodeValue, const std::shared_ptr<StubNode>& node) const
 {
-  const string& f = node->mSource.Get();
+  const std::string& f = node->mSource.Get();
   rapidjson::Value slotValue(rapidjson::kObjectType);
   nodeValue.AddMember("source", f, *mAllocator);
 }

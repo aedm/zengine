@@ -29,8 +29,8 @@ template<> StaticValueNode<Matrix>::StaticValueNode()
   mValue.LoadIdentity();
 }
 
-template<> StaticValueNode<string>::StaticValueNode()
-  : ValueNode<string>()
+template<> StaticValueNode<std::string>::StaticValueNode()
+  : ValueNode<std::string>()
 {}
 
 REGISTER_NODECLASS(FloatNode, "Float")
@@ -58,4 +58,4 @@ template class StaticValueNode<Vec2>;
 template class StaticValueNode<Vec3>;
 template class StaticValueNode<Vec4>;
 template class StaticValueNode<Matrix>;
-template class StaticValueNode<string>;
+template class StaticValueNode<std::string>;

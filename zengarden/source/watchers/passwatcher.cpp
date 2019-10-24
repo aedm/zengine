@@ -1,6 +1,7 @@
 #include "passwatcher.h"
+#include <memory>
 
-PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
+PassWatcher::PassWatcher(const std::shared_ptr<Node>& pass)
   : GeneralSceneWatcher(pass) 
 {
   mMaterial->mSolidPass.Connect(pass);
@@ -16,7 +17,7 @@ PassWatcher::PassWatcher(const shared_ptr<Node>& pass)
     {Vec3(position.x + w, position.y + h, 0), Vec2(u, v)},
   };
 
-  shared_ptr<Mesh> boxMesh = make_shared<Mesh>();
+  std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
   boxMesh->SetIndices(boxIndices);
   boxMesh->SetVertices(vertices);
   mMesh->Set(boxMesh);

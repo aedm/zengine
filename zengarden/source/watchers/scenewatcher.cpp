@@ -1,7 +1,7 @@
 #include "scenewatcher.h"
 
 
-SceneWatcher::SceneWatcher(const shared_ptr<Node>& scene) 
+SceneWatcher::SceneWatcher(const std::shared_ptr<Node>& scene) 
   : GeneralSceneWatcher(scene)
 {}
 

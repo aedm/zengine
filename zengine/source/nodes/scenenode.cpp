@@ -19,7 +19,7 @@ SceneNode::SceneNode()
   , mDOFBleed(this, "DOF bleed", false, true, true, 0.0f, 0.1f)
   , mZPrepassDisabled(this, "Disable Z prepass")
   , mFluidsSlot(this, "Fluids", true)
-  , mSceneTimes(this, string(), true, false, false, false)
+  , mSceneTimes(this, std::string(), true, false, false, false)
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
@@ -177,7 +177,7 @@ void SceneNode::CalculateRenderDependencies() {
   GenerateTransitiveClosure(mTransitiveClosure, true);
   for (auto& node : mTransitiveClosure) {
     if (IsExactType<SceneTimeNode>(node)) {
-      shared_ptr<SceneTimeNode> sceneTimeNode = PointerCast<SceneTimeNode>(node);
+      std::shared_ptr<SceneTimeNode> sceneTimeNode = PointerCast<SceneTimeNode>(node);
       ASSERT(sceneTimeNode);
       mSceneTimes.Connect(sceneTimeNode);
     }

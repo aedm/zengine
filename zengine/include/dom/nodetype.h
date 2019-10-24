@@ -4,10 +4,8 @@
 #include <unordered_map>
 #include <typeindex>
 
-using namespace std;
 class Node;
 class Slot;
-
 
 /// Returns true if the node is an instance of a certain class
 template<class T>
@@ -24,7 +22,7 @@ bool IsExactType(Slot* slot) {
 
 template<class T>
 // ReSharper disable once CppEntityUsedOnlyInUnevaluatedContext
-bool IsExactType(const shared_ptr<Node>& node) {
+bool IsExactType(const std::shared_ptr<Node>& node) {
   return typeid(T) == typeid(*node.get());
 }
 
@@ -34,16 +32,16 @@ bool IsInstanceOf(N* ptr) {
 }
 
 template<class T, class N>
-bool IsPointerOf(const shared_ptr<N>& ptr) {
-  return dynamic_pointer_cast<T>(ptr) != nullptr;
+bool IsPointerOf(const std::shared_ptr<N>& ptr) {
+  return std::dynamic_pointer_cast<T>(ptr) != nullptr;
 }
 
 
 /// Exact type of the node. Poor man's reflection.
 struct NodeClass {
   virtual ~NodeClass() = default;
-  virtual shared_ptr<Node> Manufacture() = 0;
-  string mClassName;
+  virtual std::shared_ptr<Node> Manufacture() = 0;
+  std::string mClassName;
 };
 
 
@@ -55,10 +53,10 @@ public:
   template<class T> void Register(NodeClass* nodeClass);
 
   /// Returns NodeClass by name, node name does not have to be registered
-  NodeClass* GetNodeClass(const string& name);
+  NodeClass* GetNodeClass(const std::string& name);
 
   /// Returns NodeClass by node instance. Node must be registered
-  NodeClass* GetNodeClass(const shared_ptr<Node>& node);
+  NodeClass* GetNodeClass(const std::shared_ptr<Node>& node);
 
   /// Returns NodeClass by node class. Node must be registered
   template<class T> NodeClass* GetNodeClass();
@@ -67,20 +65,20 @@ private:
   //NodeRegistry();
   static NodeRegistry* sInstance;
 
-  unordered_map<string, NodeClass*> mNodeClassesByName;
-  unordered_map<type_index, NodeClass*> mNodeIndexMap;
+  std::unordered_map<std::string, NodeClass*> mNodeClassesByName;
+  std::unordered_map<std::type_index, NodeClass*> mNodeIndexMap;
 };
 
 template<class T>
 void NodeRegistry::Register(NodeClass* nodeClass) {
   mNodeClassesByName[nodeClass->mClassName] = nodeClass;
-  mNodeIndexMap[type_index(typeid(T))] = nodeClass;
+  mNodeIndexMap[std::type_index(typeid(T))] = nodeClass;
 }
 
 template<class T>
 NodeClass* NodeRegistry::GetNodeClass() {
   /// If this breaks, you forgot to REGISTER_NODECLASS.
-  return mNodeIndexMap.at(type_index(typeid(T)));
+  return mNodeIndexMap.at(std::type_index(typeid(T)));
 }
 
 
@@ -91,11 +89,11 @@ NodeClass* NodeRegistry::GetNodeClass() {
 #define REGISTER_NODECLASS(nodeClass, nodeClassName)                               \
   struct NodeClass_##nodeClass: public NodeClass {                                 \
     NodeClass_##nodeClass() {                                                      \
-      mClassName = string(nodeClassName);                                          \
+      mClassName = std::string(nodeClassName);                                          \
       NodeRegistry::GetInstance()->Register<nodeClass>(this);					   \
     }                                                                              \
-    virtual shared_ptr<Node> Manufacture() override {                              \
-      return make_shared<nodeClass>();                                             \
+    virtual std::shared_ptr<Node> Manufacture() override {                              \
+      return std::make_shared<nodeClass>();                                             \
     }                                                                              \
   } NodeClassInstance_##nodeClass;                                                 \
 //__pragma(comment(linker, "/include:" #nodeClass));

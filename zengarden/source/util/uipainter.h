@@ -24,28 +24,28 @@ public:
   void DrawLine(const Vec2& from, const Vec2& to);
   void DrawRect(const Vec2& topLeft, const Vec2& size);
   void DrawBox(const Vec2& topLeft, const Vec2& size);
-  void DrawTexture(const shared_ptr<Texture>& texture, float x, float y);
+  void DrawTexture(const std::shared_ptr<Texture>& texture, float x, float y);
 
-  shared_ptr<Vec4Node> mColor = make_shared<Vec4Node>();
-  shared_ptr<StaticTextureNode> mTextureNode = make_shared<StaticTextureNode>();
+  std::shared_ptr<Vec4Node> mColor = std::make_shared<Vec4Node>();
+  std::shared_ptr<StaticTextureNode> mTextureNode = std::make_shared<StaticTextureNode>();
 
   QFont mTitleFont;
 
 private:
-  const shared_ptr<Material> mSolidColorMaterial = make_shared<Material>();
-  const shared_ptr<Material> mSolidTextureMaterial = make_shared<Material>();
-  const shared_ptr<Material> mTextTextureMaterial = make_shared<Material>();
+  const std::shared_ptr<Material> mSolidColorMaterial = std::make_shared<Material>();
+  const std::shared_ptr<Material> mSolidTextureMaterial = std::make_shared<Material>();
+  const std::shared_ptr<Material> mTextTextureMaterial = std::make_shared<Material>();
 
-  shared_ptr<StaticMeshNode> mLineMeshNode;
-  shared_ptr<StaticMeshNode> mRectMeshNode;
-  shared_ptr<StaticMeshNode> mBoxMeshNode;
-  shared_ptr<StaticMeshNode> mTexturedBoxMeshNode;
+  std::shared_ptr<StaticMeshNode> mLineMeshNode;
+  std::shared_ptr<StaticMeshNode> mRectMeshNode;
+  std::shared_ptr<StaticMeshNode> mBoxMeshNode;
+  std::shared_ptr<StaticMeshNode> mTexturedBoxMeshNode;
 
-  const shared_ptr<Drawable> mSolidLine = make_shared<Drawable>();
-  const shared_ptr<Drawable> mSolidRect = make_shared<Drawable>();
-  const shared_ptr<Drawable> mSolidBox = make_shared<Drawable>();
-  const shared_ptr<Drawable> mTexturedBox = make_shared<Drawable>();
-  const shared_ptr<Drawable> mTextBox = make_shared<Drawable>();
+  const std::shared_ptr<Drawable> mSolidLine = std::make_shared<Drawable>();
+  const std::shared_ptr<Drawable> mSolidRect = std::make_shared<Drawable>();
+  const std::shared_ptr<Drawable> mSolidBox = std::make_shared<Drawable>();
+  const std::shared_ptr<Drawable> mTexturedBox = std::make_shared<Drawable>();
+  const std::shared_ptr<Drawable> mTextBox = std::make_shared<Drawable>();
 
   Globals mGlobals{};
 };

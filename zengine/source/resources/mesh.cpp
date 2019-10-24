@@ -4,16 +4,16 @@
 #include <include/render/drawingapi.h>
 #include <include/base/helpers.h>
 
-shared_ptr<VertexFormat> VertexPos::mFormat = make_shared<VertexFormat>(
+std::shared_ptr<VertexFormat> VertexPos::mFormat = std::make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK);
-shared_ptr<VertexFormat> VertexPosNorm::mFormat = make_shared<VertexFormat>(
+std::shared_ptr<VertexFormat> VertexPosNorm::mFormat = std::make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK);
-shared_ptr<VertexFormat> VertexPosUvNorm::mFormat = make_shared<VertexFormat>(
+std::shared_ptr<VertexFormat> VertexPosUvNorm::mFormat = std::make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK);
-shared_ptr<VertexFormat> VertexPosUvNormTangent::mFormat = make_shared<VertexFormat>(
+std::shared_ptr<VertexFormat> VertexPosUvNormTangent::mFormat = std::make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_NORMAL_MASK | VERTEXATTRIB_TEXCOORD_MASK |
   VERTEXATTRIB_TANGENT_MASK);
-shared_ptr<VertexFormat> VertexPosUv::mFormat = make_shared<VertexFormat>(
+std::shared_ptr<VertexFormat> VertexPosUv::mFormat = std::make_shared<VertexFormat>(
   VERTEXATTRIB_POSITION_MASK | VERTEXATTRIB_TEXCOORD_MASK);
 
 
@@ -70,7 +70,7 @@ void Mesh::Render(//const vector<ShaderProgram::Attribute>& usedAttributes,
   }
 }
 
-void Mesh::AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount) {
+void Mesh::AllocateVertices(const std::shared_ptr<VertexFormat>& format, UINT vertexCount) {
   this->mFormat = format;
   this->mVertexCount = vertexCount;
   const int newBufferSize = format->mStride * vertexCount;

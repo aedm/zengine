@@ -5,7 +5,6 @@
 #include "propertiesnode.h"
 #include <vector>
 
-using namespace std;
 class FloatSplineNode;
 
 struct SplinePoint
@@ -40,7 +39,7 @@ public:
   virtual ~SplineComponent() = default;
 
   /// Returns the points of the spline
-  const vector<SplinePoint>& GetPoints() const;
+  const std::vector<SplinePoint>& GetPoints() const;
 
 protected:
   /// Disallow direct instantiation
@@ -51,7 +50,7 @@ protected:
   int FindPointIndexBefore(float time);
 
   /// Key points
-  vector<SplinePoint> mPoints;
+  std::vector<SplinePoint> mPoints;
 
   /// Recalculates tangents for a given index
   virtual void CalculateTangent(int index) = 0;
@@ -151,7 +150,7 @@ public:
   SplineFloatComponent* GetComponent(SplineLayer layer);
 
   /// Scene time node
-  shared_ptr<SceneTimeNode> mSceneTimeNode;
+  std::shared_ptr<SceneTimeNode> mSceneTimeNode;
 
   /// Time slot, connected to mSceneTimeNode
   FloatSlot mTimeSlot;
@@ -164,7 +163,7 @@ protected:
   float GetBeatSpikeValue(float time);
   float GetBeatQuantizerValue(float time);
 
-  static float EvaluateLinearSpline(vector<SplinePoint>& points, float time);
+  static float EvaluateLinearSpline(std::vector<SplinePoint>& points, float time);
 
   /// Control points of spline
   SplineFloatComponent mBaseLayer;

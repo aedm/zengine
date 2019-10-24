@@ -30,7 +30,7 @@ char* System::ReadFile(const wchar_t* fileName) {
 }
 
 void System::ReadFilesInFolder(const wchar_t* folder, const wchar_t* extension,
-                               vector<wstring>& oFileList) {
+                               std::vector<std::wstring>& oFileList) {
   wchar_t currentDir[1024];
   _wgetcwd(currentDir, 1023);
   _wchdir(folder);
@@ -43,7 +43,7 @@ void System::ReadFilesInFolder(const wchar_t* folder, const wchar_t* extension,
   }
 
   for (auto ret = 0; ret == 0; ret = _wfindnext(handle, &fileInfo)) {
-    wstring fullName(folder);
+    std::wstring fullName(folder);
     fullName.append(fileInfo.name);
     oFileList.push_back(fullName);
   }

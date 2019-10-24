@@ -5,7 +5,7 @@
 static const float DefaultPixelsPerSecond = 100.0f;
 static const int TrackHeightPixels = 20;
 
-TimelineEditor::TimelineEditor(const shared_ptr<MovieNode>& movieNode)
+TimelineEditor::TimelineEditor(const std::shared_ptr<MovieNode>& movieNode)
   : WatcherUi(movieNode) 
 {
   ZenGarden::GetInstance()->mOnMovieCursorChange += 
@@ -36,7 +36,7 @@ void TimelineEditor::SetWatcherWidget(WatcherWidget* watcherWidget) {
   mTimelineCanvas->mOnMouseWheel += Delegate(this, &TimelineEditor::HandleMouseWheel);
 
   QObject::connect(mUI.watchMovieButton, &QPushButton::pressed, [=]() {
-    const shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
+    const std::shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
     ZenGarden::GetInstance()->Watch(movieNode, WatcherPosition::UPPER_LEFT_TAB);
   });
 }
@@ -49,7 +49,7 @@ void TimelineEditor::OnChildNameChange() {
   mTimelineCanvas->update();
 }
 
-void TimelineEditor::SetSceneNodeForSelectedClip(const shared_ptr<SceneNode>& sceneNode) const
+void TimelineEditor::SetSceneNodeForSelectedClip(const std::shared_ptr<SceneNode>& sceneNode) const
 {
   if (!mSelectedClip) return;
   mSelectedClip->mSceneSlot.Connect(sceneNode);
@@ -59,7 +59,7 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) const {
   QPainter painter(mTimelineCanvas);
   painter.fillRect(mTimelineCanvas->rect(), QBrush(QColor(23, 23, 23)));
 
-  shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
+  std::shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
   if (!movieNode) return;
 
   const float height = float(mTimelineCanvas->height());
@@ -89,7 +89,7 @@ void TimelineEditor::DrawTimeline(QPaintEvent* ev) const {
   // Draw tracks
   for (int i = 0; i < movieNode->GetTrackCount(); i++) {
     const int yTop = (i + 1) * TrackHeightPixels;
-    const vector<shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
+    const std::vector<std::shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
     for (const auto& clipNode : track) {
       const int left = TimeToScreen(clipNode->mStartTime.Get());
       int length = TimeRangeToPixels(clipNode->mLength.Get());
@@ -172,12 +172,12 @@ void TimelineEditor::HandleMouseMove(QMouseEvent* event) {
   switch (mState) {
     case State::DEFAULT:
     {
-      shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
+      std::shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
       if (!movieNode) break;
       const QPoint pos = event->pos();
       for (int i = 0; i < movieNode->GetTrackCount(); i++) {
         const int yTop = (i + 1) * TrackHeightPixels;
-        const vector<shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
+        const std::vector<std::shared_ptr<ClipNode>>& track = movieNode->GetTrack(i);
         for (const  auto& clipNode : track) {
           const int left = TimeToScreen(clipNode->mStartTime.Get());
           int length = TimeRangeToPixels(clipNode->mLength.Get());

@@ -4,5 +4,5 @@
 
 class DrawableWatcher: public GeneralSceneWatcher {
 public:
-  DrawableWatcher(const shared_ptr<Node>& drawable);
+  DrawableWatcher(const std::shared_ptr<Node>& drawable);
 };

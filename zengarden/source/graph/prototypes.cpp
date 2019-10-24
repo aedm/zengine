@@ -47,11 +47,11 @@ Prototypes::Prototypes() {
 
   /// Hack to force linking
   /// TODO: remove
-  make_shared<FloatSplineNode>()->Get();
-  make_shared<FloatsToVec3Node>();
-  make_shared<CubeMeshNode>();
-  make_shared<MeshToVertexBufferNode>();
-  make_shared<FluidNode>();
+  std::make_shared<FloatSplineNode>()->Get();
+  std::make_shared<FloatsToVec3Node>();
+  std::make_shared<CubeMeshNode>();
+  std::make_shared<MeshToVertexBufferNode>();
+  std::make_shared<FluidNode>();
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {
@@ -64,13 +64,13 @@ void Prototypes::AddPrototype(NodeClass* nodeClass) {
 
 Prototypes::~Prototypes() = default;
 
-shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
+std::shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   QDialog dialog(Parent, Qt::FramelessWindowHint);
   mDialog = &dialog;
   Ui::OperatorSelector selector;
   selector.setupUi(&dialog);
 
-  vector<const Prototype*> allPrototypes;
+  std::vector<const Prototype*> allPrototypes;
   AddCategoryToTreeWidget(&mMainCategory, selector.treeWidget, nullptr, allPrototypes);
 
   dialog.setModal(true);
@@ -85,7 +85,7 @@ shared_ptr<Node> Prototypes::AskUser(QWidget* Parent, QPoint Position) {
   const Prototype* prototype = allPrototypes[ret - 1];
 
   /// Create new node, possibly based on original
-  shared_ptr<Node> node = prototype->mNodeClass->Manufacture();
+  std::shared_ptr<Node> node = prototype->mNodeClass->Manufacture();
   if (prototype->mNode != nullptr) {
     node->CopyFrom(prototype->mNode);
   }
@@ -128,7 +128,7 @@ void Prototypes::LoadStubFolder(const QString& folder, Category* category) {
     }
     else if (fileInfo.completeSuffix() == shaderSuffix) {
       INFO("shader found: %s", fileInfo.baseName().toLatin1().data());
-      shared_ptr<StubNode> stub = Util::LoadStub(fileInfo.absoluteFilePath());
+      std::shared_ptr<StubNode> stub = Util::LoadStub(fileInfo.absoluteFilePath());
       stub->Update();
       NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass<StubNode>();
       Prototype* prototype = new Prototype();
@@ -143,7 +143,7 @@ void Prototypes::LoadStubFolder(const QString& folder, Category* category) {
 
 void Prototypes::AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget,
   QTreeWidgetItem* parentItem,
-  vector<const Prototype*>& allPrototypes)
+  std::vector<const Prototype*>& allPrototypes)
 {
   for (const Prototype* prototype : category->mPrototypes) {
     allPrototypes.push_back(prototype);

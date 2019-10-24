@@ -8,10 +8,10 @@ class MeshNode: public Node {
 public:
   MeshNode();
 
-  const shared_ptr<Mesh>& GetMesh() const;
+  const std::shared_ptr<Mesh>& GetMesh() const;
 
 protected:
-  shared_ptr<Mesh> mMesh;
+  std::shared_ptr<Mesh> mMesh;
 };
 
 typedef TypedSlot<MeshNode> MeshSlot;
@@ -21,6 +21,6 @@ typedef TypedSlot<MeshNode> MeshSlot;
 class StaticMeshNode: public MeshNode {
 public:
   StaticMeshNode();
-  void Set(const shared_ptr<Mesh>& mesh);
+  void Set(const std::shared_ptr<Mesh>& mesh);
 };
 

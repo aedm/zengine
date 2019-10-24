@@ -1,20 +1,21 @@
 #include "generalscenewatcher.h"
 #include "../util/util.h"
 #include "../zengarden.h"
+#include <memory>
 
-shared_ptr<Material> GeneralSceneWatcher::mDefaultMaterial;
+std::shared_ptr<Material> GeneralSceneWatcher::mDefaultMaterial;
 
-GeneralSceneWatcher::GeneralSceneWatcher(const shared_ptr<Node>& node)
+GeneralSceneWatcher::GeneralSceneWatcher(const std::shared_ptr<Node>& node)
   : WatcherUi(node) {
   if (IsPointerOf<SceneNode>(node)) {
     mTheScene = PointerCast<SceneNode>(node);
     return;
   }
-  auto sceneNode = make_shared<SceneNode>();
+  auto sceneNode = std::make_shared<SceneNode>();
   sceneNode->mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
   sceneNode->mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
   sceneNode->mSkyLightAmbient.SetDefaultValue(0.2f);
-  sceneNode->mCamera.Connect(make_shared<CameraNode>());
+  sceneNode->mCamera.Connect(std::make_shared<CameraNode>());
   mRenderForwarder = sceneNode->Watch<RenderForwarder>(sceneNode);
   mRenderForwarder->mOnRedraw = Delegate(this, &GeneralSceneWatcher::OnRedraw);
   mTheScene = sceneNode;
@@ -26,7 +27,7 @@ GeneralSceneWatcher::~GeneralSceneWatcher() {
 
 void GeneralSceneWatcher::Paint(EventForwarderGlWidget* widget) {
   if (!mWatcherWidget) return;
-  //shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(mScene->GetReferencedNode());
+  //std::shared_ptr<SceneNode> sceneNode = PointerCast<SceneNode>(mScene->GetReferencedNode());
   mTheScene->Update();
   mTheScene->UpdateDependencies();
 
@@ -73,24 +74,24 @@ void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
 }
 
 void GeneralSceneWatcher::Init() {
-  const shared_ptr<StubNode> defaultVertex = 
+  const std::shared_ptr<StubNode> defaultVertex = 
     Util::LoadStub("engine/scenewatcher/defaultvertex.shader");
-  const shared_ptr<StubNode> defaultFragment =
+  const std::shared_ptr<StubNode> defaultFragment =
     Util::LoadStub("engine/scenewatcher/defaultfragment.shader");
 
-  shared_ptr<Pass> defaultPass = make_shared<Pass>();
+  std::shared_ptr<Pass> defaultPass = std::make_shared<Pass>();
   defaultPass->mFragmentStub.Connect(defaultFragment);
   defaultPass->mVertexStub.Connect(defaultVertex);
   defaultPass->mRenderstate.mDepthTest = true;
   defaultPass->mFaceModeSlot.SetDefaultValue(0);
   defaultPass->mBlendModeSlot.SetDefaultValue(0);
 
-  mDefaultMaterial = make_shared<Material>();
+  mDefaultMaterial = std::make_shared<Material>();
   mDefaultMaterial->mSolidPass.Connect(defaultPass);
 }
 
 void GeneralSceneWatcher::HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event) {
-  const shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
+  const std::shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
   if (!camera) return;
 
   mOriginalPosition = event->pos();
@@ -113,7 +114,7 @@ void GeneralSceneWatcher::HandleMouseRelease(EventForwarderGlWidget*, QMouseEven
 
 void GeneralSceneWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) const
 {
-  shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
+  std::shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
   if (!camera) return;
 
   if (event->buttons() & Qt::LeftButton) {
@@ -186,7 +187,7 @@ void GeneralSceneWatcher::HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* eve
   }
   if (event->key() == Qt::Key_Return) {
     /// Bake values to camera splines
-    const shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
+    const std::shared_ptr<CameraNode> camera = mTheScene->mCamera.GetNode();
     if (!camera) return;
     const auto node = camera->mOrientation.GetReferencedNode();
     if (IsPointerOf<FloatsToVec3Node>(node)) {
@@ -203,7 +204,7 @@ void GeneralSceneWatcher::HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* eve
   }
 }
 
-RenderForwarder::RenderForwarder(const shared_ptr<SceneNode>& node)
+RenderForwarder::RenderForwarder(const std::shared_ptr<SceneNode>& node)
   : Watcher(node) {}
 
 void RenderForwarder::OnRedraw() {

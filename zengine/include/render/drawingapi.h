@@ -6,8 +6,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-
 class OpenGLAPI;
 extern OpenGLAPI* OpenGL;
 extern bool GLDisableErrorChecks;
@@ -42,10 +40,10 @@ struct RenderState {
 struct ShaderProgram {
   /// Uniform properties returned by the driver
   struct Uniform {
-    Uniform(string name, ValueType type, UINT offset);
+    Uniform(std::string name, ValueType type, UINT offset);
 
     /// Uniform name, must match the generated name inside the uniform block
-    const string mName;
+    const std::string mName;
 
     /// Type (float, vec2...)
     const ValueType mType;
@@ -56,33 +54,33 @@ struct ShaderProgram {
 
   /// Sampler properties returned by the driver
   struct Sampler {
-    Sampler(string name, SamplerId handle);
+    Sampler(std::string name, SamplerId handle);
 
     /// Uniform name, must match the generated sampler name
-    const string mName;
+    const std::string mName;
 
     /// Sampler ID
     const SamplerId mHandle;
   };
 
   struct SSBO {
-    SSBO(string name, UINT index);
-    const string mName;
+    SSBO(std::string name, UINT index);
+    const std::string mName;
     const UINT mIndex;
   };
 
   ShaderProgram(ShaderHandle shaderHandle, ShaderHandle vertexProgramHandle,
-    ShaderHandle fragmentProgramHandle, vector<Uniform>& uniforms,
-    vector<Sampler>& samplers, vector<SSBO>& ssbos,
+    ShaderHandle fragmentProgramHandle, std::vector<Uniform>& uniforms,
+    std::vector<Sampler>& samplers, std::vector<SSBO>& ssbos,
     UINT uniformBlockSize);
   ~ShaderProgram();
 
   const ShaderHandle mProgramHandle;
   const ShaderHandle mVertexShaderHandle;
   const ShaderHandle mFragmentShaderHandle;
-  const vector<Uniform> mUniforms;
-  const vector<Sampler> mSamplers;
-  const vector<SSBO> mSSBOs;
+  const std::vector<Uniform> mUniforms;
+  const std::vector<Sampler> mSamplers;
+  const std::vector<SSBO> mSSBOs;
   const UINT mUniformBlockSize;
 };
 
@@ -131,38 +129,38 @@ public:
   bool mProgramCompiledHack = false;
 
   /// Shader functions
-  shared_ptr<ShaderProgram> CreateShaderFromSource(const char* vertexSource,
+  std::shared_ptr<ShaderProgram> CreateShaderFromSource(const char* vertexSource,
     const char* fragmentSource);
-  static void SetShaderProgram(const shared_ptr<ShaderProgram>& program, 
-    const shared_ptr<Buffer>& uniformBuffer);
+  static void SetShaderProgram(const std::shared_ptr<ShaderProgram>& program, 
+    const std::shared_ptr<Buffer>& uniformBuffer);
   static void EnableVertexAttribute(UINT index, ValueType nodeType, UINT offset, 
     UINT stride);
 
   /// Buffer functions
-  void SetVertexBuffer(const shared_ptr<Buffer>& buffer);
-  void SetIndexBuffer(const shared_ptr<Buffer>& buffer);
-  static void SetSsbo(UINT index, const shared_ptr<Buffer>& buffer);
+  void SetVertexBuffer(const std::shared_ptr<Buffer>& buffer);
+  void SetIndexBuffer(const std::shared_ptr<Buffer>& buffer);
+  static void SetSsbo(UINT index, const std::shared_ptr<Buffer>& buffer);
 
-  void Render(const shared_ptr<Buffer>& indexBuffer,
+  void Render(const std::shared_ptr<Buffer>& indexBuffer,
     UINT Count, PrimitiveTypeEnum primitiveType,
     UINT instanceCount);
 
   /// Texture and surface handling
   static UINT GetTexelByteCount(TexelType type);
 
-  shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
+  std::shared_ptr<Texture> MakeTexture(int width, int height, TexelType type,
     const void* texelData, bool gpuMemoryOnly,
     bool isMultisample, bool doesRepeat, bool generateMipmaps);
   static void DeleteTextureGpuData(Texture::Handle handle);
-  void UploadTextureGpuData(const shared_ptr<Texture>& texture, void* texelData);
+  void UploadTextureGpuData(const std::shared_ptr<Texture>& texture, void* texelData);
 
   void SetTexture(const ShaderProgram::Sampler& sampler, 
-    const shared_ptr<Texture>& texture, UINT slotIndex);
+    const std::shared_ptr<Texture>& texture, UINT slotIndex);
 
   /// Framebuffer operations
-  static FrameBufferId CreateFrameBuffer(const shared_ptr<Texture>& depthBuffer,
-    const shared_ptr<Texture>& targetBufferA,
-    const shared_ptr<Texture>& targetBufferB);
+  static FrameBufferId CreateFrameBuffer(const std::shared_ptr<Texture>& depthBuffer,
+    const std::shared_ptr<Texture>& targetBufferA,
+    const std::shared_ptr<Texture>& targetBufferB);
   static void DeleteFrameBuffer(FrameBufferId frameBufferId);
   void SetFrameBuffer(FrameBufferId frameBufferId);
   static void BlitFrameBuffer(FrameBufferId source, FrameBufferId target,

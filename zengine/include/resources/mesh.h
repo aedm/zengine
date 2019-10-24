@@ -4,15 +4,16 @@
 #include "../shaders/valuetype.h"
 #include "../render/drawingapi.h"
 #include <vector>
+#include <memory>
+#include <memory>
 
-using namespace std;
 class Mesh {
 public:
   ~Mesh();
 
   void Render(UINT instanceCount, PrimitiveTypeEnum primitive) const;
 
-  void AllocateVertices(const shared_ptr<VertexFormat>& format, UINT vertexCount);
+  void AllocateVertices(const std::shared_ptr<VertexFormat>& format, UINT vertexCount);
   void AllocateIndices(UINT indexCount);
 
   /// Uploads all vertices
@@ -28,16 +29,16 @@ public:
   template<int N> void SetIndices(const IndexEntry(&staticIndices)[N]);
 
   UINT mVertexCount = 0;
-  const shared_ptr<Buffer> mVertexBuffer = make_shared<Buffer>();
+  const std::shared_ptr<Buffer> mVertexBuffer = std::make_shared<Buffer>();
 
   UINT mIndexCount = 0;
-  const shared_ptr<Buffer> mIndexBuffer = make_shared<Buffer>();
+  const std::shared_ptr<Buffer> mIndexBuffer = std::make_shared<Buffer>();
 
-  shared_ptr<VertexFormat> mFormat = nullptr;
+  std::shared_ptr<VertexFormat> mFormat = nullptr;
 
   /// Raw mesh data for deserialization
   void* mRawVertexData = nullptr;
-  vector<IndexEntry> mIndexData;
+  std::vector<IndexEntry> mIndexData;
 };
 
 template<typename T, int N>

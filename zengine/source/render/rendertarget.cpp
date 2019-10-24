@@ -162,7 +162,7 @@ FrameBufferId RenderTarget::GetPostprocessTargetFramebufferId() {
   return mPostprocessFramebuffers[mPostprocessTargetBufferIndex];
 }
 
-shared_ptr<Texture> RenderTarget::GetPostprocessSourceTexture() {
+std::shared_ptr<Texture> RenderTarget::GetPostprocessSourceTexture() {
   return mPostprocessTextures[1 - mPostprocessTargetBufferIndex];
 }
 

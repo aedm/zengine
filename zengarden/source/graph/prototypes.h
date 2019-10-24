@@ -9,8 +9,6 @@
 class Prototypes;
 extern Prototypes* ThePrototypes;
 
-using namespace std;
-
 class Prototypes: public QObject {
   Q_OBJECT
 
@@ -21,7 +19,7 @@ public:
   static void Init();
   static void	Dispose();
 
-  shared_ptr<Node> AskUser(QWidget* parent, QPoint position);
+  std::shared_ptr<Node> AskUser(QWidget* parent, QPoint position);
 
   void AddPrototype(NodeClass* nodeClass);
   //void AddStub(OWNERSHIP StubNode* stub);
@@ -33,7 +31,7 @@ private:
   /// A single prototype node
   struct Prototype {
     NodeClass* mNodeClass = nullptr;
-    shared_ptr<Node> mNode;
+    std::shared_ptr<Node> mNode;
     QString mName;
   };
 
@@ -41,8 +39,8 @@ private:
   struct Category {
     ~Category();
     QString mName;
-    vector<Prototype*> mPrototypes;
-    vector<Category*> mSubCategories;
+    std::vector<Prototype*> mPrototypes;
+    std::vector<Category*> mSubCategories;
   };
 
   Category mMainCategory;
@@ -62,8 +60,8 @@ private:
 
   /// Adds a category to the Qt tree widget
   static void AddCategoryToTreeWidget(Category* category, QTreeWidget* treeWidget,
-                               QTreeWidgetItem* parentItem, 
-                               vector<const Prototype*>& allPrototypes);
+                               QTreeWidgetItem* parentItem,
+                               std::vector<const Prototype*>& allPrototypes);
 
   private slots:
   void HandleItemSelected(QTreeWidgetItem* Item, int Column) const;

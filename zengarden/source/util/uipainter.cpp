@@ -14,20 +14,20 @@ void DisposePainter() {
   SafeDelete(ThePainter);
 }
 
-void ConnectToStubParameter(const shared_ptr<Pass>& pass, bool vertexShader,
-  const char* parameterName, const shared_ptr<Node>& target) {
+void ConnectToStubParameter(const std::shared_ptr<Pass>& pass, bool vertexShader,
+  const char* parameterName, const std::shared_ptr<Node>& target) {
   if (pass == nullptr) {
     ERR("Missing pass.");
     return;
   }
   StubSlot* slot = vertexShader ? &pass->mVertexStub : &pass->mFragmentStub;
-  shared_ptr<StubNode> stub = slot->GetNode();
+  std::shared_ptr<StubNode> stub = slot->GetNode();
   if (!stub) {
     ERR("ShaderStub not connected to pass.");
     return;
   }
   stub->Update();
-  Slot* stubSlot = stub->GetSlotByParameterName(string(parameterName));
+  Slot* stubSlot = stub->GetSlotByParameterName(std::string(parameterName));
   if (!stubSlot) {
     ERR("No shader parameter called %s.", parameterName);
     return;
@@ -40,7 +40,7 @@ UiPainter::UiPainter() {
   mTitleFont.setPixelSize(ADJUST(11));
 
   /// Shaders
-  shared_ptr<Pass> pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
+  std::shared_ptr<Pass> pass = Util::LoadShader(":/transformPos.vs", ":/solidColor.fs");
   ConnectToStubParameter(pass, false, "uColor", mColor);
   pass->mRenderstate.mDepthTest = false;
   mSolidColorMaterial->mSolidPass.Connect(pass);
@@ -59,19 +59,19 @@ UiPainter::UiPainter() {
   IndexEntry boxIndices[] = { 0, 1, 2, 2, 1, 3 };
 
   /// Meshes
-  mLineMeshNode = make_shared<StaticMeshNode>();
-  mLineMeshNode->Set(make_shared<Mesh>());
-  mRectMeshNode = make_shared<StaticMeshNode>();
-  mRectMeshNode->Set(make_shared<Mesh>());
+  mLineMeshNode = std::make_shared<StaticMeshNode>();
+  mLineMeshNode->Set(std::make_shared<Mesh>());
+  mRectMeshNode = std::make_shared<StaticMeshNode>();
+  mRectMeshNode->Set(std::make_shared<Mesh>());
 
-  shared_ptr<Mesh> boxMesh = make_shared<Mesh>();
+  std::shared_ptr<Mesh> boxMesh = std::make_shared<Mesh>();
   boxMesh->SetIndices(boxIndices);
-  mBoxMeshNode = make_shared<StaticMeshNode>();
+  mBoxMeshNode = std::make_shared<StaticMeshNode>();
   mBoxMeshNode->Set(boxMesh);
 
-  shared_ptr<Mesh> textureMesh = make_shared<Mesh>();
+  std::shared_ptr<Mesh> textureMesh = std::make_shared<Mesh>();
   textureMesh->SetIndices(boxIndices);
-  mTexturedBoxMeshNode = make_shared<StaticMeshNode>();
+  mTexturedBoxMeshNode = std::make_shared<StaticMeshNode>();
   mTexturedBoxMeshNode->Set(textureMesh);
 
   /// Models
@@ -135,7 +135,7 @@ void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
   mSolidBox->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_TRIANGLES);
 }
 
-void UiPainter::DrawTexture(const shared_ptr<Texture>& texture, float x, float y) {
+void UiPainter::DrawTexture(const std::shared_ptr<Texture>& texture, float x, float y) {
   const float w(texture->mWidth);
   const float h(texture->mHeight);
   VertexPosUv vertices[] = {
