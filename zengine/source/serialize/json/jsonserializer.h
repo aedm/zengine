@@ -11,9 +11,8 @@
 #include <rapidjson/include/rapidjson/document.h>
 #include <unordered_map>
 
-extern const EnumMapperA TexelTypeMapper[];
-//extern EnumMap<SplineLayer, const char*> SplineLayerMapper;
-extern const EnumMap<SplineLayer, const char*> SplineLayerMapper;
+extern const EnumMapA<TexelType> TexelTypeMapper;
+extern const EnumMapA<SplineLayer> SplineLayerMapper;
 
 class JSONSerializer {
 public:

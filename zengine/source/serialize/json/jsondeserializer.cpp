@@ -202,11 +202,10 @@ void JSONDeserializer::DeserializeStaticTextureNode(const rapidjson::Value& valu
   const int height = value["height"].GetInt();
   const char* typeString = value["type"].GetString();
   const char* texelString = value["base64"].GetString();
-  int texelTypeInt = EnumMapperA::GetEnumFromString(TexelTypeMapper, typeString);
-  if (texelTypeInt < 0) {
+  const TexelType texelType = TexelTypeMapper.GetEnum(typeString);
+  if (signed(texelType) < 0) {
     ERR("Unknown texture type: %s", typeString);
   }
-  const TexelType texelType = TexelType(texelTypeInt);
   const std::string texelContent = base64_decode(texelString);
   const std::shared_ptr<Texture> texture = OpenGL->MakeTexture(width, height, texelType, 
     texelContent.c_str(), false, false, true, true);

@@ -7,18 +7,16 @@
 
 REGISTER_NODECLASS(StubNode, "Stub");
 
-const EnumMapperA GlobalUniformMapper[] = {
+const EnumMapA<GlobalUniformUsage> GlobalUniformMapper = {
 #undef ITEM
-#define ITEM(name, type) { "g" MAGIC(name), (UINT)GlobalUniformUsage::name },
+#define ITEM(name, type) { "g" MAGIC(name), GlobalUniformUsage::name },
   GLOBALUNIFORM_LIST
-  {"", -1}
 };
 
-const EnumMapperA GlobalSamplerMapper[] = {
+const EnumMapA<GlobalSamplerUsage> GlobalSamplerMapper = {
 #undef ITEM
-#define ITEM(name) { "g" MAGIC(name), (UINT)GlobalSamplerUsage::name },
+#define ITEM(name) { "g" MAGIC(name), GlobalSamplerUsage::name },
   GLOBALSAMPLER_LIST
-  {"", -1}
 };
 
 /// Array for global uniform types

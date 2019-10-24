@@ -7,29 +7,20 @@
 #include <rapidjson/include/rapidjson/prettywriter.h>
 #include <rapidjson/include/rapidjson/stringbuffer.h>
 
-const EnumMapperA TexelTypeMapper[] = {
-  {"RGBA8", UINT(TexelType::ARGB8)},
-  {"RGBA16", UINT(TexelType::ARGB16)},
-  {"RGBA16F", UINT(TexelType::ARGB16F)},
-  {"RGBA32F", UINT(TexelType::ARGB32F)},
-  {"", -1}
+const EnumMapA<TexelType> TexelTypeMapper = {
+  {"RGBA8", TexelType::ARGB8},
+  {"RGBA16", TexelType::ARGB16},
+  {"RGBA16F", TexelType::ARGB16F},
+  {"RGBA32F", TexelType::ARGB32F},
 };
 
-const EnumMap<SplineLayer, const char*> SplineLayerMapper = MakeEnumMapA<SplineLayer>({
+const EnumMapA<SplineLayer> SplineLayerMapper = {
   {"base", SplineLayer::BASE},
   {"noise", SplineLayer::NOISE},
   {"beat_spike_intensity", SplineLayer::BEAT_SPIKE_INTENSITY},
   {"beat_spike_frequency", SplineLayer::BEAT_SPIKE_FREQUENCY},
   {"beat_quantizer", SplineLayer::BEAT_QUANTIZER},
-  });
-
-
-
-//constexpr auto x = MakeEnumMapA<SplineLayer>({ 
-//  { SplineLayer::BASE, "foo"}
-//});
-//SplineLayer q1 = x.GetEnum("foo");
-
+};
 
 JSONSerializer::JSONSerializer(const std::shared_ptr<Node>& root) {
   mJsonDocument.SetObject();
@@ -288,15 +279,14 @@ void JSONSerializer::SerializeFloatSplineNode(
 void JSONSerializer::SerializeTextureNode(rapidjson::Value& nodeValue,
   const std::shared_ptr<TextureNode>& node) const
 {
-  std::shared_ptr<Texture> texture = node->Get();
+  const std::shared_ptr<Texture>& texture = node->Get();
   ASSERT(texture->mTexelData);
   const std::string b64 = base64_encode(reinterpret_cast<UCHAR*>(&(*texture->mTexelData)[0]),
     UINT((*texture->mTexelData).size()));
   nodeValue.AddMember("width", texture->mWidth, *mAllocator);
   nodeValue.AddMember("height", texture->mHeight, *mAllocator);
   nodeValue.AddMember("type", rapidjson::Value(
-    EnumMapperA::GetStringFromEnum(TexelTypeMapper, int(texture->mType)), *mAllocator),
-    *mAllocator);
+    TexelTypeMapper.GetName(texture->mType), *mAllocator), *mAllocator);
   nodeValue.AddMember("base64", b64, *mAllocator);
 }
 

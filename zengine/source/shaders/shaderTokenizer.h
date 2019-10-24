@@ -40,7 +40,7 @@ namespace Shaders {
 	ITEM(macro)				      \
 	ITEM(choice)			      \
 
-  enum ShaderTokenEnum {
+  enum class ShaderTokenEnum {
     TOKEN_UNKNOWN,
     TOKEN_COMMENT_LINE,
     TOKEN_METADATA,				// "//!"

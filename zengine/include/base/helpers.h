@@ -111,7 +111,7 @@ public:
     Name mName;
     Enum mEnum;
   };
-  constexpr EnumMap(const std::initializer_list<Item>& items) : mItems(items) {}
+  EnumMap(const std::initializer_list<Item>& items) : mItems(items) {}
   Enum GetEnum(Name name) const {
     for (const auto& item : mItems) {
       if (item.mName == name) return item.mEnum;
@@ -124,76 +124,23 @@ public:
     }
     return nullptr;
   }
+  Enum GetEnumA(const char* name, int nameLength) const {
+    for (const auto& item : mItems) {
+      if (strlen(item.mName) == nameLength &&
+        strncmp(name, item.mName, nameLength) == 0) {
+          return item.mEnum;
+      }
+    }
+    return Enum(-1);
+  }
   std::vector<Item> mItems;
 };
 
-template<typename Enum>
-EnumMap<Enum, const char*> MakeEnumMapA(
-  const std::initializer_list<typename EnumMap<Enum, const char*>::Item>& items)
-{
-  return EnumMap<Enum, const char*>(items);
-}
-
-template<typename Enum>
-EnumMap<Enum, const wchar_t*> MakeEnumMapW(
-  const std::initializer_list<typename EnumMap<Enum, const wchar_t*>::Item>& items)
-{
-  return EnumMap<Enum, const wchar_t*>(items);
-}
-
-
-template<typename CharType>
-struct EnumMapper {
-  const CharType*	name;
-  int	value;
-
-  static const CharType* GetStringFromEnum(const EnumMapper<CharType>* mapper,
-                                           int enumId);
-  static int GetEnumFromString(const EnumMapper<CharType>* mapper,
-                               const CharType* value);
-  static int GetEnumFromString(const EnumMapper<CharType>* mapper,
-                               const CharType* value, int stringLength);
-};
-
-typedef EnumMapper<char> EnumMapperA;
-typedef EnumMapper<wchar_t>	EnumMapperW;
-
-
-template<typename CharType>
-const CharType*	EnumMapper<CharType>::GetStringFromEnum(
-    const EnumMapper<CharType>* mapper, int enumId) {
-  for (; mapper->value != -1; ++mapper) {
-    if (enumId == mapper->value) return mapper->name;
-  }
-  ERR(L"GetStringFromEnum: Unknown enum: %d.", enumId);
-  return nullptr;
-}
-
-
-template<typename CharType>
-int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper, 
-                                            const CharType* value) {
-  for (; mapper->value != -1; ++mapper) {
-    if (strcmp(value, mapper->name) == 0) return mapper->value;
-  }
-  return -1;
-}
-
-template<typename CharType>
-int EnumMapper<CharType>::GetEnumFromString(const EnumMapper<CharType>* mapper, 
-                                            const CharType* value, int stringLength) {
-  for (; mapper->value != -1; ++mapper) {
-    if (strlen(mapper->name) == stringLength &&
-        strncmp(value, mapper->name, stringLength) == 0) {
-      return mapper->value;
-    }
-  }
-  return -1;
-}
+template <typename Enum> using EnumMapA = EnumMap<Enum, const char*>;
 
 namespace Convert {
-  extern std::wstring StringToWstring(const std::string& sourceString);
+  std::wstring StringToWstring(const std::string& sourceString);
 }
 
-extern std::string ToJson(const std::shared_ptr<Document>& document);
-extern std::shared_ptr<Document> FromJson(const std::string& json);
+std::string ToJson(const std::shared_ptr<Document>& document);
+std::shared_ptr<Document> FromJson(const std::string& json);

@@ -21,7 +21,7 @@ StubAnalyzer::StubAnalyzer(const char* stubSource)
   std::vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
     mCurrentLineNumber = line->LineNumber;
-    if (line->SubStrings[0].Token == TOKEN_COLON) {
+    if (line->SubStrings[0].Token == ShaderTokenEnum::TOKEN_COLON) {
       AnalyzeMetadataLine(line);
     } else {
       mStrippedSource = mStrippedSource + line->EntireLine.ToString() + '\n';
@@ -38,22 +38,22 @@ void StubAnalyzer::AnalyzeMetadataLine(SourceLine* line) {
   }
 
   switch (line->SubStrings[1].Token) {
-    case TOKEN_name:
+    case ShaderTokenEnum::TOKEN_name:
       AnalyzeName(line);
       break;
-    case TOKEN_returns:
+    case ShaderTokenEnum::TOKEN_returns:
       AnalyzeReturns(line);
       break;
-    case TOKEN_param:
+    case ShaderTokenEnum::TOKEN_param:
       AnalyzeParam(line);
       break;
-    case TOKEN_global:
+    case ShaderTokenEnum::TOKEN_global:
       AnalyzeGlobal(line);
       break;
-    case TOKEN_input:
+    case ShaderTokenEnum::TOKEN_input:
       AnalyzeVariable(line, mInputs);
       break;
-    case TOKEN_output:
+    case ShaderTokenEnum::TOKEN_output:
       AnalyzeVariable(line, mOutputs);
       break;
     default:
@@ -64,7 +64,8 @@ void StubAnalyzer::AnalyzeMetadataLine(SourceLine* line) {
 }
 
 void StubAnalyzer::AnalyzeName(SourceLine* line) {
-  if (line->SubStrings.size() != 3 || line->SubStrings[2].Token != TOKEN_STRING) {
+  if (line->SubStrings.size() != 3 || 
+    line->SubStrings[2].Token != ShaderTokenEnum::TOKEN_STRING) {
     ERR("line %d: Wrong syntax, use ':name \"<name>\"'", mCurrentLineNumber);
     return;
   }
@@ -128,18 +129,19 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
  
   /// Global sampler
   if (declaredType == StubParameter::Type::SAMPLER2D) {
-    int usage = 
-      EnumMapperA::GetEnumFromString(GlobalSamplerMapper, name.Begin, name.Length);
-    if (usage < 0) {
+    GlobalSamplerUsage usage = GlobalSamplerMapper.GetEnumA(name.Begin, name.Length);
+    if (signed(usage) < 0) {
       ERR("line %d: Unrecognized global sampler '%s'.", mCurrentLineNumber,
         name.ToString().c_str());
       return;
     }
     StubGlobalSampler* globalSampler = new StubGlobalSampler();
     globalSampler->name = name.ToString();
-    globalSampler->usage = GlobalSamplerUsage(usage);
-    globalSampler->isMultiSampler = (line->SubStrings[2].Token == TOKEN_sampler2DMS);
-    globalSampler->isShadow = (line->SubStrings[2].Token == TOKEN_sampler2DShadow);
+    globalSampler->usage = usage;
+    globalSampler->isMultiSampler = 
+      (line->SubStrings[2].Token == ShaderTokenEnum::TOKEN_sampler2DMS);
+    globalSampler->isShadow = 
+      (line->SubStrings[2].Token == ShaderTokenEnum::TOKEN_sampler2DShadow);
     mGlobalSamplers.push_back(globalSampler);
     return;
   }
@@ -150,8 +152,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  int usage =
-    EnumMapperA::GetEnumFromString(GlobalUniformMapper, name.Begin, name.Length);
+  int usage = int(GlobalUniformMapper.GetEnumA(name.Begin, name.Length));
   if (usage < 0) {
     ERR("line %d: Unrecognized global uniform '%s'.", mCurrentLineNumber,
       name.ToString().c_str());
@@ -177,17 +178,17 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
 StubParameter::Type StubAnalyzer::TokenToType(const SubString& subStr) const
 {
   switch (subStr.Token) {
-    case TOKEN_void:            return StubParameter::Type::TVOID;
-    case TOKEN_float:           return StubParameter::Type::FLOAT;
-    case TOKEN_vec2:            return StubParameter::Type::VEC2;
-    case TOKEN_vec3:            return StubParameter::Type::VEC3;
-    case TOKEN_vec4:            return StubParameter::Type::VEC4;
-    case TOKEN_mat4:            return StubParameter::Type::MATRIX44;
-    case TOKEN_sampler2D:       return StubParameter::Type::SAMPLER2D;
-    case TOKEN_sampler2DMS:     return StubParameter::Type::SAMPLER2D;
-    case TOKEN_sampler2DShadow: return StubParameter::Type::SAMPLER2D;
-    case TOKEN_image2D:         return StubParameter::Type::IMAGE2D;
-    case TOKEN_buffer:          return StubParameter::Type::BUFFER;
+    case ShaderTokenEnum::TOKEN_void:            return StubParameter::Type::TVOID;
+    case ShaderTokenEnum::TOKEN_float:           return StubParameter::Type::FLOAT;
+    case ShaderTokenEnum::TOKEN_vec2:            return StubParameter::Type::VEC2;
+    case ShaderTokenEnum::TOKEN_vec3:            return StubParameter::Type::VEC3;
+    case ShaderTokenEnum::TOKEN_vec4:            return StubParameter::Type::VEC4;
+    case ShaderTokenEnum::TOKEN_mat4:            return StubParameter::Type::MATRIX44;
+    case ShaderTokenEnum::TOKEN_sampler2D:       return StubParameter::Type::SAMPLER2D;
+    case ShaderTokenEnum::TOKEN_sampler2DMS:     return StubParameter::Type::SAMPLER2D;
+    case ShaderTokenEnum::TOKEN_sampler2DShadow: return StubParameter::Type::SAMPLER2D;
+    case ShaderTokenEnum::TOKEN_image2D:         return StubParameter::Type::IMAGE2D;
+    case ShaderTokenEnum::TOKEN_buffer:          return StubParameter::Type::BUFFER;
     default:
       ERR("line %d: Wrong type '%s'", mCurrentLineNumber, subStr.ToString().c_str());
       return StubParameter::Type::NONE;

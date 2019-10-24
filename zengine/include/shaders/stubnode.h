@@ -78,8 +78,8 @@ enum class GlobalSamplerUsage {
   LOCAL,	/// For non-global uniforms
 };
 
-extern const EnumMapperA GlobalUniformMapper[];
-extern const EnumMapperA GlobalSamplerMapper[];
+extern const EnumMapA<GlobalUniformUsage> GlobalUniformMapper;
+extern const EnumMapA<GlobalSamplerUsage> GlobalSamplerMapper;
 extern const ValueType GlobalUniformTypes[];
 extern const int GlobalUniformOffsets[];
 extern const int GlobalSamplerOffsets[];
