@@ -6,6 +6,7 @@
 #include "defines.h"
 #include <set>
 #include <vector>
+#include <string>
 
 using namespace fastdelegate;
 

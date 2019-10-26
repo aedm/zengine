@@ -3,6 +3,7 @@
 
 #include <include/base/defines.h>
 #include <vector>
+#include <string>
 
 namespace Shaders {
 
