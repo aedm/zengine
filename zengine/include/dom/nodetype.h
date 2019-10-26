@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <typeindex>
+#include <memory>
 
 class Node;
 class Slot;
