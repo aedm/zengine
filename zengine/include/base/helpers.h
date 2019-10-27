@@ -140,6 +140,7 @@ template <typename Enum> using EnumMapA = EnumMap<Enum, const char*>;
 
 namespace Convert {
   std::wstring StringToWstring(const std::string& sourceString);
+  std::string WstringToString(const std::wstring& sourceString);
 }
 
 std::string ToJson(const std::shared_ptr<Document>& document);

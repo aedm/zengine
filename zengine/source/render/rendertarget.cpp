@@ -4,7 +4,7 @@
 static const int ShadowMapSize = 2048;
 static const int SquareBufferSize = 1024;
 
-RenderTarget::RenderTarget(Vec2 size, bool forFrameGrabbing)
+RenderTarget::RenderTarget(glm::ivec2 size, bool forFrameGrabbing)
   : mForFrameGrabbing(forFrameGrabbing)
 {
   Resize(size);
@@ -17,7 +17,7 @@ RenderTarget::~RenderTarget() {
 
 void RenderTarget::SetGBufferAsTarget(Globals* globals) const
 {
-  globals->RenderTargetSize = mSize;
+  globals->RenderTargetSize = Vec2(mSize.x, mSize.y);
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = nullptr;
   globals->GBufferSourceA = nullptr;
@@ -32,7 +32,7 @@ void RenderTarget::SetGBufferAsTarget(Globals* globals) const
 
 void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) const
 {
-  globals->RenderTargetSize = mSize;
+  globals->RenderTargetSize = Vec2(mSize.x, mSize.y);
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = mDepthBuffer;
   globals->GBufferSourceA = nullptr;
@@ -48,7 +48,7 @@ void RenderTarget::SetGBufferAsTargetForZPostPass(Globals* globals) const
 void RenderTarget::SetColorBufferAsTarget(Globals* globals) const
 {
   OpenGL->SetFrameBuffer(mColorBufferId);
-  globals->RenderTargetSize = mSize;
+  globals->RenderTargetSize = Vec2(mSize.x, mSize.y);
   globals->RenderTargetSizeRecip = Vec2(1.0f / mSize.x, 1.0f / mSize.y);
   globals->DepthBufferSource = mDepthBuffer;
   globals->GBufferSourceA = mGBufferA;
@@ -84,7 +84,7 @@ void RenderTarget::SetSquareBufferAsTarget(Globals* globals) const
   OpenGLAPI::SetViewport(0, 0, SquareBufferSize, SquareBufferSize);
 }
 
-void RenderTarget::Resize(Vec2 size) {
+void RenderTarget::Resize(glm::ivec2 size) {
   if (mForFrameGrabbing) {
     mScreenSize = size;
     size = mFrameGrabberSize;
@@ -149,7 +149,7 @@ void RenderTarget::Resize(Vec2 size) {
   }
 }
 
-Vec2 RenderTarget::GetSize() const
+glm::ivec2 RenderTarget::GetSize() const
 {
   return mSize;
 }
