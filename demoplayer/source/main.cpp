@@ -70,8 +70,10 @@ void LoadEngineShaderFolder(const std::wstring& folder) {
   for (std::wstring& fileName : engineStubSourceFiles) {
     if (fileName[fileName.length() - 1] == L'.') continue;
     if (std::wstring(fileName.end() - 7, fileName.end()) == ShaderExtension) {
-      std::string stubName(fileName.begin() + EngineFolder.length(),
-        fileName.end() - ShaderExtension.length());
+      std::string stubName = Convert::WstringToString(std::wstring(
+        fileName.begin() + EngineFolder.length(),
+        fileName.end() - ShaderExtension.length()
+      ));
       std::string source(System::ReadFile(fileName.c_str()));
       TheEngineStubs->SetStubSource(stubName, source);;
     }

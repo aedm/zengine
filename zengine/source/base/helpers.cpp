@@ -1,9 +1,11 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
 #include "../serialize/json/jsonserializer.h"
 #include "../serialize/json/jsondeserializer.h"
 #include <include/base/helpers.h>
 #include <cstdarg>
+#include <codecvt>
 
 Logger* TheLogger = new Logger();
 
@@ -57,6 +59,11 @@ namespace Convert {
     std::wstring temp(s.length(), L' ');
     std::copy(s.begin(), s.end(), temp.begin());
     return temp;
+  }
+  std::string WstringToString(const std::wstring& s) {
+    using convert_typeX = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_typeX, wchar_t> converterX;
+    return converterX.to_bytes(s);
   }
 }
 

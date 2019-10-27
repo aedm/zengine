@@ -1,8 +1,12 @@
 #pragma once
 
-#include "../base/vectormath.h"
+#include "../base/defines.h"
 #include <vector>
 #include <memory>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 // Possible types of shader values and variables
 enum class ValueType {
@@ -19,10 +23,10 @@ UINT ValueTypeByteSize(ValueType type);
 // Translation between shader types and C++ types
 template<ValueType T> struct ValueTypes;
 template<> struct ValueTypes<ValueType::FLOAT> { typedef float Type; };
-template<> struct ValueTypes<ValueType::VEC2> { typedef Vec2 Type; };
-template<> struct ValueTypes<ValueType::VEC3> { typedef Vec3 Type; };
-template<> struct ValueTypes<ValueType::VEC4> { typedef Vec4 Type; };
-template<> struct ValueTypes<ValueType::MATRIX44> { typedef Matrix Type; };
+template<> struct ValueTypes<ValueType::VEC2> { typedef glm::vec2 Type; };
+template<> struct ValueTypes<ValueType::VEC3> { typedef glm::vec3 Type; };
+template<> struct ValueTypes<ValueType::VEC4> { typedef glm::vec4 Type; };
+template<> struct ValueTypes<ValueType::MATRIX44> { typedef glm::mat4x4 Type; };
 
 
 /// Possible variable types in vertex attributes
@@ -79,7 +83,7 @@ public:
 
 /// Common vertex formats
 struct VertexPos {
-  Vec3 mPosition;
+  glm::vec3 mPosition;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
@@ -87,17 +91,17 @@ struct VertexPos {
 
 
 struct VertexPosNorm {
-  Vec3 mPosition;
-  Vec3 mNormal;
+  glm::vec3 mPosition;
+  glm::vec3 mNormal;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
 };
 
 struct VertexPosUvNorm {
-  Vec3 mPosition;
-  Vec2 mUv;
-  Vec3 mNormal;
+  glm::vec3 mPosition;
+  glm::vec2 mUv;
+  glm::vec3 mNormal;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
@@ -105,10 +109,10 @@ struct VertexPosUvNorm {
 
 
 struct VertexPosUvNormTangent {
-  Vec3 mPosition;
-  Vec2 mUv;
-  Vec3 mNormal;
-  Vec3 mTangent;
+  glm::vec3 mPosition;
+  glm::vec2 mUv;
+  glm::vec3 mNormal;
+  glm::vec3 mTangent;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
@@ -116,8 +120,8 @@ struct VertexPosUvNormTangent {
 
 
 struct VertexPosUv {
-  Vec3 mPosition;
-  Vec2 mUv;
+  glm::vec3 mPosition;
+  glm::vec2 mUv;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;

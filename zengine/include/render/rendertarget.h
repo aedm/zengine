@@ -2,10 +2,11 @@
 
 #include "../resources/texture.h"
 #include "../shaders/stubnode.h"
+#include <glm/vec2.hpp>
 
 class RenderTarget {
 public:
-  RenderTarget(Vec2 size, bool forFrameGrabbing = false);
+  RenderTarget(glm::ivec2 size, bool forFrameGrabbing = false);
   ~RenderTarget();
 
   /// Sets the G-Buffer as render target
@@ -17,8 +18,8 @@ public:
   void SetShadowBufferAsTarget(Globals* globals) const;
   void SetSquareBufferAsTarget(Globals* globals) const;
 
-  void Resize(Vec2 size);
-  Vec2 GetSize() const;
+  void Resize(glm::ivec2 size);
+  glm::ivec2 GetSize() const;
 
   FrameBufferId GetPostprocessSourceFramebufferId();
   FrameBufferId GetPostprocessTargetFramebufferId();
@@ -52,25 +53,25 @@ public:
   /// Default framebuffer id is 0
   FrameBufferId mColorBufferId = 0;
 
-  /// When color buffer texture is created for framegrabbing
+  /// When color buffer texture is created for frame grabbing
   std::shared_ptr<Texture> mColorTexture = nullptr;
 
   /// Skylight shadow
   FrameBufferId mShadowBufferId = 0;
   std::shared_ptr<Texture> mShadowTexture = nullptr;
 
-  Vec2 mSize = Vec2(0, 0);
+  glm::ivec2 mSize = { 0, 0 };
 private:
   /// Screen size, can be different than render target size when grabbing frames
-  Vec2 mScreenSize = Vec2(0, 0);
+  glm::ivec2 mScreenSize = { 0, 0 };
 
-  const Vec2 mFrameGrabberSize = Vec2(1920, 1080);
+  const glm::ivec2 mFrameGrabberSize = { 1920, 1080 };
 
   void DropResources();
 
   /// Gaussian half-resolution ping-pong buffers, for intermediate blurred images
-  std::shared_ptr<Texture> mPostprocessTextures[2] = {nullptr, nullptr};
-  FrameBufferId mPostprocessFramebuffers[2] = {0, 0};
+  std::shared_ptr<Texture> mPostprocessTextures[2] = { nullptr, nullptr };
+  FrameBufferId mPostprocessFramebuffers[2] = { 0, 0 };
 
   /// Current postprocess draw framebuffer index (the other one is the source)
   int mPostprocessTargetBufferIndex = 0;

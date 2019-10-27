@@ -6,6 +6,9 @@ REGISTER_NODECLASS(GeosphereMeshNode, "Geosphere");
 REGISTER_NODECLASS(PlaneMeshNode, "Plane");
 REGISTER_NODECLASS(PolarSphereMeshNode, "PolarSphere");
 
+using glm::vec3;
+using glm::vec2;
+
 CubeMeshNode::CubeMeshNode()
   : mSizeX(this, "SizeX")
   , mSizeY(this, "SizeY")
@@ -20,44 +23,44 @@ void CubeMeshNode::Operate() {
   const float z = mSizeZ.Get();
 
   VertexPosUvNormTangent vertices[] = {
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
-    {Vec3(x, -y, z), Vec2(1, 0), Vec3(1, 0, 0), Vec3(0, 0, 0)},
-    {Vec3(x, -y, -z), Vec2(1, 1), Vec3(1, 0, 0), Vec3(0, 0, 0)},
+    {vec3(x, y, z), vec2(0, 0), vec3(1, 0, 0), vec3(0, 0, 0)},
+    {vec3(x, y, -z), vec2(0, 1), vec3(1, 0, 0), vec3(0, 0, 0)},
+    {vec3(x, -y, z), vec2(1, 0), vec3(1, 0, 0), vec3(0, 0, 0)},
+    {vec3(x, -y, -z), vec2(1, 1), vec3(1, 0, 0), vec3(0, 0, 0)},
 
-    {Vec3(-x, y, -z), Vec2(0, 1), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, y, z), Vec2(0, 0), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(-1, 0, 0), Vec3(0, 0, 0)},
+    {vec3(-x, y, -z), vec2(0, 1), vec3(-1, 0, 0), vec3(0, 0, 0)},
+    {vec3(-x, y, z), vec2(0, 0), vec3(-1, 0, 0), vec3(0, 0, 0)},
+    {vec3(-x, -y, -z), vec2(1, 1), vec3(-1, 0, 0), vec3(0, 0, 0)},
+    {vec3(-x, -y, z), vec2(1, 0), vec3(-1, 0, 0), vec3(0, 0, 0)},
 
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 1, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 1, 0), Vec3(0, 0, 0)},
-    {Vec3(x, y, -z), Vec2(0, 1), Vec3(0, 1, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, y, -z), Vec2(1, 1), Vec3(0, 1, 0), Vec3(0, 0, 0)},
+    {vec3(x, y, z), vec2(0, 0), vec3(0, 1, 0), vec3(0, 0, 0)},
+    {vec3(-x, y, z), vec2(1, 0), vec3(0, 1, 0), vec3(0, 0, 0)},
+    {vec3(x, y, -z), vec2(0, 1), vec3(0, 1, 0), vec3(0, 0, 0)},
+    {vec3(-x, y, -z), vec2(1, 1), vec3(0, 1, 0), vec3(0, 0, 0)},
 
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, -1, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, -1, 0), Vec3(0, 0, 0)},
-    {Vec3(x, -y, z), Vec2(0, 0), Vec3(0, -1, 0), Vec3(0, 0, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 0), Vec3(0, -1, 0), Vec3(0, 0, 0)},
+    {vec3(x, -y, -z), vec2(0, 1), vec3(0, -1, 0), vec3(0, 0, 0)},
+    {vec3(-x, -y, -z), vec2(1, 1), vec3(0, -1, 0), vec3(0, 0, 0)},
+    {vec3(x, -y, z), vec2(0, 0), vec3(0, -1, 0), vec3(0, 0, 0)},
+    {vec3(-x, -y, z), vec2(1, 0), vec3(0, -1, 0), vec3(0, 0, 0)},
 
-    {Vec3(x, -y, z), Vec2(0, 1), Vec3(0, 0, 1), Vec3(0, 0, 0)},
-    {Vec3(-x, -y, z), Vec2(1, 1), Vec3(0, 0, 1), Vec3(0, 0, 0)},
-    {Vec3(x, y, z), Vec2(0, 0), Vec3(0, 0, 1), Vec3(0, 0, 0)},
-    {Vec3(-x, y, z), Vec2(1, 0), Vec3(0, 0, 1), Vec3(0, 0, 0)},
+    {vec3(x, -y, z), vec2(0, 1), vec3(0, 0, 1), vec3(0, 0, 0)},
+    {vec3(-x, -y, z), vec2(1, 1), vec3(0, 0, 1), vec3(0, 0, 0)},
+    {vec3(x, y, z), vec2(0, 0), vec3(0, 0, 1), vec3(0, 0, 0)},
+    {vec3(-x, y, z), vec2(1, 0), vec3(0, 0, 1), vec3(0, 0, 0)},
 
-    {Vec3(x, y, -z), Vec2(0, 0), Vec3(0, 0, -1), Vec3(0, 0, 0)},
-    {Vec3(-x, y, -z), Vec2(1, 0), Vec3(0, 0, -1), Vec3(0, 0, 0)},
-    {Vec3(x, -y, -z), Vec2(0, 1), Vec3(0, 0, -1), Vec3(0, 0, 0)},
-    {Vec3(-x, -y, -z), Vec2(1, 1), Vec3(0, 0, -1), Vec3(0, 0, 0)},
+    {vec3(x, y, -z), vec2(0, 0), vec3(0, 0, -1), vec3(0, 0, 0)},
+    {vec3(-x, y, -z), vec2(1, 0), vec3(0, 0, -1), vec3(0, 0, 0)},
+    {vec3(x, -y, -z), vec2(0, 1), vec3(0, 0, -1), vec3(0, 0, 0)},
+    {vec3(-x, -y, -z), vec2(1, 1), vec3(0, 0, -1), vec3(0, 0, 0)},
   };
 
-  Vec3 tangents[] = {
-    Vec3(0, -1, 0),
-    Vec3(0, -1, 0),
-    Vec3(-1, 0, 0),
-    Vec3(-1, 0, 0),
-    Vec3(-1, 0, 0),
-    Vec3(-1, 0, 0),
+  vec3 tangents[] = {
+    vec3(0, -1, 0),
+    vec3(0, -1, 0),
+    vec3(-1, 0, 0),
+    vec3(-1, 0, 0),
+    vec3(-1, 0, 0),
+    vec3(-1, 0, 0),
   };
 
   for (int i = 0; i < 6; i++) {
@@ -100,22 +103,22 @@ void HalfCubeMeshNode::Operate() {
 
   VertexPosNorm vertices[] = {
     /// Top
-    { Vec3(0.5f, 1, 0.5f), Vec3(0, 1, 0) },
-    { Vec3(-0.5f, 1, 0.5f), Vec3(0, 1, 0) },
-    { Vec3(0.5f, 1, -0.5f), Vec3(0, 1, 0) },
-    { Vec3(-0.5f, 1, -0.5f), Vec3(0, 1, 0) },
+    { vec3(0.5f, 1, 0.5f), vec3(0, 1, 0) },
+    { vec3(-0.5f, 1, 0.5f), vec3(0, 1, 0) },
+    { vec3(0.5f, 1, -0.5f), vec3(0, 1, 0) },
+    { vec3(-0.5f, 1, -0.5f), vec3(0, 1, 0) },
 
     /// Side
-    { Vec3(0.5f, 1, 0.5f), Vec3(1, 0, 0) },
-    { Vec3(0.5f, 1, -0.5f), Vec3(1, 0, 0) },
-    { Vec3(0.5f, 0, 0.5f), Vec3(1, 0, 0) },
-    { Vec3(0.5f, 0, -0.5f), Vec3(1, 0, 0) },
+    { vec3(0.5f, 1, 0.5f), vec3(1, 0, 0) },
+    { vec3(0.5f, 1, -0.5f), vec3(1, 0, 0) },
+    { vec3(0.5f, 0, 0.5f), vec3(1, 0, 0) },
+    { vec3(0.5f, 0, -0.5f), vec3(1, 0, 0) },
 
     /// Front
-    { Vec3(0.5f, 0, 0.5f), Vec3(0, 0, 1) },
-    { Vec3(-0.5f, 0, 0.5f), Vec3(0, 0, 1) },
-    { Vec3(0.5f, 1, 0.5f), Vec3(0, 0, 1) },
-    { Vec3(-0.5f, 1, 0.5f), Vec3(0, 0, 1) },
+    { vec3(0.5f, 0, 0.5f), vec3(0, 0, 1) },
+    { vec3(-0.5f, 0, 0.5f), vec3(0, 0, 1) },
+    { vec3(0.5f, 1, 0.5f), vec3(0, 0, 1) },
+    { vec3(-0.5f, 1, 0.5f), vec3(0, 0, 1) },
   };
 
   IndexEntry indexes[3 * 2 * 3];
@@ -158,15 +161,15 @@ GeosphereMeshNode::GeosphereMeshNode()
 }
 
 
-void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float flatten,
+void MakeGeosphereTriangle(const vec3& p1, const vec3& p2, const vec3& p3, float flatten,
   float size, int resolution, VertexPosUvNormTangent** oVertexTarget,
   IndexEntry** oIndexTarget, int* oBaseIndex)
 {
   /// Generate vertices
-  const Vec3 d1 = p2 - p1;
-  const Vec3 d2 = p3 - p1;
-  const Vec3 flatNormal = d2.Cross(d1).Normal();
-  const Vec3 upVector(0, 1, 0);
+  const vec3 d1 = p2 - p1;
+  const vec3 d2 = p3 - p1;
+  const vec3 flatNormal = normalize(cross(d2, d1));
+  const vec3 upVector(0, 1, 0);
 
   VertexPosUvNormTangent* vertexTarget = *oVertexTarget;
   const int maxCoord = 1 << resolution;
@@ -175,15 +178,15 @@ void MakeGeosphereTriangle(const Vec3& p1, const Vec3& p2, const Vec3& p3, float
     const float yr = float(y) * vRecip;
     for (int x = 0; x <= maxCoord - y; x++) {
       const float xr = float(x) * vRecip;
-      Vec3 p = p1 + d1 * xr + d2 * yr;
-      Vec3 spherical = p.Normal();
-      const Vec3 pos = (spherical + (p - spherical) * flatten) * size;
-      Vec3 normal = spherical + (flatNormal - spherical) * flatten;
-      const Vec3 tangent = upVector.Cross(normal).Normal();
+      vec3 p = p1 + d1 * xr + d2 * yr;
+      vec3 spherical = normalize(p);
+      const vec3 pos = (spherical + (p - spherical) * flatten) * size;
+      vec3 normal = spherical + (flatNormal - spherical) * flatten;
+      const vec3 tangent = normalize(cross(upVector, normal));
       const float urad = atan2f(spherical.x, spherical.z);
       const float xz = sqrtf(spherical.x * spherical.x + spherical.z * spherical.z);
       const float vrad = atan2f(xz, spherical.y);
-      const Vec2 uv((urad / Pi) * 0.5f + 0.5f, vrad / Pi + 0.5f);
+      const vec2 uv((urad / Pi) * 0.5f + 0.5f, vrad / Pi + 0.5f);
       vertexTarget->mPosition = pos;
       vertexTarget->mUv = uv;
       vertexTarget->mNormal = normal;
@@ -254,11 +257,11 @@ void GeosphereMeshNode::Operate() {
 
   const float p = 1.0f / sqrtf(3.0f);
   /// Tetraeder vertices
-  Vec3 tv[] = {
-    Vec3(1, 1, 1) * p,
-    Vec3(1, -1, -1) * p,
-    Vec3(-1, 1, -1) * p,
-    Vec3(-1, -1, 1) * p,
+  vec3 tv[] = {
+    vec3(1, 1, 1) * p,
+    vec3(1, -1, -1) * p,
+    vec3(-1, 1, -1) * p,
+    vec3(-1, -1, 1) * p,
   };
 
   int baseIndex = 0;
@@ -326,10 +329,10 @@ void PlaneMeshNode::Operate() {
     float xCoord = -1.0f;
     float u = 0.0f;
     for (int x = 0; x <= segmentsPerEdge; x++) {
-      vertexTarget->mPosition = Vec3(xCoord, 0.0, yCoord) * size;
-      vertexTarget->mUv = Vec2(u, v);
-      vertexTarget->mNormal = Vec3(0, 1, 0);
-      vertexTarget->mTangent = Vec3(1, 0, 0);
+      vertexTarget->mPosition = vec3(xCoord, 0.0, yCoord) * size;
+      vertexTarget->mUv = vec2(u, v);
+      vertexTarget->mNormal = vec3(0, 1, 0);
+      vertexTarget->mTangent = vec3(1, 0, 0);
       vertexTarget++;
       xCoord += coordStep;
       u += uvStep;
@@ -419,11 +422,11 @@ void PolarSphereMeshNode::Operate() {
       const float yc = cosf(yCoord);
       const float xc = sinf(xCoord) * radius;
       const float zc = cosf(xCoord) * radius;
-      Vec3 spherical(xc, yc, zc);
+      vec3 spherical(xc, yc, zc);
       vertexTarget->mPosition = spherical * size;
-      vertexTarget->mUv = Vec2(u, v);
+      vertexTarget->mUv = vec2(u, v);
       vertexTarget->mNormal = spherical;
-      vertexTarget->mTangent = Vec3(0, 1, 0).Cross(spherical).Normal();
+      vertexTarget->mTangent = normalize(cross(vec3(0, 1, 0), spherical));
       vertexTarget++;
       xCoord += xStep;
       u += uStep;
