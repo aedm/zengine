@@ -3,6 +3,8 @@
 
 REGISTER_NODECLASS(CameraNode, "Camera");
 
+using glm::ivec2;
+
 CameraNode::CameraNode()
   : mTarget(this, "Target", false, true, true, 0.0f, 10.0f)
   , mDistance(this, "Distance", false, true, true, 0.0f, 10.0f)
@@ -29,7 +31,7 @@ void CameraNode::SetupGlobals(Globals* globals) const
   if (mOrthonormal) {
     globals->View = mat4x4();
     globals->Camera = mat4x4();
-    globals->Projection = Matrix::Ortho(0, 0, canvasSize.x, canvasSize.y);
+    globals->Projection = glm::ortho(0.0f, 0.0f, canvasSize.x, canvasSize.y);
     return;
   }
 
