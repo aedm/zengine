@@ -43,7 +43,7 @@ void CameraNode::SetupGlobals(Globals* globals) const
   /// Camera matrix
   //Matrix rotate = 
   //  Matrix::Rotate(Quaternion::FromEuler(mOrientation.x, mOrientation.y, 0));
-  const Matrix xRot = Matrix::Rotate(mOrientation.Get().x, vec3(1, 0, 0));
+  const mat4x4 xRot = glm::rotate(mat4x4(), mOrientation.Get().x, vec3(1, 0, 0));
   const Matrix yRot = Matrix::Rotate(mOrientation.Get().y, vec3(0, 1, 0));
   //Matrix lookAt = 
   //  Matrix::LookAt(vec3(0, 0, mDistance.Get()), mTarget.Get(), vec3(0, 1, 0));
