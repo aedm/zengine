@@ -158,8 +158,7 @@ int CALLBACK WinMain(
   OpenGL->OnContextSwitch();
 
   LoadEngineShaders();
-  const Vec2 windowSize = Vec2(float(windowWidth), float(windowHeight));
-  RenderTarget* renderTarget = new RenderTarget(windowSize, recordVideo);
+  RenderTarget* renderTarget = new RenderTarget(ivec2(windowWidth, windowHeight));
 
   /// Load precalc project file
   char* json = System::ReadFile(L"loading.zen");

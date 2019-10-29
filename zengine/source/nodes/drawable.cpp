@@ -1,4 +1,5 @@
 #include <include/nodes/drawable.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 REGISTER_NODECLASS(Drawable, "Drawable");
 
@@ -46,13 +47,13 @@ void Drawable::Draw(Globals* oldGlobals, PassType passType, PrimitiveTypeEnum Pr
 }
 
 
-void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) const
+void Drawable::ComputeForcedShadowCenter(Globals* globals, vec3& oShadowCenter) const
 {
   Globals currentGlobals = *globals;
   ApplyTransformation(currentGlobals);
   if (mIsShadowCenter.Get() > 0.5f) {
-    const Vec4 s = Vec4(0, 0, 0, 1) * currentGlobals.View;
-    oShadowCenter = Vec3(s.x, s.y, s.z);
+    const vec4 s = vec4(0, 0, 0, 1) * currentGlobals.View;
+    oShadowCenter = vec3(s.x, s.y, s.z);
   }
   for (UINT i = 0; i < mChildren.GetMultiNodeCount(); i++) {
     PointerCast<Drawable>(mChildren.GetReferencedMultiNode(i))->ComputeForcedShadowCenter(
@@ -62,20 +63,22 @@ void Drawable::ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) 
 
 void Drawable::ApplyTransformation(Globals& globals) const
 {
-  const Vec3 movv = mMove.Get();
+  const vec3 movv = mMove.Get();
   if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
-    const Matrix move = Matrix::Translate(mMove.Get());
+    const mat4 move = glm::translate(mat4(), mMove.Get());
     globals.World = globals.World * move;
   }
-  const Vec3 rotv = mRotate.Get();
+  const vec3 rotv = mRotate.Get();
   if (rotv.x != 0 || rotv.y != 0 || rotv.z != 0) {
-    const Matrix rotate = Matrix::Rotate(Quaternion::FromEuler(rotv.x, rotv.y, rotv.z));
-    globals.World = globals.World * rotate;
+    const mat4 rotateX = glm::rotate(mat4(), rotv.x, { 1, 0, 0 });
+    const mat4 rotateY = glm::rotate(rotateX, rotv.y, { 0, 1, 0 });
+    const mat4 rotateZ = glm::rotate(rotateY, rotv.z, { 0, 0, 1 });
+    globals.World = globals.World * rotateZ;
   }
   const float scalev = mScale.Get();
   if (scalev != 0.0f) {
     const float s = powf(2.0f, scalev);
-    const Matrix scale = Matrix::Scale(Vec3(s, s, s));
+    const mat4 scale = glm::scale(mat4(), {s, s, s});
     globals.World = globals.World * scale;
   }
 

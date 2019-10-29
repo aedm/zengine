@@ -19,14 +19,14 @@ bool CreateNodeCommand::Undo() {
   return true;
 }
 
-MoveNodeCommand::MoveNodeCommand(std::shared_ptr<Node> node, const Vec2& position)
+MoveNodeCommand::MoveNodeCommand(std::shared_ptr<Node> node, const vec2& position)
   : mNode(std::move(node))
   , mNewPosition(position) {
   mOldPosition = mNode->GetPosition();
 }
 
-MoveNodeCommand::MoveNodeCommand(std::shared_ptr<Node> node, const Vec2& position,
-                                 const Vec2& oldPosition) 
+MoveNodeCommand::MoveNodeCommand(std::shared_ptr<Node> node, const vec2& position,
+                                 const vec2& oldPosition) 
   : mNode(std::move(node))
   , mNewPosition(position)
   , mOldPosition(oldPosition)

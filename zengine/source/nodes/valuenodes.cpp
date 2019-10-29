@@ -23,10 +23,10 @@ template<> StaticValueNode<vec4>::StaticValueNode()
   mValue = vec4(0, 0, 0, 0);
 }
 
-template<> StaticValueNode<Matrix>::StaticValueNode()
-  : ValueNode<Matrix>()
+template<> StaticValueNode<mat4>::StaticValueNode()
+  : ValueNode<mat4>()
 {
-  mValue.LoadIdentity();
+  mValue = mat4();
 }
 
 template<> StaticValueNode<std::string>::StaticValueNode()
@@ -34,14 +34,14 @@ template<> StaticValueNode<std::string>::StaticValueNode()
 {}
 
 REGISTER_NODECLASS(FloatNode, "Float")
-REGISTER_NODECLASS(vec2Node, "vec2")
-REGISTER_NODECLASS(vec3Node, "vec3")
-REGISTER_NODECLASS(vec4Node, "vec4")
+REGISTER_NODECLASS(Vec2Node, "vec2")
+REGISTER_NODECLASS(Vec3Node, "vec3")
+REGISTER_NODECLASS(Vec4Node, "vec4")
 REGISTER_NODECLASS(MatrixNode, "Matrix")
 
 
 template<>
-void StaticValueNode<Matrix>::Set(const Matrix& newValue) {
+void StaticValueNode<mat4>::Set(const mat4& newValue) {
   mValue = newValue;
   SendMsg(MessageType::VALUE_CHANGED);
 }
@@ -57,5 +57,5 @@ template class StaticValueNode<float>;
 template class StaticValueNode<vec2>;
 template class StaticValueNode<vec3>;
 template class StaticValueNode<vec4>;
-template class StaticValueNode<mat4x4>;
+template class StaticValueNode<mat4>;
 template class StaticValueNode<std::string>;

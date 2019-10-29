@@ -183,7 +183,7 @@ ValueEditor<T>::ValueEditor(QWidget* parent, const QString& name, const VectorTy
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setSpacing(4);
   layout->setContentsMargins(0, 0, 0, 0);
-  for (UINT i = 0; i < VectorType::Dimensions; i++) {
+  for (UINT i = 0; i < VectorType::length(); i++) {
     FloatEditor* floatEditor = new FloatEditor(parent, name + suffixes[i], value[i]);
     floatEditor->onValueChange += Delegate(this, &ValueEditor<T>::HandleFloatValueChange);
     layout->addWidget(floatEditor);
@@ -194,7 +194,7 @@ ValueEditor<T>::ValueEditor(QWidget* parent, const QString& name, const VectorTy
 template <ValueType T>
 void ValueEditor<T>::Set(const VectorType& value) {
   mValue = value;
-  for (UINT i = 0; i < VectorType::Dimensions; i++) {
+  for (UINT i = 0; i < VectorType::length(); i++) {
     mFloatEditors[i]->Set(value[i]);
   }
 }
@@ -202,7 +202,7 @@ void ValueEditor<T>::Set(const VectorType& value) {
 
 template <ValueType T>
 void ValueEditor<T>::SetRange(float minimum, float maximum) {
-  for (UINT i = 0; i < VectorType::Dimensions; i++) {
+  for (UINT i = 0; i < VectorType::length(); i++) {
     mFloatEditors[i]->SetRange(minimum, maximum);
   }
 }
@@ -210,7 +210,7 @@ void ValueEditor<T>::SetRange(float minimum, float maximum) {
 
 template <ValueType T>
 void ValueEditor<T>::SetReadOnly(bool readOnly) {
-  for (UINT i = 0; i < VectorType::Dimensions; i++) {
+  for (UINT i = 0; i < VectorType::length(); i++) {
     mFloatEditors[i]->SetReadOnly(readOnly);
   }
 }
@@ -219,7 +219,7 @@ void ValueEditor<T>::SetReadOnly(bool readOnly) {
 template <ValueType T>
 void ValueEditor<T>::HandleFloatValueChange(QWidget* floatEditor,
   const float& value) {
-  for (UINT i = 0; i < VectorType::Dimensions; i++) {
+  for (UINT i = 0; i < VectorType::length(); i++) {
     if (mFloatEditors[i] == floatEditor) {
       float& target = mValue[i];
       if (target != value) {

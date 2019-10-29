@@ -79,16 +79,16 @@ void StubNode::Operate() {
         canReuseSlot = IsInstanceOf<ValueStubSlot<float>*>(it->second);
         break;
       case StubParameter::Type::VEC2:
-        canReuseSlot = IsInstanceOf<ValueStubSlot<Vec2>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<vec2>*>(it->second);
         break;
       case StubParameter::Type::VEC3:
-        canReuseSlot = IsInstanceOf<ValueStubSlot<Vec3>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<vec3>*>(it->second);
         break;
       case StubParameter::Type::VEC4:
-        canReuseSlot = IsInstanceOf<ValueStubSlot<Vec4>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<vec4>*>(it->second);
         break;
       case StubParameter::Type::MATRIX44:
-        canReuseSlot = IsInstanceOf<ValueStubSlot<Matrix>*>(it->second);
+        canReuseSlot = IsInstanceOf<ValueStubSlot<mat4>*>(it->second);
         break;
       case StubParameter::Type::SAMPLER2D:
       case StubParameter::Type::IMAGE2D:
@@ -116,13 +116,13 @@ void StubNode::Operate() {
         slot = new ValueStubSlot<float>(this, param->mName);
         break;
       case StubParameter::Type::VEC2:
-        slot = new ValueStubSlot<Vec2>(this, param->mName);
+        slot = new ValueStubSlot<vec2>(this, param->mName);
         break;
       case StubParameter::Type::VEC3:
-        slot = new ValueStubSlot<Vec3>(this, param->mName);
+        slot = new ValueStubSlot<vec3>(this, param->mName);
         break;
       case StubParameter::Type::VEC4:
-        slot = new ValueStubSlot<Vec4>(this, param->mName);
+        slot = new ValueStubSlot<vec4>(this, param->mName);
         break;
       case StubParameter::Type::SAMPLER2D:
       case StubParameter::Type::IMAGE2D:
@@ -270,10 +270,10 @@ ValueType StubParameter::ToValueType(Type type)
 
 ValueType NodeToValueType(const std::shared_ptr<Node>& node) {
   if (IsPointerOf<ValueNode<float>>(node)) return ValueType::FLOAT;
-  if (IsPointerOf<ValueNode<Vec2>>(node)) return ValueType::VEC2;
-  if (IsPointerOf<ValueNode<Vec3>>(node)) return ValueType::VEC3;
-  if (IsPointerOf<ValueNode<Vec4>>(node)) return ValueType::VEC4;
-  if (IsPointerOf<ValueNode<Matrix>>(node)) return ValueType::MATRIX44;
+  if (IsPointerOf<ValueNode<vec2>>(node)) return ValueType::VEC2;
+  if (IsPointerOf<ValueNode<vec3>>(node)) return ValueType::VEC3;
+  if (IsPointerOf<ValueNode<vec4>>(node)) return ValueType::VEC4;
+  if (IsPointerOf<ValueNode<mat4>>(node)) return ValueType::MATRIX44;
   SHOULD_NOT_HAPPEN;
   return ValueType(-1);
 }

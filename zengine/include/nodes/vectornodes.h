@@ -2,7 +2,7 @@
 
 #include "valuenodes.h"
 
-class FloatsToVec3Node: public ValueNode<Vec3> {
+class FloatsToVec3Node: public ValueNode<vec3> {
 public:
   FloatsToVec3Node();
 
@@ -10,17 +10,17 @@ public:
   FloatSlot mY;
   FloatSlot mZ;
 
-  const Vec3& Get() override;
+  const vec3& Get() override;
 
   void HandleMessage(Message* message) override;
 
 protected:
   void Operate() override;
 
-  Vec3 mValue;
+  vec3 mValue;
 };
 
-class FloatsToVec4Node : public ValueNode<Vec4> {
+class FloatsToVec4Node : public ValueNode<vec4> {
 public:
   FloatsToVec4Node();
 
@@ -29,14 +29,14 @@ public:
   FloatSlot mZ;
   FloatSlot mW;
 
-  const Vec4& Get() override;
+  const vec4& Get() override;
 
   void HandleMessage(Message* message) override;
 
 protected:
   void Operate() override;
 
-  Vec4 mValue;
+  vec4 mValue;
 };
 
 

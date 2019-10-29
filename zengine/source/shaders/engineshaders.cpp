@@ -39,14 +39,11 @@ void EngineShaders::ApplyPostProcess(RenderTarget* renderTarget, Globals* global
 
 void EngineShaders::BlitGBufferToPostprocessBuffers(RenderTarget* renderTarget, 
                                                     Globals* globals) {
-  const Vec2 size = renderTarget->GetSize();
-  const UINT width = UINT(size.x);
-  const UINT height = UINT(size.y);
-
+  const ivec2 size = renderTarget->GetSize();
   /// Blit G-Buffer into postprocess ping-pong buffers 
   OpenGLAPI::BlitFrameBuffer(renderTarget->mGBufferId,
                           renderTarget->GetPostprocessTargetFramebufferId(),
-                          0, 0, width, height, 0, 0, width, height);
+                          0, 0, size.x, size.y, 0, 0, size.x, size.y);
   renderTarget->SwapPostprocessBuffers();
 }
 
@@ -56,7 +53,7 @@ void EngineShaders::ApplyDepthOfField(RenderTarget* renderTarget, Globals* globa
   mPostProcess_DOF->Update();
   if (!mPostProcess_DOF->isComplete()) return;
 
-  const Vec2 size = renderTarget->GetSize();
+  const ivec2 size = renderTarget->GetSize();
   const UINT width = UINT(size.x);
   const UINT height = UINT(size.y);
 
@@ -82,28 +79,24 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
   mPostProcess_GaussianBlurVertical->Update();
   if (!mPostProcess_GaussianBlurVertical->isComplete()) return;
 
-  const Vec2 size = renderTarget->GetSize();
-  UINT width = UINT(size.x);
-  UINT height = UINT(size.y);
-  const UINT originalWidth = width;
-  const UINT originalHeight = height;
+  ivec2 size = renderTarget->GetSize();
+  const ivec2 originalSize = size;
 
-  const UINT downsampleCount = UINT(ceilf(log2f(size.x / float(BloomEffectMaxResolution))));
+  const UINT downsampleCount = 
+    UINT(ceilf(log2f(float(size.x) / float(BloomEffectMaxResolution))));
 
   /// Decrease resolution
   for (UINT i = 0; i < downsampleCount; i++) {
     OpenGLAPI::BlitFrameBuffer(renderTarget->GetPostprocessSourceFramebufferId(),
                             renderTarget->GetPostprocessTargetFramebufferId(),
-                            0, 0, width, height, 0, 0, width / 2, height / 2);
-    width /= 2;
-    height /= 2;
+                            0, 0, size.x, size.y, 0, 0, size.x / 2, size.y / 2);
+    size /= 2;
     renderTarget->SwapPostprocessBuffers();
   }
 
   /// Blur the image
-  globals->PPGaussRelativeSize = Vec2(float(width) / float(originalWidth),
-                                      float(height) / float(originalHeight));
-  globals->PPGaussPixelSize = Vec2(1.0f, 1.0f) / renderTarget->GetSize();
+  globals->PPGaussRelativeSize = vec2(size) / vec2(originalSize);
+  globals->PPGaussPixelSize = 1.0f / vec2(originalSize);
 
   const UINT gaussIterationCount = 1;
 
@@ -116,9 +109,9 @@ void EngineShaders::GenerateBloomTexture(RenderTarget* renderTarget, Globals* gl
       pass = mPostProcess_GaussianBlurHorizontal_First;
     }
     if (i <= 1) {
-      glViewport(0, 0, originalWidth, originalHeight);
+      glViewport(0, 0, originalSize.x, originalSize.y);
       OpenGL->Clear(true, false, 0);
-      glViewport(0, 0, width, height);
+      glViewport(0, 0, size.x, size.y);
     }
     pass->Set(globals);
     mFullScreenQuad->Render(1, PRIMITIVE_TRIANGLES);
@@ -134,11 +127,9 @@ void EngineShaders::RenderFinalImage(RenderTarget* renderTarget, Globals* global
   if (!mPostProcess_GaussianBlur_Blend_MSAA->isComplete()) return;
 
   /// Additively blend bloom to Gbuffer, and perform HDR multisampling correction
-  const Vec2 size = renderTarget->GetSize();
-  const UINT width = UINT(size.x);
-  const UINT height = UINT(size.y);
+  const ivec2 size = renderTarget->GetSize();
   OpenGL->SetFrameBuffer(renderTarget->mColorBufferId);
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, size.x, size.y);
   globals->PPGauss = renderTarget->GetPostprocessSourceTexture();
   globals->GBufferSourceA = sourceColorMsaa;
   mPostProcess_GaussianBlur_Blend_MSAA->Set(globals);
@@ -209,10 +200,10 @@ void EngineShaders::BuildPostProcessPasses() {
   /// Fullscreen quad
   IndexEntry quadIndices[] = {0, 1, 2, 2, 1, 3};
   VertexPosUv quadVertices[] = {
-    {Vec3(-1, -1, 0), Vec2(0, 0)},
-    {Vec3(1, -1, 0), Vec2(1, 0)},
-    {Vec3(-1, 1, 0), Vec2(0, 1)},
-    {Vec3(1, 1, 0), Vec2(1, 1)},
+    {vec3(-1, -1, 0), vec2(0, 0)},
+    {vec3(1, -1, 0), vec2(1, 0)},
+    {vec3(-1, 1, 0), vec2(0, 1)},
+    {vec3(1, 1, 0), vec2(1, 1)},
   };
 
   mFullScreenQuad = std::make_shared<Mesh>();

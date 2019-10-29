@@ -96,7 +96,6 @@ protected:
   bool mAllowTextboxValueChanges = true;
 };
 
-
 /// A widget able to edit and display a vector value
 template <ValueType T>
 class ValueEditor: public QWidget {
@@ -124,7 +123,7 @@ protected:
   VectorType mValue;
 
   /// Float editors for each dimension
-  FloatEditor* mFloatEditors[VectorType::Dimensions]{};
+  FloatEditor* mFloatEditors[VectorType::length()]{};
 
   /// Handles value change from float editors
   void HandleFloatValueChange(QWidget* floatEditor, const float& value);

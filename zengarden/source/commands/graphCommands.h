@@ -19,17 +19,17 @@ private:
 
 class MoveNodeCommand: public Command {
 public:
-  MoveNodeCommand(std::shared_ptr<Node> node, const Vec2& position);
-  MoveNodeCommand(std::shared_ptr<Node> node, const Vec2& position, 
-    const Vec2& oldPosition);
+  MoveNodeCommand(std::shared_ptr<Node> node, const vec2& position);
+  MoveNodeCommand(std::shared_ptr<Node> node, const vec2& position, 
+    const vec2& oldPosition);
 
   bool Do() override;
   bool Undo() override;
 
 private:
   std::shared_ptr<Node> mNode;
-  Vec2 mNewPosition;
-  Vec2 mOldPosition;
+  vec2 mNewPosition;
+  vec2 mOldPosition;
 };
 
 
