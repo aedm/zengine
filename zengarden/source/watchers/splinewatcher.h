@@ -31,9 +31,9 @@ protected:
 
   QPointF ToScreenCoord(float time, float value) const;
   float ScreenToTime(int xPos) const;
-  Vec2 ScreenToPoint(const QPoint& pos) const;
+  vec2 ScreenToPoint(const QPoint& pos) const;
 
-  Vec2 GetStepsPerPixel() const;
+  vec2 GetStepsPerPixel() const;
   QPointF GetPixelsPerStep() const;
 
   enum class State {
@@ -44,9 +44,9 @@ protected:
   };
   State mState = State::DEFAULT;
 
-  Vec2 mLeftCenterPoint = Vec2(0, 0);
-  Vec2 mZoomLevel = Vec2(0, 0);
-  Vec2 mOriginalPoint;
+  vec2 mLeftCenterPoint = vec2(0, 0);
+  vec2 mZoomLevel = vec2(0, 0);
+  vec2 mOriginalPoint;
 
   int mHoveredPointIndex = -1;
   SplineLayer mHoveredLayer = SplineLayer::NONE;

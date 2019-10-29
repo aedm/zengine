@@ -22,8 +22,9 @@ public:
   FloatSlot mInstances;
   FloatSlot mIsShadowCenter;
 
-  void Draw(Globals* globals, PassType passType, PrimitiveTypeEnum Primitive = PRIMITIVE_TRIANGLES);
-  void ComputeForcedShadowCenter(Globals* globals, Vec3& oShadowCenter) const;
+  void Draw(Globals* globals, PassType passType, 
+    PrimitiveTypeEnum primitive = PRIMITIVE_TRIANGLES);
+  void ComputeForcedShadowCenter(Globals* globals, vec3& oShadowCenter) const;
 
 protected:
   /// Handle received messages

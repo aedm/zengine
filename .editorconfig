@@ -1,0 +1,22 @@
+
+[*.proto]
+indent_style=tab
+indent_size=tab
+tab_width=4
+
+[*.{appxmanifest,build,c,c++,cc,config,cp,cpp,csproj,cu,cuh,cxx,dbml,discomap,dtd,h,hh,hpp,hxx,inc,inl,ino,ipp,jsproj,lsproj,mpp,njsproj,nuspec,proj,props,resw,resx,StyleCop,targets,tasks,tpp,vbproj,xaml,xamlx,xml,xoml,xsd}]
+indent_style=space
+indent_size=2
+tab_width=2
+guidelines = 90
+guidelines_style = 1px dotted 40ff0000
+
+[*]
+# ReSharper inspection severities
+resharper_cpp_clang_tidy_cppcoreguidelines_macro_usage_highlighting=none
+resharper_cpp_clang_tidy_hicpp_special_member_functions_highlighting=none
+resharper_cpp_clang_tidy_hicpp_use_auto_highlighting=none
+resharper_cpp_clang_tidy_modernize_use_auto_highlighting=none
+resharper_cpp_class_can_be_final_highlighting=none
+resharper_cpp_parameter_may_be_const_highlighting=none
+resharper_cpp_use_auto_highlighting=none

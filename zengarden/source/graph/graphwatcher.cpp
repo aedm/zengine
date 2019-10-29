@@ -31,7 +31,7 @@ GraphWatcher::~GraphWatcher() {
 void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
   OpenGL->OnContextSwitch();
 
-  Vec2 canvasSize, topLeft;
+  vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
 
   ThePainter->SetupViewport(glWidget->width(), glWidget->height(), topLeft, canvasSize);
@@ -40,7 +40,7 @@ void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
   OpenGL->Clear();
 
   /// Draw connections
-  ThePainter->mColor->Set(Vec4(1, 1, 1, 1));
+  ThePainter->mColor->Set(vec4(1, 1, 1, 1));
   for (const auto& node : GetGraph()->mNodes.GetDirectMultiNodes()) {
     std::shared_ptr<NodeWidget> nodeWidget = mWidgetMap.at(node);
     auto& widgetSlots = nodeWidget->GetWidgetSlots();
@@ -51,8 +51,8 @@ void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
           std::shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget != nullptr) {
             /// Draw connection
-            const Vec2 p1 = connectedNodeWidget->GetOutputPosition();
-            const Vec2 p2 = nodeWidget->GetInputPosition(i);
+            const vec2 p1 = connectedNodeWidget->GetOutputPosition();
+            const vec2 p2 = nodeWidget->GetInputPosition(i);
             ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
           }
         }
@@ -64,8 +64,8 @@ void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
           std::shared_ptr<NodeWidget> connectedNodeWidget = GetNodeWidget(connectedNode);
           if (connectedNodeWidget) {
             /// Draw connection
-            const Vec2 p1 = connectedNodeWidget->GetOutputPosition();
-            const Vec2 p2 = nodeWidget->GetInputPosition(i);
+            const vec2 p1 = connectedNodeWidget->GetOutputPosition();
+            const vec2 p2 = nodeWidget->GetInputPosition(i);
             ThePainter->DrawLine(p1.x, p1.y, p2.x, p2.y);
           }
         }
@@ -74,16 +74,16 @@ void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
   }
 
   if (mCurrentState == State::CONNECT_TO_NODE) {
-    const Vec2 from = mClickedWidget->GetInputPosition(mClickedSlotIndex);
-    const Vec2 to = mCurrentMousePos;
-    ThePainter->mColor->Set(Vec4(1, 1, 1, 0.7));
+    const vec2 from = mClickedWidget->GetInputPosition(mClickedSlotIndex);
+    const vec2 to = mCurrentMousePos;
+    ThePainter->mColor->Set(vec4(1, 1, 1, 0.7));
     ThePainter->DrawLine(from, to);
   }
 
   if (mCurrentState == State::CONNECT_TO_SLOT) {
-    const Vec2 from = mClickedWidget->GetOutputPosition();
-    const Vec2 to = mCurrentMousePos;
-    ThePainter->mColor->Set(Vec4(1, 1, 1, 0.7));
+    const vec2 from = mClickedWidget->GetOutputPosition();
+    const vec2 to = mCurrentMousePos;
+    ThePainter->mColor->Set(vec4(1, 1, 1, 0.7));
     ThePainter->DrawLine(from, to);
   }
 
@@ -94,9 +94,9 @@ void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
 
   /// Draw selection rectangle
   if (mCurrentState == State::SELECT_RECTANGLE) {
-    ThePainter->mColor->Set(Vec4(0.4, 0.9, 1, 0.1));
+    ThePainter->mColor->Set(vec4(0.4, 0.9, 1, 0.1));
     ThePainter->DrawBox(mOriginalMousePos, mCurrentMousePos - mOriginalMousePos);
-    ThePainter->mColor->Set(Vec4(0.6, 0.9, 1, 0.6));
+    ThePainter->mColor->Set(vec4(0.6, 0.9, 1, 0.6));
     ThePainter->DrawRect(mOriginalMousePos, mCurrentMousePos - mOriginalMousePos);
   }
 
@@ -159,13 +159,13 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   GetGlWidget()->mOnMouseWheel += Delegate(this, &GraphWatcher::HandleMouseWheel);
 }
 
-bool IsInsideRect(Vec2 position, Vec2 topleft, Vec2 size) {
+bool IsInsideRect(vec2 position, vec2 topleft, vec2 size) {
   return (position.x >= topleft.x && position.x <= topleft.x + size.x
     && position.y >= topleft.y && position.y <= topleft.y + size.y);
 }
 
 
-bool HasIntersection(Vec2 pos1, Vec2 size1, Vec2 pos2, Vec2 size2) {
+bool HasIntersection(vec2 pos1, vec2 size1, vec2 pos2, vec2 size2) {
   if (size1.x < 0) {
     pos1.x += size1.x;
     size1.x = -size1.x;
@@ -215,7 +215,7 @@ void GraphWatcher::StorePositionOfSelectedNodes() {
 }
 
 void GraphWatcher::HandleMouseLeftDown(QMouseEvent* event) {
-  const Vec2 mousePos = MouseToWorld(event);
+  const vec2 mousePos = MouseToWorld(event);
   mOriginalMousePos = mousePos;
   mCurrentMousePos = mousePos;
 
@@ -265,7 +265,7 @@ void GraphWatcher::HandleMouseLeftUp(QMouseEvent* event) {
   case State::MOVE_NODES:
     if (mAreNodesMoved) {
       for (const std::shared_ptr<NodeWidget>& widget : mSelectedNodeWidgets) {
-        Vec2 pos = widget->GetDirectNode()->GetPosition();
+        vec2 pos = widget->GetDirectNode()->GetPosition();
         TheCommandStack->Execute(
           new MoveNodeCommand(widget->GetDirectNode(), pos,
             mOriginalWidgetPositions.at(widget)));
@@ -326,7 +326,7 @@ void GraphWatcher::HandleMouseRightDown(QMouseEvent* event) {
 
   /// Pan canvas
   if (mCurrentState == State::DEFAULT) {
-    mOriginalMousePos = Vec2(float(event->x()), float(event->y()));
+    mOriginalMousePos = vec2(float(event->x()), float(event->y()));
     mOriginalCenter = mCenter;
     mCurrentState = State::PAN_CANVAS;
   }
@@ -341,7 +341,7 @@ void GraphWatcher::HandleMouseRightUp(QMouseEvent* event) {
 
 
 void GraphWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) {
-  const Vec2 mousePos = MouseToWorld(event);
+  const vec2 mousePos = MouseToWorld(event);
   mCurrentMousePos = mousePos;
 
   /// Reset all frame colors
@@ -356,13 +356,13 @@ void GraphWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) 
   switch (mCurrentState) {
   case State::MOVE_NODES:
   {
-    const Vec2 mouseDiff = mousePos - mOriginalMousePos;
+    const vec2 mouseDiff = mousePos - mOriginalMousePos;
     if ((event->modifiers() & Qt::ControlModifier) > 0 && !mAreNodesMoved) {
       const std::shared_ptr<Node> originalNode = mHoveredWidget->GetDirectNode();
       std::shared_ptr<Ghost> ghost = std::make_shared<Ghost>();
       ghost->mOriginalNode.Connect(originalNode);
       ghost->SetName(originalNode->GetName());
-      const Vec2 position = mOriginalWidgetPositions[mHoveredWidget] + mouseDiff;
+      const vec2 position = mOriginalWidgetPositions[mHoveredWidget] + mouseDiff;
       ghost->SetPosition(position);
       TheCommandStack->Execute(new CreateNodeCommand(ghost, GetGraph()));
       /// Adding new nodes to a graph resets watcher state, but we want to move the ghost
@@ -421,8 +421,8 @@ void GraphWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) 
     break;
   case State::PAN_CANVAS:
   {
-    const Vec2 mousePixelPos(float(event->x()), float(event->y()));
-    const Vec2 diff = mousePixelPos - mOriginalMousePos;
+    const vec2 mousePixelPos(float(event->x()), float(event->y()));
+    const vec2 diff = mousePixelPos - mOriginalMousePos;
     mCenter = mOriginalCenter - diff * mZoomFactor;
     GetGlWidget()->update();
   }
@@ -448,7 +448,7 @@ void GraphWatcher::HandleMouseWheel(EventForwarderGlWidget*, QWheelEvent* event)
 }
 
 
-void GraphWatcher::FindHoveredWidget(Vec2 mousePos,
+void GraphWatcher::FindHoveredWidget(vec2 mousePos,
   std::shared_ptr<NodeWidget>* oHoveredWidget, int* oSlotIndex)
 {
   *oHoveredWidget = nullptr;
@@ -591,21 +591,21 @@ void GraphWatcher::OnSlotConnectionChanged(Slot* slot) {
 }
 
 
-Vec2 GraphWatcher::CanvasToWorld(const Vec2& canvasCoord) const {
-  Vec2 canvasSize, topLeft;
+vec2 GraphWatcher::CanvasToWorld(const vec2& canvasCoord) const {
+  vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
   return topLeft + canvasCoord * mZoomFactor;
 }
 
 
-Vec2 GraphWatcher::MouseToWorld(QMouseEvent* event) const {
-  const Vec2 mouseCoord(float(event->x()), float(event->y()));
+vec2 GraphWatcher::MouseToWorld(QMouseEvent* event) const {
+  const vec2 mouseCoord(float(event->x()), float(event->y()));
   return CanvasToWorld(mouseCoord);
 }
 
-void GraphWatcher::GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) const
+void GraphWatcher::GetCanvasDimensions(vec2& oCanvasSize, vec2& oTopLeft) const
 {
-  oCanvasSize = Vec2(float(GetGlWidget()->width()), float(GetGlWidget()->height())) * 
+  oCanvasSize = vec2(float(GetGlWidget()->width()), float(GetGlWidget()->height())) * 
     mZoomFactor;
   oTopLeft = mCenter - oCanvasSize / 2.0f;
 
@@ -648,8 +648,8 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
     node->SetName(fileInfo.fileName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
 
-    const Vec2 pos = 
-      CanvasToWorld(Vec2(float(event->pos().x()), float(event->pos().y())));
+    const vec2 pos = 
+      CanvasToWorld(vec2(float(event->pos().x()), float(event->pos().y())));
     TheCommandStack->Execute(new MoveNodeCommand(node, pos));
     event->acceptProposedAction();
   }
@@ -659,8 +659,8 @@ void GraphWatcher::HandleDropEvent(QDropEvent* event) {
     node->mFileName.SetDefaultValue(fileName.toStdString());
     node->SetName(fileInfo.baseName().toStdString());
     TheCommandStack->Execute(new CreateNodeCommand(node, GetGraph()));
-    const Vec2 pos = 
-      CanvasToWorld(Vec2(float(event->pos().x()), float(event->pos().y())));
+    const vec2 pos = 
+      CanvasToWorld(vec2(float(event->pos().x()), float(event->pos().y())));
     TheCommandStack->Execute(new MoveNodeCommand(node, pos));
     event->acceptProposedAction();
   }

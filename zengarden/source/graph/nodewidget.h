@@ -36,14 +36,14 @@ public:
   bool NeedsRepaint() const;
   void Paint();
 
-  Vec2 GetOutputPosition() const;
-  Vec2 GetInputPosition(int slotIndex);
+  vec2 GetOutputPosition() const;
+  vec2 GetInputPosition(int slotIndex);
 
   /// Slot paint data
   struct WidgetSlot {
-    Vec2 mPosition;
-    Vec2 mSize;
-    Vec2 mSpotPos;
+    vec2 mPosition = vec2();
+    vec2 mSize = vec2();
+    vec2 mSpotPos = vec2();
     Slot* mSlot = nullptr;
   };
   const std::vector<WidgetSlot*>& GetWidgetSlots() const;
@@ -83,7 +83,7 @@ private:
 
   /// Height of the titlebar
   float mTitleHeight = 0.0f;
-  Vec2 mOutputPosition;
+  vec2 mOutputPosition;
   QString mNodeTitle;
   std::vector<WidgetSlot*>	mWidgetSlots;
 

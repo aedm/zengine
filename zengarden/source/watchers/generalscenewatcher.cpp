@@ -12,8 +12,8 @@ GeneralSceneWatcher::GeneralSceneWatcher(const std::shared_ptr<Node>& node)
     return;
   }
   auto sceneNode = std::make_shared<SceneNode>();
-  sceneNode->mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 1.0, 0.5f).Normal());
-  sceneNode->mSkyLightColor.SetDefaultValue(Vec3(1.0f, 1.0f, 1.0f));
+  sceneNode->mSkyLightDirection.SetDefaultValue(normalize(vec3(0.5f, 1.0, 0.5f)));
+  sceneNode->mSkyLightColor.SetDefaultValue(vec3(1.0f, 1.0f, 1.0f));
   sceneNode->mSkyLightAmbient.SetDefaultValue(0.2f);
   sceneNode->mCamera.Connect(std::make_shared<CameraNode>());
   mRenderForwarder = sceneNode->Watch<RenderForwarder>(sceneNode);
@@ -40,11 +40,11 @@ void GeneralSceneWatcher::Paint(EventForwarderGlWidget* widget) {
   }
 
   if (!mRenderTarget) {
-    mRenderTarget = new RenderTarget(Vec2(float(mWatcherWidget->width()),
+    mRenderTarget = new RenderTarget(vec2(float(mWatcherWidget->width()),
                                           float(mWatcherWidget->height())));
   }
 
-  const Vec2 size = Vec2(widget->width(), widget->height());
+  const vec2 size = vec2(widget->width(), widget->height());
   mRenderTarget->Resize(size);
 
   mRenderTarget->SetGBufferAsTarget(&mGlobals);
@@ -119,7 +119,7 @@ void GeneralSceneWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* 
 
   if (event->buttons() & Qt::LeftButton) {
     const auto diff = event->pos() - mOriginalPosition;
-    Vec3 orientation = camera->mOrientation.Get();
+    vec3 orientation = camera->mOrientation.Get();
     const float dx = float(diff.x()) / 300.0f;
     const float dy = float(diff.y()) / 300.0f;
     orientation.y = mOriginalOrientation.y + dx;

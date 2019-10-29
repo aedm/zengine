@@ -12,7 +12,7 @@ FloatsToVec3Node::FloatsToVec3Node()
   , mValue(0, 0, 0)
 {}
 
-const Vec3& FloatsToVec3Node::Get() {
+const vec3& FloatsToVec3Node::Get() {
   Update();
   return mValue;
 }
@@ -30,7 +30,7 @@ void FloatsToVec3Node::HandleMessage(Message* message) {
 }
 
 void FloatsToVec3Node::Operate() {
-  mValue = Vec3(mX.Get(), mY.Get(), mZ.Get());
+  mValue = vec3(mX.Get(), mY.Get(), mZ.Get());
 }
 
 FloatToFloatNode::FloatToFloatNode()
@@ -67,7 +67,7 @@ FloatsToVec4Node::FloatsToVec4Node()
   , mValue(0, 0, 0, 0)
 {}
 
-const Vec4& FloatsToVec4Node::Get() {
+const vec4& FloatsToVec4Node::Get() {
   Update();
   return mValue;
 }
@@ -85,7 +85,7 @@ void FloatsToVec4Node::HandleMessage(Message* message) {
 }
 
 void FloatsToVec4Node::Operate() {
-  mValue = Vec4(mX.Get(), mY.Get(), mZ.Get(), mW.Get());
+  mValue = vec4(mX.Get(), mY.Get(), mZ.Get(), mW.Get());
 }
 
 MaddNode::MaddNode()

@@ -6,7 +6,7 @@
 
 class RenderTarget {
 public:
-  RenderTarget(glm::ivec2 size, bool forFrameGrabbing = false);
+  RenderTarget(ivec2 size, bool forFrameGrabbing = false);
   ~RenderTarget();
 
   /// Sets the G-Buffer as render target
@@ -18,8 +18,8 @@ public:
   void SetShadowBufferAsTarget(Globals* globals) const;
   void SetSquareBufferAsTarget(Globals* globals) const;
 
-  void Resize(glm::ivec2 size);
-  glm::ivec2 GetSize() const;
+  void Resize(ivec2 size);
+  ivec2 GetSize() const;
 
   FrameBufferId GetPostprocessSourceFramebufferId();
   FrameBufferId GetPostprocessTargetFramebufferId();
@@ -60,12 +60,12 @@ public:
   FrameBufferId mShadowBufferId = 0;
   std::shared_ptr<Texture> mShadowTexture = nullptr;
 
-  glm::ivec2 mSize = { 0, 0 };
+  ivec2 mSize = { 0, 0 };
 private:
   /// Screen size, can be different than render target size when grabbing frames
-  glm::ivec2 mScreenSize = { 0, 0 };
+  ivec2 mScreenSize = { 0, 0 };
 
-  const glm::ivec2 mFrameGrabberSize = { 1920, 1080 };
+  const ivec2 mFrameGrabberSize = { 1920, 1080 };
 
   void DropResources();
 

@@ -18,12 +18,12 @@ public:
   UiPainter();
   ~UiPainter();
 
-  void SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft, Vec2 size);
+  void SetupViewport(int canvasWidth, int canvasHeight, vec2 topLeft, vec2 size);
 
   void DrawLine(float x1, float y1, float x2, float y2);
-  void DrawLine(const Vec2& from, const Vec2& to);
-  void DrawRect(const Vec2& topLeft, const Vec2& size);
-  void DrawBox(const Vec2& topLeft, const Vec2& size);
+  void DrawLine(const vec2& from, const vec2& to);
+  void DrawRect(const vec2& topLeft, const vec2& size);
+  void DrawBox(const vec2& topLeft, const vec2& size);
   void DrawTexture(const std::shared_ptr<Texture>& texture, float x, float y);
 
   std::shared_ptr<Vec4Node> mColor = std::make_shared<Vec4Node>();

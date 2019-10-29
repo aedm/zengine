@@ -41,7 +41,7 @@ private:
   /// Draws the graph
   void Paint(EventForwarderGlWidget*);
 
-  /// All wigdets on the graph
+  /// All widgets on the graph
   std::shared_ptr<Graph> GetGraph() const;
 
   /// Handle drag events
@@ -51,7 +51,7 @@ private:
   /// Mapping from node to widget
   std::map<std::shared_ptr<Node>, std::shared_ptr<NodeWidget>> mWidgetMap;
 
-  /// Operators currectly selected
+  /// Operators currently selected
   std::set<std::shared_ptr<NodeWidget>> mSelectedNodeWidgets;
 
   /// State machine
@@ -66,15 +66,15 @@ private:
   State mCurrentState;
 
   /// View parameters
-  Vec2 mCenter = Vec2(0, 0);
+  vec2 mCenter = vec2(0, 0);
   float mZoomFactor = 1.0f;
   int mZoomExponent = 0;
 
   /// Converts pixel coordinates (eg. mouse) to world coordinates
-  Vec2 MouseToWorld(QMouseEvent* event) const;
-  Vec2 CanvasToWorld(const Vec2& canvasCoord) const;
-  void GetCanvasDimensions(Vec2& oCanvasSize, Vec2& oTopLeft) const;
-
+  vec2 MouseToWorld(QMouseEvent* event) const;
+  vec2 CanvasToWorld(const vec2& canvasCoord) const;
+  void GetCanvasDimensions(vec2& oCanvasSize, vec2& oTopLeft) const;
+  
   /// True if mouse movement was made during STATE_MOVE_NODES
   bool mAreNodesMoved{};
 
@@ -82,13 +82,13 @@ private:
   bool mIsConnectionValid{};
 
   /// Mouse position when the clicking occured
-  Vec2 mOriginalMousePos;
+  vec2 mOriginalMousePos;
 
   /// Original position of center at the time of pressing the left mouse button
-  Vec2 mOriginalCenter;
+  vec2 mOriginalCenter;
   
   /// Current mouse position
-  Vec2 mCurrentMousePos;
+  vec2 mCurrentMousePos;
 
   /// Clicked widget for some operations
   std::shared_ptr<NodeWidget> mClickedWidget;
@@ -98,15 +98,15 @@ private:
   std::shared_ptr<NodeWidget> mHoveredWidget;
   int mHoveredSlotIndex;
 
-  /// Operators currectly selected
-  std::map<std::shared_ptr<NodeWidget>, Vec2> mOriginalWidgetPositions;
+  /// Operators currently selected
+  std::map<std::shared_ptr<NodeWidget>, vec2> mOriginalWidgetPositions;
 
 
   void DeselectAll();
   void SelectSingleWidget(const std::shared_ptr<NodeWidget>& nodeWidget);
   void StorePositionOfSelectedNodes();
 
-  void FindHoveredWidget(Vec2 mousePos, std::shared_ptr<NodeWidget>* oHoveredWidget,
+  void FindHoveredWidget(vec2 mousePos, std::shared_ptr<NodeWidget>* oHoveredWidget,
     int* oSlotIndex);
 
   /// NodeWidgets can request a redraw

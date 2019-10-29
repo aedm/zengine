@@ -11,7 +11,8 @@
 using glm::vec2;
 using glm::vec3;
 using glm::vec4;
-using glm::mat4x4;
+using glm::mat4;
+using glm::ivec2;
 
 /// Nodes holding primitive values.
 template<typename T>
@@ -44,7 +45,7 @@ template<> StaticValueNode<float>::StaticValueNode();
 template<> StaticValueNode<vec2>::StaticValueNode();
 template<> StaticValueNode<vec3>::StaticValueNode();
 template<> StaticValueNode<vec4>::StaticValueNode();
-template<> StaticValueNode<mat4x4>::StaticValueNode();
+template<> StaticValueNode<mat4>::StaticValueNode();
 template<> StaticValueNode<std::string>::StaticValueNode();
 
 
@@ -189,12 +190,12 @@ typedef ValueSlot<float> FloatSlot;
 typedef ValueSlot<vec2> Vec2Slot;
 typedef ValueSlot<vec3> Vec3Slot;
 typedef ValueSlot<vec4> Vec4Slot;
-typedef ValueSlot<mat4x4> MatrixSlot;
+typedef ValueSlot<mat4> MatrixSlot;
 typedef ValueSlot<std::string> StringSlot;
 
 typedef StaticValueNode<float> FloatNode;
 typedef StaticValueNode<vec2> Vec2Node;
 typedef StaticValueNode<vec3> Vec3Node;
 typedef StaticValueNode<vec4> Vec4Node;
-typedef StaticValueNode<mat4x4> MatrixNode;
+typedef StaticValueNode<mat4> MatrixNode;
 typedef StaticValueNode<std::string> StringNode;
