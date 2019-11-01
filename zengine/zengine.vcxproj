@@ -102,7 +102,6 @@
     <ClInclude Include="include\base\fastdelegate.h" />
     <ClInclude Include="include\base\helpers.h" />
     <ClInclude Include="include\base\system.h" />
-    <ClInclude Include="include\base\vectormath.h" />
     <ClInclude Include="include\dom\document.h" />
     <ClInclude Include="include\dom\ghost.h" />
     <ClInclude Include="include\dom\graph.h" />
@@ -149,7 +148,6 @@
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp" />
     <ClCompile Include="source\base\system.cpp" />
-    <ClCompile Include="source\base\vectormath.cpp" />
     <ClCompile Include="source\dom\document.cpp" />
     <ClCompile Include="source\dom\ghost.cpp" />
     <ClCompile Include="source\dom\graph.cpp" />
