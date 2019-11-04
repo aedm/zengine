@@ -2,7 +2,6 @@
 
 #include "../resources/texture.h"
 #include "../shaders/stubnode.h"
-#include <glm/vec2.hpp>
 
 class RenderTarget {
 public:

@@ -26,7 +26,7 @@ template<> StaticValueNode<vec4>::StaticValueNode()
 template<> StaticValueNode<mat4>::StaticValueNode()
   : ValueNode<mat4>()
 {
-  mValue = mat4();
+  mValue = mat4(1.0f);
 }
 
 template<> StaticValueNode<std::string>::StaticValueNode()

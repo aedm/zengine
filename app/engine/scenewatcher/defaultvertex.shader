@@ -12,7 +12,7 @@
 
 SHADER
 {
-	gl_Position = vec4(aPosition, 1.0) * gTransformation; 
+	gl_Position = gTransformation * vec4(aPosition, 1.0); 
 	vNormal = aNormal;
 	vTexCoord = aTexCoord;
 }

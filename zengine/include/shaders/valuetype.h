@@ -3,15 +3,6 @@
 #include "../base/defines.h"
 #include <vector>
 #include <memory>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-
-using glm::vec2;
-using glm::vec3;
-using glm::vec4;
-using glm::mat4;
 
 // Possible types of shader values and variables
 enum class ValueType {

@@ -160,8 +160,8 @@ void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, vec2 topLeft,
   mGlobals.RenderTargetSizeRecip =
     vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
 
-  mGlobals.Camera = mat4();
-  mGlobals.World = mat4();
+  mGlobals.Camera = mat4(1.0f);
+  mGlobals.World = mat4(1.0f);
   mGlobals.Projection =
     glm::ortho(topLeft.x, topLeft.x + size.x, topLeft.y + size.y, topLeft.y);
   mGlobals.Transformation = mGlobals.Projection;

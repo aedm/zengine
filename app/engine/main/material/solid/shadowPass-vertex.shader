@@ -7,7 +7,7 @@
 
 SHADER
 {
-   vec4 pos = vec4(aPosition, 1.0) * gTransformation; 
+   vec4 pos = gTransformation * vec4(aPosition, 1.0); 
    pos.z += gSkylightBias * 0.01;
    gl_Position = pos;
 }

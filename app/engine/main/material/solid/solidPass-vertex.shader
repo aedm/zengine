@@ -19,14 +19,14 @@
 
 SHADER
 {
-  vec4 pos = vec4(aPosition, 1.0) * gTransformation; 
+  vec4 pos = gTransformation * vec4(aPosition, 1.0); 
 
   vTexCoord = aTexCoord;
-  vNormal = (vec4(aNormal, 0.0) * gView).xyz;
-  vTangent = (vec4(aTangent, 0.0) * gView).xyz;
-  vSkyLightCoord = (vec4(aPosition, 1.0) * gSkylightTransformation).xyz; 
+  vNormal = (gView * vec4(aNormal, 0.0)).xyz;
+  vTangent = (gView * vec4(aTangent, 0.0)).xyz;
+  vSkyLightCoord = (gSkylightTransformation * vec4(aPosition, 1.0)).xyz; 
   vModelSpacePos = aPosition;
-  vViewSpacePos = (vec4(aPosition, 1.0) * gView).xyz;
+  vViewSpacePos = (gView * vec4(aPosition, 1.0)).xyz;
 
   gl_Position = pos;
 }
