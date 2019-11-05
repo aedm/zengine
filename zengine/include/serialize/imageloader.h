@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "../resources/texture.h"
+#include <string>
 
 namespace Zengine {
   void InitGDIPlus();

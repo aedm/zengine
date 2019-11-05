@@ -77,7 +77,7 @@
     <IncludePath>..\zengine\include;$(IncludePath);$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>..\components\bass;..\zengine\lib;$(LibraryPath)</LibraryPath>
     <IntDir>$(ProjectDir)\.msbuild\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)\app\</OutDir>
+    <OutDir>$(SolutionDir)\app\</OutDir>
     <TargetName>demo-debug64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -210,5 +210,4 @@ private:
   RenderState::FaceMode mFaceMode = RenderState::FaceMode::BACK;
   RenderState::BlendMode mBlendMode = RenderState::BlendMode::NORMAL;
   bool mBlendEnabled{};
-  UINT mClearColorShadow{};
 };
