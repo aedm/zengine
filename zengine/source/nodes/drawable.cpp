@@ -61,19 +61,19 @@ void Drawable::ComputeForcedShadowCenter(Globals* globals, vec3& oShadowCenter) 
   }
 }
 
-void Drawable::ApplyTransformation(Globals& globals) const
+void Drawable:: ApplyTransformation(Globals& globals) const
 {
   const vec3 movv = mMove.Get();
   if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
-    const mat4 move = glm::translate(mat4(1.0f), mMove.Get());
-    globals.World = move * globals.World;
+    globals.World = glm::translate(globals.World, mMove.Get());
+    //globals.World = move * globals.World;
   }
   const vec3 rotv = mRotate.Get();
   if (rotv.x != 0 || rotv.y != 0 || rotv.z != 0) {
-    const mat4 rotateX = glm::rotate(mat4(1.0f), rotv.x, { 1, 0, 0 });
-    const mat4 rotateY = glm::rotate(rotateX, rotv.y, { 0, 1, 0 });
-    const mat4 rotateZ = glm::rotate(rotateY, rotv.z, { 0, 0, 1 });
-    globals.World = rotateZ * globals.World;
+    globals.World = glm::rotate(globals.World, rotv.x, { 1, 0, 0 });
+    globals.World = glm::rotate(globals.World, rotv.y, { 0, 1, 0 });
+    globals.World = glm::rotate(globals.World, rotv.z, { 0, 0, 1 });
+    //globals.World = rotateZ * globals.World;
   }
   const float scalev = mScale.Get();
   if (scalev != 0.0f) {
@@ -82,10 +82,10 @@ void Drawable::ApplyTransformation(Globals& globals) const
     globals.World = scale * globals.World;
   }
 
-  globals.View = globals.World * globals.Camera;
-  globals.Transformation = globals.View * globals.Projection;
+  globals.View = globals.Camera * globals.World;
+  globals.Transformation = globals.Projection * globals.Camera * globals.World;
   globals.SkylightTransformation =
-     globals.World * globals.SkylightCamera * globals.SkylightProjection;
+    globals.SkylightProjection * globals.SkylightCamera * globals.World;
 }
 
 
