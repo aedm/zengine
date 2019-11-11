@@ -77,9 +77,6 @@
     <ClInclude Include="include\render\drawingapi.h">
       <Filter>include\render</Filter>
     </ClInclude>
-    <ClInclude Include="include\base\vectormath.h">
-      <Filter>include\base</Filter>
-    </ClInclude>
     <ClInclude Include="include\base\fastdelegate.h">
       <Filter>include\base</Filter>
     </ClInclude>
@@ -190,9 +187,6 @@
       <Filter>source\base</Filter>
     </ClCompile>
     <ClCompile Include="source\base\system.cpp">
-      <Filter>source\base</Filter>
-    </ClCompile>
-    <ClCompile Include="source\base\vectormath.cpp">
       <Filter>source\base</Filter>
     </ClCompile>
     <ClCompile Include="source\dom\node.cpp">

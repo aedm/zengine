@@ -165,7 +165,7 @@ void TypedSlotWatcher<T>::SetWatcherWidget(WatcherWidget* watcherWidget) {
 
   layout->addWidget(mEditor);
 
-  Vec2 range = mSlot->GetRange();
+  vec2 range = mSlot->GetRange();
   mEditor->SetRange(range.x, range.y);
   UpdateReadOnly();
 }

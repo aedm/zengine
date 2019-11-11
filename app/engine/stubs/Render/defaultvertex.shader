@@ -14,8 +14,8 @@
 
 SHADER
 {
-  gl_Position = vec4(aPosition, 1.0) * gTransformation; 
-  vPosition = (vec4(aPosition, 1.0) * gView).xyz;
-  vNormal = (vec4(aNormal, 0.0) * gView).xyz;
+  gl_Position = gTransformation * vec4(aPosition, 1.0); 
+  vPosition = (gView * vec4(aPosition, 1.0)).xyz;
+  vNormal = (gView * vec4(aNormal, 0.0)).xyz;
   vTexCoord = aTexCoord;
 }

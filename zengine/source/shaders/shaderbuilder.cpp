@@ -120,10 +120,10 @@ void ShaderBuilder::CollectInputsAndOutputs(
 
 StubParameter::Type NodeToParamType(const std::shared_ptr<Node>& node) {
   if (IsPointerOf<ValueNode<float>>(node)) return StubParameter::Type::FLOAT;
-  if (IsPointerOf<ValueNode<Vec2>>(node)) return StubParameter::Type::VEC2;
-  if (IsPointerOf<ValueNode<Vec3>>(node)) return StubParameter::Type::VEC3;
-  if (IsPointerOf<ValueNode<Vec4>>(node)) return StubParameter::Type::VEC4;
-  if (IsPointerOf<ValueNode<Matrix>>(node)) return StubParameter::Type::MATRIX44;
+  if (IsPointerOf<ValueNode<vec2>>(node)) return StubParameter::Type::VEC2;
+  if (IsPointerOf<ValueNode<vec3>>(node)) return StubParameter::Type::VEC3;
+  if (IsPointerOf<ValueNode<vec4>>(node)) return StubParameter::Type::VEC4;
+  if (IsPointerOf<ValueNode<mat4>>(node)) return StubParameter::Type::MATRIX44;
   if (IsPointerOf<ValueNode<std::shared_ptr<Texture>>>(node)) {
     return StubParameter::Type::SAMPLER2D;
   }

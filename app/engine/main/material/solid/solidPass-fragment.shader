@@ -28,7 +28,7 @@
 
 SHADER
 {
-  vec3 lightDir = (vec4(normalize(gSkylightDirection), 0) * gCamera).xyz;
+  vec3 lightDir = (gCamera * vec4(normalize(gSkylightDirection), 0)).xyz;
   vec2 texCoord = vTexCoord * TextureScale.xy;
    
   #if defined NormalMap_CONNECTED

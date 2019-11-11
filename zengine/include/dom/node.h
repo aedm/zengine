@@ -2,7 +2,6 @@
 
 #include "nodetype.h"
 #include "watcher.h"
-#include "../base/vectormath.h"
 #include "../base/fastdelegate.h"
 #include "../base/helpers.h"
 #include <vector>
@@ -184,7 +183,7 @@ public:
 
   /// Calculates the transitive closure of the node to "oResult" in topological ordering.
   /// Deepest nodes come first. 
-  void GenerateTransitiveClosure(std::vector<std::shared_ptr<Node>>& oResultm, 
+  void GenerateTransitiveClosure(std::vector<std::shared_ptr<Node>>& oResult, 
     bool includeHiddenSlots);
 
   /// Returns a node which can actually do what it claims to do. Most nodes
@@ -244,10 +243,10 @@ private:
 public:
   virtual void SetName(const std::string& name);
   virtual const std::string& GetName() const;
-  virtual void SetPosition(Vec2 position);
-  virtual Vec2 GetPosition() const;
-  virtual void SetSize(Vec2 size);
-  virtual Vec2 GetSize() const;
+  virtual void SetPosition(vec2 position);
+  virtual vec2 GetPosition() const;
+  virtual void SetSize(vec2 size);
+  virtual vec2 GetSize() const;
 
   /// Returns the list of publicly editable slots
   const std::vector<Slot*>& GetPublicSlots() const;
@@ -270,8 +269,8 @@ private:
   std::string mName;
 
   /// Position and size on the Graph
-  Vec2 mPosition;
-  Vec2 mSize;
+  vec2 mPosition;
+  vec2 mSize;
 
   /// Public slots of this node.
   std::vector<Slot*>	mPublicSlots;

@@ -1,6 +1,9 @@
 #include <include/nodes/cameranode.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 REGISTER_NODECLASS(CameraNode, "Camera");
+
+using glm::ivec2;
 
 CameraNode::CameraNode()
   : mTarget(this, "Target", false, true, true, 0.0f, 10.0f)
@@ -15,39 +18,34 @@ CameraNode::CameraNode()
   mFovY.SetDefaultValue(60.0f * (Pi / 180.0f));
   mZNear.SetDefaultValue(0.1f);
   mZFar.SetDefaultValue(200.0f);
-  mTarget.SetDefaultValue(Vec3(0, 0, 0));
+  mTarget.SetDefaultValue(vec3(0, 0, 0));
   mDistance.SetDefaultValue(5.0f);
-  mOrientation.SetDefaultValue(Vec3(0, 0, 0));
+  mOrientation.SetDefaultValue(vec3(0, 0, 0));
 }
 
 void CameraNode::SetupGlobals(Globals* globals) const
 {
-  const Vec2 canvasSize = globals->RenderTargetSize;
-  globals->World.LoadIdentity();
+  const vec2 canvasSize = globals->RenderTargetSize;
+  globals->World = mat4(1.0f); /// Load identity matrix
 
   if (mOrthonormal) {
-    globals->View.LoadIdentity();
-    globals->Camera.LoadIdentity();
-    globals->Projection = Matrix::Ortho(0, 0, canvasSize.x, canvasSize.y);
+    globals->View = mat4(1.0f);
+    globals->Camera = mat4(1.0f);
+    globals->Projection = glm::ortho(0.0f, 0.0f, canvasSize.x, canvasSize.y);
     return;
   }
 
   /// Projection matrix
   const float aspectRatio = canvasSize.x / canvasSize.y;
-  globals->Projection =
-    Matrix::Projection(mFovY.Get(), mZFar.Get(), mZNear.Get(), aspectRatio);
+  globals->Projection = 
+    glm::perspective(mFovY.Get(), aspectRatio, mZNear.Get(), mZFar.Get());
 
   /// Camera matrix
-  //Matrix rotate = 
-  //  Matrix::Rotate(Quaternion::FromEuler(mOrientation.x, mOrientation.y, 0));
-  const Matrix xRot = Matrix::Rotate(mOrientation.Get().x, Vec3(1, 0, 0));
-  const Matrix yRot = Matrix::Rotate(mOrientation.Get().y, Vec3(0, 1, 0));
-  //Matrix lookAt = 
-  //  Matrix::LookAt(Vec3(0, 0, mDistance.Get()), mTarget.Get(), Vec3(0, 1, 0));
-  //globals->View = lookAt * xRot * yRot;
-  const Matrix target = Matrix::Translate(-mTarget.Get());
-  const Matrix distance = Matrix::Translate(Vec3(0, 0, -mDistance.Get()));
-  globals->Camera = distance * xRot * yRot * target;
+  globals->Camera = mat4(1.0f);
+  globals->Camera = glm::translate(globals->Camera, -mTarget.Get());
+  globals->Camera = glm::translate(globals->Camera, { 0, 0, -mDistance.Get() });
+  globals->Camera = glm::rotate(globals->Camera, mOrientation.Get().x, vec3(1, 0, 0));
+  globals->Camera = glm::rotate(globals->Camera, mOrientation.Get().y, vec3(0, 1, 0));
 
   const float shake = mShake.Get() * 0.1f;
   if (shake > 0.0f) {
@@ -58,10 +56,9 @@ void CameraNode::SetupGlobals(Globals* globals) const
       (sinf(time * 0.87f) + cosf(time * 2.23f) + cosf(time * 3.71f + 0.8f)) * shake;
     const float zAngle =
       (sinf(time * 0.67f) + cosf(time * 2.43f) + cosf(time * 3.81f + 0.5f)) * shake;
-    const Matrix xShakeRot = Matrix::Rotate(xAngle, Vec3(1, 0, 0));
-    const Matrix yShakeRot = Matrix::Rotate(yAngle, Vec3(0, 1, 0));
-    const Matrix zRot = Matrix::Rotate(zAngle, Vec3(0, 0, 1));
-    globals->Camera = xShakeRot * yShakeRot * zRot * globals->Camera;
+    globals->Camera = glm::rotate(globals->Camera, xAngle, { 1, 0, 0 });
+    globals->Camera = glm::rotate(globals->Camera, yAngle, { 0, 1, 0 });
+    globals->Camera = glm::rotate(globals->Camera, zAngle, { 0, 0, 1 });
   }
 }
 

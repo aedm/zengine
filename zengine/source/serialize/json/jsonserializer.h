@@ -50,9 +50,9 @@ private:
     rapidjson::Value& nodeValue, const std::shared_ptr<Node>& node);
 
   /// Helpers
-  rapidjson::Value SerializeVec2(const Vec2& vec) const;
-  rapidjson::Value SerializeVec3(const Vec3& vec) const;
-  rapidjson::Value SerializeVec4(const Vec4& vec) const;
+  rapidjson::Value SerializeVec2(const vec2& vec) const;
+  rapidjson::Value SerializeVec3(const vec3& vec) const;
+  rapidjson::Value SerializeVec4(const vec4& vec) const;
 
   /// Number of nodes to save
   int mNodeCount;

@@ -55,8 +55,8 @@ namespace Util {
     return pass;
   }
 
-  static Vec3 ToVec3(const aiVector3D& v) {
-    return Vec3(v.x, v.y, v.z);
+  static vec3 ToVec3(const aiVector3D& v) {
+    return vec3(v.x, v.y, v.z);
   }
 
   std::shared_ptr<Mesh> LoadMesh(const QString& fileName) {
@@ -115,8 +115,8 @@ namespace Util {
     std::vector<VertexPosUvNormTangent> vertices(mesh->mNumVertices);
     for (UINT i = 0; i < mesh->mNumVertices; i++) {
       vertices[i].mPosition = ToVec3(mesh->mVertices[i]);
-      const Vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
-      vertices[i].mUv = Vec2(uv.x, uv.y);
+      const vec3 uv = ToVec3(mesh->mTextureCoords[0][i]);
+      vertices[i].mUv = vec2(uv.x, uv.y);
       vertices[i].mNormal = ToVec3(mesh->mNormals[i]);
       vertices[i].mTangent = ToVec3(mesh->mTangents[i]);
     }

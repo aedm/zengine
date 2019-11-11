@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../base/vectormath.h"
+#include "../base/defines.h"
 #include <vector>
 #include <memory>
 
@@ -19,10 +19,10 @@ UINT ValueTypeByteSize(ValueType type);
 // Translation between shader types and C++ types
 template<ValueType T> struct ValueTypes;
 template<> struct ValueTypes<ValueType::FLOAT> { typedef float Type; };
-template<> struct ValueTypes<ValueType::VEC2> { typedef Vec2 Type; };
-template<> struct ValueTypes<ValueType::VEC3> { typedef Vec3 Type; };
-template<> struct ValueTypes<ValueType::VEC4> { typedef Vec4 Type; };
-template<> struct ValueTypes<ValueType::MATRIX44> { typedef Matrix Type; };
+template<> struct ValueTypes<ValueType::VEC2> { typedef vec2 Type; };
+template<> struct ValueTypes<ValueType::VEC3> { typedef vec3 Type; };
+template<> struct ValueTypes<ValueType::VEC4> { typedef vec4 Type; };
+template<> struct ValueTypes<ValueType::MATRIX44> { typedef mat4 Type; };
 
 
 /// Possible variable types in vertex attributes
@@ -79,7 +79,7 @@ public:
 
 /// Common vertex formats
 struct VertexPos {
-  Vec3 mPosition;
+  vec3 mPosition;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
@@ -87,17 +87,17 @@ struct VertexPos {
 
 
 struct VertexPosNorm {
-  Vec3 mPosition;
-  Vec3 mNormal;
+  vec3 mPosition;
+  vec3 mNormal;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
 };
 
 struct VertexPosUvNorm {
-  Vec3 mPosition;
-  Vec2 mUv;
-  Vec3 mNormal;
+  vec3 mPosition;
+  vec2 mUv;
+  vec3 mNormal;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
@@ -105,10 +105,10 @@ struct VertexPosUvNorm {
 
 
 struct VertexPosUvNormTangent {
-  Vec3 mPosition;
-  Vec2 mUv;
-  Vec3 mNormal;
-  Vec3 mTangent;
+  vec3 mPosition;
+  vec2 mUv;
+  vec3 mNormal;
+  vec3 mTangent;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;
@@ -116,8 +116,8 @@ struct VertexPosUvNormTangent {
 
 
 struct VertexPosUv {
-  Vec3 mPosition;
-  Vec2 mUv;
+  vec3 mPosition;
+  vec2 mUv;
 
   /// Vertex format descriptor for this struct
   static std::shared_ptr<VertexFormat> mFormat;

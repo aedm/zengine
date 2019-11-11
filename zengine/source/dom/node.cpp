@@ -392,23 +392,23 @@ const std::string& Node::GetName() const {
   return mName;
 }
 
-void Node::SetPosition(const Vec2 position) {
+void Node::SetPosition(const vec2 position) {
   mPosition.x = floorf(position.x);
   mPosition.y = floorf(position.y);
   NotifyWatchers(&Watcher::OnGraphPositionChanged);
 }
 
-Vec2 Node::GetPosition() const {
+vec2 Node::GetPosition() const {
   return mPosition;
 }
 
-void Node::SetSize(const Vec2 size) {
+void Node::SetSize(const vec2 size) {
   mSize = size;
   EnqueueMessage(MessageType::NODE_NAME_CHANGED);
   SendMsg(MessageType::NODE_NAME_CHANGED);
 }
 
-Vec2 Node::GetSize() const {
+vec2 Node::GetSize() const {
   return mSize;
 }
 

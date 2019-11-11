@@ -1,5 +1,18 @@
 #pragma once
 
+
+#define GLM_FORCE_XYZW_ONLY
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+
+using glm::vec2;
+using glm::ivec2;
+using glm::vec3;
+using glm::vec4;
+using glm::mat4;
+
 /// Shader stuff
 const int		NoiseMapSize				= 512;
 

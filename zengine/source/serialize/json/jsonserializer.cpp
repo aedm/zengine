@@ -134,7 +134,7 @@ rapidjson::Value JSONSerializer::Serialize(const std::shared_ptr<Node>& node) {
   return v;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec) const
+rapidjson::Value JSONSerializer::SerializeVec2(const vec2& vec) const
 {
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
@@ -142,7 +142,7 @@ rapidjson::Value JSONSerializer::SerializeVec2(const Vec2& vec) const
   return jsonObject;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec3(const Vec3& vec) const
+rapidjson::Value JSONSerializer::SerializeVec3(const vec3& vec) const
 {
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);
@@ -151,7 +151,7 @@ rapidjson::Value JSONSerializer::SerializeVec3(const Vec3& vec) const
   return jsonObject;
 }
 
-rapidjson::Value JSONSerializer::SerializeVec4(const Vec4& vec) const
+rapidjson::Value JSONSerializer::SerializeVec4(const vec4& vec) const
 {
   rapidjson::Value jsonObject(rapidjson::kObjectType);
   jsonObject.AddMember("x", vec.x, *mAllocator);

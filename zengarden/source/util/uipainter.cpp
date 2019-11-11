@@ -3,6 +3,7 @@
 #include <zengine.h>
 #include <QTextStream>
 #include <QDir>
+#include <glm/gtc/matrix_transform.hpp>
 
 UiPainter* ThePainter = nullptr;
 
@@ -95,28 +96,28 @@ UiPainter::~UiPainter() = default;
 
 void UiPainter::DrawLine(float x1, float y1, float x2, float y2) {
   VertexPos vertices[] = {
-    {Vec3(x1 + 0.5f, y1 + 0.5f, 0)},
-    {Vec3(x2 + 0.5f, y2 + 0.5f, 0)}
+    {vec3(x1 + 0.5f, y1 + 0.5f, 0)},
+    {vec3(x2 + 0.5f, y2 + 0.5f, 0)}
   };
   mLineMeshNode->GetMesh()->SetVertices(vertices);
   mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
 
-void UiPainter::DrawLine(const Vec2& From, const Vec2& To) {
+void UiPainter::DrawLine(const vec2& From, const vec2& To) {
   VertexPos vertices[] = {
-    {Vec3(From.x + 0.5f, From.y + 0.5f, 0)},
-    {Vec3(To.x + 0.5f, To.y + 0.5f, 0)} };
+    {vec3(From.x + 0.5f, From.y + 0.5f, 0)},
+    {vec3(To.x + 0.5f, To.y + 0.5f, 0)} };
   mLineMeshNode->GetMesh()->SetVertices(vertices);
   mSolidLine->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_LINES);
 }
 
-void UiPainter::DrawRect(const Vec2& topLeft, const Vec2& size) {
-  const Vec3 pos(topLeft.x + 0.5f, topLeft.y + 0.5f, 0);
+void UiPainter::DrawRect(const vec2& topLeft, const vec2& size) {
+  const vec3 pos(topLeft.x + 0.5f, topLeft.y + 0.5f, 0);
   VertexPos vertices[] = {
     {pos},
-    {pos + Vec3(size.x - 1, 0, 0)},
-    {pos + Vec3(size.x - 1, size.y - 1, 0)},
-    {pos + Vec3(0, size.y - 1, 0)},
+    {pos + vec3(size.x - 1, 0, 0)},
+    {pos + vec3(size.x - 1, size.y - 1, 0)},
+    {pos + vec3(0, size.y - 1, 0)},
     {pos},
   };
   mRectMeshNode->GetMesh()->SetVertices(vertices);
@@ -124,12 +125,12 @@ void UiPainter::DrawRect(const Vec2& topLeft, const Vec2& size) {
 }
 
 
-void UiPainter::DrawBox(const Vec2& TopLeft, const Vec2& Size) {
+void UiPainter::DrawBox(const vec2& TopLeft, const vec2& Size) {
   VertexPos vertices[] = {
-    {Vec3(TopLeft.x, TopLeft.y, 0)},
-    {Vec3(TopLeft.x + Size.x, TopLeft.y, 0)},
-    {Vec3(TopLeft.x, TopLeft.y + Size.y, 0)},
-    {Vec3(TopLeft.x + Size.x, TopLeft.y + Size.y, 0)},
+    {vec3(TopLeft.x, TopLeft.y, 0)},
+    {vec3(TopLeft.x + Size.x, TopLeft.y, 0)},
+    {vec3(TopLeft.x, TopLeft.y + Size.y, 0)},
+    {vec3(TopLeft.x + Size.x, TopLeft.y + Size.y, 0)},
   };
   mBoxMeshNode->GetMesh()->SetVertices(vertices);
   mSolidBox->Draw(&mGlobals, PassType::SOLID, PRIMITIVE_TRIANGLES);
@@ -139,10 +140,10 @@ void UiPainter::DrawTexture(const std::shared_ptr<Texture>& texture, float x, fl
   const float w(texture->mWidth);
   const float h(texture->mHeight);
   VertexPosUv vertices[] = {
-    {Vec3(x, y, 0), Vec2(0, 0)},
-    {Vec3(x + w, y, 0), Vec2(1, 0)},
-    {Vec3(x, y + h, 0), Vec2(0, 1)},
-    {Vec3(x + w, y + h, 0), Vec2(1, 1)},
+    {vec3(x, y, 0), vec2(0, 0)},
+    {vec3(x + w, y, 0), vec2(1, 0)},
+    {vec3(x, y + h, 0), vec2(0, 1)},
+    {vec3(x + w, y + h, 0), vec2(1, 1)},
   };
 
   mTextureNode->Set(texture);
@@ -150,18 +151,18 @@ void UiPainter::DrawTexture(const std::shared_ptr<Texture>& texture, float x, fl
   mTexturedBox->Draw(&mGlobals, PassType::SOLID);
 }
 
-void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, Vec2 topLeft,
-  Vec2 size) {
+void UiPainter::SetupViewport(int canvasWidth, int canvasHeight, vec2 topLeft,
+  vec2 size) {
   OpenGLAPI::SetViewport(0, 0, canvasWidth, canvasHeight);
-  mColor->Set(Vec4(1, 1, 1, 1));
+  mColor->Set(vec4(1, 1, 1, 1));
 
-  mGlobals.RenderTargetSize = Vec2(canvasWidth, canvasHeight);
+  mGlobals.RenderTargetSize = vec2(canvasWidth, canvasHeight);
   mGlobals.RenderTargetSizeRecip =
-    Vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
+    vec2(1.0f / float(canvasWidth), 1.0f / float(canvasHeight));
 
-  mGlobals.Camera.LoadIdentity();
-  mGlobals.World.LoadIdentity();
+  mGlobals.Camera = mat4(1.0f);
+  mGlobals.World = mat4(1.0f);
   mGlobals.Projection =
-    Matrix::Ortho(topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y);
+    glm::ortho(topLeft.x, topLeft.x + size.x, topLeft.y + size.y, topLeft.y);
   mGlobals.Transformation = mGlobals.Projection;
 }

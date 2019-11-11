@@ -19,7 +19,7 @@ static const float TitlePadding = ADJUST(3.0f);
 static const float SlotSpacing = ADJUST(5.0f);
 
 /// Space between slots
-static const Vec2 SlotPadding = ADJUST(Vec2(5.0f, 1.0f));
+static const vec2 SlotPadding = ADJUST(vec2(5.0f, 1.0f));
 
 /// Left margin in front of slots
 static const float SlotLeftMargin = ADJUST(5.0f);
@@ -30,7 +30,7 @@ static const float SlotRightMargin = ADJUST(20.0f);
 /// Slot width
 static const float SlotWidth = ADJUST(80.0f);
 
-static const Vec2 ConnectionSpotSize = ADJUST(Vec2(4.0f, 4.0f));
+static const vec2 ConnectionSpotSize = ADJUST(vec2(4.0f, 4.0f));
 static const float ConnectionSpotPadding = ADJUST(8.0f);
 
 static const float Opacity = 0.7f;
@@ -114,14 +114,14 @@ void NodeWidget::CalculateLayout() {
   mTitleHeight = float(fontHeight) + TitlePadding * 2.0f + 1.0f;
   float slotY = mTitleHeight + SlotSpacing;
   for (WidgetSlot* sw : mWidgetSlots) {
-    sw->mPosition = Vec2(SlotLeftMargin, slotY);
+    sw->mPosition = vec2(SlotLeftMargin, slotY);
     sw->mSize =
-      Vec2(SlotWidth, float(fontHeight) + SlotPadding.y * 2.0f);
-    sw->mSpotPos = Vec2(ConnectionSpotPadding, slotY + sw->mSize.y / 2.0f);
+      vec2(SlotWidth, float(fontHeight) + SlotPadding.y * 2.0f);
+    sw->mSpotPos = vec2(ConnectionSpotPadding, slotY + sw->mSize.y / 2.0f);
     slotY += sw->mSize.y + SlotSpacing;
   }
-  const Vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
-  mOutputPosition = Vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
+  const vec2 size(SlotLeftMargin + SlotWidth + SlotRightMargin, slotY + 1);
+  mOutputPosition = vec2(size.x - ConnectionSpotPadding - 1.0f, mTitleHeight / 2.0f);
   GetDirectNode()->SetSize(size);
 
   mForceUpdate = true;
@@ -135,7 +135,7 @@ void NodeWidget::UpdateTexture() {
     unsigned char* bits = mImage.bits();
     const int height = mImage.height();
     const int width = mImage.width();
-    std::vector<char> texels(height * width * 4);
+    std::vector<char> texels(size_t(height) * size_t(width) * 4);
     unsigned char* source = bits;
     unsigned char* dest = reinterpret_cast<unsigned char*>(&texels[0]);
     for (int i = 0; i < height * width; i++) {
@@ -162,27 +162,27 @@ void NodeWidget::UpdateTexture() {
   }
 }
 
-static Vec4 LiveHeaderColor = Vec4(0, 0.2, 0.4, Opacity);
-static Vec4 GhostHeaderColor = Vec4(0.4, 0.2, 0, Opacity);
-static Vec4 ReferenceHeaderColor = Vec4(0.4, 0.0, 0.2, Opacity);
+static vec4 LiveHeaderColor = vec4(0, 0.2, 0.4, Opacity);
+static vec4 GhostHeaderColor = vec4(0.4, 0.2, 0, Opacity);
+static vec4 ReferenceHeaderColor = vec4(0.4, 0.0, 0.2, Opacity);
 
 
 void NodeWidget::Paint() {
   UpdateTexture();
 
   const std::shared_ptr<Node> node = GetDirectNode();
-  const Vec2 position = node->GetPosition();
+  const vec2 position = node->GetPosition();
   ThePainter->DrawTexture(mTexture, position.x, position.y);
 }
 
 
-Vec2 NodeWidget::GetOutputPosition() const
+vec2 NodeWidget::GetOutputPosition() const
 {
   return GetDirectNode()->GetPosition() + mOutputPosition;
 }
 
 
-Vec2 NodeWidget::GetInputPosition(int SlotIndex)
+vec2 NodeWidget::GetInputPosition(int SlotIndex)
 {
   WidgetSlot* sw = mWidgetSlots[SlotIndex];
   return GetDirectNode()->GetPosition() + sw->mSpotPos;
@@ -249,7 +249,7 @@ void NodeWidget::HandleNameChange() {
 }
 
 
-QColor QColorFromVec4(const Vec4& vec) {
+QColor QColorFromVec4(const vec4& vec) {
   return QColor::fromRgbF(vec.x, vec.y, vec.z, vec.w);
 }
 
@@ -261,7 +261,7 @@ void NodeWidget::DiscardTexture() {
 void NodeWidget::PaintToImage()
 {
   std::shared_ptr<Node> node = GetDirectNode();
-  Vec2 size = node->GetSize();
+  vec2 size = node->GetSize();
   int iWidth = int(ceilf(size.x));
   int iHeight = int(ceilf(size.y));
 
@@ -269,7 +269,7 @@ void NodeWidget::PaintToImage()
   pixmap.fill(QColor(0, 0, 0, 1));
   mPainter.begin(&pixmap);
 
-  Vec4 headerColor = LiveHeaderColor;
+  vec4 headerColor = LiveHeaderColor;
   if (node->IsGhostNode()) {
     headerColor = PointerCast<Ghost>(node)->IsDirectReference()
       ? ReferenceHeaderColor : GhostHeaderColor;
@@ -285,13 +285,13 @@ void NodeWidget::PaintToImage()
 
   mPainter.setPen(Qt::NoPen);
   mPainter.setBrush(QColor::fromRgbF(0.2, 0.7, 0.9, 1));
-  Vec2 outputTopLeft = mOutputPosition - ConnectionSpotSize * 0.5f;
+  vec2 outputTopLeft = mOutputPosition - ConnectionSpotSize * 0.5f;
   mPainter.drawRect(QRectF(outputTopLeft.x, outputTopLeft.y,
     ConnectionSpotSize.x, ConnectionSpotSize.y));
 
   mPainter.setPen(QColor::fromRgbF(0.9, 0.9, 0.9, 1));
-  mPainter.drawText(
-    QRectF(0, 0, size.x - ConnectionSpotPadding - ConnectionSpotSize.x, mTitleHeight),
+  mPainter.drawText(QRectF(0, 0, 
+    double(size.x - ConnectionSpotPadding - ConnectionSpotSize.x), double(mTitleHeight)),
     Qt::AlignVCenter | Qt::AlignCenter, mNodeTitle);
 
   /// Paint slots
@@ -356,7 +356,7 @@ void NodeWidget::PaintToImage()
 
   mPainter.setPen(frameColor);
   mPainter.setBrush(Qt::NoBrush);
-  mPainter.drawRect(QRectF(0, 0, size.x - 1, size.y - 1));
+  mPainter.drawRect(QRectF(0, 0, double(size.x - 1), double(size.y - 1)));
 
   mPainter.end();
   mImage = QGLWidget::convertToGLFormat(pixmap.toImage().mirrored(false, true));

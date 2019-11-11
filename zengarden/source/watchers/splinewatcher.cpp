@@ -148,7 +148,7 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
     {
       const QPoint diff = mOriginalMousePos - event->pos();
       mLeftCenterPoint =
-        mOriginalPoint + GetStepsPerPixel().Dot(Vec2(diff.x(), diff.y()));
+        mOriginalPoint + dot(GetStepsPerPixel(), vec2(diff.x(), diff.y()));
       mSplineWidget->update();
       UpdateRangeLabels();
     }
@@ -156,7 +156,7 @@ void FloatSplineWatcher::HandleMouseMove(QMouseEvent* event) {
     case State::POINT_MOVE:
     {
       const QPoint diff = event->pos() - mOriginalMousePos;
-      const Vec2 p = mOriginalPoint + GetStepsPerPixel().Dot(Vec2(diff.x(), diff.y()));
+      const vec2 p = mOriginalPoint + dot(GetStepsPerPixel(), vec2(diff.x(), diff.y()));
       std::shared_ptr<FloatSplineNode> spline = PointerCast<FloatSplineNode>(GetNode());
       spline->SetPointValue(mHoveredLayer, mHoveredPointIndex, p.x, p.y);
       mSplineWidget->update();
@@ -219,7 +219,7 @@ void FloatSplineWatcher::HandleMouseLeftDown(QMouseEvent* event) {
     std::shared_ptr<FloatSplineNode> spline = GetSpline();
     const SplinePoint& p =
       spline->GetComponent(mHoveredLayer)->GetPoints()[mHoveredPointIndex];
-    mOriginalPoint = Vec2(p.mTime, p.mValue);
+    mOriginalPoint = vec2(p.mTime, p.mValue);
   } else {
     /// Move time
     mState = FloatSplineWatcher::State::TIME_MOVE;
@@ -240,14 +240,14 @@ void FloatSplineWatcher::HandleMouseUp(QMouseEvent* event) {
 
 
 void FloatSplineWatcher::HandleMouseWheel(QWheelEvent* event) {
-  const Vec2 before = ScreenToPoint(event->pos());
+  const vec2 before = ScreenToPoint(event->pos());
   const float zoomDelta = float(event->delta()) / (120.0f * 4.0f);
   if (QApplication::keyboardModifiers() & Qt::ControlModifier) {
     mZoomLevel.x += zoomDelta;
   } else {
     mZoomLevel.y += zoomDelta;
   }
-  const Vec2 after = ScreenToPoint(event->pos());
+  const vec2 after = ScreenToPoint(event->pos());
   mLeftCenterPoint -= after - before;
   mSplineWidget->update();
   UpdateRangeLabels();
@@ -329,18 +329,18 @@ float FloatSplineWatcher::ScreenToTime(int xPos) const
   return float(xPos) * GetStepsPerPixel().x + mLeftCenterPoint.x;
 }
 
-Vec2 FloatSplineWatcher::ScreenToPoint(const QPoint& pos) const
+vec2 FloatSplineWatcher::ScreenToPoint(const QPoint& pos) const
 {
-  const Vec2 spp = GetStepsPerPixel();
+  const vec2 spp = GetStepsPerPixel();
   const float x = float(pos.x()) * spp.x + mLeftCenterPoint.x;
   const float y = mLeftCenterPoint.y -
     (0.5f * float(mSplineWidget->height()) - float(pos.y())) * spp.y;
-  return Vec2(x, y);
+  return vec2(x, y);
 }
 
-Vec2 FloatSplineWatcher::GetStepsPerPixel() const
+vec2 FloatSplineWatcher::GetStepsPerPixel() const
 {
-  return Vec2(powf(0.5f, mZoomLevel.x) / DefaultPixelsPerBeat,
+  return vec2(powf(0.5f, mZoomLevel.x) / DefaultPixelsPerBeat,
               -powf(0.5f, mZoomLevel.y) / DefaultPixelsPerValue);
 }
 
@@ -394,7 +394,7 @@ void FloatSplineWatcher::DrawSpline(QPaintEvent* ev) const {
   /// Draw spline
   painter.setPen(QColor(0, 192, 192));
   const UINT sampleCount = mSplineWidget->width();
-  const Vec2 spp = GetStepsPerPixel();
+  const vec2 spp = GetStepsPerPixel();
   const float ppsy = 1.0f / spp.y;
   const float heightHalf = 0.5f * float(mSplineWidget->height());
   float t = mLeftCenterPoint.x;
@@ -438,7 +438,7 @@ void FloatSplineWatcher::DrawSplineComponentControl(
   SplineFloatComponent* component = spline->GetComponent(layer);
 
   const UINT sampleCount = mSplineWidget->width();
-  const Vec2 spp = GetStepsPerPixel();
+  const vec2 spp = GetStepsPerPixel();
   const float ppsy = 1.0f / spp.y;
   const float heightHalf = 0.5f * float(mSplineWidget->height());
   float t = mLeftCenterPoint.x;

@@ -1,5 +1,7 @@
 #include <include/nodes/scenenode.h>
 #include <include/shaders/engineshaders.h>
+#include <glm/gtc/matrix_transform.hpp>
+
 REGISTER_NODECLASS(SceneNode, "Scene");
 
 SceneNode::SceneNode()
@@ -23,9 +25,9 @@ SceneNode::SceneNode()
 {
   mSkyLightSpread.SetDefaultValue(10.0f);
   mSkyLightSampleSpread.SetDefaultValue(5.0f);
-  mShadowMapSize.SetDefaultValue(Vec3(30, 30, 50));
-  mSkyLightDirection.SetDefaultValue(Vec3(0.5f, 0.5f, 0.5f));
-  mSkyLightColor.SetDefaultValue(Vec3(1, 1, 1));
+  mShadowMapSize.SetDefaultValue(vec3(30, 30, 50));
+  mSkyLightDirection.SetDefaultValue(vec3(0.5f, 0.5f, 0.5f));
+  mSkyLightColor.SetDefaultValue(vec3(1, 1, 1));
   mSkyLightAmbient.SetDefaultValue(0.2f);
   mDOFEnabled.SetDefaultValue(0.0f);
   mDOFFocusDistance.SetDefaultValue(50.0f);
@@ -62,22 +64,23 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   /// Pass #1: skylight shadow
   renderTarget->SetShadowBufferAsTarget(globals);
   OpenGL->Clear(true, true, 0xff00ff80);
-  const Vec3 s = mShadowMapSize.Get();
-  const Vec3 lightDir = mSkyLightDirection.Get().Normal();
+  const vec3 s = mShadowMapSize.Get();
+  const vec3 lightDir = normalize(mSkyLightDirection.Get());
 
-  const Matrix lookAt = Matrix::LookAt(-lightDir, Vec3(0, 0, 0), Vec3(0, 1, 0));
-  const Matrix target = Matrix::Translate(-camera->mTarget.Get());
+  const mat4 lookAt = glm::lookAt(-lightDir, vec3(0, 0, 0), vec3(0, 1, 0));
+  const mat4 target = glm::translate(mat4(1.0f), -camera->mTarget.Get());
   globals->Camera = lookAt * target;
  
-  globals->Projection = Matrix::Ortho(-s.x, -s.y, s.x, s.y, -s.z, s.z);
-  globals->World.LoadIdentity();
-    /// Calculate shadow center
-  Vec3 shadowCenter(0, 0, 0);
+  globals->Projection = glm::ortho(-s.x, s.x, -s.y, s.y, -s.z, s.z);
+  globals->World = mat4(1.0f);
+
+  /// Calculate shadow center
+  vec3 shadowCenter(0, 0, 0);
   for (UINT i = 0; i < mDrawables.GetMultiNodeCount(); i++) {
     auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->ComputeForcedShadowCenter(globals, shadowCenter);
   }
-  const Matrix shadowCenterTarget = Matrix::Translate(-shadowCenter);
+  const mat4 shadowCenterTarget = glm::translate(mat4(1.0f), -shadowCenter);
   globals->Camera = shadowCenterTarget * globals->Camera;
 
   globals->SkylightProjection = globals->Projection;

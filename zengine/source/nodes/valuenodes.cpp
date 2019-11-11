@@ -6,27 +6,27 @@ template<> StaticValueNode<float>::StaticValueNode()
   mValue = 0.0f;
 }
 
-template<> StaticValueNode<Vec2>::StaticValueNode()
-  : ValueNode<Vec2>() {
-  mValue = Vec2(0, 0);
+template<> StaticValueNode<vec2>::StaticValueNode()
+  : ValueNode<vec2>() {
+  mValue = vec2(0, 0);
 }
 
-template<> StaticValueNode<Vec3>::StaticValueNode()
-  : ValueNode<Vec3>()
+template<> StaticValueNode<vec3>::StaticValueNode()
+  : ValueNode<vec3>()
 {
-  mValue = Vec3(0, 0, 0);
+  mValue = vec3(0, 0, 0);
 }
 
-template<> StaticValueNode<Vec4>::StaticValueNode()
-  : ValueNode<Vec4>()
+template<> StaticValueNode<vec4>::StaticValueNode()
+  : ValueNode<vec4>()
 {
-  mValue = Vec4(0, 0, 0, 0);
+  mValue = vec4(0, 0, 0, 0);
 }
 
-template<> StaticValueNode<Matrix>::StaticValueNode()
-  : ValueNode<Matrix>()
+template<> StaticValueNode<mat4>::StaticValueNode()
+  : ValueNode<mat4>()
 {
-  mValue.LoadIdentity();
+  mValue = mat4(1.0f);
 }
 
 template<> StaticValueNode<std::string>::StaticValueNode()
@@ -34,14 +34,14 @@ template<> StaticValueNode<std::string>::StaticValueNode()
 {}
 
 REGISTER_NODECLASS(FloatNode, "Float")
-REGISTER_NODECLASS(Vec2Node, "Vec2")
-REGISTER_NODECLASS(Vec3Node, "Vec3")
-REGISTER_NODECLASS(Vec4Node, "Vec4")
+REGISTER_NODECLASS(Vec2Node, "vec2")
+REGISTER_NODECLASS(Vec3Node, "vec3")
+REGISTER_NODECLASS(Vec4Node, "vec4")
 REGISTER_NODECLASS(MatrixNode, "Matrix")
 
 
 template<>
-void StaticValueNode<Matrix>::Set(const Matrix& newValue) {
+void StaticValueNode<mat4>::Set(const mat4& newValue) {
   mValue = newValue;
   SendMsg(MessageType::VALUE_CHANGED);
 }
@@ -54,8 +54,8 @@ void StaticValueNode<T>::Set(const T& newValue) {
 }
 
 template class StaticValueNode<float>;
-template class StaticValueNode<Vec2>;
-template class StaticValueNode<Vec3>;
-template class StaticValueNode<Vec4>;
-template class StaticValueNode<Matrix>;
+template class StaticValueNode<vec2>;
+template class StaticValueNode<vec3>;
+template class StaticValueNode<vec4>;
+template class StaticValueNode<mat4>;
 template class StaticValueNode<std::string>;

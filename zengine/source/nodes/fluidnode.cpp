@@ -66,7 +66,7 @@ void FluidNode::Render(float deltaTime) const
   globals.FluidCurlAmount = mCurlAmount.Get();
   globals.FluidPressureFade = mPressureFade.Get();
   globals.FluidDeltaTime = deltaTime;
-  globals.RenderTargetSizeRecip = Vec2(VELOCITY_TEXEL_SIZE, VELOCITY_TEXEL_SIZE);
+  globals.RenderTargetSizeRecip = { VELOCITY_TEXEL_SIZE, VELOCITY_TEXEL_SIZE };
 
   /// Curl step
   OpenGLAPI::SetViewport(0, 0, VELOCITY_RESOLUTION, VELOCITY_RESOLUTION);
@@ -118,7 +118,7 @@ void FluidNode::Render(float deltaTime) const
 
   /// Color advection
   OpenGLAPI::SetViewport(0, 0, COLOR_RESOLUTION, COLOR_RESOLUTION);
-  globals.RenderTargetSizeRecip = Vec2(COLOR_PIXEL_SIZE, COLOR_PIXEL_SIZE);
+  globals.RenderTargetSizeRecip = { COLOR_PIXEL_SIZE, COLOR_PIXEL_SIZE };
   globals.FluidDissipation = mColorDissipation.Get();
   globals.FluidColor = mColor1Texture;
   TheEngineShaders->mFluid_AdvectionPass->Set(&globals);

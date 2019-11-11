@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../dom/node.h"
-#include "../base/vectormath.h"
 #include <string>
 
 /// Nodes holding primitive values.
@@ -32,10 +31,10 @@ protected:
 
 
 template<> StaticValueNode<float>::StaticValueNode();
-template<> StaticValueNode<Vec2>::StaticValueNode();
-template<> StaticValueNode<Vec3>::StaticValueNode();
-template<> StaticValueNode<Vec4>::StaticValueNode();
-template<> StaticValueNode<Matrix>::StaticValueNode();
+template<> StaticValueNode<vec2>::StaticValueNode();
+template<> StaticValueNode<vec3>::StaticValueNode();
+template<> StaticValueNode<vec4>::StaticValueNode();
+template<> StaticValueNode<mat4>::StaticValueNode();
 template<> StaticValueNode<std::string>::StaticValueNode();
 
 
@@ -43,9 +42,6 @@ template<typename T>
 const T& StaticValueNode<T>::Get() {
   return mValue;
 }
-
-
-
 
 
 /// Slots for value nodes. These slots have a StaticValueNode built in
@@ -62,7 +58,7 @@ public:
   const T& Get() const;
 
   /// Return minimum & maximum
-  Vec2 GetRange() const;
+  vec2 GetRange() const;
 
   /// Sets the value of the built-in Node.
   void SetDefaultValue(const T& value);
@@ -113,8 +109,8 @@ const T& ValueSlot<T>::Get() const {
 
 
 template<typename T>
-Vec2 ValueSlot<T>::GetRange() const {
-  return Vec2(mMinimum, mMaximum);
+vec2 ValueSlot<T>::GetRange() const {
+  return vec2(mMinimum, mMaximum);
 }
 
 
@@ -173,24 +169,22 @@ void ValueSlot<T>::DisconnectAll(bool notifyOwner) {
   }
 }
 
-
 template<typename T>
 bool ValueSlot<T>::IsDefaulted() {
   return GetReferencedNode() == mDefault;
 }
 
-
 /// Node and slot types
 typedef ValueSlot<float> FloatSlot;
-typedef ValueSlot<Vec2> Vec2Slot;
-typedef ValueSlot<Vec3> Vec3Slot;
-typedef ValueSlot<Vec4> Vec4Slot;
-typedef ValueSlot<Matrix> MatrixSlot;
+typedef ValueSlot<vec2> Vec2Slot;
+typedef ValueSlot<vec3> Vec3Slot;
+typedef ValueSlot<vec4> Vec4Slot;
+typedef ValueSlot<mat4> MatrixSlot;
 typedef ValueSlot<std::string> StringSlot;
 
 typedef StaticValueNode<float> FloatNode;
-typedef StaticValueNode<Vec2> Vec2Node;
-typedef StaticValueNode<Vec3> Vec3Node;
-typedef StaticValueNode<Vec4> Vec4Node;
-typedef StaticValueNode<Matrix> MatrixNode;
+typedef StaticValueNode<vec2> Vec2Node;
+typedef StaticValueNode<vec3> Vec3Node;
+typedef StaticValueNode<vec4> Vec4Node;
+typedef StaticValueNode<mat4> MatrixNode;
 typedef StaticValueNode<std::string> StringNode;

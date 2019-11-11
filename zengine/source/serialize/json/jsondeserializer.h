@@ -41,9 +41,9 @@ private:
   /// Connects a slot by "id" tag.
   void ConnectValueSlotById(const rapidjson::Value& value, Slot* slot);
 
-  static Vec2 DeserializeVec2(const rapidjson::Value& value);
-  static Vec3 DeserializeVec3(const rapidjson::Value& value);
-  static Vec4 DeserializeVec4(const rapidjson::Value& value);
+  static vec2 DeserializeVec2(const rapidjson::Value& value);
+  static vec3 DeserializeVec3(const rapidjson::Value& value);
+  static vec4 DeserializeVec4(const rapidjson::Value& value);
 
   std::unordered_map<int, std::shared_ptr<Node>> mNodes;
 
