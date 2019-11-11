@@ -132,7 +132,7 @@ void RenderTarget::Resize(ivec2 size) {
 
   /// Video output framebuffer
   if (mForFrameGrabbing && mColorBufferId == 0) {
-    mShadowTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8,
+    mColorTexture = OpenGL->MakeTexture(width, height, TexelType::ARGB8,
       nullptr, true, false, false, false);
     mColorBufferId = OpenGLAPI::CreateFrameBuffer(nullptr, mColorTexture, nullptr);
   }

@@ -87,8 +87,6 @@ void OpenGLAPI::OnContextSwitch() {
 
   mDepthTestEnabledShadow = true;
   SetDepthTest(false);
-
-  mClearColorShadow = 1;
   SetClearColor(0);
 
   glDepthMask(true);
@@ -368,6 +366,10 @@ void OpenGLAPI::BindFrameBuffer(FrameBufferId frameBufferId) {
     glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
     CheckGLError();
     mBoundFrameBufferShadow = frameBufferId;
+#ifdef _DEBUG
+    GLenum state = glCheckNamedFramebufferStatus(frameBufferId, GL_FRAMEBUFFER);
+    ASSERT(state == GL_FRAMEBUFFER_COMPLETE);
+#endif
   }
 }
 
@@ -491,13 +493,11 @@ inline float IntColorToFloat(UINT color) {
 
 
 void OpenGLAPI::SetClearColor(UINT clearColor) {
-  if (clearColor == mClearColorShadow) return;
   glClearColor(
     IntColorToFloat((clearColor >> 16) & 0xff),
     IntColorToFloat((clearColor >> 8) & 0xff),
     IntColorToFloat((clearColor) & 0xff),
     1.0f);
-  mClearColorShadow = clearColor;
   CheckGLError();
 }
 
