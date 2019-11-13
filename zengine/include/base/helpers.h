@@ -1,6 +1,9 @@
 #pragma once
 #include "system.h"
 #include <memory>
+#include <string_view>
+
+using std::string_view;
 
 #if 1
 #	ifdef _DEBUG
@@ -124,11 +127,10 @@ public:
     }
     return nullptr;
   }
-  Enum GetEnumA(const char* name, int nameLength) const {
+  Enum GetEnumA(const string_view& name) const {
     for (const auto& item : mItems) {
-      if (strlen(item.mName) == nameLength &&
-        strncmp(name, item.mName, nameLength) == 0) {
-          return item.mEnum;
+      if (name == item.mName) {
+        return item.mEnum;
       }
     }
     return Enum(-1);

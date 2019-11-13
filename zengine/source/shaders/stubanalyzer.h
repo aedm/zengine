@@ -2,6 +2,10 @@
 
 #include <include/shaders/stubnode.h>
 #include "../shaders/shaderTokenizer.h"
+#include <string>
+#include <vector>
+
+using std::string;
 
 /// TODO: Remove this.
 using namespace Shaders;
@@ -15,13 +19,13 @@ public:
 private:
   StubAnalyzer(const char* stubSource);
 
-  void AnalyzeMetadataLine(SourceLine* line);
+  void AnalyzeMetadataLine(const SourceLine& line);
 
-  void AnalyzeName(SourceLine* line);
-  void AnalyzeReturns(SourceLine* line);
-  void AnalyzeParam(SourceLine* line);
-  void AnalyzeGlobal(SourceLine* line);
-  void AnalyzeVariable(SourceLine* line,
+  void AnalyzeName(const SourceLine& line);
+  void AnalyzeReturns(const SourceLine& line);
+  void AnalyzeParam(const SourceLine& line);
+  void AnalyzeGlobal(const SourceLine& line);
+  void AnalyzeVariable(const SourceLine& line,
                        std::vector<StubInOutVariable*>& storage) const;
 
   StubParameter::Type TokenToType(const SubString& subStr) const;
@@ -29,12 +33,12 @@ private:
   int mCurrentLineNumber;
 
   /// Builders
-  std::string mName;
-  std::string mStrippedSource;
+  string mName;
+  string mStrippedSource;
   StubParameter::Type mReturnType;
-  std::vector<StubParameter*> mParameters;
-  std::vector<StubGlobalUniform*> mGlobalUniforms;
-  std::vector<StubGlobalSampler*> mGlobalSamplers;
-  std::vector<StubInOutVariable*> mInputs;
-  std::vector<StubInOutVariable*> mOutputs;
+  vector<StubParameter*> mParameters;
+  vector<StubGlobalUniform*> mGlobalUniforms;
+  vector<StubGlobalSampler*> mGlobalSamplers;
+  vector<StubInOutVariable*> mInputs;
+  vector<StubInOutVariable*> mOutputs;
 };

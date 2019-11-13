@@ -3,7 +3,11 @@
 
 #include <include/base/defines.h>
 #include <vector>
-#include <string>
+//#include <string>
+#include <string_view>
+
+using std::string_view;
+using std::vector;
 
 namespace Shaders {
 
@@ -55,23 +59,19 @@ namespace Shaders {
   };
 
   struct SubString {
-    SubString(const char* begin, UINT length);
-    SubString(const char* begin, UINT length, ShaderTokenEnum token);
+    const ShaderTokenEnum mToken = ShaderTokenEnum::TOKEN_UNKNOWN;
+    const string_view mStringView;
 
-    ShaderTokenEnum mToken = ShaderTokenEnum::TOKEN_UNKNOWN;
-    const char* mBegin = nullptr;
-    UINT mLength = 0;
-
-    std::string ToString() const;
+    SubString(const string_view& stringView, ShaderTokenEnum token);
+    static SubString FromString(const char* begin, size_t length);
   };
 
   struct SourceLine {
-    int mLineNumber = -1;
-    std::vector<SubString> mSubStrings;
-    SubString mEntireLine;
-
-    SourceLine(int lineNumber, const char* lineBegin);
+    const int mLineNumber;
+    const string_view mEntireLine;
+    const vector<SubString> mSubStrings;
+    SourceLine(int lineNumber, const string_view& entireLine, vector<SubString>&& subStrings);
   };
 
-  OWNERSHIP std::vector<SourceLine*>* SplitToWords(const char* source);
+  OWNERSHIP vector<SourceLine> SplitToWords(const char* source);
 }

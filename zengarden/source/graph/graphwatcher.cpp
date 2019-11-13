@@ -36,8 +36,8 @@ void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
 
   ThePainter->SetupViewport(glWidget->width(), glWidget->height(), topLeft, canvasSize);
 
-  glClearColor(0.26f, 0.26f, 0.26f, 1.0f);
-  OpenGL->Clear();
+  //glClearColor(0.26f, 0.26f, 0.26f, 1.0f);
+  OpenGL->Clear(true, false, 0x434343);
 
   /// Draw connections
   ThePainter->mColor->Set(vec4(1, 1, 1, 1));

@@ -10,32 +10,32 @@ REGISTER_NODECLASS(StubNode, "Stub");
 const EnumMapA<GlobalUniformUsage> GlobalUniformMapper = {
 #undef ITEM
 #define ITEM(name, type) { "g" MAGIC(name), GlobalUniformUsage::name },
-  GLOBALUNIFORM_LIST
+  GLOBAL_UNIFORM_LIST
 };
 
 const EnumMapA<GlobalSamplerUsage> GlobalSamplerMapper = {
 #undef ITEM
 #define ITEM(name) { "g" MAGIC(name), GlobalSamplerUsage::name },
-  GLOBALSAMPLER_LIST
+  GLOBAL_SAMPLER_LIST
 };
 
 /// Array for global uniform types
 const ValueType GlobalUniformTypes[] = {
 #undef ITEM
 #define ITEM(name, type) type,
-  GLOBALUNIFORM_LIST
+  GLOBAL_UNIFORM_LIST
 };
 
 const int GlobalUniformOffsets[] = {
 #undef ITEM
 #define ITEM(name, type) offsetof(Globals, name),
-  GLOBALUNIFORM_LIST
+  GLOBAL_UNIFORM_LIST
 };
 
 const int GlobalSamplerOffsets[] = {
 #undef ITEM
 #define ITEM(name) offsetof(Globals, name),
-  GLOBALSAMPLER_LIST
+  GLOBAL_SAMPLER_LIST
 };
 
 StubNode::StubNode()

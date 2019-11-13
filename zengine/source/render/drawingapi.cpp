@@ -367,8 +367,10 @@ void OpenGLAPI::BindFrameBuffer(FrameBufferId frameBufferId) {
     CheckGLError();
     mBoundFrameBufferShadow = frameBufferId;
 #ifdef _DEBUG
-    GLenum state = glCheckNamedFramebufferStatus(frameBufferId, GL_FRAMEBUFFER);
-    ASSERT(state == GL_FRAMEBUFFER_COMPLETE);
+    if (frameBufferId != 0) {
+      GLenum state = glCheckNamedFramebufferStatus(frameBufferId, GL_FRAMEBUFFER);
+      ASSERT(state == GL_FRAMEBUFFER_COMPLETE);
+    }
 #endif
   }
 }
