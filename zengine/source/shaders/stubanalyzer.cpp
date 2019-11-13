@@ -20,11 +20,11 @@ StubAnalyzer::StubAnalyzer(const char* stubSource)
   , mReturnType(StubParameter::Type::TVOID) {
   std::vector<SourceLine*>* lines = SplitToWords(stubSource);
   for (SourceLine* line : *lines) {
-    mCurrentLineNumber = line->LineNumber;
-    if (line->SubStrings[0].Token == ShaderTokenEnum::TOKEN_COLON) {
+    mCurrentLineNumber = line->mLineNumber;
+    if (line->mSubStrings[0].mToken == ShaderTokenEnum::TOKEN_COLON) {
       AnalyzeMetadataLine(line);
     } else {
-      mStrippedSource = mStrippedSource + line->EntireLine.ToString() + '\n';
+      mStrippedSource = mStrippedSource + line->mEntireLine.ToString() + '\n';
     }
     delete line;
   }
@@ -32,12 +32,12 @@ StubAnalyzer::StubAnalyzer(const char* stubSource)
 }
 
 void StubAnalyzer::AnalyzeMetadataLine(SourceLine* line) {
-  if (line->SubStrings.size() < 2) {
+  if (line->mSubStrings.size() < 2) {
     ERR("line %d: Line empty.", mCurrentLineNumber);
     return;
   }
 
-  switch (line->SubStrings[1].Token) {
+  switch (line->mSubStrings[1].mToken) {
     case ShaderTokenEnum::TOKEN_name:
       AnalyzeName(line);
       break;
@@ -58,41 +58,41 @@ void StubAnalyzer::AnalyzeMetadataLine(SourceLine* line) {
       break;
     default:
       ERR("line %d: unknown metadata type '%s'.", mCurrentLineNumber,
-          line->SubStrings[1].ToString().c_str());
+          line->mSubStrings[1].ToString().c_str());
       break;
   }
 }
 
 void StubAnalyzer::AnalyzeName(SourceLine* line) {
-  if (line->SubStrings.size() != 3 || 
-    line->SubStrings[2].Token != ShaderTokenEnum::TOKEN_STRING) {
+  if (line->mSubStrings.size() != 3 || 
+    line->mSubStrings[2].mToken != ShaderTokenEnum::TOKEN_STRING) {
     ERR("line %d: Wrong syntax, use ':name \"<name>\"'", mCurrentLineNumber);
     return;
   }
 
-  mName = line->SubStrings[2].ToString();
+  mName = line->mSubStrings[2].ToString();
 }
 
 void StubAnalyzer::AnalyzeReturns(SourceLine* line) {
-  if (line->SubStrings.size() != 3) {
+  if (line->mSubStrings.size() != 3) {
     ERR("line %d: Wrong syntax, use ':returns [void|float|vec2|vec3|vec4]'",
         mCurrentLineNumber);
     return;
   }
 
-  mReturnType = TokenToType(line->SubStrings[2]);
+  mReturnType = TokenToType(line->mSubStrings[2]);
 }
 
 void StubAnalyzer::AnalyzeParam(SourceLine* line) {
-  if (line->SubStrings.size() < 4) {
+  if (line->mSubStrings.size() < 4) {
     ERR("line %d: Wrong syntax, use ':param <type> <name>'",
         mCurrentLineNumber);
     return;
   }
 
   StubParameter* parameter = new StubParameter();
-  parameter->mType = TokenToType(line->SubStrings[2]);
-  parameter->mName = line->SubStrings[3].ToString();
+  parameter->mType = TokenToType(line->mSubStrings[2]);
+  parameter->mName = line->mSubStrings[3].ToString();
   mParameters.push_back(parameter);
 }
 
@@ -100,12 +100,12 @@ void StubAnalyzer::AnalyzeParam(SourceLine* line) {
 void StubAnalyzer::AnalyzeVariable(SourceLine* line,
                                    std::vector<StubInOutVariable*>& Storage) const
 {
-  if (line->SubStrings.size() < 4) {
+  if (line->mSubStrings.size() < 4) {
     ERR("line %d: Wrong syntax", mCurrentLineNumber);
     return;
   }
 
-  const StubParameter::Type variableType = TokenToType(line->SubStrings[2]);
+  const StubParameter::Type variableType = TokenToType(line->mSubStrings[2]);
   if (!StubParameter::IsValidValueType(variableType)) {
     ERR("line %d: Invalid type");
     return;
@@ -113,23 +113,23 @@ void StubAnalyzer::AnalyzeVariable(SourceLine* line,
 
   StubInOutVariable* parameter = new StubInOutVariable();
   parameter->type = StubParameter::ToValueType(variableType);
-  parameter->name = line->SubStrings[3].ToString();
+  parameter->name = line->mSubStrings[3].ToString();
   Storage.push_back(parameter);
 }
 
 
 void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
-  if (line->SubStrings.size() < 4) {
+  if (line->mSubStrings.size() < 4) {
     ERR("line %d: Wrong syntax", mCurrentLineNumber);
     return;
   }
 
-  const StubParameter::Type declaredType = TokenToType(line->SubStrings[2]);
-  SubString& name = line->SubStrings[3];
+  const StubParameter::Type declaredType = TokenToType(line->mSubStrings[2]);
+  SubString& name = line->mSubStrings[3];
  
   /// Global sampler
   if (declaredType == StubParameter::Type::SAMPLER2D) {
-    GlobalSamplerUsage usage = GlobalSamplerMapper.GetEnumA(name.Begin, name.Length);
+    GlobalSamplerUsage usage = GlobalSamplerMapper.GetEnumA(name.mBegin, name.mLength);
     if (signed(usage) < 0) {
       ERR("line %d: Unrecognized global sampler '%s'.", mCurrentLineNumber,
         name.ToString().c_str());
@@ -139,9 +139,9 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     globalSampler->name = name.ToString();
     globalSampler->usage = usage;
     globalSampler->isMultiSampler = 
-      (line->SubStrings[2].Token == ShaderTokenEnum::TOKEN_sampler2DMS);
+      (line->mSubStrings[2].mToken == ShaderTokenEnum::TOKEN_sampler2DMS);
     globalSampler->isShadow = 
-      (line->SubStrings[2].Token == ShaderTokenEnum::TOKEN_sampler2DShadow);
+      (line->mSubStrings[2].mToken == ShaderTokenEnum::TOKEN_sampler2DShadow);
     mGlobalSamplers.push_back(globalSampler);
     return;
   }
@@ -152,7 +152,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
     return;
   }
 
-  int usage = int(GlobalUniformMapper.GetEnumA(name.Begin, name.Length));
+  int usage = int(GlobalUniformMapper.GetEnumA(name.mBegin, name.mLength));
   if (usage < 0) {
     ERR("line %d: Unrecognized global uniform '%s'.", mCurrentLineNumber,
       name.ToString().c_str());
@@ -177,7 +177,7 @@ void StubAnalyzer::AnalyzeGlobal(SourceLine* line) {
 
 StubParameter::Type StubAnalyzer::TokenToType(const SubString& subStr) const
 {
-  switch (subStr.Token) {
+  switch (subStr.mToken) {
     case ShaderTokenEnum::TOKEN_void:            return StubParameter::Type::TVOID;
     case ShaderTokenEnum::TOKEN_float:           return StubParameter::Type::FLOAT;
     case ShaderTokenEnum::TOKEN_vec2:            return StubParameter::Type::VEC2;

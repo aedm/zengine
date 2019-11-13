@@ -7,8 +7,8 @@
 
 namespace Shaders {
 
-  /// Macrolist for shader tokens
-#define SHADERTOKEN_LIST	\
+  /// Macro list for shader tokens
+#define SHADER_TOKEN_LIST	\
 	ITEM(float)				      \
 	ITEM(vec2)				      \
 	ITEM(vec3)				      \
@@ -51,26 +51,27 @@ namespace Shaders {
     TOKEN_STRING,
 #undef ITEM
 #define ITEM(name) TOKEN_##name,
-    SHADERTOKEN_LIST
+    SHADER_TOKEN_LIST
   };
 
   struct SubString {
-    SubString(const char* Begin, UINT Length);
-    SubString(const char* Begin, UINT Length, ShaderTokenEnum Token);
+    SubString(const char* begin, UINT length);
+    SubString(const char* begin, UINT length, ShaderTokenEnum token);
 
-    ShaderTokenEnum Token;
-    const char* Begin;
-    UINT Length;
+    ShaderTokenEnum mToken = ShaderTokenEnum::TOKEN_UNKNOWN;
+    const char* mBegin = nullptr;
+    UINT mLength = 0;
+
     std::string ToString() const;
   };
 
   struct SourceLine {
-    int					LineNumber;
-    std::vector<SubString>	SubStrings;
-    SubString			EntireLine;
+    int mLineNumber = -1;
+    std::vector<SubString> mSubStrings;
+    SubString mEntireLine;
 
-    SourceLine(int LineNumber, const char* LineBegin);
+    SourceLine(int lineNumber, const char* lineBegin);
   };
 
-  OWNERSHIP std::vector<SourceLine*>* SplitToWords(const char* Text);
+  OWNERSHIP std::vector<SourceLine*>* SplitToWords(const char* source);
 }

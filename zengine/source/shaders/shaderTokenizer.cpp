@@ -12,44 +12,44 @@ namespace Shaders
     {"=",	ShaderTokenEnum::TOKEN_EQUALS },
     #undef ITEM
     #define ITEM(name) { MAGIC(name), ShaderTokenEnum::TOKEN_##name },
-    SHADERTOKEN_LIST
+    SHADER_TOKEN_LIST
   };
 
 
   /// Skips whitespace characters
-  static const char* SkipWhiteSpace(const char* Position)
+  static const char* SkipWhiteSpace(const char* position)
   {
-    const char* pos = Position;
+    const char* pos = position;
     while (*pos == ' ' || *pos == '\t') pos++;
     return pos;
   }
 
   /// Skips all characters except those in SkipCharacters and '\0', 
   /// returns the first matching position
-  static const char* SkipUntil(const char* Position, const char* SkipCharacters)
+  static const char* SkipUntil(const char* position, const char* skipCharacters)
   {
-    const char* pos = Position;
+    const char* pos = position;
     // ReSharper disable once CppPossiblyErroneousEmptyStatements
-    for (char c = *pos; c != 0 && !strchr(SkipCharacters, c); c = *++pos);
+    for (char c = *pos; c != 0 && !strchr(skipCharacters, c); c = *++pos);
     return pos;
   }
 
 
   /// Skips all characters in SkipCharacters, returns the first non-matching position
-  static const char* SkipAll(const char* Position, const char* SkipCharacters)
+  static const char* SkipAll(const char* position, const char* skipCharacters)
   {
-    const char* pos = Position;
+    const char* pos = position;
     // ReSharper disable once CppPossiblyErroneousEmptyStatements
-    for (char c = *pos; c != 0 && strchr(SkipCharacters, c); c = *++pos);
+    for (char c = *pos; c != 0 && strchr(skipCharacters, c); c = *++pos);
     return pos;
   }
 
   /// Returns next word in quotes
-  SubString GetNextQuote(const char* Position, int LineNumber)
+  SubString GetNextQuote(const char* position, int lineNumber)
   {
-    ASSERT(Position[0] == '\"');
+    ASSERT(position[0] == '\"');
 
-    const char* pos = Position + 1;
+    const char* pos = position + 1;
     while (true)
     {
       pos = SkipUntil(pos, "\"\\\n\r");
@@ -62,19 +62,19 @@ namespace Shaders
     }
     if (*pos != '"')
     {
-      ERR(L"Unfinished quotemark in line %d.", LineNumber);
+      ERR(L"Unfinished quotemark in line %d.", lineNumber);
     }
     else pos++;
-    return SubString(Position, UINT(pos - Position), ShaderTokenEnum::TOKEN_STRING);
+    return SubString(position, UINT(pos - position), ShaderTokenEnum::TOKEN_STRING);
   }
 
   /// Returns next word. Comment lines are one word. Stops before line endings.
-  SubString GetNextWord(const char* Position, int LineNumber)
+  SubString GetNextWord(const char* position, int lineNumber)
   {
-    const char* begin = Position;
+    const char* begin = position;
 
     /// Handle quoted strings
-    if (*begin == '"') return GetNextQuote(begin, LineNumber);
+    if (*begin == '"') return GetNextQuote(begin, lineNumber);
 
     if (begin[0] == ':') {
       return SubString(begin, 1, ShaderTokenEnum::TOKEN_COLON);
@@ -87,7 +87,7 @@ namespace Shaders
 
     const char* pos = SkipUntil(begin, "/;= \t\n\r\"");
 
-    if (pos == Position)
+    if (pos == position)
     {
       if (pos[0] == '/' && pos[1] == '/')
       {
@@ -107,7 +107,7 @@ namespace Shaders
 
 
   /// Splits the while source code into words
-  std::vector<SourceLine*>* Shaders::SplitToWords(const char* source)
+  std::vector<SourceLine*>* SplitToWords(const char* source)
   {
     int lineNumber = 1;
     const char* pos = source;
@@ -125,7 +125,7 @@ namespace Shaders
       {
         if (line)
         {
-          line->EntireLine.Length = UINT(beforeLineEndings - line->EntireLine.Begin);
+          line->mEntireLine.mLength = UINT(beforeLineEndings - line->mEntireLine.mBegin);
           lines->push_back(line);
           line = nullptr;
         }
@@ -140,40 +140,40 @@ namespace Shaders
 
       /// Process next work
       SubString subString = GetNextWord(pos, lineNumber);
-      line->SubStrings.push_back(subString);
-      pos += subString.Length;
+      line->mSubStrings.push_back(subString);
+      pos += subString.mLength;
     }
     if (line) lines->push_back(line);
     return lines;
   }
 
 
-  SubString::SubString(const char* _Begin, UINT _Length)
-    : Begin(_Begin)
-    , Length(_Length)
+  SubString::SubString(const char* begin, UINT length)
+    : mBegin(begin)
+    , mLength(length)
   {
-    ShaderTokenEnum token = ShaderTokenMapper.GetEnumA(Begin, Length);
-    Token = (signed(token) < 0) ? ShaderTokenEnum::TOKEN_UNKNOWN : token;
+    ShaderTokenEnum token = ShaderTokenMapper.GetEnumA(mBegin, mLength);
+    mToken = (signed(token) < 0) ? ShaderTokenEnum::TOKEN_UNKNOWN : token;
   }
 
-  SubString::SubString(const char* _Begin, UINT _Length, ShaderTokenEnum _Token)
-    : Token(_Token)
-    , Begin(_Begin)
-    , Length(_Length)
+  SubString::SubString(const char* begin, UINT length, ShaderTokenEnum token)
+    : mToken(token)
+    , mBegin(begin)
+    , mLength(length)
   {}
 
   std::string SubString::ToString() const
   {
-    if (Token == ShaderTokenEnum::TOKEN_STRING)
+    if (mToken == ShaderTokenEnum::TOKEN_STRING)
     {
-      return std::string(Begin + 1, Length - 2);
+      return std::string(mBegin + 1, mLength - 2);
     }
-    return std::string(Begin, Length);
+    return std::string(mBegin, mLength);
   }
 
-  SourceLine::SourceLine(int _LineNumber, const char* LineBegin)
-    : LineNumber(_LineNumber)
-    , EntireLine(LineBegin, 0, ShaderTokenEnum::TOKEN_UNKNOWN)
+  SourceLine::SourceLine(int lineNumber, const char* lineBegin)
+    : mLineNumber(lineNumber)
+    , mEntireLine(lineBegin, 0, ShaderTokenEnum::TOKEN_UNKNOWN)
   {}
 
 }
