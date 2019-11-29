@@ -288,7 +288,7 @@ float CalculateSoftShadow2(vec3 lightProjectionCoord, float sampleSpread, float 
   return shadow;
 }  
 
-#ifdef FRAGMENT_SHADER
+#if 0 // FRAGMENT_SHADER
 
 float CalculateSoftShadow3(vec3 lightProjectionCoord, mat4 skylightProjection, vec3 skyNormal, vec3 skyTangent, vec3 skyBinormal, float sampleSpread, float spread) {
   //if (skyNormal.z < 0) return 0;
