@@ -71,7 +71,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   const mat4 target = glm::translate(mat4(1.0f), -camera->mTarget.Get());
   globals->Camera = lookAt * target;
  
-  globals->Projection = glm::ortho(-s.x, s.x, -s.y, s.y, -s.z, s.z);
+  globals->Projection = glm::ortho(-s.x, s.x, -s.y, s.y, s.z, -s.z);
   globals->World = mat4(1.0f);
 
   /// Calculate shadow center
