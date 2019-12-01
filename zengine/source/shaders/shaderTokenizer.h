@@ -3,12 +3,16 @@
 
 #include <include/base/defines.h>
 #include <vector>
-#include <string>
+//#include <string>
+#include <string_view>
+
+using std::string_view;
+using std::vector;
 
 namespace Shaders {
 
-  /// Macrolist for shader tokens
-#define SHADERTOKEN_LIST	\
+  /// Macro list for shader tokens
+#define SHADER_TOKEN_LIST	\
 	ITEM(float)				      \
 	ITEM(vec2)				      \
 	ITEM(vec3)				      \
@@ -51,26 +55,23 @@ namespace Shaders {
     TOKEN_STRING,
 #undef ITEM
 #define ITEM(name) TOKEN_##name,
-    SHADERTOKEN_LIST
+    SHADER_TOKEN_LIST
   };
 
   struct SubString {
-    SubString(const char* Begin, UINT Length);
-    SubString(const char* Begin, UINT Length, ShaderTokenEnum Token);
+    const ShaderTokenEnum mToken = ShaderTokenEnum::TOKEN_UNKNOWN;
+    const string_view mStringView;
 
-    ShaderTokenEnum Token;
-    const char* Begin;
-    UINT Length;
-    std::string ToString() const;
+    SubString(const string_view& stringView, ShaderTokenEnum token);
+    static SubString FromString(const char* begin, size_t length);
   };
 
   struct SourceLine {
-    int					LineNumber;
-    std::vector<SubString>	SubStrings;
-    SubString			EntireLine;
-
-    SourceLine(int LineNumber, const char* LineBegin);
+    const int mLineNumber;
+    const string_view mEntireLine;
+    const vector<SubString> mSubStrings;
+    SourceLine(int lineNumber, const string_view& entireLine, vector<SubString>&& subStrings);
   };
 
-  OWNERSHIP std::vector<SourceLine*>* SplitToWords(const char* Text);
+  OWNERSHIP vector<SourceLine> SplitToWords(const char* source);
 }

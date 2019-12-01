@@ -8,7 +8,7 @@
 #include <map>
 
 /// Macro list for global uniforms (name/usage, type)
-#define GLOBALUNIFORM_LIST \
+#define GLOBAL_UNIFORM_LIST \
   ITEM(Time,                          ValueType::FLOAT) \
   ITEM(Camera,                        ValueType::MATRIX44) \
   ITEM(World,                         ValueType::MATRIX44) \
@@ -48,7 +48,7 @@
   ITEM(FluidPressureFade,             ValueType::FLOAT) \
   ITEM(FluidDissipation,              ValueType::FLOAT) \
 
-#define GLOBALSAMPLER_LIST \
+#define GLOBAL_SAMPLER_LIST \
   ITEM(SkylightTexture) \
   ITEM(DepthBufferSource) \
   ITEM(GBufferSourceA) \
@@ -67,14 +67,14 @@
 enum class GlobalUniformUsage {
 #undef ITEM
 #define ITEM(name, type) name,
-  GLOBALUNIFORM_LIST
+  GLOBAL_UNIFORM_LIST
   LOCAL,	/// For non-global uniforms
 };
 
 enum class GlobalSamplerUsage {
 #undef ITEM
 #define ITEM(name) name,
-  GLOBALSAMPLER_LIST
+  GLOBAL_SAMPLER_LIST
   LOCAL,	/// For non-global uniforms
 };
 
@@ -88,11 +88,11 @@ extern const int GlobalSamplerOffsets[];
 struct Globals {
 #undef ITEM
 #define ITEM(name, type) ValueTypes<type>::Type name;
-  GLOBALUNIFORM_LIST
+  GLOBAL_UNIFORM_LIST
 
 #undef ITEM
 #define ITEM(name) std::shared_ptr<Texture> name;
-  GLOBALSAMPLER_LIST
+  GLOBAL_SAMPLER_LIST
 };
 
 /// Stub parameter, becomes a slot
