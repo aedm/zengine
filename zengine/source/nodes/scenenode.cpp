@@ -68,8 +68,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
   const vec3 lightDir = normalize(mSkyLightDirection.Get());
 
   const mat4 lookAt = glm::lookAt(-lightDir, vec3(0, 0, 0), vec3(0, 1, 0));
-  const mat4 target = glm::translate(mat4(1.0f), -camera->mTarget.Get());
-  globals->Camera = lookAt * target;
+  globals->Camera = glm::translate(lookAt, -camera->mTarget.Get());
  
   globals->Projection = glm::ortho(-s.x, s.x, -s.y, s.y, s.z, -s.z);
   globals->World = mat4(1.0f);
@@ -80,8 +79,7 @@ void SceneNode::Draw(RenderTarget* renderTarget, Globals* globals) {
     auto& drawable = PointerCast<Drawable>(mDrawables.GetReferencedMultiNode(i));
     drawable->ComputeForcedShadowCenter(globals, shadowCenter);
   }
-  const mat4 shadowCenterTarget = glm::translate(mat4(1.0f), -shadowCenter);
-  globals->Camera = shadowCenterTarget * globals->Camera;
+  globals->Camera = glm::translate(globals->Camera, -shadowCenter);
 
   globals->SkylightProjection = globals->Projection;
   globals->SkylightCamera = globals->Camera;

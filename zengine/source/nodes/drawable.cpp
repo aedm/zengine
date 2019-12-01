@@ -63,23 +63,20 @@ void Drawable::ComputeForcedShadowCenter(Globals* globals, vec3& oShadowCenter) 
 
 void Drawable:: ApplyTransformation(Globals& globals) const
 {
-  const vec3 movv = mMove.Get();
-  if (movv.x != 0 || movv.y != 0 || movv.z != 0) {
+  const vec3 move = mMove.Get();
+  if (move.x != 0 || move.y != 0 || move.z != 0) {
     globals.World = glm::translate(globals.World, mMove.Get());
-    //globals.World = move * globals.World;
   }
-  const vec3 rotv = mRotate.Get();
-  if (rotv.x != 0 || rotv.y != 0 || rotv.z != 0) {
-    globals.World = glm::rotate(globals.World, rotv.x, { 1, 0, 0 });
-    globals.World = glm::rotate(globals.World, rotv.y, { 0, 1, 0 });
-    globals.World = glm::rotate(globals.World, rotv.z, { 0, 0, 1 });
-    //globals.World = rotateZ * globals.World;
+  const vec3 rotate = mRotate.Get();
+  if (rotate.x != 0 || rotate.y != 0 || rotate.z != 0) {
+    globals.World = glm::rotate(globals.World, rotate.x, { 1, 0, 0 });
+    globals.World = glm::rotate(globals.World, rotate.y, { 0, 1, 0 });
+    globals.World = glm::rotate(globals.World, rotate.z, { 0, 0, 1 });
   }
-  const float scalev = mScale.Get();
-  if (scalev != 0.0f) {
-    const float s = powf(2.0f, scalev);
-    const mat4 scale = glm::scale(mat4(1.0f), {s, s, s});
-    globals.World = scale * globals.World;
+  const float scale = mScale.Get();
+  if (scale != 0.0f) {
+    const float s = powf(2.0f, scale);
+    globals.World = glm::scale(globals.World, { s, s, s });
   }
 
   globals.View = globals.Camera * globals.World;
