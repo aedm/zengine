@@ -484,14 +484,16 @@ void ZenGarden::LoadMusic() {
     ERR("Can't initialize BASS");
     return;
   }
+  int a = BASS_ErrorGetCode();
   mBassMusicChannel = BASS_StreamCreateFile(FALSE, L"demo.mp3", 0, 0, BASS_STREAM_PRESCAN);
+  int b = BASS_ErrorGetCode();
 }
 
 void ZenGarden::PlayMusic(float beats) const
 {
   const float bps = GetPropertiesNode()->mBPM.Get() / 60.0f;
   const float seconds = beats / bps;
-  if (mBassMusicChannel < 0) return;
+  if (mBassMusicChannel == 0) return;
   BASS_ChannelSetPosition(mBassMusicChannel,
     BASS_ChannelSeconds2Bytes(mBassMusicChannel, seconds),
     BASS_POS_BYTE);
@@ -500,6 +502,6 @@ void ZenGarden::PlayMusic(float beats) const
 
 void ZenGarden::StopMusic() const
 {
-  if (mBassMusicChannel < 0) return;
+  if (mBassMusicChannel == 0) return;
   BASS_ChannelStop(mBassMusicChannel);
 }

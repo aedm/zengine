@@ -95,7 +95,7 @@ private:
   void keyPressEvent(QKeyEvent* event) override;
 
   /// Music related
-  int mBassMusicChannel = -1;
+  int mBassMusicChannel = 0;
   void LoadMusic();
   void PlayMusic(float beats) const;
   void StopMusic() const;
