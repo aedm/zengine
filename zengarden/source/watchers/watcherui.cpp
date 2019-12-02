@@ -21,9 +21,9 @@ WatcherUi::~WatcherUi() {
 }
 
 
-EventForwarderGlWidget* WatcherUi::GetGlWidget() const
+QGLWidget* WatcherUi::GetGlWidget() const
 {
-  return mWatcherWidget->GetGLWidget();
+  return mWatcherWidget->GetGlWidget();
 }
 
 

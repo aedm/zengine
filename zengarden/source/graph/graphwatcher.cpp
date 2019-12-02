@@ -28,13 +28,13 @@ GraphWatcher::~GraphWatcher() {
 }
 
 
-void GraphWatcher::Paint(EventForwarderGlWidget* glWidget) {
+void GraphWatcher::Paint() {
   OpenGL->OnContextSwitch();
 
   vec2 canvasSize, topLeft;
   GetCanvasDimensions(canvasSize, topLeft);
 
-  ThePainter->SetupViewport(glWidget->width(), glWidget->height(), topLeft, canvasSize);
+  ThePainter->SetupViewport(mWatcherWidget->width(), mWatcherWidget->height(), topLeft, canvasSize);
 
   //glClearColor(0.26f, 0.26f, 0.26f, 1.0f);
   OpenGL->Clear(true, false, 0x434343);
@@ -110,7 +110,7 @@ void GraphWatcher::Update() const
 }
 
 
-void GraphWatcher::HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event) {
+void GraphWatcher::HandleMousePress(QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftDown(event);
   }
@@ -120,7 +120,7 @@ void GraphWatcher::HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event)
 }
 
 
-void GraphWatcher::HandleMouseRelease(EventForwarderGlWidget*, QMouseEvent* event) {
+void GraphWatcher::HandleMouseRelease(QMouseEvent* event) {
   if (event->button() == Qt::LeftButton) {
     HandleMouseLeftUp(event);
   }
@@ -151,12 +151,12 @@ void GraphWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
     mWidgetMap[node] = widget;
   }
 
-  GetGlWidget()->mOnPaint += Delegate(this, &GraphWatcher::Paint);
-  GetGlWidget()->mOnMousePress += Delegate(this, &GraphWatcher::HandleMousePress);
-  GetGlWidget()->mOnMouseRelease += Delegate(this, &GraphWatcher::HandleMouseRelease);
-  GetGlWidget()->mOnMouseMove += Delegate(this, &GraphWatcher::HandleMouseMove);
-  GetGlWidget()->mOnKeyPress += Delegate(this, &GraphWatcher::HandleKeyPress);
-  GetGlWidget()->mOnMouseWheel += Delegate(this, &GraphWatcher::HandleMouseWheel);
+  watcherWidget->mOnPaint += Delegate(this, &GraphWatcher::Paint);
+  watcherWidget->mOnMousePress += Delegate(this, &GraphWatcher::HandleMousePress);
+  watcherWidget->mOnMouseRelease += Delegate(this, &GraphWatcher::HandleMouseRelease);
+  watcherWidget->mOnMouseMove += Delegate(this, &GraphWatcher::HandleMouseMove);
+  watcherWidget->mOnKeyPress += Delegate(this, &GraphWatcher::HandleKeyPress);
+  watcherWidget->mOnMouseWheel += Delegate(this, &GraphWatcher::HandleMouseWheel);
 }
 
 bool IsInsideRect(vec2 position, vec2 topleft, vec2 size) {
@@ -340,7 +340,7 @@ void GraphWatcher::HandleMouseRightUp(QMouseEvent* event) {
 }
 
 
-void GraphWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) {
+void GraphWatcher::HandleMouseMove(QMouseEvent* event) {
   const vec2 mousePos = MouseToWorld(event);
   mCurrentMousePos = mousePos;
 
@@ -440,7 +440,7 @@ void GraphWatcher::HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event) 
 }
 
 
-void GraphWatcher::HandleMouseWheel(EventForwarderGlWidget*, QWheelEvent* event) {
+void GraphWatcher::HandleMouseWheel(QWheelEvent* event) {
   mZoomExponent -= event->delta();
   if (mZoomExponent < 0) mZoomExponent = 0;
   mZoomFactor = powf(2.0, float(mZoomExponent) / (120.0f * 4.0f));
@@ -473,7 +473,7 @@ void GraphWatcher::FindHoveredWidget(vec2 mousePos,
 }
 
 
-void GraphWatcher::HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* event) {
+void GraphWatcher::HandleKeyPress(QKeyEvent* event) {
   const auto scanCode = event->nativeScanCode();
 
   if (scanCode == 41) {

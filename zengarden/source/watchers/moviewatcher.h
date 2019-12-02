@@ -13,7 +13,7 @@ public:
   void SetWatcherWidget(WatcherWidget* watcherWidget) override;
 
 protected:
-  void Paint(EventForwarderGlWidget* widget);
+  void Paint();
   void HandleMovieCursorChange(float movieCursor) const;
 
   RenderTarget* mRenderTarget = nullptr;

@@ -23,10 +23,10 @@ void MovieWatcher::OnTimeEdited(float time) {
 
 void MovieWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUi::SetWatcherWidget(watcherWidget);
-  GetGlWidget()->mOnPaint += Delegate(this, &MovieWatcher::Paint);
+  watcherWidget->mOnPaint += Delegate(this, &MovieWatcher::Paint);
 }
 
-void MovieWatcher::Paint(EventForwarderGlWidget* widget) {
+void MovieWatcher::Paint() {
   if (!mWatcherWidget) return;
 
   std::shared_ptr<MovieNode> movieNode = PointerCast<MovieNode>(GetNode());
@@ -37,6 +37,7 @@ void MovieWatcher::Paint(EventForwarderGlWidget* widget) {
     mRenderTarget =
       new RenderTarget(ivec2(mWatcherWidget->width(), mWatcherWidget->height()));
   }
+  const auto widget = GetGlWidget();
   mRenderTarget->Resize(ivec2(widget->width(), widget->height()));
   movieNode->Draw(mRenderTarget, ZenGarden::GetInstance()->GetMovieCursor());
 }

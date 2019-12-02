@@ -24,53 +24,14 @@ public:
   virtual ~WatcherWidget();
 
   /// Get the OpenGL widget, if any
-  virtual EventForwarderGlWidget* GetGLWidget();
+  virtual QGLWidget* GetGlWidget();
 
   const WatcherPosition	mPosition;
   QTabWidget* mTabWidget = nullptr;
 
   std::shared_ptr<WatcherUi> mWatcher;
-protected:
 
-  void SetTabLabel(const QString& text);
-
-  /// Handle drag events
-  void dragEnterEvent(QDragEnterEvent *event) override;
-  void dropEvent(QDropEvent *event) override;
-};
-
-
-/// Boilerplate class, converts Qt virtual functions to events :(
-class EventForwarderGlWidget: public QGLWidget {
-public:
-  EventForwarderGlWidget(QWidget* Parent, QGLWidget* ShareWidget);
-  virtual ~EventForwarderGlWidget();
-
-  Event<EventForwarderGlWidget*, QMouseEvent*> mOnMouseMove;
-  Event<EventForwarderGlWidget*, QMouseEvent*> mOnMousePress;
-  Event<EventForwarderGlWidget*, QMouseEvent*> mOnMouseRelease;
-  Event<EventForwarderGlWidget*, QKeyEvent*> mOnKeyPress;
-  Event<EventForwarderGlWidget*, QKeyEvent*> mOnKeyRelease;
-  Event<EventForwarderGlWidget*, QWheelEvent*> mOnMouseWheel;
-  Event<EventForwarderGlWidget*> mOnPaint;
-
-protected:
-  void mouseMoveEvent(QMouseEvent* event) override;
-  void mousePressEvent(QMouseEvent* event) override;
-  void mouseReleaseEvent(QMouseEvent* event) override;
-  void keyPressEvent(QKeyEvent* event) override;
-  void keyReleaseEvent(QKeyEvent* event) override;
-  void wheelEvent(QWheelEvent * event) override;
-  void paintGL() override;
-};
-
-
-/// Boilerplate class, converts Qt virtual functions to events :(
-class EventForwarderWidget: public QWidget {
-public:
-  EventForwarderWidget(QWidget* parent);
-
-  Event<QPaintEvent*> mOnPaint;
+  Event<> mOnPaint;
   Event<QMouseEvent*> mOnMouseMove;
   Event<QMouseEvent*> mOnMousePress;
   Event<QMouseEvent*> mOnMouseRelease;
@@ -85,20 +46,80 @@ protected:
   void mouseReleaseEvent(QMouseEvent* event) override;
   void keyPressEvent(QKeyEvent* event) override;
   void keyReleaseEvent(QKeyEvent* event) override;
-  void wheelEvent(QWheelEvent * event) override;
+  void wheelEvent(QWheelEvent* event) override;
+
+  void SetTabLabel(const QString& text);
+
+  /// Handle drag events
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
 };
 
 
+///// Boilerplate class, converts Qt virtual functions to events :(
+//class EventForwarderGlWidget: public QGLWidget {
+//public:
+//  EventForwarderGlWidget(QWidget* Parent, QGLWidget* ShareWidget);
+//  virtual ~EventForwarderGlWidget();
+//
+//  Event<EventForwarderGlWidget*, QMouseEvent*> mOnMouseMove;
+//  Event<EventForwarderGlWidget*, QMouseEvent*> mOnMousePress;
+//  Event<EventForwarderGlWidget*, QMouseEvent*> mOnMouseRelease;
+//  Event<EventForwarderGlWidget*, QKeyEvent*> mOnKeyPress;
+//  Event<EventForwarderGlWidget*, QKeyEvent*> mOnKeyRelease;
+//  Event<EventForwarderGlWidget*, QWheelEvent*> mOnMouseWheel;
+//  Event<EventForwarderGlWidget*> mOnPaint;
+//
+//protected:
+//  void mouseMoveEvent(QMouseEvent* event) override;
+//  void mousePressEvent(QMouseEvent* event) override;
+//  void mouseReleaseEvent(QMouseEvent* event) override;
+//  void keyPressEvent(QKeyEvent* event) override;
+//  void keyReleaseEvent(QKeyEvent* event) override;
+//  void wheelEvent(QWheelEvent * event) override;
+//  void paintGL() override;
+//};
 
+
+///// Boilerplate class, converts Qt virtual functions to events :(
+//class EventForwarderWidget: public QWidget {
+//public:
+//  EventForwarderWidget(QWidget* parent);
+//
+//  Event<QPaintEvent*> mOnPaint;
+//  Event<QMouseEvent*> mOnMouseMove;
+//  Event<QMouseEvent*> mOnMousePress;
+//  Event<QMouseEvent*> mOnMouseRelease;
+//  Event<QKeyEvent*> mOnKeyPress;
+//  Event<QKeyEvent*> mOnKeyRelease;
+//  Event<QWheelEvent*> mOnMouseWheel;
+//
+//protected:
+//  void paintEvent(QPaintEvent* ev) override;
+//  void mouseMoveEvent(QMouseEvent* event) override;
+//  void mousePressEvent(QMouseEvent* event) override;
+//  void mouseReleaseEvent(QMouseEvent* event) override;
+//  void keyPressEvent(QKeyEvent* event) override;
+//  void keyReleaseEvent(QKeyEvent* event) override;
+//  void wheelEvent(QWheelEvent * event) override;
+//};
+
+
+/// A watcher widget that creates a full-size GL draw surface
 class GLWatcherWidget: public WatcherWidget {
 public:
   GLWatcherWidget(QWidget* parent, const std::shared_ptr<WatcherUi>& watcher, 
     QGLWidget* shareWidget, WatcherPosition position, QTabWidget* tabWidget = nullptr);
   virtual ~GLWatcherWidget();
 
-  EventForwarderGlWidget* GetGLWidget() override;
-  QGLWidget* mShareWidget;
+  QGLWidget* GetGlWidget() override;
+  //QGLWidget* mShareWidget;
+  //Event<QGLWidget*> mOnGlPaint;
 
-protected:
-  EventForwarderGlWidget* mGLWidget;
+  /// Handle paint event of the internal GL surface
+  void HandleGlPaint();
+
+private:
+  //EventForwarderGlWidget* mGlWidget;
+  QGLWidget* mGlWidget;
 };

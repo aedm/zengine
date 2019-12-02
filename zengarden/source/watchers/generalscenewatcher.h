@@ -8,8 +8,7 @@ class SceneNode;
 
 class RenderForwarder: public Watcher {
 public:
-  RenderForwarder(const std::shared_ptr<SceneNode>& node);
-  virtual ~RenderForwarder() = default;
+  explicit RenderForwarder(const std::shared_ptr<SceneNode>& node);
   void OnRedraw() override;
   FastDelegate<void()> mOnRedraw;
 };
@@ -17,7 +16,7 @@ public:
 class GeneralSceneWatcher: public WatcherUi {
 public:
   GeneralSceneWatcher(const std::shared_ptr<Node>& node);
-  virtual ~GeneralSceneWatcher();
+  ~GeneralSceneWatcher() override;
 
   /// Initializes resources needed for scene watchers
   static void Init();
@@ -32,9 +31,6 @@ protected:
 
   RenderTarget* mRenderTarget = nullptr;
 
-  ///// Scene node to be drawn.
-  //std::shared_ptr<Node> mScene;
-  
   /// Default scene node, might be unused
   std::shared_ptr<SceneNode> mTheScene;
 
@@ -54,7 +50,7 @@ protected:
 
   /// Mouse position at pressing
   QPoint mOriginalPosition;
-  vec3 mOriginalOrientation;
+  vec3 mOriginalOrientation {};
   float mOriginalDistance = 0.0f;
 
   /// Static resources initializes by Init()

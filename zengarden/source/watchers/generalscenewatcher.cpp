@@ -62,7 +62,7 @@ void GeneralSceneWatcher::OnRedraw() {
 
 void GeneralSceneWatcher::SetWatcherWidget(WatcherWidget* watcherWidget) {
   WatcherUi::SetWatcherWidget(watcherWidget);
-  watcherWidget->GetGLWidget()->setFocusPolicy(Qt::ClickFocus);
+  watcherWidget->GetGlWidget()->setFocusPolicy(Qt::ClickFocus);
 
   GetGlWidget()->mOnPaint += Delegate(this, &GeneralSceneWatcher::Paint);
   GetGlWidget()->mOnMousePress += Delegate(this, &GeneralSceneWatcher::HandleMousePress);

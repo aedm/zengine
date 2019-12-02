@@ -22,15 +22,15 @@ public:
 
 private:
   /// Qt widget event handlers
-  void HandleMousePress(EventForwarderGlWidget*, QMouseEvent* event);
-  void HandleMouseRelease(EventForwarderGlWidget*, QMouseEvent* event);
-  void HandleMouseMove(EventForwarderGlWidget*, QMouseEvent* event);
-  void HandleMouseWheel(EventForwarderGlWidget*, QWheelEvent* event);
+  void HandleMousePress(QMouseEvent* event);
+  void HandleMouseRelease(QMouseEvent* event);
+  void HandleMouseMove(QMouseEvent* event);
+  void HandleMouseWheel(QWheelEvent* event);
   void HandleMouseLeftDown(QMouseEvent* event);
   void HandleMouseLeftUp(QMouseEvent* event);
   void HandleMouseRightDown(QMouseEvent* event);
   void HandleMouseRightUp(QMouseEvent* event);
-  void HandleKeyPress(EventForwarderGlWidget*, QKeyEvent* event);
+  void HandleKeyPress(QKeyEvent* event);
 
   /// Watcher callbacks
   void OnSlotConnectionChanged(Slot* slot) override;
@@ -39,7 +39,7 @@ private:
   void Update() const;
 
   /// Draws the graph
-  void Paint(EventForwarderGlWidget*);
+  void Paint();
 
   /// All widgets on the graph
   std::shared_ptr<Graph> GetGraph() const;
