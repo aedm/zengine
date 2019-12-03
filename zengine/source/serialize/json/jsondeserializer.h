@@ -6,7 +6,7 @@
 #include <include/nodes/texturenode.h>
 #include <include/nodes/splinenode.h>
 #include <include/shaders/stubnode.h>
-#include <rapidjson/include/rapidjson/document.h>
+#include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
 
