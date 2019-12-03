@@ -8,7 +8,7 @@
 #include <include/nodes/splinenode.h>
 #include <include/shaders/stubnode.h>
 #include <string>
-#include <rapidjson/include/rapidjson/document.h>
+#include <rapidjson/document.h>
 #include <unordered_map>
 
 extern const EnumMapA<TexelType> TexelTypeMapper;

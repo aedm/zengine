@@ -7,4 +7,4 @@ A general 3D engine.
 - qt
 - vckpg
 
-`vcpkg install glm:x64-windows` 
+`vcpkg install glm:x64-windows rapidjson:x64-windows` 

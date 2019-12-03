@@ -3,9 +3,8 @@
 #include <include/base/helpers.h>
 #include <include/nodes/valuenodes.h>
 #include "base64/base64.h"
-#include <rapidjson/include/rapidjson/writer.h>
-#include <rapidjson/include/rapidjson/prettywriter.h>
-#include <rapidjson/include/rapidjson/stringbuffer.h>
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
 
 const EnumMapA<TexelType> TexelTypeMapper = {
   {"RGBA8", TexelType::ARGB8},
