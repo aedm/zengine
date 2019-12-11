@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>transformPos.vs</file>
-        <file>transformPosUV.vs</file>
-        <file>solidTexture.fs</file>
-        <file>solidColor.fs</file>
-        <file>textTexture.fs</file>
-    </qresource>
-</RCC>

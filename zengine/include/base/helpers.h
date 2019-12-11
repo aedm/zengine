@@ -4,6 +4,7 @@
 #include <string_view>
 
 using std::string_view;
+using std::static_pointer_cast;
 
 #if 1
 #	ifdef _DEBUG

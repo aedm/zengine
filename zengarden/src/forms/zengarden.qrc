@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="zengarden">
+    <file>icons/angle-right.svg</file>
+  </qresource>
+</RCC>
