@@ -30,3 +30,4 @@ app/zengarden-release64.exe
 app/demo-release64.exe
 *.jpg
 *.png
+out/
