@@ -5,9 +5,8 @@
 #include <mmsystem.h>
 #include <ctime>
 
-#define GLEW_STATIC
-#include <glew/glew.h>
-#include <gl/GL.h>
+#include <GL/glew.h>
+#include <GL/GL.h>
 
 #include <zengine.h>
 #include <bass/bass.h>

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zengine", "zengine\zengine.vcxproj", "{31844F21-69DE-4C92-A7D5-C8DEFE994011}"
 EndProject
@@ -71,6 +71,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB7C2FC9-94EB-4A42-9E86-01E1F59EE896}
 		Qt5Version = $(DefaultQtVersion)
 	EndGlobalSection
 EndGlobal

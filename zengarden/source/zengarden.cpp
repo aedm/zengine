@@ -17,8 +17,8 @@
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
-#include <QMouseEvent>
-#include <QFileDialog>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QFileDialog>
 #include <bass.h>
 
 static ZenGarden* gZengarden;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QFileSystemWatcher>
+#include <QtCore/QFileSystemWatcher>
 #include "ui_zengarden.h"
 #include "watchers/documentwatcher.h"
 #include "watchers/logwatcher.h"

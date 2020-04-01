@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zengine.h>
-#include <QFont>
+#include <QtGui/QFont>
 
 class QString;
 class UiPainter;

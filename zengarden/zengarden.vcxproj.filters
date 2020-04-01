@@ -53,9 +53,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_zengarden.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\main.cpp">
       <Filter>source</Filter>
     </ClCompile>
@@ -64,9 +61,6 @@
     </ClCompile>
     <ClCompile Include="source\commands\command.cpp">
       <Filter>source\commands</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\qrc_ui_shaders.cpp">
-      <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="source\graph\nodewidget.cpp">
       <Filter>source\graph</Filter>
@@ -101,12 +95,6 @@
     <ClCompile Include="source\watchers\stubwatcher.cpp">
       <Filter>source\watchers</Filter>
     </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_zengarden.cpp">
-      <Filter>Generated Files\Debug-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_zengarden.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_zengarden.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
@@ -115,9 +103,6 @@
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_prototypes.cpp">
       <Filter>Generated Files\Debug-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_prototypes.cpp">
-      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_prototypes.cpp">
       <Filter>Generated Files\Release</Filter>
@@ -155,17 +140,8 @@
     <ClCompile Include="source\watchers\moviewatcher.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\util\meshhloader.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\propertyeditor\valuewidgets.cpp">
       <Filter>source\propertyeditor</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_valuewidgets.cpp">
-      <Filter>Generated Files\Debug-static</Filter>
-    </ClCompile>
-    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_valuewidgets.cpp">
-      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_valuewidgets.cpp">
       <Filter>Generated Files\Release</Filter>
@@ -216,9 +192,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_zengarden.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\commands\command.h">
       <Filter>source\commands</Filter>
     </ClInclude>
@@ -233,9 +206,6 @@
     </ClInclude>
     <ClInclude Include="source\util\uipainter.h">
       <Filter>source\util</Filter>
-    </ClInclude>
-    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_operatorSelector.h">
-      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\documentwatcher.h">
       <Filter>source\watchers</Filter>
@@ -270,25 +240,13 @@
     <ClInclude Include="source\watchers\splinewatcher.h">
       <Filter>source\watchers</Filter>
     </ClInclude>
-    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_splineeditor.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\watchers\watcherui.h">
       <Filter>source\watchers</Filter>
-    </ClInclude>
-    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_documentviewer.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include=".msbuild\qtGeneratedFiles\ui_movieeditor.h">
-      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\timelineeditor.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\watchers\moviewatcher.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\util\meshloader.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="source\propertyeditor\sloteditor.h">

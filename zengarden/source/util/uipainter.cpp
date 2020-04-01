@@ -1,8 +1,8 @@
 #include "uipainter.h"
 #include "util.h"
 #include <zengine.h>
-#include <QTextStream>
-#include <QDir>
+#include <QtCore/QTextStream>
+#include <QtCore/QDir>
 #include <glm/gtc/matrix_transform.hpp>
 
 UiPainter* ThePainter = nullptr;

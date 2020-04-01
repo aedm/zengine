@@ -2,8 +2,7 @@
 #include <include/base/helpers.h>
 #include <Windows.h>
 
-#define GLEW_STATIC
-#include <glew/glew.h>
+#include <GL/glew.h>
 #include <utility>
 #include <memory>
 

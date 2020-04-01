@@ -3,11 +3,11 @@
 #include "../util/uipainter.h"
 #include "../zengarden.h"
 #include <zengine.h>
-#include <QImage>
-#include <QGLWidget>
-#include <QPixmap>
-#include <QGuiApplication>
-#include <QScreen>
+#include <QtGui/QImage>
+#include <QtOpenGL/QGLWidget>
+#include <QtGui/QPixmap>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <utility>
 
 /// Layout of the widget

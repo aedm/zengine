@@ -1,13 +1,13 @@
 #pragma once
 
 #include <zengine.h>
-#include <QDialog>
-#include <QTreeWidgetItem>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QTreeWidgetItem>
 #include <typeindex>
 #include <QtCore/QString>
 
 class Prototypes;
-extern Prototypes* ThePrototypes;
+extern Prototypes* ThePrototypes; 
 
 class Prototypes: public QObject {
   Q_OBJECT

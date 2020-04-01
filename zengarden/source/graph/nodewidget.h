@@ -4,7 +4,7 @@
 #include <zengine.h>
 #include <memory>
 #include <functional>
-#include <QPainter>
+#include <QtGui/QPainter>
 
 /// NodeWidget is a Watcher for a Node on a Graph. Every Node has a NodeWidget associated
 /// to it.
