@@ -76,14 +76,11 @@ void ZenGarden::InitModules() {
 
   /// Set palette
   QPalette pal = mUI.innerPropertyFrame->palette();
-  //QPalette pal2 = mUI.dummy3->palette();
   pal.setColor(QPalette::Background, pal.background().color().light(125));
   pal.setColor(QPalette::WindowText, pal.background().color().light(135));
   mUI.innerPropertyFrame->setPalette(pal);
   pal.setColor(QPalette::WindowText, pal.background().color().dark());
   mUI.outerPropertyFrame->setPalette(pal);
-  //pal2.setColor(QPalette::WindowText, QColor(200, 200, 200));
-  //mUI.dummy3->setPalette(pal2);
   mUI.verticalDummy->repaint();
 
   /// Initialize OpenGL and its dependencies
@@ -107,6 +104,9 @@ void ZenGarden::InitModules() {
 
   CreateNewDocument();
   LoadMusic();
+
+  const std::string a = GenerateNodeId();
+  INFO("FLUFF: %s", a.c_str());
 }
 
 void ZenGarden::DisposeModules() {

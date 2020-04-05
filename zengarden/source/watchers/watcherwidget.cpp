@@ -16,7 +16,7 @@ WatcherWidget::~WatcherWidget() {
   /// There are two cases: 
   /// 1. The node is killed, and it detaches the WatcherUI. The WatcherUI calls this
   ///    destructor, thereby ultimately commiting suicide.  
-  /// 2. The user kills the watcher by closing it on the UI. This descturctor is called
+  /// 2. The user kills the watcher by closing it on the UI. This destructor is called
   ///    first, and the WatcherUI is freed because this object holds the last reference
   ///    to it.
   mWatcher->mWatcherWidget = nullptr;

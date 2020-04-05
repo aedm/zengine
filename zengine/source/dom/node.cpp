@@ -228,9 +228,10 @@ bool Slot::IsGhost() const
   return mGhostSlot;
 }
 
-Node::Node(bool isForwarderNode) {
+Node::Node() {
   mIsUpToDate = false;
   mIsProperlyConnected = true;
+  mId = GenerateNodeId();
 }
 
 

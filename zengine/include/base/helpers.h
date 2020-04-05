@@ -147,3 +147,4 @@ namespace Convert {
 
 std::string ToJson(const std::shared_ptr<Document>& document);
 std::shared_ptr<Document> FromJson(const std::string& json);
+std::string GenerateNodeId();

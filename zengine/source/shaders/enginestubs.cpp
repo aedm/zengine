@@ -22,6 +22,10 @@ void EngineStubs::SetStubSource(const std::string& name, const std::string& sour
 }
 
 std::shared_ptr<StubNode> EngineStubs::GetStub(const std::string& name) {
+  if (mStubs.find(name) == mStubs.end()) {
+    ERR("Can not find stub file '%s'", name);
+    SHOULD_NOT_HAPPEN;
+  }
   return mStubs.at(name);
 }
 

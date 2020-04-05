@@ -75,7 +75,7 @@ void LoadEngineShaderFolder(const std::wstring& folder) {
         fileName.end() - ShaderExtension.length()
       ));
       std::string source(System::ReadFile(fileName.c_str()));
-      TheEngineStubs->SetStubSource(stubName, source);;
+      TheEngineStubs->SetStubSource(stubName, source);
     }
     else {
       LoadEngineShaderFolder(fileName + L"/");

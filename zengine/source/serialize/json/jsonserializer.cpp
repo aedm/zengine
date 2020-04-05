@@ -92,6 +92,7 @@ rapidjson::Value JSONSerializer::Serialize(const std::shared_ptr<Node>& node) {
   /// Save node ID
   const int nodeID = mNodes.at(node);
   v.AddMember("id", nodeID, *mAllocator);
+  v.AddMember("sid", node->mId, *mAllocator);
 
   /// Save node name
   if (!node->GetName().empty()) {

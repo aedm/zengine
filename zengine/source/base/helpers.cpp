@@ -6,6 +6,9 @@
 #include <include/base/helpers.h>
 #include <cstdarg>
 #include <codecvt>
+#include <sstream>
+#include <random>
+#include <string>
 
 Logger* TheLogger = new Logger();
 
@@ -22,7 +25,7 @@ void Logger::Log2(LogSeverity severity, const wchar_t* logString, ...) {
 }
 
 void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
-                      const wchar_t* logString, ...) {
+  const wchar_t* logString, ...) {
   const int funlen = swprintf(TempStringW, LogMessageMaxLength, function);
 
   va_list args;
@@ -34,7 +37,7 @@ void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
 }
 
 void Logger::LogFunc2(LogSeverity severity, const wchar_t* function,
-                      const char* logString, ...) {
+  const char* logString, ...) {
   /// God, this is bad.
   va_list args;
   va_start(args, logString);
@@ -75,4 +78,23 @@ std::string ToJson(const std::shared_ptr<Document>& document) {
 std::shared_ptr<Document> FromJson(const std::string& json) {
   const JSONDeserializer deserializer(json);
   return deserializer.GetDocument();
+}
+
+std::string GenerateNodeId() {
+  const UINT length = 24;
+  const UINT groupSize = 4;
+  std::random_device random;
+  std::mt19937 gen(random());
+  std::uniform_int_distribution<> dist(0, 15);
+  std::stringstream stream;
+  UINT groupCount = groupSize;
+  for (UINT i = 0; i < length; i++) {
+    if (groupCount-- == 0) {
+      groupCount = groupSize - 1;
+      stream << '-';
+    }
+    const auto rc = dist(gen);
+    stream << std::hex << rc;
+  }
+  return stream.str();
 }

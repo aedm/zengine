@@ -201,8 +201,11 @@ public:
   /// This is useful for creating new nodes with predefined content, eg shader stubs.
   virtual void CopyFrom(const std::shared_ptr<Node>& node);
 
+  /// Globally unique id of the node
+  std::string mId;
+
 protected:
-  Node(bool isForwarderNode = false);
+  Node();
 
   /// True is all slots are properly connected
   bool mIsProperlyConnected;
@@ -269,8 +272,8 @@ private:
   std::string mName;
 
   /// Position and size on the Graph
-  vec2 mPosition;
-  vec2 mSize;
+  vec2 mPosition = vec2(0, 0);
+  vec2 mSize = vec2(0, 0);
 
   /// Public slots of this node.
   std::vector<Slot*>	mPublicSlots;
