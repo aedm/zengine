@@ -35,7 +35,7 @@ std::shared_ptr<Document> JSONDeserializer::GetDocument() const
 
 void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
   const std::string nodeClassName = value["node"].GetString();
-  const int id = value["id"].GetInt();
+  const std::string id = value["id"].GetString();
   ASSERT(mNodes.find(id) == mNodes.end());
 
   std::shared_ptr<Node> node;
@@ -111,7 +111,7 @@ vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
 }
 
 void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
-  const int id = value["id"].GetInt();
+  const std::string id = value["id"].GetString();
   const std::shared_ptr<Node> node = mNodes.at(id);
   const auto& slots = node->GetSerializableSlots();
 
@@ -124,7 +124,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         const rapidjson::Value& jsonSlot = jsonSlots["Original"];
         if (jsonSlot.HasMember("connect")) {
           const rapidjson::Value& jsonConnect = jsonSlot["connect"];
-          const int connId = jsonConnect.GetInt();
+          const std::string connId = jsonConnect.GetString();
           const std::shared_ptr<Node> connNode = mNodes.at(connId);
           PointerCast<Ghost>(node)->mOriginalNode.Connect(connNode);
         }
@@ -159,13 +159,13 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         }
         if (jsonConnect.IsArray()) {
           for (UINT i = 0; i < jsonConnect.Size(); i++) {
-            int connId = jsonConnect[i].GetInt();
+            std::string connId = jsonConnect[i].GetString();
             std::shared_ptr<Node> connNode = mNodes.at(connId);
             slot->Connect(connNode);
           }
         }
         else {
-          int connId = jsonConnect.GetInt();
+          std::string connId = jsonConnect.GetString();
           std::shared_ptr<Node> connNode = mNodes.at(connId);
           slot->Connect(connNode);
         }
@@ -277,7 +277,7 @@ void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
 
 void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
   if (value.HasMember("id")) {
-    const int connId = int(value["id"].GetDouble());
+    const std::string connId = value["id"].GetString();
     auto& connNode = mNodes.at(connId);
     slot->Connect(connNode);
   }

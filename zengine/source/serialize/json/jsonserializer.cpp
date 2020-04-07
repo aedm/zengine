@@ -42,7 +42,7 @@ std::string JSONSerializer::GetJSON() const
 }
 
 void JSONSerializer::Traverse(const std::shared_ptr<Node>& root) {
-  mNodes[root] = ++mNodeCount;
+  mNodes.insert(root);
 
   /// Traverse slots
   for (const auto& slotPair : root->GetSerializableSlots()) {
@@ -90,9 +90,7 @@ rapidjson::Value JSONSerializer::Serialize(const std::shared_ptr<Node>& node) {
   }
 
   /// Save node ID
-  const int nodeID = mNodes.at(node);
-  v.AddMember("id", nodeID, *mAllocator);
-  v.AddMember("sid", node->mId, *mAllocator);
+  v.AddMember("id", node->mId, *mAllocator);
 
   /// Save node name
   if (!node->GetName().empty()) {
@@ -182,8 +180,8 @@ void JSONSerializer::SerializeGeneralNode(
         /// Save connections
         rapidjson::Value connections(rapidjson::kArrayType);
         for (const auto& connectedNode : slot->GetDirectMultiNodes()) {
-          const int connectedID = mNodes.at(connectedNode);
-          connections.PushBack(connectedID, *mAllocator);
+          connections.PushBack(rapidjson::Value(connectedNode->mId, *mAllocator), 
+            *mAllocator);
         }
         slotObject.AddMember("connect", connections, *mAllocator);
       }
@@ -191,8 +189,8 @@ void JSONSerializer::SerializeGeneralNode(
         /// Save connection
         const auto& connectedNode = slot->GetDirectNode();
         if (connectedNode != nullptr && !slot->IsDefaulted()) {
-          const int connectedID = mNodes.at(connectedNode);
-          slotObject.AddMember("connect", connectedID, *mAllocator);
+          slotObject.AddMember("connect", 
+            rapidjson::Value(connectedNode->mId, *mAllocator), *mAllocator);
         }
 
         /// Save default values

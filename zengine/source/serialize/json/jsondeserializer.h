@@ -45,7 +45,7 @@ private:
   static vec3 DeserializeVec3(const rapidjson::Value& value);
   static vec4 DeserializeVec4(const rapidjson::Value& value);
 
-  std::unordered_map<int, std::shared_ptr<Node>> mNodes;
+  std::unordered_map<std::string, std::shared_ptr<Node>> mNodes;
 
   std::shared_ptr<Document> mDocument;
 };

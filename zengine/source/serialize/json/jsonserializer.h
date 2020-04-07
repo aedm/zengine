@@ -58,7 +58,7 @@ private:
   int mNodeCount;
 
   /// All nodes to save
-  std::unordered_map<std::shared_ptr<Node>, int> mNodes;
+  std::set<std::shared_ptr<Node>> mNodes;
   std::vector<std::shared_ptr<Node>> mNodesList;
 
   rapidjson::Document mJsonDocument;
