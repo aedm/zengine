@@ -4,8 +4,6 @@
 #include "base64/base64.h"
 #include <include/dom/ghost.h>
 #include <memory>
-#include <memory>
-#include <memory>
 
 JSONDeserializer::JSONDeserializer(const std::string& json) {
   rapidjson::Document d;

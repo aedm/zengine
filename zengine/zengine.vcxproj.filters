@@ -175,7 +175,6 @@
       <Filter>include\shaders</Filter>
     </ClInclude>
     <ClInclude Include="include\dom\ghost.h" />
-    <ClInclude Include="include\serialize\lodepng.h" />
     <ClInclude Include="include\nodes\texturenode.h" />
     <ClInclude Include="include\shaders\valuetype.h" />
     <ClInclude Include="include\nodes\buffernode.h" />
@@ -282,7 +281,6 @@
       <Filter>source\shaders</Filter>
     </ClCompile>
     <ClCompile Include="source\dom\ghost.cpp" />
-    <ClCompile Include="source\serialize\lodepng.cpp" />
     <ClCompile Include="source\nodes\texturenode.cpp" />
     <ClCompile Include="source\shaders\valuetype.cpp" />
     <ClCompile Include="source\nodes\buffernode.cpp" />

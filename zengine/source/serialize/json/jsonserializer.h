@@ -9,7 +9,6 @@
 #include <include/shaders/stubnode.h>
 #include <string>
 #include <rapidjson/document.h>
-#include <unordered_map>
 
 extern const EnumMapA<TexelType> TexelTypeMapper;
 extern const EnumMapA<SplineLayer> SplineLayerMapper;
