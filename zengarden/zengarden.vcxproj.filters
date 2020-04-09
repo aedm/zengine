@@ -176,6 +176,21 @@
     <ClCompile Include="source\propertyeditor\sloteditor.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\graph\filechangelistener.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug-static\moc_filechangelistener.cpp">
+      <Filter>Generated Files\Debug-static</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Debug\moc_filechangelistener.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release\moc_filechangelistener.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include=".msbuild\qtGeneratedFiles\Release-static\moc_filechangelistener.cpp">
+      <Filter>Generated Files\Release-static</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="source\forms\zengarden.ui">
@@ -213,6 +228,9 @@
     </CustomBuild>
     <CustomBuild Include="source\propertyeditor\valuewidgets.h">
       <Filter>source\propertyeditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="source\graph\filechangelistener.h">
+      <Filter>Generated Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

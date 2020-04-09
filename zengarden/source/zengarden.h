@@ -9,6 +9,8 @@
 #include <QtCore/QTime>
 #include <QtCore/QDir>
 
+#include "graph/filechangelistener.h"
+
 class ZenGarden: public QMainWindow {
   Q_OBJECT
 
@@ -88,6 +90,7 @@ private:
   void LoadEngineShaders(const QDir& dir);
   QDir mEngineShadersDir;
   QFileSystemWatcher mEngineShadersFolderWatcher;
+  FileChangeListener mFileChangeListener;
 
   void keyPressEvent(QKeyEvent* event) override;
 

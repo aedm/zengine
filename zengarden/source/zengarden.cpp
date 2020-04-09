@@ -405,6 +405,8 @@ void ZenGarden::HandleMenuNew() {
   //Watch(graph, WatcherPosition::RIGHT_TAB);
 
   SetupMovieWatcher();
+
+  mFileChangeListener.SetProjectDirectory(directoryName);
 }
 
 void ZenGarden::HandleMenuOpen() {
