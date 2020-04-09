@@ -48,9 +48,6 @@ private:
   /// Closes a watcher tab
   void DeleteWatcherWidget(WatcherWidget* widget);
 
-  /// Creates blank document
-  void CreateNewDocument();
-
   void SetupMovieWatcher();
 
   WatcherWidget* mPropertyEditor = nullptr;
@@ -65,7 +62,7 @@ private:
   /// The currently open document
   std::shared_ptr<Document> mDocument;
   DocumentWatcher* mDocumentWatcher = nullptr;
-  QString mDocumentFileName;
+  QString mDocumentDirectory;
   
   /// When creating a new Graph, this number will be its index
   UINT mNextGraphIndex = 0;
