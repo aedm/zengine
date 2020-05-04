@@ -47,11 +47,11 @@ Prototypes::Prototypes() {
 
   /// Hack to force linking
   /// TODO: remove
-  std::make_shared<FloatSplineNode>()->Get();
-  std::make_shared<FloatsToVec3Node>();
-  std::make_shared<CubeMeshNode>();
-  std::make_shared<MeshToVertexBufferNode>();
-  std::make_shared<FluidNode>();
+  const auto tmp1 = std::make_shared<FloatSplineNode>();
+  const auto tmp2 = std::make_shared<FloatsToVec3Node>();
+  const auto tmp3 = std::make_shared<CubeMeshNode>();
+  const auto tmp4 = std::make_shared<MeshToVertexBufferNode>();
+  const auto tmp5 = std::make_shared<FluidNode>();
 }
 
 void Prototypes::AddPrototype(NodeClass* nodeClass) {

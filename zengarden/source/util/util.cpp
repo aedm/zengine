@@ -6,11 +6,6 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 #include "../commands/graphCommands.h"
-#include <memory>
-#include <memory>
-#include <memory>
-#include <memory>
-#include <memory>
 
 namespace Util {
 

@@ -406,7 +406,7 @@ void ZenGarden::HandleMenuNew() {
 
   SetupMovieWatcher();
 
-  mFileChangeListener.SetProjectDirectory(directoryName);
+  mFileChangeListener.SetProjectDirectory(directoryName, mDocument);
 }
 
 void ZenGarden::HandleMenuOpen() {
