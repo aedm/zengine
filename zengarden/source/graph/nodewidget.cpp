@@ -95,8 +95,8 @@ void NodeWidget::CreateWidgetSlots() {
   for (auto x : mWidgetSlots) delete x;
   mWidgetSlots.clear();
 
-  for (Slot* slot : GetDirectNode()->GetPublicSlots()) {
-    if (IsInstanceOf<StringSlot*>(slot)) continue;
+  for (Slot* slot : GetDirectNode()->GetSlots()) {
+    if (!slot->mIsPublic || IsInstanceOf<StringSlot*>(slot)) continue;
     WidgetSlot* sw = new WidgetSlot();
     sw->mSlot = slot;
     mWidgetSlots.push_back(sw);

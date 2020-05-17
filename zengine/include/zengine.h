@@ -38,6 +38,8 @@
 #include "nodes/buffernode.h"
 #include "nodes/fluidnode.h"
 
+#include "serialize/jsonserializer.h"
+
 // ReSharper restore CppUnusedIncludeDirective
 
 /// Initializes Zengine. Returns true if everything went okay.

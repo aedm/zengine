@@ -56,6 +56,7 @@ T SafeCastAllowNull(K object) {
 
 /// Logging facility 
 class Document;
+class Graph;
 class Logger;
 extern Logger* TheLogger;
 
@@ -145,6 +146,6 @@ namespace Convert {
   std::string WstringToString(const std::wstring& sourceString);
 }
 
-std::string ToJson(const std::shared_ptr<Document>& document);
-std::shared_ptr<Document> FromJson(const std::string& json);
+//std::string ToJson(const std::shared_ptr<Document>& document);
+//std::shared_ptr<Document> FromJson(const std::string& json);
 std::string GenerateNodeId();

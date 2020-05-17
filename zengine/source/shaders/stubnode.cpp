@@ -103,8 +103,7 @@ void StubNode::Operate() {
     }
     if (canReuseSlot) {
       /// This slot was used before, reuse it.
-      /// "isTraversable" is false since it's already in the mTraversableSlots vector.
-      AddSlot(it->second, true, true, true);
+      AddSlot(it->second);
       mParameterSlotMap[param] = it->second;
       it->second = nullptr;
     }

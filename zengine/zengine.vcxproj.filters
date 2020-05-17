@@ -119,9 +119,6 @@
     <ClInclude Include="include\dom\document.h">
       <Filter>include\dom</Filter>
     </ClInclude>
-    <ClInclude Include="source\serialize\json\jsonserializer.h">
-      <Filter>source\serialize\json</Filter>
-    </ClInclude>
     <ClInclude Include="include\dom\nodetype.h">
       <Filter>include\dom</Filter>
     </ClInclude>
@@ -134,14 +131,8 @@
     <ClInclude Include="include\render\rendertarget.h">
       <Filter>include\render</Filter>
     </ClInclude>
-    <ClInclude Include="source\serialize\json\base64\base64.h">
-      <Filter>source\serialize\json\base64</Filter>
-    </ClInclude>
     <ClInclude Include="include\nodes\cameranode.h">
       <Filter>include\nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="source\serialize\json\jsondeserializer.h">
-      <Filter>source\serialize\json</Filter>
     </ClInclude>
     <ClInclude Include="include\nodes\scenenode.h">
       <Filter>include\nodes</Filter>
@@ -180,6 +171,16 @@
     <ClInclude Include="include\nodes\buffernode.h" />
     <ClInclude Include="include\serialize\imageloader.h" />
     <ClInclude Include="include\nodes\fluidnode.h" />
+    <ClInclude Include="include\serialize\jsondeserializer.h">
+      <Filter>source\serialize\json</Filter>
+    </ClInclude>
+    <ClInclude Include="include\serialize\jsonserializer.h">
+      <Filter>source\serialize\json</Filter>
+    </ClInclude>
+    <ClInclude Include="source\serialize\base64\base64.h">
+      <Filter>source\serialize\json\base64</Filter>
+    </ClInclude>
+    <ClInclude Include="include\dom\transitiveclosure.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base\helpers.cpp">
@@ -224,9 +225,6 @@
     <ClCompile Include="source\dom\document.cpp">
       <Filter>source\dom</Filter>
     </ClCompile>
-    <ClCompile Include="source\serialize\json\jsonserializer.cpp">
-      <Filter>source\serialize\json</Filter>
-    </ClCompile>
     <ClCompile Include="source\dom\nodetype.cpp">
       <Filter>source\dom</Filter>
     </ClCompile>
@@ -239,14 +237,8 @@
     <ClCompile Include="source\render\rendertarget.cpp">
       <Filter>source\render</Filter>
     </ClCompile>
-    <ClCompile Include="source\serialize\json\base64\base64.cpp">
-      <Filter>source\serialize\json\base64</Filter>
-    </ClCompile>
     <ClCompile Include="source\nodes\cameranode.cpp">
       <Filter>source\nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="source\serialize\json\jsondeserializer.cpp">
-      <Filter>source\serialize\json</Filter>
     </ClCompile>
     <ClCompile Include="source\nodes\scenenode.cpp">
       <Filter>source\nodes</Filter>
@@ -286,6 +278,16 @@
     <ClCompile Include="source\nodes\buffernode.cpp" />
     <ClCompile Include="source\serialize\imageloader.cpp" />
     <ClCompile Include="source\nodes\fluidnode.cpp" />
+    <ClCompile Include="source\serialize\base64\base64.cpp">
+      <Filter>source\serialize\json\base64</Filter>
+    </ClCompile>
+    <ClCompile Include="source\serialize\jsondeserializer.cpp">
+      <Filter>source\serialize\json</Filter>
+    </ClCompile>
+    <ClCompile Include="source\serialize\jsonserializer.cpp">
+      <Filter>source\serialize\json</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dom\transitiveclosure.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\shader3.txt">

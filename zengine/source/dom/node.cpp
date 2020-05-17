@@ -60,10 +60,17 @@ Slot::Slot(Node* owner, std::string name, bool isMultiSlot, bool isPublic,
   bool isSerializable, bool isTraversable)
   : mName(std::move(name))
   , mIsMultiSlot(isMultiSlot) 
+  , mIsPublic(isPublic)
+  , mIsSerializable(isSerializable)
+  , mIsTraversable(isTraversable)
   , mOwner(owner)
 {
   ASSERT(owner != nullptr);
-  owner->AddSlot(this, isPublic, isSerializable, isTraversable);
+
+  /// All public slots need to be serializable
+  ASSERT(!isPublic || isSerializable);
+
+  owner->AddSlot(this);
 }
 
 
@@ -322,11 +329,13 @@ void Node::ReceiveMessage(Message* message) {
 
 
 void Node::CheckConnections() {
-  for (Slot* slot : mPublicSlots) {
-    /// TODO: handle multislots
-    if (!slot->mIsMultiSlot && slot->GetReferencedNode() == nullptr) {
-      mIsProperlyConnected = false;
-      return;
+  for (Slot* slot : mSlots) {
+    if (slot->mIsPublic) {
+      /// TODO: handle multislots
+      if (!slot->mIsMultiSlot && slot->GetReferencedNode() == nullptr) {
+        mIsProperlyConnected = false;
+        return;
+      }
     }
   }
   mIsProperlyConnected = true;
@@ -343,15 +352,18 @@ void Node::EnqueueMessage(MessageType message, Slot* slot /*= nullptr*/,
 
 void Node::Update() {
   if (!mIsUpToDate && mIsProperlyConnected) {
-    for (Slot* slot : mPublicSlots) {
-      if (slot->mIsMultiSlot) {
-        for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
-          slot->GetReferencedMultiNode(i)->Update();
+    for (Slot* slot : mSlots) {
+      /// TODO: 'public' is probably not the flag to check here
+      if (slot->mIsPublic) {
+        if (slot->mIsMultiSlot) {
+          for (UINT i = 0; i < slot->GetMultiNodeCount(); i++) {
+            slot->GetReferencedMultiNode(i)->Update();
+          }
         }
-      }
-      else {
-        std::shared_ptr<Node> node = slot->GetReferencedNode();
-        if (node) node->Update();
+        else {
+          std::shared_ptr<Node> node = slot->GetReferencedNode();
+          if (node) node->Update();
+        }
       }
     }
     Operate();
@@ -413,38 +425,44 @@ vec2 Node::GetSize() const {
   return mSize;
 }
 
-void Node::AddSlot(Slot* slot, bool isPublic, bool isSerializable, bool isTraversable) {
-  /// All public slots need to be serializable
-  ASSERT(!isPublic || isSerializable);
+void Node::AddSlot(Slot* slot) {
+  ASSERT(find(mSlots.begin(), mSlots.end(), slot) == mSlots.end());
+  mSlots.push_back(slot);
 
-  if (isPublic) {
-    ASSERT(find(mPublicSlots.begin(), mPublicSlots.end(), slot) == mPublicSlots.end());
-    mPublicSlots.push_back(slot);
-  }
-  if (isTraversable) {
-    ASSERT(find(mTraversableSlots.begin(), mTraversableSlots.end(), slot) == mTraversableSlots.end());
-    mTraversableSlots.push_back(slot);
-  }
-  if (isSerializable) {
+  //if (isPublic) {
+  //  ASSERT(find(mPublicSlots.begin(), mPublicSlots.end(), slot) == mPublicSlots.end());
+  //  mPublicSlots.push_back(slot);
+  //}
+  //if (isTraversable) {
+  //  ASSERT(find(mTraversableSlots.begin(), mTraversableSlots.end(), slot) == mTraversableSlots.end());
+  //  mTraversableSlots.push_back(slot);
+  //}
+  if (slot->mIsSerializable) {
     mSerializableSlotsByName[slot->mName] = slot;
   }
 }
 
 void Node::ClearSlots() {
-  mPublicSlots.clear();
+  mSlots.clear();
+  //mPublicSlots.clear();
   mSerializableSlotsByName.clear();
-  mTraversableSlots.clear();
+  //mTraversableSlots.clear();
 }
 
-const std::vector<Slot*>& Node::GetPublicSlots() const
-{
-  return mPublicSlots;
+const std::vector<Slot*>& Node::GetSlots() const {
+  return mSlots;
 }
 
-const std::vector<Slot*>& Node::GetTraversableSlots() const
-{
-  return mTraversableSlots;
-}
+
+//const std::vector<Slot*>& Node::GetPublicSlots() const
+//{
+//  return mPublicSlots;
+//}
+//
+//const std::vector<Slot*>& Node::GetTraversableSlots() const
+//{
+//  return mTraversableSlots;
+//}
 
 const std::unordered_map<std::string, Slot*>& Node::GetSerializableSlots() const
 {
@@ -471,45 +489,3 @@ void Node::AssignWatcher(const std::shared_ptr<Watcher>& watcher) {
   watcher->ChangeNode(this->shared_from_this());
 }
 
-class TransitiveClosure {
-public:
-  TransitiveClosure(const std::shared_ptr<Node>& root, bool includeHiddenSlots,
-                    std::vector<std::shared_ptr<Node>>& oResult)
-  {
-    mResult = &oResult;
-    mIncludeHiddenSlots = includeHiddenSlots;
-    Traverse(root);
-  }
-
-private:
-  void Traverse(const std::shared_ptr<Node>& node) {
-    if (mVisited.find(node) != mVisited.end()) return;
-    mVisited.insert(node);
-
-    const std::vector<Slot*>& slots =
-      mIncludeHiddenSlots ? node->GetTraversableSlots() : node->GetPublicSlots();
-
-    for (Slot* slot : slots) {
-      if (slot->mIsMultiSlot) {
-        for (const std::shared_ptr<Node>& directNode : slot->GetDirectMultiNodes()) {
-          Traverse(directNode);
-        }
-      }
-      else if (!slot->IsDefaulted()) {
-        std::shared_ptr<Node> dependency = slot->GetDirectNode();
-        if (dependency != nullptr) Traverse(dependency);
-      }
-    }
-
-    mResult->push_back(node);
-  }
-
-  bool mIncludeHiddenSlots;
-  std::vector<std::shared_ptr<Node>>* mResult;
-  std::set<std::shared_ptr<Node>> mVisited;
-};
-
-void Node::GenerateTransitiveClosure(std::vector<std::shared_ptr<Node>>& oResult,
-  bool includeHiddenSlots) {
-  TransitiveClosure tmp(this->shared_from_this(), includeHiddenSlots, oResult);
-}

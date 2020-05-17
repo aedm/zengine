@@ -1,12 +1,14 @@
 #pragma once
 
-#include "../dom/node.h"
 #include "drawable.h"
 #include "cameranode.h"
+#include "../dom/node.h"
+#include "../dom/transitiveclosure.h"
 #include "../render/rendertarget.h"
 #include "../shaders/pass.h"
 #include "timenode.h"
 #include <memory>
+
 
 class SceneNode: public Node {
 public:
@@ -51,7 +53,7 @@ protected:
   void HandleMessage(Message* message) override;
 
 private:
-  std::vector<std::shared_ptr<Node>> mTransitiveClosure;
+  std::unique_ptr<TransitiveClosure> mTransitiveClosure;
   Slot mSceneTimes;
   float mSceneTime = 0.0f;
   float mLastRenderTime{};

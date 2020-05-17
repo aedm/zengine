@@ -150,6 +150,10 @@ public:
   void SetGhost(bool isGhostSlot);
   bool IsGhost() const;
 
+  const bool mIsPublic;
+  const bool mIsSerializable;
+  const bool mIsTraversable;
+
 protected:
   /// The operator which this slot is a member of
   Node* const mOwner;
@@ -183,8 +187,8 @@ public:
 
   /// Calculates the transitive closure of the node to "oResult" in topological ordering.
   /// Deepest nodes come first. 
-  void GenerateTransitiveClosure(std::vector<std::shared_ptr<Node>>& oResult, 
-    bool includeHiddenSlots);
+  //void GenerateTransitiveClosure(std::vector<std::shared_ptr<Node>>& oResult, 
+  //  bool includeHiddenSlots);
 
   /// Returns a node which can actually do what it claims to do. Most nodes
   /// return "this", but there are a few exceptions that refer to a different node:
@@ -251,18 +255,21 @@ public:
   virtual void SetSize(vec2 size);
   virtual vec2 GetSize() const;
 
-  /// Returns the list of publicly editable slots
-  const std::vector<Slot*>& GetPublicSlots() const;
+  /// Returns the list of slots
+  const std::vector<Slot*>& GetSlots() const;
 
-  /// Returns the list of all slots
-  const std::vector<Slot*>& GetTraversableSlots() const;
+  ///// Returns the list of publicly editable slots
+  //const std::vector<Slot*>& GetPublicSlots() const;
+
+  ///// Returns the list of all slots
+  //const std::vector<Slot*>& GetTraversableSlots() const;
 
   /// Returns the slots that need to be serialized when saving / loading
   const std::unordered_map<std::string, Slot*>& GetSerializableSlots() const;
 
 protected:
   /// Registers a new slot
-  void AddSlot(Slot* slot, bool isPublic, bool isSerializable, bool isTraversable);
+  void AddSlot(Slot* slot);
 
   /// Removes public and serializable slots
   void ClearSlots();
@@ -275,13 +282,15 @@ private:
   vec2 mPosition = vec2(0, 0);
   vec2 mSize = vec2(0, 0);
 
+  std::vector<Slot*> mSlots;
+
   /// Public slots of this node.
-  std::vector<Slot*>	mPublicSlots;
+  //std::vector<Slot*> mPublicSlots;
 
   /// All traversable slots of this node. These include hidden slots that aren't 
   /// displayed on the UI (like SceneTime slots of SplineNodes), but they don't
   /// include generated slots (like for StubNodes).
-  std::vector<Slot*>	mTraversableSlots;
+  //std::vector<Slot*> mTraversableSlots;
 
   /// Slots that need to be serialized when saving / loading.
   std::unordered_map<std::string, Slot*> mSerializableSlotsByName;

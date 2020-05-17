@@ -162,7 +162,9 @@ int CALLBACK WinMain(
 
   /// Load precalc project file
   char* json = System::ReadFile(L"loading.zen");
-  std::shared_ptr<Document> loading = FromJson(std::string(json));
+  //std::shared_ptr<Document> loading = FromJson(std::string(json));
+  std::shared_ptr<Document> loading;
+  NOT_IMPLEMENTED;
   ASSERT(loading);
   delete json;
 
@@ -172,14 +174,16 @@ int CALLBACK WinMain(
 
   /// Load demo file
   json = System::ReadFile(L"demo.zen");
-  std::shared_ptr<Document> doc = FromJson(std::string(json));
+  //std::shared_ptr<Document> doc = FromJson(std::string(json));
+  std::shared_ptr<Document> doc;
   ASSERT(doc);
   delete json;
 
   /// Compile shaders, upload resources
-  std::vector<std::shared_ptr<Node>> nodes;
-  doc->GenerateTransitiveClosure(nodes, true);
-  for (const auto& node : nodes) node->Update();
+  TransitiveClosure transitiveClosure(doc);
+  for (const std::shared_ptr<Node>& node : TransitiveClosure(doc).GetTopologicalOrder()) {
+    node->Update();
+  }
 
   /// No more OpenGL resources should be allocated after this point
   //PleaseNoNewResources = true;

@@ -1,8 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 
-#include "../serialize/json/jsonserializer.h"
-#include "../serialize/json/jsondeserializer.h"
 #include <include/base/helpers.h>
 #include <cstdarg>
 #include <codecvt>
@@ -70,15 +68,15 @@ namespace Convert {
   }
 }
 
-std::string ToJson(const std::shared_ptr<Document>& document) {
-  const JSONSerializer serializer(document);
-  return serializer.GetJSON();
-}
+//std::string ToJson(const std::shared_ptr<Document>& document) {
+//  const JSONSerializer serializer(document);
+//  return serializer.GetJSON();
+//}
 
-std::shared_ptr<Document> FromJson(const std::string& json) {
-  const JSONDeserializer deserializer(json);
-  return deserializer.GetDocument();
-}
+//std::shared_ptr<Document> FromJson(const std::string& json) {
+//  const JSONDeserializer deserializer(json);
+//  return deserializer.GetDocument();
+//}
 
 std::string GenerateNodeId() {
   const UINT length = 24;

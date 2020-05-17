@@ -1,6 +1,7 @@
 #include <include/dom/ghost.h>
 #include <include/dom/nodetype.h>
 
+/// TODO: use plain TransitiveClosure for this
 class GhostTransitiveClosure {
 public:
   GhostTransitiveClosure(const std::shared_ptr<Node>& root, 
@@ -19,12 +20,15 @@ private:
     }
     mVisited.insert(node);
 
-    const std::vector<Slot*>& slots = node->GetPublicSlots();
+    const std::vector<Slot*>& slots = node->GetSlots();
     bool foundGhostSlot = false;
 
     for (Slot* slot : slots) {
       if (slot->IsGhost()) {
         foundGhostSlot = true;
+        continue;
+      }
+      if (!slot->mIsPublic) {
         continue;
       }
 
@@ -94,12 +98,14 @@ std::shared_ptr<Node> Ghost::GetReferencedNode() {
 void Ghost::Regenerate() {
   const std::shared_ptr<Node> root = mOriginalNode.GetReferencedNode();
   std::vector<std::shared_ptr<Node>> topologicalOrder;
-  if (root != nullptr) GhostTransitiveClosure(root, topologicalOrder);
+  if (root != nullptr) {
+    GhostTransitiveClosure(root, topologicalOrder);
+  }
 
   std::set<std::shared_ptr<Node>> newInternalNodes;
   std::map<std::shared_ptr<Node>, std::shared_ptr<Node>> newNodeMapping;
   ClearSlots();
-  AddSlot(&mOriginalNode, false, true, true);
+  AddSlot(&mOriginalNode);
 
   if (topologicalOrder.empty()) {
     /// No ghost slots, just reference the original node
@@ -121,17 +127,19 @@ void Ghost::Regenerate() {
       newNodeMapping[node] = internalNode;
 
       /// Connect slots
-      const auto& originalSlots = node->GetPublicSlots();
-      const auto& internalNodeSlots = internalNode->GetPublicSlots();
+      const auto& originalSlots = node->GetSlots();
+      const auto& internalNodeSlots = internalNode->GetSlots();
       const size_t slotCount = originalSlots.size();
-      ASSERT(slotCount == internalNode->GetPublicSlots().size());
+      ASSERT(slotCount == internalNode->GetSlots().size());
       for (UINT i = 0; i < slotCount; i++) {
         Slot* originalSlot = originalSlots[i];
+        /// TODO: review if this check is necessary
+        if (!originalSlot->mIsPublic) continue;
         Slot* internalSlot = internalNodeSlots[i];
         ASSERT(originalSlot->mName == internalSlot->mName);
         if (originalSlot->IsGhost()) {
           /// TODO: initialize value
-          AddSlot(internalSlot, true, true, true);
+          AddSlot(internalSlot);
           if (originalSlot->IsDefaulted() &&
             internalSlot->GetDirectNode() == originalSlot->GetDirectNode()) {
             internalSlot->DisconnectAll(true);

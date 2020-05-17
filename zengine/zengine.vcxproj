@@ -107,6 +107,7 @@
     <ClInclude Include="include\dom\graph.h" />
     <ClInclude Include="include\dom\node.h" />
     <ClInclude Include="include\dom\nodetype.h" />
+    <ClInclude Include="include\dom\transitiveclosure.h" />
     <ClInclude Include="include\nodes\buffernode.h" />
     <ClInclude Include="include\nodes\fluidnode.h" />
     <ClInclude Include="include\nodes\propertiesnode.h" />
@@ -137,9 +138,9 @@
     <ClInclude Include="include\shaders\stubnode.h" />
     <ClInclude Include="include\shaders\valuestubslot.h" />
     <ClInclude Include="include\zengine.h" />
-    <ClInclude Include="source\serialize\json\base64\base64.h" />
-    <ClInclude Include="source\serialize\json\jsondeserializer.h" />
-    <ClInclude Include="source\serialize\json\jsonserializer.h" />
+    <ClInclude Include="source\serialize\base64\base64.h" />
+    <ClInclude Include="include\serialize\jsondeserializer.h" />
+    <ClInclude Include="include\serialize\jsonserializer.h" />
     <ClInclude Include="source\shaders\shaderbuilder.h" />
     <ClInclude Include="source\shaders\shaderTokenizer.h" />
     <ClInclude Include="source\shaders\stubanalyzer.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="source\dom\graph.cpp" />
     <ClCompile Include="source\dom\node.cpp" />
     <ClCompile Include="source\dom\nodetype.cpp" />
+    <ClCompile Include="source\dom\transitiveclosure.cpp" />
     <ClCompile Include="source\dom\watcher.cpp" />
     <ClCompile Include="source\nodes\buffernode.cpp" />
     <ClCompile Include="source\nodes\cameranode.cpp" />
@@ -173,12 +175,12 @@
     <ClCompile Include="source\resources\mesh.cpp" />
     <ClCompile Include="source\resources\texture.cpp" />
     <ClCompile Include="source\serialize\imageloader.cpp" />
-    <ClCompile Include="source\serialize\json\base64\base64.cpp">
+    <ClCompile Include="source\serialize\base64\base64.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
-    <ClCompile Include="source\serialize\json\jsondeserializer.cpp" />
-    <ClCompile Include="source\serialize\json\jsonserializer.cpp" />
+    <ClCompile Include="source\serialize\jsondeserializer.cpp" />
+    <ClCompile Include="source\serialize\jsonserializer.cpp" />
     <ClCompile Include="source\shaders\engineshaders.cpp" />
     <ClCompile Include="source\shaders\enginestubs.cpp" />
     <ClCompile Include="source\shaders\material.cpp" />

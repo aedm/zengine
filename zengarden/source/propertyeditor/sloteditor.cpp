@@ -60,7 +60,8 @@ void SlotEditor::RebuildSlots() {
   const std::shared_ptr<Node> directNode = GetDirectNode();
 
   /// Generate slot editors
-  for (Slot* slot : directNode->GetPublicSlots()) {
+  for (Slot* slot : directNode->GetSlots()) {
+    if (!slot->mIsPublic) continue;
     /// Create horizontal widget to add editor and ghost button
     QWidget* widget = new QWidget(mSlotsWidget);
     slotLayout->addWidget(widget);
