@@ -22,14 +22,13 @@ const EnumMapA<SplineLayer> SplineLayerMapper = {
   {"beat_quantizer", SplineLayer::BEAT_QUANTIZER},
 };
 
-JSONSerializer::JSONSerializer(const std::shared_ptr<Node>& root) {
-  mJsonDocument.SetObject();
-  mAllocator = &mJsonDocument.GetAllocator();
+JSONSerializer::JSONSerializer(const std::shared_ptr<Document>& document)
+  : mDocument(document)
+{
+  //mNodeCount = 0;
+  //Traverse(document);
 
-  mNodeCount = 0;
-  Traverse(root);
-
-  DumpNodes();
+  //DumpNodes();
 }
 
 //std::string JSONSerializer::GetJSON() const
@@ -42,52 +41,64 @@ JSONSerializer::JSONSerializer(const std::shared_ptr<Node>& root) {
 //  return buffer.GetString();
 //}
 
-std::string JSONSerializer::GetDocumentJson() const {
+std::string JSONSerializer::GetDocumentJson() {
+  rapidjson::Document documentJson;
+  documentJson.SetObject();
+  mAllocator = &documentJson.GetAllocator();
+  documentJson.AddMember("document", Serialize(mDocument), *mAllocator);
+  documentJson.AddMember("movie", Serialize(mDocument->mMovie.GetNode()), *mAllocator);
+  documentJson.AddMember("properties", Serialize(mDocument->mProperties.GetNode()), 
+    *mAllocator);
+  return ToString(documentJson);
+}
+
+std::string JSONSerializer::ToString(const rapidjson::Document& document) {
   rapidjson::StringBuffer buffer;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
   writer.SetIndent(' ', 1);
   //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-  mJsonDocument.Accept(writer);
+  document.Accept(writer);
   return buffer.GetString();
 }
 
-void JSONSerializer::Traverse(const std::shared_ptr<Node>& root) {
-  mNodes.insert(root);
 
-  /// Traverse slots
-  for (const auto& slotPair : root->GetSerializableSlots()) {
-    Slot* slot = slotPair.second;
-    if (slot->mIsMultiSlot) {
-      for (auto& node : slot->GetDirectMultiNodes()) {
-        auto it = mNodes.find(node);
-        if (it == mNodes.end()) {
-          Traverse(node);
-        }
-      }
-    }
-    else {
-      std::shared_ptr<Node> node = slot->GetDirectNode();
-      if (node == nullptr || slot->IsDefaulted()) continue;
-      auto it = mNodes.find(node);
-      if (it == mNodes.end()) {
-        Traverse(node);
-      }
-    }
-  }
+//void JSONSerializer::Traverse(const std::shared_ptr<Node>& root) {
+//  mNodes.insert(root);
+//
+//  /// Traverse slots
+//  for (const auto& slotPair : root->GetSerializableSlots()) {
+//    Slot* slot = slotPair.second;
+//    if (slot->mIsMultiSlot) {
+//      for (auto& node : slot->GetDirectMultiNodes()) {
+//        auto it = mNodes.find(node);
+//        if (it == mNodes.end()) {
+//          Traverse(node);
+//        }
+//      }
+//    }
+//    else {
+//      std::shared_ptr<Node> node = slot->GetDirectNode();
+//      if (node == nullptr || slot->IsDefaulted()) continue;
+//      auto it = mNodes.find(node);
+//      if (it == mNodes.end()) {
+//        Traverse(node);
+//      }
+//    }
+//  }
+//
+//  //mNodesList.push_back(root);
+//}
 
-  mNodesList.push_back(root);
-}
-
-void JSONSerializer::DumpNodes() {
-  rapidjson::Value nodesArray(rapidjson::kArrayType);
-  for (auto& node : mNodesList) {
-    nodesArray.PushBack(Serialize(node), *mAllocator);
-  }
-  mJsonDocument.AddMember("nodes", nodesArray, *mAllocator);
-}
+//void JSONSerializer::DumpNodes() {
+//  rapidjson::Value nodesArray(rapidjson::kArrayType);
+//  for (auto& node : mNodesList) {
+//    nodesArray.PushBack(Serialize(node), *mAllocator);
+//  }
+//  mJsonDocument.AddMember("nodes", nodesArray, *mAllocator);
+//}
 
 
-rapidjson::Value JSONSerializer::Serialize(const std::shared_ptr<Node>& node) {
+rapidjson::Value JSONSerializer::Serialize(const std::shared_ptr<Node>& node) const {
   rapidjson::Value v(rapidjson::kObjectType);
 
   /// Save class type
@@ -169,9 +180,8 @@ rapidjson::Value JSONSerializer::SerializeVec4(const vec4& vec) const
   return jsonObject;
 }
 
-
 void JSONSerializer::SerializeGeneralNode(
-  rapidjson::Value& nodeValue, const std::shared_ptr<Node>& node)
+  rapidjson::Value& nodeValue, const std::shared_ptr<Node>& node) const
 {
   /// Save slots
   if (!node->GetSerializableSlots().empty()) {

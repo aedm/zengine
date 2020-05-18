@@ -357,15 +357,16 @@ void ZenGarden::SetupMovieWatcher() {
   mMovieWatcherLayout->addWidget(mMovieWatcherWidget);
 }
 
-void ZenGarden::HandleMenuSaveAs() {
+void ZenGarden::HandleMenuSaveAs() const {
   INFO("Saving document...");
   QTime myTimer;
   myTimer.start();
-  //JSONSerializer serializer(mDocument);
-  //const std::string json = ToJson(mDocument);
-  //QFile file(fileName);
-  //file.open(QIODevice::WriteOnly);
-  //file.write(json.c_str());
+  JSONSerializer serializer(mDocument);
+  const std::string json = serializer.GetDocumentJson();
+  QFile file(QDir(mDocumentDirectory).filePath("project.zen"));
+  file.open(QIODevice::WriteOnly);
+  file.write(json.c_str());
+  file.close();
 
   //serializer.GetJSON()
 
@@ -487,7 +488,8 @@ void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
   mCommonGLWidget->makeCurrent();
 
-  TransitiveClosure closure(mDocument, [](Slot* slot) { return slot->mIsPublic; });
+  TransitiveClosure closure(mDocument, true, 
+    [](Slot* slot) { return slot->mIsPublic; });
   const auto& nodes = closure.GetTopologicalOrder();
   for (UINT i = nodes.size(); i > 0; i--) {
     if (nodes[i - 1].use_count()) nodes[i - 1]->Dispose();

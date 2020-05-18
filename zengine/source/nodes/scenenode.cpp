@@ -173,8 +173,8 @@ void SceneNode::HandleMessage(Message* message) {
 }
 
 void SceneNode::CalculateRenderDependencies() {
-  mTransitiveClosure = std::make_unique<TransitiveClosure>(this->shared_from_this(),
-    [](Slot* slot) { return slot->mIsTraversable; });
+  mTransitiveClosure = std::make_unique<TransitiveClosure>(this->shared_from_this(), 
+    false, [](Slot* slot) { return slot->mIsTraversable; });
   mSceneTimes.DisconnectAll(false);
   for (auto& node : mTransitiveClosure->GetTopologicalOrder()) {
     if (IsExactType<SceneTimeNode>(node)) {
@@ -197,7 +197,6 @@ float SceneNode::GetSceneTime() const {
 }
 
 void SceneNode::UpdateDependencies() {
-  /// Update dependencies
   for (auto& node : mTransitiveClosure->GetTopologicalOrder()) {
     if (this != node.get()) node->Update();
   }

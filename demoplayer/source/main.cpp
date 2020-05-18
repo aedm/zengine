@@ -180,8 +180,8 @@ int CALLBACK WinMain(
   delete json;
 
   /// Compile shaders, upload resources
-  TransitiveClosure transitiveClosure(doc);
-  for (const std::shared_ptr<Node>& node : TransitiveClosure(doc).GetTopologicalOrder()) {
+  TransitiveClosure closure(doc, false);
+  for (const std::shared_ptr<Node>& node : closure.GetTopologicalOrder()) {
     node->Update();
   }
 

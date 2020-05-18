@@ -3,9 +3,10 @@
 #include <utility>
 
 TransitiveClosure::TransitiveClosure(const std::shared_ptr<Node>& root,
-  std::function<bool(Slot*)> includeSlotPredicate)
+  bool useVirtualNodes, std::function<bool(Slot*)> includeSlotPredicate)
   : mRoot(root)
   , mIncludeSlotPredicate(std::move(includeSlotPredicate))
+  , mUseVirtualNodes(useVirtualNodes)
 {}
 
 std::vector<std::shared_ptr<Node>>& TransitiveClosure::GetTopologicalOrder() {
@@ -24,19 +25,19 @@ void TransitiveClosure::Traverse(const std::shared_ptr<Node>& node) {
   if (mVisited.find(node) != mVisited.end()) return;
   mVisited.insert(node);
 
-  //const std::vector<Slot*>& slots =
-  //  mIncludeHiddenSlots ? node->GetTraversableSlots() : node->GetPublicSlots();
   const std::vector<Slot*>& slots = node->GetSlots();
   for (Slot* slot : slots) {
     if (mIncludeSlotPredicate == nullptr || mIncludeSlotPredicate(slot)) {
       if (slot->mIsMultiSlot) {
-        for (const std::shared_ptr<Node>& directNode : slot->GetDirectMultiNodes()) {
-          Traverse(directNode);
+        for (const std::shared_ptr<Node>& dependency : slot->GetDirectMultiNodes()) {
+          Traverse(mUseVirtualNodes ? dependency : dependency->GetReferencedNode());
         }
       }
       else if (!slot->IsDefaulted()) {
         std::shared_ptr<Node> dependency = slot->GetDirectNode();
-        if (dependency != nullptr) Traverse(dependency);
+        if (dependency != nullptr) {
+          Traverse(mUseVirtualNodes ? dependency : dependency->GetReferencedNode());
+        }
       }
     }
   }

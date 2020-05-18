@@ -112,7 +112,7 @@ private slots:
   void LoadEngineShader(const QString& path) const;
 
   /// Menu buttons
-  void HandleMenuSaveAs();
+  void HandleMenuSaveAs() const;
   void HandleMenuNew();
   void HandleMenuOpen();
   void HandlePropertiesMenu();
