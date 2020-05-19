@@ -16,6 +16,7 @@ class JSONSerializer {
 public:
   JSONSerializer(const std::shared_ptr<Document>& document);
   std::string GetDocumentJson();
+  std::string GetGraphJson(const std::shared_ptr<Graph>& graph);
 
 private:
   /// Collect nodes in the transitive close of root

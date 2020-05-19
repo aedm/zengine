@@ -1,6 +1,6 @@
 #include "util.h"
 #include <QtCore/QDir>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <memory>
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure

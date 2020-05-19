@@ -52,11 +52,27 @@ std::string JSONSerializer::GetDocumentJson() {
   return ToString(documentJson);
 }
 
+std::string JSONSerializer::GetGraphJson(const std::shared_ptr<Graph>& graph) {
+  rapidjson::Document graphJson;
+  graphJson.SetObject();
+  mAllocator = &graphJson.GetAllocator();
+
+  /// Serialize the graph
+  graphJson.AddMember("graph", Serialize(graph), *mAllocator);
+
+  /// Serialize nodes in the graph
+  rapidjson::Value nodesArray(rapidjson::kArrayType);
+  for (const auto& node : graph->mNodes.GetDirectMultiNodes()) {
+    nodesArray.PushBack(Serialize(node), *mAllocator);
+  }
+  graphJson.AddMember("nodes", nodesArray, *mAllocator);
+  return ToString(graphJson);
+}
+
 std::string JSONSerializer::ToString(const rapidjson::Document& document) {
   rapidjson::StringBuffer buffer;
   rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
   writer.SetIndent(' ', 1);
-  //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   document.Accept(writer);
   return buffer.GetString();
 }

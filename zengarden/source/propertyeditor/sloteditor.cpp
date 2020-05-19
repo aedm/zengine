@@ -3,7 +3,7 @@
 #include "../zengarden.h"
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLabel>
-#include <QClipboard>
+#include <QtGui/QClipboard>
 
 SlotEditor::SlotEditor(const std::shared_ptr<Node>& node)
   : PropertyEditor(node) 

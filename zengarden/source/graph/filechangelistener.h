@@ -1,8 +1,8 @@
 #pragma once
 
 #include <zengine.h>
-#include <QDir>
-#include <QFileSystemWatcher>
+#include <QtCore/QDir>
+#include <QtCore/QFileSystemWatcher>
 #include <memory>
 
 using std::map;

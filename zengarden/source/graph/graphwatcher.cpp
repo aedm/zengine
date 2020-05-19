@@ -6,10 +6,10 @@
 #include "prototypes.h"
 #include "../zengarden.h"
 #include <zengine.h>
-#include <QTimer>
-#include <QMouseEvent>
-#include <QMimeData>
-#include <QFileInfo>
+#include <QtCore/QTimer>
+#include <QtGui/QMouseEvent>
+#include <QtCore/QMimeData>
+#include <QtCore/QFileInfo>
 
 GraphWatcher::GraphWatcher(const std::shared_ptr<Node>& graph)
   : WatcherUi(graph) {

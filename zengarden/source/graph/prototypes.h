@@ -1,8 +1,8 @@
 #pragma once
 
 #include <zengine.h>
-#include <QDialog>
-#include <QTreeWidgetItem>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QTreeWidgetItem>
 #include <typeindex>
 #include <QtCore/QString>
 

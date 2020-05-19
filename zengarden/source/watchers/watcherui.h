@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zengine.h>
-#include <QDropEvent>
+#include <QtGui/QDropEvent>
 
 class WatcherWidget;
 class EventForwarderGlWidget;

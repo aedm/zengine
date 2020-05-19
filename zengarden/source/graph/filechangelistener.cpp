@@ -1,6 +1,6 @@
 #include "filechangelistener.h"
 #include "../util/util.h"
-#include <QDirIterator>
+#include <QtCore/QDirIterator>
 #include <vector>
 
 using std::vector;

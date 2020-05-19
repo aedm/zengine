@@ -17,8 +17,8 @@
 #include <zengine.h>
 #include <QtCore/QTimer>
 #include <QtCore/QDir>
-#include <QMouseEvent>
-#include <QFileDialog>
+#include <QtGui/QMouseEvent>
+#include <QtWidgets/QFileDialog>
 #include <bass.h>
 
 static ZenGarden* gZengarden;
@@ -362,12 +362,24 @@ void ZenGarden::HandleMenuSaveAs() const {
   QTime myTimer;
   myTimer.start();
   JSONSerializer serializer(mDocument);
-  const std::string json = serializer.GetDocumentJson();
-  QFile file(QDir(mDocumentDirectory).filePath("project.zen"));
-  file.open(QIODevice::WriteOnly);
-  file.write(json.c_str());
-  file.close();
 
+  /// Save main document
+  const std::string documentJson = serializer.GetDocumentJson();
+  QFile documentFile(QDir(mDocumentDirectory).filePath("project.zen"));
+  documentFile.open(QIODevice::WriteOnly);
+  documentFile.write(documentJson.c_str());
+  documentFile.close();
+
+  /// Save each graph
+  for (const auto& node : mDocument->mGraphs.GetDirectMultiNodes()) {
+    const std::string graphJson = 
+      serializer.GetGraphJson(std::dynamic_pointer_cast<Graph>(node));
+    QFile graphFile(QDir(QDir(mDocumentDirectory).filePath(
+      QString::fromStdString(node->GetName()))).filePath("project.zen"));
+    graphFile.open(QIODevice::WriteOnly);
+    graphFile.write(graphJson.c_str());
+    graphFile.close();
+  }
   //serializer.GetJSON()
 
   const int milliseconds = myTimer.elapsed();
