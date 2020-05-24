@@ -5,36 +5,104 @@
 #include <algorithm>
 #include <memory>
 
-JSONDeserializer::JSONDeserializer(const std::string& json) {
+JSONDeserializer::JSONDeserializer(const std::shared_ptr<Document>& document)
+  : mDocument(document)
+{}
+
+void JSONDeserializer::SetDocumentJson(const std::string& documentJson) {
+  ASSERT(mDocument == nullptr);
+
   rapidjson::Document d;
-  d.Parse(json.c_str());
+  d.Parse(documentJson.c_str());
 
-  rapidjson::Value& jsonNodes = d["nodes"];
-  ASSERT(jsonNodes.IsArray());
+  INFO("Loading document...");
+  rapidjson::Value& documentObject = d["document"];
+  DeserializeNode(documentObject);
 
-  INFO("Loading nodes...");
-  for (UINT i = 0; i < jsonNodes.Size(); i++) {
-    DeserializeNode(jsonNodes[i]);
-  }
+  INFO("Loading properties...");
+  rapidjson::Value& propertiesObject = d["properties"];
+  DeserializeNode(propertiesObject);
 
-  INFO("Loading connections...");
-  for (UINT i = 0; i < jsonNodes.Size(); i++) {
-    ConnectSlots(jsonNodes[i]);
-  }
+  INFO("Loading movie timeline...");
+  rapidjson::Value& movieObject = d["movie"];
+  DeserializeNode(movieObject);
 
   INFO("Loading done.");
 }
 
-std::shared_ptr<Document> JSONDeserializer::GetDocument() const
+void JSONDeserializer::AddGraphJson(const std::string& graphJson) {
+  rapidjson::Document& d = mJsonDocuments.emplace_back();
+  d.Parse(graphJson.c_str());
+
+  INFO("Loading graph...");
+  rapidjson::Value& graphObject = d["graph"];
+  DeserializeNode(graphObject);
+
+  rapidjson::Value& jsonNodes = d["nodes"];
+  ASSERT(jsonNodes.IsArray());
+
+  INFO("Loading graph nodes...");
+  for (UINT i = 0; i < jsonNodes.Size(); i++) {
+    DeserializeNode(jsonNodes[i]);
+  }
+
+  //INFO("Loading connections...");
+  //for (UINT i = 0; i < jsonNodes.Size(); i++) {
+  //  ConnectSlots(jsonNodes[i]);
+  //}
+
+  INFO("Loading done.");
+}
+
+std::shared_ptr<Document> JSONDeserializer::GetDocument()
 {
   ASSERT(mDocument);
+  ConnectNodes();
   return mDocument;
 }
 
+void JSONDeserializer::LoadNode(rapidjson::Value& value) {
+  unique_ptr<SerializedNode> serializedNode = std::make_unique<SerializedNode>();
+  serializedNode->mJsonValue = &value;
+  if (!value.HasMember("slots")) return;
+  rapidjson::Value& jsonSlots = value["slots"];
+  for (rapidjson::Value::ConstMemberIterator itr = jsonSlots.MemberBegin();
+    itr != jsonSlots.MemberEnd(); ++itr) {
+    const rapidjson::Value& jsonSlot = itr->value;
+
+    /// Connect to nodes
+    if (jsonSlot.HasMember("connect")) {
+      const rapidjson::Value& jsonConnect = jsonSlot["connect"];
+      if (jsonConnect.IsArray()) {
+        for (UINT i = 0; i < jsonConnect.Size(); i++) {
+          serializedNode->mRequiredIds.insert(jsonConnect[i].GetString());
+        }
+      }
+      else {
+        serializedNode->mRequiredIds.insert(jsonConnect.GetString());
+      }
+    }
+  }
+}
+
+void JSONDeserializer::ConnectNodes() {
+  while (!mUnconnectedNodes.empty()) {
+    for (const auto& it : mUnconnectedNodes) {
+      /// Check whether node can be connected
+      bool connectable = true;
+      for (const auto& connection : it->mConnections) {
+        
+      }
+    }
+  }
+}
+
+
 void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
+  ASSERT(value.IsObject());
   const std::string nodeClassName = value["node"].GetString();
   const std::string id = value["id"].GetString();
-  ASSERT(mNodes.find(id) == mNodes.end());
+  ASSERT(mNodesById.find(id) == mNodesById.end());
 
   std::shared_ptr<Node> node;
   if (nodeClassName == "ghost") {
@@ -44,7 +112,7 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     NodeClass* nodeClass = NodeRegistry::GetInstance()->GetNodeClass(nodeClassName);
     node = nodeClass->Manufacture();
   }
-  mNodes[id] = node;
+  mNodesById[id] = node;
 
   if (value.HasMember("name")) {
     node->SetName(value["name"].GetString());
@@ -83,6 +151,50 @@ void JSONDeserializer::DeserializeNode(rapidjson::Value& value) {
     ASSERT(mDocument == nullptr);
     mDocument = PointerCast<Document>(node);
   }
+
+  AnalyzeSlots(node, value);
+}
+
+void JSONDeserializer::AnalyzeSlots(const shared_ptr<Node>& node,
+  rapidjson::Value& value)
+{
+  if (!value.HasMember("slots")) return;
+
+  const auto nodeConnections = std::make_unique<NodeConnections>();
+  mUnconnectedNodes.insert(nodeConnections);
+  nodeConnections->mNode = node;
+
+  rapidjson::Value& jsonSlots = value["slots"];
+
+  for (rapidjson::Value::ConstMemberIterator itr = jsonSlots.MemberBegin();
+    itr != jsonSlots.MemberEnd(); ++itr) {
+    const rapidjson::Value& jsonSlot = itr->value;
+
+    auto& nodeConnection = nodeConnections->mConnections.emplace_back();
+    nodeConnection.mSlotName = itr->name.GetString();
+
+    /// Set ghost flag
+    if (jsonSlot.HasMember("ghost")) {
+      nodeConnection.mIsGhostSlot = jsonSlot["ghost"].GetBool();
+    }
+
+    /// Connect to nodes
+    if (jsonSlot.HasMember("connect")) {
+      const rapidjson::Value& jsonConnect = jsonSlot["connect"];
+      if (jsonConnect.IsArray()) {
+        for (UINT i = 0; i < jsonConnect.Size(); i++) {
+          nodeConnection.mNodeIds.emplace_back(jsonConnect[i].GetString());
+        }
+      }
+      else {
+        nodeConnection.mNodeIds.emplace_back(jsonConnect.GetString());
+      }
+    }
+
+    if (jsonSlot.HasMember("default")) {
+      nodeConnection.mDefault = &jsonSlot["default"];
+    }
+  }
 }
 
 vec2 JSONDeserializer::DeserializeVec2(const rapidjson::Value& value) {
@@ -108,9 +220,9 @@ vec4 JSONDeserializer::DeserializeVec4(const rapidjson::Value& value) {
   return vec4(x, y, z, w);
 }
 
-void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
+void JSONDeserializer::ConnectSlots2(rapidjson::Value& value) {
   const std::string id = value["id"].GetString();
-  const std::shared_ptr<Node> node = mNodes.at(id);
+  const std::shared_ptr<Node> node = mNodesById.at(id);
   const auto& slots = node->GetSerializableSlots();
 
   if (value.HasMember("slots")) {
@@ -123,7 +235,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         if (jsonSlot.HasMember("connect")) {
           const rapidjson::Value& jsonConnect = jsonSlot["connect"];
           const std::string connId = jsonConnect.GetString();
-          const std::shared_ptr<Node> connNode = mNodes.at(connId);
+          const std::shared_ptr<Node> connNode = mNodesById.at(connId);
           PointerCast<Ghost>(node)->mOriginalNode.Connect(connNode);
         }
       }
@@ -158,13 +270,13 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
         if (jsonConnect.IsArray()) {
           for (UINT i = 0; i < jsonConnect.Size(); i++) {
             std::string connId = jsonConnect[i].GetString();
-            std::shared_ptr<Node> connNode = mNodes.at(connId);
+            std::shared_ptr<Node> connNode = mNodesById.at(connId);
             slot->Connect(connNode);
           }
         }
         else {
           std::string connId = jsonConnect.GetString();
-          std::shared_ptr<Node> connNode = mNodes.at(connId);
+          std::shared_ptr<Node> connNode = mNodesById.at(connId);
           slot->Connect(connNode);
         }
       }
@@ -194,7 +306,7 @@ void JSONDeserializer::ConnectSlots(rapidjson::Value& value) {
 }
 
 void JSONDeserializer::DeserializeStaticTextureNode(const rapidjson::Value& value,
-  const std::shared_ptr<StaticTextureNode>& node) const
+                                                    const std::shared_ptr<StaticTextureNode>& node) const
 {
   const int width = value["width"].GetInt();
   const int height = value["height"].GetInt();
@@ -273,13 +385,13 @@ void JSONDeserializer::DeserializeStubNode(const rapidjson::Value& value,
 }
 
 
-void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
-  if (value.HasMember("id")) {
-    const std::string connId = value["id"].GetString();
-    auto& connNode = mNodes.at(connId);
-    slot->Connect(connNode);
-  }
-}
+//void JSONDeserializer::ConnectValueSlotById(const rapidjson::Value& value, Slot* slot) {
+//  if (value.HasMember("id")) {
+//    const std::string connId = value["id"].GetString();
+//    auto& connNode = mNodesById.at(connId);
+//    slot->Connect(connNode);
+//  }
+//}
 
 void JSONDeserializer::DeserializeFloatNode(const rapidjson::Value& value,
   const std::shared_ptr<FloatNode>& node) {

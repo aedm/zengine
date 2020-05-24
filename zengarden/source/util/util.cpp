@@ -13,6 +13,7 @@ namespace Util {
     return ReadFileQt(QString::fromLatin1(FileName));
   }
 
+  /// TODO: return a string instead
   OWNERSHIP char* ReadFileQt(const QString& FileName) {
     QFile file(FileName);
     if (!file.open(QFile::ReadOnly)) {

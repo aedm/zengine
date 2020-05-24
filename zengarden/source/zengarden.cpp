@@ -380,25 +380,9 @@ void ZenGarden::HandleMenuSaveAs() const {
     graphFile.write(graphJson.c_str());
     graphFile.close();
   }
-  //serializer.GetJSON()
 
   const int milliseconds = myTimer.elapsed();
   INFO("Document saved in %.3f seconds.", float(milliseconds) / 1000.0f);
-
-  //const QString fileName = QFileDialog::getSaveFileName(this,
-  //  tr("Open project"), "app", tr("Zengine project (*.zen)"));
-
-  //INFO("Saving document...");
-  //QTime myTimer;
-  //myTimer.start();
-  //const std::string json = ToJson(mDocument);
-  //QFile file(fileName);
-  //file.open(QIODevice::WriteOnly);
-  //file.write(json.c_str());
-
-  //const int milliseconds = myTimer.elapsed();
-  //INFO("Document saved in %.3f seconds.", float(milliseconds) / 1000.0f);
-  //mDocumentFileName = fileName;
 }
 
 void ZenGarden::Tick() {
@@ -417,6 +401,7 @@ void ZenGarden::HandleMenuNew() {
   const QString directoryName = QFileDialog::getExistingDirectory(this,
     tr("Create New Project"), nullptr, QFileDialog::ShowDirsOnly);
   if (directoryName.isEmpty()) return;
+  NOT_IMPLEMENTED;
 
   DeleteDocument();
   mDocument = std::make_shared<Document>();
@@ -424,72 +409,70 @@ void ZenGarden::HandleMenuNew() {
   mDocument->mMovie.Connect(std::make_shared<MovieNode>());
   mDocumentDirectory = directoryName;
 
-  //const std::shared_ptr<Graph> graph = std::make_shared<Graph>();
-  //mDocument->mGraphs.Connect(graph);
-
   Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
-  //Watch(graph, WatcherPosition::RIGHT_TAB);
-
   SetupMovieWatcher();
-
   mFileChangeListener.SetProjectDirectory(directoryName, mDocument);
 }
 
 void ZenGarden::HandleMenuOpen() {
-  const QString directory = QFileDialog::getExistingDirectory(this,
+  const QString directoryName = QFileDialog::getExistingDirectory(this,
     tr("Open project directory"), nullptr, QFileDialog::ShowDirsOnly);
-  if (directory.isEmpty()) return;
-  NOT_IMPLEMENTED;
+  if (directoryName.isEmpty()) return;
 
-  //const QString fileName = QFileDialog::getOpenFileName(this,
-  //  tr("Open project"), "app", tr("Zengine project (*.zen)"));
-  //if (fileName.isEmpty()) return;
+  //DeleteDocument();
+  //mDocument = std::make_shared<Document>();
+  //mDocument->mProperties.Connect(std::make_shared<PropertiesNode>());
+  //mDocument->mMovie.Connect(std::make_shared<MovieNode>());
+  //mDocumentDirectory = directoryName;
+
+  //Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
+  //SetupMovieWatcher();
+  //mFileChangeListener.SetProjectDirectory(directoryName, mDocument);
 
   /// Measure load time
   QTime myTimer;
   myTimer.start();
 
+  //QFile documentFile(QDir(mDocumentDirectory).filePath("project.zen"));
+
+  JSONDeserializer deserializer(nullptr);
+  mCommonGLWidget->makeCurrent();
+
   /// Load file content
-  //const std::unique_ptr<char> json = std::unique_ptr<char>(Util::ReadFileQt(fileName));
-  //if (json == nullptr) return;
+  QDir documentDir(directoryName);
+  const std::unique_ptr<char> json = std::unique_ptr<char>(
+    Util::ReadFileQt(documentDir.filePath("project.zen")));
+  if (json == nullptr) {
+    ERR("Can't load project document.");
+    return;
+  };
+  deserializer.SetDocumentJson(json.get());
 
-  ///// Parse file into a Document
-  //mCommonGLWidget->makeCurrent();
-  //const std::shared_ptr<Document> document = FromJson(std::string(json.get()));
-  //if (document == nullptr) return;
+  /// Load graphs
+  QStringList dirs = documentDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+  for (const auto& dir : dirs) {
+    const std::unique_ptr<char> graphJson = std::unique_ptr<char>(
+      Util::ReadFileQt(QDir(documentDir.filePath(dir)).filePath("project.zen")));
+    if (graphJson == nullptr) {
+      /// TODO: which graph?
+      INFO("Graph can't be loaded.");
+      continue;
+    };
+    deserializer.AddGraphJson(graphJson.get());
+  }
 
-  ///// Load succeeded, remove old document
-  //DeleteDocument();
-  //mDocument = document;
-  //mDocumentFileName = fileName;
+  /// Generate document from JSONs
+  shared_ptr<Document> document = deserializer.GetDocument();
 
-  ///// Make sure a MovieNode exists in the document.
-  //if (!mDocument->mMovie.GetNode()) {
-  //  const std::shared_ptr<MovieNode> movieNode = std::make_shared<MovieNode>();
-  //  mDocument->mMovie.Connect(movieNode);
-  //}
+  DeleteDocument();
+  mDocument = document;
+  mDocumentDirectory = directoryName;
 
-  ///// Make sure a PropertiesNode exists in the document.
-  //if (!mDocument->mProperties.GetNode()) {
-  //  mDocument->mProperties.Connect(std::make_shared<PropertiesNode>());
-  //}
+  Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
+  SetupMovieWatcher();
 
-  ///// Open "debug" node first -- nvidia Nsight workaround, it can only debug the
-  ///// first OpenGL window
-  //std::vector<std::shared_ptr<Node>> nodes;
-  //mDocument->GenerateTransitiveClosure(nodes, false);
-  //for (const auto& node : nodes) {
-  //  if (node->GetName() == "debug") {
-  //    Watch(node, WatcherPosition::UPPER_LEFT_TAB);
-  //    break;
-  //  }
-  //}
-
-  //Watch(mDocument, WatcherPosition::BOTTOM_LEFT_TAB);
-  //SetupMovieWatcher();
-
-  //const int milliseconds = myTimer.elapsed();
-  //INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
+  const int milliseconds = myTimer.elapsed();
+  INFO("Document loaded in %.3f seconds.", float(milliseconds) / 1000.0f);
 }
 
 void ZenGarden::HandlePropertiesMenu() {
@@ -498,6 +481,7 @@ void ZenGarden::HandlePropertiesMenu() {
 
 void ZenGarden::DeleteDocument() {
   if (!mDocument) return;
+
   mCommonGLWidget->makeCurrent();
 
   TransitiveClosure closure(mDocument, true, 

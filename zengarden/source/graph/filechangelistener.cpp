@@ -13,7 +13,17 @@ FileChangeListener::FileChangeListener() {
 }
 
 void FileChangeListener::SetProjectDirectory(const QString& projectDirectory,
-  shared_ptr<Document>& document) {
+  shared_ptr<Document>& document)
+{
+  /// Reset state
+  mFileWatcher.removePaths(mFileWatcher.files());
+  mFileWatcher.removePaths(mFileWatcher.directories());
+  mPathsToGraphs.clear();
+  mPathsToNodes.clear();
+  mProjectDir.clear();
+  mDocument.reset();
+
+  /// Add new directory
   INFO("Watching project directory '%s'", projectDirectory.toStdString().c_str());
   mProjectDir = projectDirectory;
   mDocument = document;

@@ -14,7 +14,6 @@ class FileChangeListener: public QObject {
 
 public:
   FileChangeListener();
-
   void SetProjectDirectory(const QString& projectDirectory, 
     shared_ptr<Document>& document);
 

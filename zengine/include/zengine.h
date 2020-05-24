@@ -39,6 +39,7 @@
 #include "nodes/fluidnode.h"
 
 #include "serialize/jsonserializer.h"
+#include "serialize/jsondeserializer.h"
 
 // ReSharper restore CppUnusedIncludeDirective
 
